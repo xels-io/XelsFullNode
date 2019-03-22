@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>Xels.PoAChainD</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>Xels.PoAChainD</PackageId>
+    <RuntimeFrameworkVersion>2.1.1</RuntimeFrameworkVersion>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <PreBuildEvent></PreBuildEvent>
+  <CodeAnalysisRuleSet>..\None.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NBitcoin\NBitcoin.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Api\Xels.Bitcoin.Features.Api.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Apps\Xels.Bitcoin.Features.Apps.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.BlockStore\Xels.Bitcoin.Features.BlockStore.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Consensus\Xels.Bitcoin.Features.Consensus.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.MemoryPool\Xels.Bitcoin.Features.MemoryPool.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Miner\Xels.Bitcoin.Features.Miner.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.PoA\Xels.Bitcoin.Features.PoA.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.RPC\Xels.Bitcoin.Features.RPC.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Wallet\Xels.Bitcoin.Features.Wallet.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin\Xels.Bitcoin.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+	<CodeAnalysisRuleSet>..\None.ruleset</CodeAnalysisRuleSet>
+	<Version>0.0.5-beta</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSharpFunctionalExtensions" Version="1.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Consensus\Xels.Bitcoin.Features.Consensus.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Miner\Xels.Bitcoin.Features.Miner.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.PoA\Xels.Bitcoin.Features.PoA.csproj" />
+    <ProjectReference Include="..\Xels.SmartContracts.Core\Xels.SmartContracts.Core.csproj" />
+    <ProjectReference Include="..\Xels.SmartContracts.CLR\Xels.SmartContracts.CLR.csproj" />
+    <ProjectReference Include="..\Xels.SmartContracts\Xels.SmartContracts.csproj" />
+  </ItemGroup>
+
+</Project>

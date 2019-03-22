@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Authors>Xels Group Ltd.</Authors>
+    <Company>Xels Group Ltd.</Company>
+    <Product>Xels Smart Contracts</Product>
+    <Version>0.7.0-alpha</Version>
+    <PackageId>Xels.SmartContracts</PackageId>
+	<CodeAnalysisRuleSet>..\None.ruleset</CodeAnalysisRuleSet>
+	<AssemblyVersion>0.7.0.0</AssemblyVersion>
+  </PropertyGroup>
+
+</Project>

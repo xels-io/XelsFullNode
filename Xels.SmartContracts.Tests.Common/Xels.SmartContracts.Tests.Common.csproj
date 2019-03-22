@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RuntimeFrameworkVersion>2.1.1</RuntimeFrameworkVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Xels.Bitcoin.Features.SmartContracts\Xels.Bitcoin.Features.SmartContracts.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.IntegrationTests.Common\Xels.Bitcoin.IntegrationTests.Common.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Tests.Common\Xels.Bitcoin.Tests.Common.csproj" />
+    <ProjectReference Include="..\Xels.SmartContracts.Networks\Xels.SmartContracts.Networks.csproj" />
+  </ItemGroup>
+
+</Project>

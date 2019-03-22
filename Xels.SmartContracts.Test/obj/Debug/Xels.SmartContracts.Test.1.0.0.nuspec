@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Xels.SmartContracts.Test</id>
+    <version>1.0.0</version>
+    <authors>Xels.SmartContracts.Test</authors>
+    <owners>Xels.SmartContracts.Test</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Package Description</description>
+    <dependencies>
+      <group targetFramework=".NETCoreApp2.1">
+        <dependency id="Xels.Bitcoin.Api" version="3.0.0.4-beta" exclude="Build,Analyzers" />
+        <dependency id="Xels.Bitcoin" version="3.0.0.4-beta" exclude="Build,Analyzers" />
+        <dependency id="Xels.SmartContracts.Networks" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="Xels.SmartContracts.Tests.Common" version="1.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="F:\XelsPublicRepos\XelsFullNode\Xels.SmartContracts.Test\bin\Debug\netcoreapp2.1\Xels.SmartContracts.Test.dll" target="lib\netcoreapp2.1\Xels.SmartContracts.Test.dll" />
+  </files>
+</package>

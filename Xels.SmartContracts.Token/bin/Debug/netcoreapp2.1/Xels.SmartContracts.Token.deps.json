@@ -1,0 +1,50 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v2.1",
+    "signature": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v2.1": {
+      "Xels.SmartContracts.Token/1.0.0": {
+        "dependencies": {
+          "Xels.SmartContracts": "0.7.0-alpha",
+          "Xels.SmartContracts.Standards": "0.0.2-beta"
+        },
+        "runtime": {
+          "Xels.SmartContracts.Token.dll": {}
+        }
+      },
+      "Xels.SmartContracts/0.7.0-alpha": {
+        "runtime": {
+          "Xels.SmartContracts.dll": {}
+        }
+      },
+      "Xels.SmartContracts.Standards/0.0.2-beta": {
+        "dependencies": {
+          "Xels.SmartContracts": "0.7.0-alpha"
+        },
+        "runtime": {
+          "Xels.SmartContracts.Standards.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Xels.SmartContracts.Token/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Xels.SmartContracts/0.7.0-alpha": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Xels.SmartContracts.Standards/0.0.2-beta": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

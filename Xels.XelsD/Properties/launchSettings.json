@@ -1,0 +1,23 @@
+{
+  "profiles": {
+    "Xels.XelsD": {
+      "commandName": "Project"
+    },
+    "Xels.XelsD Test": {
+      "commandName": "Project",
+      "commandLineArgs": "-testnet"
+    },
+    "Xels.XelsD Test with RPC": {
+      "commandName": "Project",
+      "commandLineArgs": "-testnet -server -rpcpassword=password -rpcuser=user"
+    },
+    "Xels.XelsD Test Keepalive 60s": {
+      "commandName": "Project",
+      "commandLineArgs": "-testnet -keepalive=60"
+    },
+    "Xels.XelsD Test No assumevalid": {
+      "commandName": "Project",
+      "commandLineArgs": "-testnet -assumevalid=0 -checkpoints=false"
+    }
+  }
+}

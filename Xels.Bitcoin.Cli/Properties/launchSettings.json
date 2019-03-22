@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "Xels.CLI Xels REST API": {
+      "commandName": "Project",
+      "commandLineArgs": "xels Wallet/files"
+    },
+    "Xels.CLI Xels RPC": {
+      "commandName": "Project",
+      "commandLineArgs": "xels -rpcuser=xelstestuser -rpcpassword=xelstestpass -rpcport=26174 getinfo"
+    },
+    "Xels.CLI Bitcoin RPC": {
+      "commandName": "Project",
+      "commandLineArgs": "bitcoin -rpcuser=btctestuser -rpcpassword=btctestpass getbalance"
+    }
+  }
+}

@@ -1,0 +1,84 @@
+﻿using System.Net;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using NBitcoin;
+using Xels.Bitcoin.Configuration;
+using Xels.Bitcoin.Configuration.Settings;
+using Xels.Bitcoin.P2P.Peer;
+using Xels.Bitcoin.P2P.Protocol.Payloads;
+using Xels.Bitcoin.Utilities;
+using Xels.Bitcoin.Utilities.Extensions;
+
+namespace Xels.Bitcoin.P2P
+{
+    /// <summary>
+    /// The connector used to connect to peers specified with the -addnode argument
+    /// </summary>
+    public sealed class PeerConnectorAddNode : PeerConnector
+    {
+        /// <summary>Constructor for dependency injection.</summary>
+        public PeerConnectorAddNode(
+            IAsyncLoopFactory asyncLoopFactory,
+            IDateTimeProvider dateTimeProvider,
+            ILoggerFactory loggerFactory,
+            Network network,
+            INetworkPeerFactory networkPeerFactory,
+            INodeLifetime nodeLifetime,
+            NodeSettings nodeSettings,
+            ConnectionManagerSettings connectionSettings,
+            IPeerAddressManager peerAddressManager,
+            ISelfEndpointTracker selfEndpointTracker) :
+            base(asyncLoopFactory, dateTimeProvider, loggerFactory, network, networkPeerFactory, nodeLifetime, nodeSettings, connectionSettings, peerAddressManager, selfEndpointTracker)
+        {
+            this.Requirements.RequiredServices = NetworkPeerServices.Nothing;
+        }
+
+        /// <inheritdoc/>
+        public override void OnInitialize()
+        {
+            // For the -addnode connector, effectively disable burst mode by preventing high frequency connection attempts.
+            // The initial -addnode list will all have their connection attempts made in parallel regardless, so this
+            // does not slow down the startup.
+            this.burstConnectionInterval = TimeSpans.Second;
+
+            this.MaxOutboundConnections = this.ConnectionSettings.AddNode.Count;
+
+            // Add the endpoints from the -addnode arg to the address manager.
+            foreach (IPEndPoint ipEndpoint in this.ConnectionSettings.AddNode)
+            {
+                this.peerAddressManager.AddPeer(ipEndpoint.MapToIpv6(), IPAddress.Loopback);
+            }
+        }
+
+        /// <summary>This connector is always started.</summary>
+        public override bool CanStartConnect
+        {
+            get { return true; }
+        }
+
+        /// <inheritdoc/>
+        public override void OnStartConnect()
+        {
+            this.CurrentParameters.PeerAddressManagerBehaviour().Mode = PeerAddressManagerBehaviourMode.AdvertiseDiscover;
+        }
+
+        /// <summary>
+        /// Only connect to nodes as specified in the -addnode arg.
+        /// </summary>
+        public override async Task OnConnectAsync()
+        {
+            await this.ConnectionSettings.AddNode.ForEachAsync(this.ConnectionSettings.MaxOutboundConnections, this.nodeLifetime.ApplicationStopping,
+                async (ipEndpoint, cancellation) =>
+                {
+                    if (this.nodeLifetime.ApplicationStopping.IsCancellationRequested)
+                        return;
+
+                    PeerAddress peerAddress = this.peerAddressManager.FindPeer(ipEndpoint);
+                    if (peerAddress != null && !this.IsPeerConnected(peerAddress.Endpoint))
+                    {
+                        await this.ConnectAsync(peerAddress).ConfigureAwait(false);
+                    }
+                }).ConfigureAwait(false);
+        }
+    }
+}

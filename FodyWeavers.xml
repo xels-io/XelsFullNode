@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Weavers>
+  <Tracer adapterAssembly="FodyNlogAdapter"
+      logManager="FodyNlogAdapter.Adapters.LogManagerAdapter"      
+      logger="FodyNlogAdapter.Adapters.LoggerAdapter"
+      staticLogger="FodyNlogAdapter.Log"
+      traceConstructors="false"
+      traceProperties="false">
+      <TraceOn namespace="Xels.Bitcoin+*" class="private" method="private" />
+      <TraceOn namespace="Xels.SmartContracts.Core+*" class="private" method="private" />
+      <TraceOn namespace="Xels.SmartContracts.CLR+*" class="private" method="private" />
+      <NoTrace namespace="Xels.Bitcoin.Features.Consensus+*" />
+      <NoTrace namespace="Xels.Bitcoin.Features.Miner+*" />
+      <NoTrace namespace="*.Tests+*" />
+      <NoTrace namespace="*.IntegrationTests+*" />
+  </Tracer>  
+</Weavers>
