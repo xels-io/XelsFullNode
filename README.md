@@ -12,25 +12,25 @@ Getting started - Building and running a Xels Full Node
 
 Our full node is currently in alpha.  
 
-```
 
+
+Supported Platforms
 ---------------
-
-## Supported Platforms
 
 * <b>Windows</b> - works from Windows 7 and later, on both x86 and x64 architecture. Most of the development and testing is happening here.
 * <b>Linux</b> - works on Ubuntu 14.04 and later (x64).
 * <b>MacOS</b> - works from OSX 10.12 and later. 
 
-## Prerequisites
+Prerequisites
+---------------
 
 To install and run the node, you need
 * [.NET Core 2.1](https://www.microsoft.com/net/download/core)
 * [Git](https://git-scm.com/)
 
-## Build instructions
-
-### Get the repository and its dependencies
+Build instructions
+---------------
+Get the repository and its dependencies
 
 git clone https://github.com/xels-io/XelsFullNode.git  
 
