@@ -34,11 +34,10 @@ Get the repository and its dependencies
 
 git clone https://github.com/xels-io/XelsFullNode.git  
 
+```
 dotnet build
-
 ```
 
-### Build and run the code
 With this node, you can connect to either the Xels network or the Bitcoin network, either on MainNet or TestNet.
 So you have 4 options:
 
