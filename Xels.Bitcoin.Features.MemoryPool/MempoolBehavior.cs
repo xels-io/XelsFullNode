@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
 using Xels.Bitcoin.Connection;
+using Xels.Bitcoin.EventBus.CoreEvents;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.P2P.Protocol;
@@ -50,7 +51,7 @@ namespace Xels.Bitcoin.Features.MemoryPool
         private readonly IInitialBlockDownloadState initialBlockDownloadState;
 
         /// <summary>Peer notifications available to subscribe to.</summary>
-        private readonly Signals.Signals signals;
+        private readonly Signals.ISignals signals;
 
         /// <summary>Instance logger for the memory pool behavior component.</summary>
         private readonly ILogger logger;
@@ -95,7 +96,7 @@ namespace Xels.Bitcoin.Features.MemoryPool
             MempoolOrphans orphans,
             IConnectionManager connectionManager,
             IInitialBlockDownloadState initialBlockDownloadState,
-            Signals.Signals signals,
+            Signals.ISignals signals,
             ILoggerFactory loggerFactory,
             Network network)
         {
@@ -316,7 +317,7 @@ namespace Xels.Bitcoin.Features.MemoryPool
 
                 if (this.isBlocksOnlyMode)
                 {
-                    this.logger.LogInformation("Transaction ID '{0}' inventory sent in violation of protocol peer '{1}'.", inv.Hash, peer.RemoteSocketEndpoint);
+                    this.logger.LogDebug("Transaction ID '{0}' inventory sent in violation of protocol peer '{1}'.", inv.Hash, peer.RemoteSocketEndpoint);
                     continue;
                 }
 
@@ -369,7 +370,7 @@ namespace Xels.Bitcoin.Features.MemoryPool
             // Stop processing the transaction early if we are in blocks only mode.
             if (this.isBlocksOnlyMode)
             {
-                this.logger.LogInformation("Transaction sent in violation of protocol from peer '{0}'.", peer.RemoteSocketEndpoint);
+                this.logger.LogDebug("Transaction sent in violation of protocol from peer '{0}'.", peer.RemoteSocketEndpoint);
                 this.logger.LogTrace("(-)[BLOCKSONLY]");
                 return;
             }
@@ -390,7 +391,7 @@ namespace Xels.Bitcoin.Features.MemoryPool
                 await this.validator.SanityCheck();
                 this.RelayTransaction(trxHash);
 
-                this.signals.SignalTransaction(trx);
+                this.signals.Publish(new TransactionReceived(trx));
 
                 long mmsize = state.MempoolSize;
                 long memdyn = state.MempoolDynamicSize;
@@ -425,19 +426,19 @@ namespace Xels.Bitcoin.Features.MemoryPool
                 {
                     if (!state.IsInvalid)
                     {
-                        this.logger.LogInformation("Force relaying transaction ID '{0}' from whitelisted peer '{1}'.", trxHash, peer.RemoteSocketEndpoint);
+                        this.logger.LogDebug("Force relaying transaction ID '{0}' from whitelisted peer '{1}'.", trxHash, peer.RemoteSocketEndpoint);
                         this.RelayTransaction(trxHash);
                     }
                     else
                     {
-                        this.logger.LogInformation("Not relaying invalid transaction ID '{0}' from whitelisted peer '{1}' ({2}).", trxHash, peer.RemoteSocketEndpoint, state);
+                        this.logger.LogDebug("Not relaying invalid transaction ID '{0}' from whitelisted peer '{1}' ({2}).", trxHash, peer.RemoteSocketEndpoint, state);
                     }
                 }
             }
 
             if (state.IsInvalid)
             {
-                this.logger.LogInformation("Transaction ID '{0}' from peer '{1}' was not accepted. Invalid state of '{2}'.", trxHash, peer.RemoteSocketEndpoint, state);
+                this.logger.LogDebug("Transaction ID '{0}' from peer '{1}' was not accepted. Invalid state of '{2}'.", trxHash, peer.RemoteSocketEndpoint, state);
             }
         }
 

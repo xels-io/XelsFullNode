@@ -5,14 +5,18 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
 using NBitcoin.BuilderExtensions;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Features.Wallet.Broadcasting;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Utilities;
+using Xels.Bitcoin.Utilities.Extensions;
+using TracerAttributes;
 
 [assembly: InternalsVisibleTo("Xels.Bitcoin.Features.Wallet.Tests")]
 
@@ -23,6 +27,9 @@ namespace Xels.Bitcoin.Features.Wallet
     /// </summary>
     public class WalletManager : IWalletManager
     {
+        // <summary>As per RPC method definition this should be the max allowable expiry duration.</summary>
+        private const int MaxWalletUnlockDurationInSeconds = 1073741824;
+
         /// <summary>Quantity of accounts created in a wallet file when a wallet is restored.</summary>
         private const int WalletRecoveryAccountsCount = 1;
 
@@ -35,6 +42,8 @@ namespace Xels.Bitcoin.Features.Wallet
         /// <summary>Timer for saving wallet files to the file system.</summary>
         private const int WalletSavetimeIntervalInMinutes = 5;
 
+        private const string DownloadChainLoop = "WalletManager.DownloadChain";
+
         /// <summary>
         /// A lock object that protects access to the <see cref="Wallet"/>.
         /// Any of the collections inside Wallet must be synchronized using this lock.
@@ -45,7 +54,7 @@ namespace Xels.Bitcoin.Features.Wallet
         private IAsyncLoop asyncLoop;
 
         /// <summary>Factory for creating background async loop tasks.</summary>
-        private readonly IAsyncLoopFactory asyncLoopFactory;
+        private readonly IAsyncProvider asyncProvider;
 
         /// <summary>Gets the list of wallets.</summary>
         public ConcurrentBag<Wallet> Wallets { get; }
@@ -57,7 +66,7 @@ namespace Xels.Bitcoin.Features.Wallet
         protected readonly Network network;
 
         /// <summary>The chain of headers.</summary>
-        protected readonly ConcurrentChain chain;
+        protected readonly ChainIndexer ChainIndexer;
 
         /// <summary>Global application life cycle control - triggers when application shuts down.</summary>
         private readonly INodeLifetime nodeLifetime;
@@ -80,23 +89,29 @@ namespace Xels.Bitcoin.Features.Wallet
         /// <summary>The settings for the wallet feature.</summary>
         private readonly IScriptAddressReader scriptAddressReader;
 
+        /// <summary>The private key cache for unlocked wallets.</summary>
+        private readonly MemoryCache privateKeyCache;
+
         public uint256 WalletTipHash { get; set; }
+        public int WalletTipHeight { get; set; }
 
         // In order to allow faster look-ups of transactions affecting the wallets' addresses,
         // we keep a couple of objects in memory:
         // 1. the list of unspent outputs for checking whether inputs from a transaction are being spent by our wallet and
         // 2. the list of addresses contained in our wallet for checking whether a transaction is being paid to the wallet.
+        // 3. a mapping of all inputs with their corresponding transactions, to facilitate rapid lookup
         private Dictionary<OutPoint, TransactionData> outpointLookup;
         internal ScriptToAddressLookup scriptToAddressLookup;
+        private Dictionary<OutPoint, TransactionData> inputLookup;
 
         public WalletManager(
             ILoggerFactory loggerFactory,
             Network network,
-            ConcurrentChain chain,
+            ChainIndexer chainIndexer,
             WalletSettings walletSettings,
             DataFolder dataFolder,
             IWalletFeePolicy walletFeePolicy,
-            IAsyncLoopFactory asyncLoopFactory,
+            IAsyncProvider asyncProvider,
             INodeLifetime nodeLifetime,
             IDateTimeProvider dateTimeProvider,
             IScriptAddressReader scriptAddressReader,
@@ -104,11 +119,11 @@ namespace Xels.Bitcoin.Features.Wallet
         {
             Guard.NotNull(loggerFactory, nameof(loggerFactory));
             Guard.NotNull(network, nameof(network));
-            Guard.NotNull(chain, nameof(chain));
+            Guard.NotNull(chainIndexer, nameof(chainIndexer));
             Guard.NotNull(walletSettings, nameof(walletSettings));
             Guard.NotNull(dataFolder, nameof(dataFolder));
             Guard.NotNull(walletFeePolicy, nameof(walletFeePolicy));
-            Guard.NotNull(asyncLoopFactory, nameof(asyncLoopFactory));
+            Guard.NotNull(asyncProvider, nameof(asyncProvider));
             Guard.NotNull(nodeLifetime, nameof(nodeLifetime));
             Guard.NotNull(scriptAddressReader, nameof(scriptAddressReader));
 
@@ -120,8 +135,8 @@ namespace Xels.Bitcoin.Features.Wallet
 
             this.network = network;
             this.coinType = (CoinType)network.Consensus.CoinType;
-            this.chain = chain;
-            this.asyncLoopFactory = asyncLoopFactory;
+            this.ChainIndexer = chainIndexer;
+            this.asyncProvider = asyncProvider;
             this.nodeLifetime = nodeLifetime;
             this.fileStorage = new FileStorage<Wallet>(dataFolder.WalletPath);
             this.broadcasterManager = broadcasterManager;
@@ -136,6 +151,9 @@ namespace Xels.Bitcoin.Features.Wallet
 
             this.scriptToAddressLookup = this.CreateAddressFromScriptLookup();
             this.outpointLookup = new Dictionary<OutPoint, TransactionData>();
+            this.inputLookup = new Dictionary<OutPoint, TransactionData>();
+
+            this.privateKeyCache = new MemoryCache(new MemoryCacheOptions() { ExpirationScanFrequency = new TimeSpan(0, 1, 0) });
         }
 
         /// <summary>
@@ -184,11 +202,27 @@ namespace Xels.Bitcoin.Features.Wallet
 
             foreach (Wallet wallet in wallets)
             {
-                this.Wallets.Add(wallet);
-                foreach (HdAccount account in wallet.GetAccountsByCoinType(this.coinType))
+                this.Load(wallet);
+                foreach (HdAccount account in wallet.GetAccounts())
                 {
                     this.AddAddressesToMaintainBuffer(account, false);
                     this.AddAddressesToMaintainBuffer(account, true);
+                }
+            }
+
+            if (this.walletSettings.IsDefaultWalletEnabled())
+            {
+                // Check if it already exists, if not, create one.
+                if (!wallets.Any(w => w.Name == this.walletSettings.DefaultWalletName))
+                {
+                    var mnemonic = new Mnemonic(Wordlist.English, WordCount.Twelve);
+                    this.CreateWallet(this.walletSettings.DefaultWalletPassword, this.walletSettings.DefaultWalletName, string.Empty, mnemonic);
+                }
+
+                // Make sure both unlock is specified, and that we actually have a default wallet name specified.
+                if (this.walletSettings.UnlockDefaultWallet)
+                {
+                    this.UnlockWallet(this.walletSettings.DefaultWalletPassword, this.walletSettings.DefaultWalletName, MaxWalletUnlockDurationInSeconds);
                 }
             }
 
@@ -196,10 +230,12 @@ namespace Xels.Bitcoin.Features.Wallet
             this.LoadKeysLookupLock();
 
             // Find the last chain block received by the wallet manager.
-            this.WalletTipHash = this.LastReceivedBlockHash();
+            HashHeightPair hashHeightPair = this.LastReceivedBlockInfo();
+            this.WalletTipHash = hashHeightPair.Hash;
+            this.WalletTipHeight= hashHeightPair.Height;
 
             // Save the wallets file every 5 minutes to help against crashes.
-            this.asyncLoop = this.asyncLoopFactory.Run("Wallet persist job", token =>
+            this.asyncLoop = this.asyncProvider.CreateAndRunAsyncLoop("Wallet persist job", token =>
             {
                 this.SaveWallets();
                 this.logger.LogInformation("Wallets saved to file at {0}.", this.dateTimeProvider.GetUtcNow());
@@ -242,7 +278,7 @@ namespace Xels.Bitcoin.Features.Wallet
             // Generate multiple accounts and addresses from the get-go.
             for (int i = 0; i < WalletCreationAccountsCount; i++)
             {
-                HdAccount account = wallet.AddNewAccount(password, this.coinType, this.dateTimeProvider.GetTimeOffset());
+                HdAccount account = wallet.AddNewAccount(password, this.dateTimeProvider.GetTimeOffset());
                 IEnumerable<HdAddress> newReceivingAddresses = account.CreateAddresses(this.network, this.walletSettings.UnusedAddressesBuffer);
                 IEnumerable<HdAddress> newChangeAddresses = account.CreateAddresses(this.network, this.walletSettings.UnusedAddressesBuffer, true);
                 this.UpdateKeysLookupLocked(newReceivingAddresses.Concat(newChangeAddresses));
@@ -251,9 +287,9 @@ namespace Xels.Bitcoin.Features.Wallet
             // If the chain is downloaded, we set the height of the newly created wallet to it.
             // However, if the chain is still downloading when the user creates a wallet,
             // we wait until it is downloaded in order to set it. Otherwise, the height of the wallet will be the height of the chain at that moment.
-            if (this.chain.IsDownloaded())
+            if (this.ChainIndexer.IsDownloaded())
             {
-                this.UpdateLastBlockSyncedHeight(wallet, this.chain.Tip);
+                this.UpdateLastBlockSyncedHeight(wallet, this.ChainIndexer.Tip);
             }
             else
             {
@@ -268,10 +304,51 @@ namespace Xels.Bitcoin.Features.Wallet
         }
 
         /// <inheritdoc />
+        public string SignMessage(string password, string walletName, string externalAddress, string message)
+        {
+            Guard.NotEmpty(password, nameof(password));
+            Guard.NotEmpty(walletName, nameof(walletName));
+            Guard.NotEmpty(message, nameof(message));
+            Guard.NotEmpty(externalAddress, nameof(externalAddress));
+
+            // Get wallet
+            Wallet wallet = this.GetWalletByName(walletName);
+
+            // Sign the message.
+            HdAddress hdAddress = wallet.GetAddress(externalAddress);
+            Key privateKey = wallet.GetExtendedPrivateKeyForAddress(password, hdAddress).PrivateKey;
+            return privateKey.SignMessage(message);
+        }
+
+        /// <inheritdoc />
+        public bool VerifySignedMessage(string externalAddress, string message, string signature)
+        {
+            Guard.NotEmpty(message, nameof(message));
+            Guard.NotEmpty(externalAddress, nameof(externalAddress));
+            Guard.NotEmpty(signature, nameof(signature));
+
+            bool result = false;
+
+            try
+            {
+                BitcoinPubKeyAddress bitcoinPubKeyAddress = new BitcoinPubKeyAddress(externalAddress, this.network);
+                result = bitcoinPubKeyAddress.VerifyMessage(message, signature);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogTrace("Failed to verify message: {0}", ex.ToString());
+                this.logger.LogTrace("(-)[EXCEPTION]");
+            }
+            return result;
+        }
+
+        /// <inheritdoc />
         public Wallet LoadWallet(string password, string name)
         {
             Guard.NotEmpty(password, nameof(password));
             Guard.NotEmpty(name, nameof(name));
+
+            Wallet walletByName = this.GetWalletByName(name);
 
             // Load the file from the local system.
             Wallet wallet = this.fileStorage.LoadByFileName($"{name}.{WalletFileExtension}");
@@ -292,6 +369,45 @@ namespace Xels.Bitcoin.Features.Wallet
             this.Load(wallet);
 
             return wallet;
+        }
+
+        /// <inheritdoc />
+        public void UnlockWallet(string password, string name, int timeout)
+        {
+            Guard.NotEmpty(password, nameof(password));
+            Guard.NotEmpty(name, nameof(name));
+
+            // Length of expiry of the unlocking, restricted to max duration.
+            TimeSpan duration = new TimeSpan(0, 0, Math.Min(timeout, MaxWalletUnlockDurationInSeconds));
+
+            this.CacheSecret(name, password, duration);
+        }
+
+        /// <inheritdoc />
+        public void LockWallet(string name)
+        {
+            Guard.NotNull(name, nameof(name));
+
+            Wallet wallet = this.GetWalletByName(name);
+            string cacheKey = wallet.EncryptedSeed;
+            this.privateKeyCache.Remove(cacheKey);
+        }
+
+        [NoTrace]
+        private SecureString CacheSecret(string name, string walletPassword, TimeSpan duration)
+        {
+            Wallet wallet = this.GetWalletByName(name);
+            string cacheKey = wallet.EncryptedSeed;
+
+            if (!this.privateKeyCache.TryGetValue(cacheKey, out SecureString secretValue))
+            {
+                Key privateKey = Key.Parse(wallet.EncryptedSeed, walletPassword, wallet.Network);
+                secretValue = privateKey.ToString(wallet.Network).ToSecureString();
+            }
+
+            this.privateKeyCache.Set(cacheKey, secretValue, duration);
+
+            return secretValue;
         }
 
         /// <inheritdoc />
@@ -329,7 +445,7 @@ namespace Xels.Bitcoin.Features.Wallet
                 HdAccount account;
                 lock (this.lockObject)
                 {
-                    account = wallet.AddNewAccount(password, this.coinType, this.dateTimeProvider.GetTimeOffset());
+                    account = wallet.AddNewAccount(password, this.dateTimeProvider.GetTimeOffset());
                 }
 
                 IEnumerable<HdAddress> newReceivingAddresses = account.CreateAddresses(this.network, this.walletSettings.UnusedAddressesBuffer);
@@ -340,10 +456,10 @@ namespace Xels.Bitcoin.Features.Wallet
             // If the chain is downloaded, we set the height of the recovered wallet to that of the recovery date.
             // However, if the chain is still downloading when the user restores a wallet,
             // we wait until it is downloaded in order to set it. Otherwise, the height of the wallet may not be known.
-            if (this.chain.IsDownloaded())
+            if (this.ChainIndexer.IsDownloaded())
             {
-                int blockSyncStart = this.chain.GetHeightAtTime(creationTime);
-                this.UpdateLastBlockSyncedHeight(wallet, this.chain.GetBlock(blockSyncStart));
+                int blockSyncStart = this.ChainIndexer.GetHeightAtTime(creationTime);
+                this.UpdateLastBlockSyncedHeight(wallet, this.ChainIndexer.GetHeader(blockSyncStart));
             }
             else
             {
@@ -370,7 +486,7 @@ namespace Xels.Bitcoin.Features.Wallet
             HdAccount account;
             lock (this.lockObject)
             {
-                account = wallet.AddNewAccount(this.coinType, extPubKey, accountIndex, this.dateTimeProvider.GetTimeOffset());
+                account = wallet.AddNewAccount(extPubKey, accountIndex, this.dateTimeProvider.GetTimeOffset());
             }
 
             IEnumerable<HdAddress> newReceivingAddresses = account.CreateAddresses(this.network, this.walletSettings.UnusedAddressesBuffer);
@@ -380,10 +496,10 @@ namespace Xels.Bitcoin.Features.Wallet
             // If the chain is downloaded, we set the height of the recovered wallet to that of the recovery date.
             // However, if the chain is still downloading when the user restores a wallet,
             // we wait until it is downloaded in order to set it. Otherwise, the height of the wallet may not be known.
-            if (this.chain.IsDownloaded())
+            if (this.ChainIndexer.IsDownloaded())
             {
-                int blockSyncStart = this.chain.GetHeightAtTime(creationTime);
-                this.UpdateLastBlockSyncedHeight(wallet, this.chain.GetBlock(blockSyncStart));
+                int blockSyncStart = this.ChainIndexer.GetHeightAtTime(creationTime);
+                this.UpdateLastBlockSyncedHeight(wallet, this.ChainIndexer.GetHeader(blockSyncStart));
             }
             else
             {
@@ -424,7 +540,7 @@ namespace Xels.Bitcoin.Features.Wallet
 
             lock (this.lockObject)
             {
-                account = wallet.GetFirstUnusedAccount(this.coinType);
+                account = wallet.GetFirstUnusedAccount();
 
                 if (account != null)
                 {
@@ -433,7 +549,7 @@ namespace Xels.Bitcoin.Features.Wallet
                 }
 
                 // No unused account was found, create a new one.
-                account = wallet.AddNewAccount(password, this.coinType, this.dateTimeProvider.GetTimeOffset());
+                account = wallet.AddNewAccount(password, this.dateTimeProvider.GetTimeOffset());
                 IEnumerable<HdAddress> newReceivingAddresses = account.CreateAddresses(this.network, this.walletSettings.UnusedAddressesBuffer);
                 IEnumerable<HdAddress> newChangeAddresses = account.CreateAddresses(this.network, this.walletSettings.UnusedAddressesBuffer, true);
                 this.UpdateKeysLookupLocked(newReceivingAddresses.Concat(newChangeAddresses));
@@ -455,7 +571,9 @@ namespace Xels.Bitcoin.Features.Wallet
             lock (this.lockObject)
             {
                 // Get the account.
-                HdAccount account = wallet.GetAccountByCoinType(accountReference.AccountName, this.coinType);
+                HdAccount account = wallet.GetAccount(accountReference.AccountName);
+                if (account == null)
+                    throw new WalletException($"No account with the name '{accountReference.AccountName}' could be found.");
                 extPubKey = account.ExtendedPubKey;
             }
 
@@ -492,7 +610,9 @@ namespace Xels.Bitcoin.Features.Wallet
             lock (this.lockObject)
             {
                 // Get the account.
-                HdAccount account = wallet.GetAccountByCoinType(accountReference.AccountName, this.coinType);
+                HdAccount account = wallet.GetAccount(accountReference.AccountName);
+                if (account == null)
+                    throw new WalletException($"No account with the name '{accountReference.AccountName}' could be found.");
 
                 List<HdAddress> unusedAddresses = isChange ?
                     account.InternalAddresses.Where(acc => !acc.Transactions.Any()).ToList() :
@@ -519,6 +639,23 @@ namespace Xels.Bitcoin.Features.Wallet
             return addresses;
         }
 
+        public HdAddress GetNewAddress(WalletAccountReference accountReference)
+        {
+            Wallet wallet = this.GetWalletByName(accountReference.WalletName);
+            IEnumerable<HdAddress> addresses;
+
+            lock (this.lockObject)
+            {
+                HdAccount account = wallet.GetAccount(accountReference.AccountName);
+                if (account == null)
+                    throw new WalletException($"No account with the name '{accountReference.AccountName}' could be found.");
+
+                addresses = account.CreateAddresses(this.network, 1, isChange: false);
+                this.UpdateKeysLookupLocked(addresses);
+            }
+            return addresses.FirstOrDefault();
+        }
+
         /// <inheritdoc />
         public (string folderPath, IEnumerable<string>) GetWalletsFiles()
         {
@@ -540,11 +677,15 @@ namespace Xels.Bitcoin.Features.Wallet
                 var accounts = new List<HdAccount>();
                 if (!string.IsNullOrEmpty(accountName))
                 {
-                    accounts.Add(wallet.GetAccountByCoinType(accountName, this.coinType));
+                    HdAccount account = wallet.GetAccount(accountName);
+                    if (account == null)
+                        throw new WalletException($"No account with the name '{accountName}' could be found.");
+
+                    accounts.Add(account);
                 }
                 else
                 {
-                    accounts.AddRange(wallet.GetAccountsByCoinType(this.coinType));
+                    accounts.AddRange(wallet.GetAccounts());
                 }
 
                 foreach (HdAccount account in accounts)
@@ -584,22 +725,36 @@ namespace Xels.Bitcoin.Features.Wallet
                 var accounts = new List<HdAccount>();
                 if (!string.IsNullOrEmpty(accountName))
                 {
-                    accounts.Add(wallet.GetAccountByCoinType(accountName, this.coinType));
+                    HdAccount account = wallet.GetAccount(accountName);
+                    if (account == null)
+                        throw new WalletException($"No account with the name '{accountName}' could be found.");
+
+                    accounts.Add(account);
                 }
                 else
                 {
-                    accounts.AddRange(wallet.GetAccountsByCoinType(this.coinType));
+                    accounts.AddRange(wallet.GetAccounts());
                 }
 
                 foreach (HdAccount account in accounts)
                 {
-                    (Money amountConfirmed, Money amountUnconfirmed) result = account.GetSpendableAmount();
+                    // Calculates the amount of spendable coins.
+                    UnspentOutputReference[] spendableBalance = account.GetSpendableTransactions(this.ChainIndexer.Tip.Height, this.network.Consensus.CoinbaseMaturity).ToArray();
+                    Money spendableAmount = Money.Zero;
+                    foreach (UnspentOutputReference bal in spendableBalance)
+                    {
+                        spendableAmount += bal.Transaction.Amount;
+                    }
+
+                    // Get the total balances.
+                    (Money amountConfirmed, Money amountUnconfirmed) result = account.GetBalances();
 
                     balances.Add(new AccountBalance
                     {
                         Account = account,
                         AmountConfirmed = result.amountConfirmed,
-                        AmountUnconfirmed = result.amountUnconfirmed
+                        AmountUnconfirmed = result.amountUnconfirmed,
+                        SpendableAmount = spendableAmount
                     });
                 }
             }
@@ -624,10 +779,10 @@ namespace Xels.Bitcoin.Features.Wallet
 
                 foreach (Wallet wallet in this.Wallets)
                 {
-                    hdAddress = wallet.GetAllAddressesByCoinType(this.coinType).FirstOrDefault(a => a.Address == address);
+                    hdAddress = wallet.GetAllAddresses().FirstOrDefault(a => a.Address == address);
                     if (hdAddress == null) continue;
 
-                    (Money amountConfirmed, Money amountUnconfirmed) result = hdAddress.GetSpendableAmount();
+                    (Money amountConfirmed, Money amountUnconfirmed) result = hdAddress.GetBalances();
 
                     balance.AmountConfirmed = result.amountConfirmed;
                     balance.AmountUnconfirmed = result.amountUnconfirmed;
@@ -651,7 +806,7 @@ namespace Xels.Bitcoin.Features.Wallet
             Guard.NotEmpty(walletName, nameof(walletName));
 
             Wallet wallet = this.GetWalletByName(walletName);
-            
+
             return wallet;
         }
 
@@ -665,7 +820,7 @@ namespace Xels.Bitcoin.Features.Wallet
             HdAccount[] res = null;
             lock (this.lockObject)
             {
-                res = wallet.GetAccountsByCoinType(this.coinType).ToArray();
+                res = wallet.GetAccounts().ToArray();
             }
             return res;
         }
@@ -675,7 +830,7 @@ namespace Xels.Bitcoin.Features.Wallet
         {
             if (!this.Wallets.Any())
             {
-                int height = this.chain.Tip.Height;
+                int height = this.ChainIndexer.Tip.Height;
                 this.logger.LogTrace("(-)[NO_WALLET]:{0}", height);
                 return height;
             }
@@ -683,7 +838,7 @@ namespace Xels.Bitcoin.Features.Wallet
             int res;
             lock (this.lockObject)
             {
-                res = this.Wallets.Min(w => w.AccountsRoot.SingleOrDefault(a => a.CoinType == this.coinType)?.LastBlockSyncedHeight) ?? 0;
+                res = this.Wallets.Min(w => w.AccountsRoot.Single().LastBlockSyncedHeight) ?? 0;
             }
 
             return res;
@@ -696,36 +851,36 @@ namespace Xels.Bitcoin.Features.Wallet
         /// Gets the hash of the last block received by the wallets.
         /// </summary>
         /// <returns>Hash of the last block received by the wallets.</returns>
-        public uint256 LastReceivedBlockHash()
+        public HashHeightPair LastReceivedBlockInfo()
         {
             if (!this.Wallets.Any())
             {
-                uint256 hash = this.chain.Tip.HashBlock;
-                this.logger.LogTrace("(-)[NO_WALLET]:'{0}'", hash);
-                return hash;
+                ChainedHeader chainedHeader = this.ChainIndexer.Tip;
+                this.logger.LogTrace("(-)[NO_WALLET]:'{0}'", chainedHeader);
+                return new HashHeightPair(chainedHeader);
             }
 
-            uint256 lastBlockSyncedHash;
+            AccountRoot accountRoot;
             lock (this.lockObject)
             {
-                lastBlockSyncedHash = this.Wallets
-                    .Select(w => w.AccountsRoot.SingleOrDefault(a => a.CoinType == this.coinType))
+                accountRoot = this.Wallets
+                    .Select(w => w.AccountsRoot.Single())
                     .Where(w => w != null)
                     .OrderBy(o => o.LastBlockSyncedHeight)
-                    .FirstOrDefault()?.LastBlockSyncedHash;
+                    .FirstOrDefault();
 
                 // If details about the last block synced are not present in the wallet,
                 // find out which is the oldest wallet and set the last block synced to be the one at this date.
-                if (lastBlockSyncedHash == null)
+                if (accountRoot == null || accountRoot.LastBlockSyncedHash == null)
                 {
                     this.logger.LogWarning("There were no details about the last block synced in the wallets.");
                     DateTimeOffset earliestWalletDate = this.Wallets.Min(c => c.CreationTime);
                     this.UpdateWhenChainDownloaded(this.Wallets, earliestWalletDate.DateTime);
-                    lastBlockSyncedHash = this.chain.Tip.HashBlock;
+                    return new HashHeightPair(this.ChainIndexer.Tip);
                 }
             }
 
-            return lastBlockSyncedHash;
+            return new HashHeightPair(accountRoot.LastBlockSyncedHash, accountRoot.LastBlockSyncedHeight.Value);
         }
 
         /// <inheritdoc />
@@ -747,9 +902,9 @@ namespace Xels.Bitcoin.Features.Wallet
             UnspentOutputReference[] res = null;
             lock (this.lockObject)
             {
-                res = wallet.GetAllSpendableTransactions(this.coinType, this.chain.Tip.Height, confirmations, accountFilter).ToArray();
+                res = wallet.GetAllSpendableTransactions(this.ChainIndexer.Tip.Height, confirmations, accountFilter).ToArray();
             }
-            
+
             return res;
         }
 
@@ -762,7 +917,7 @@ namespace Xels.Bitcoin.Features.Wallet
             UnspentOutputReference[] res = null;
             lock (this.lockObject)
             {
-                HdAccount account = wallet.GetAccountByCoinType(walletAccountReference.AccountName, this.coinType);
+                HdAccount account = wallet.GetAccount(walletAccountReference.AccountName);
 
                 if (account == null)
                 {
@@ -771,9 +926,9 @@ namespace Xels.Bitcoin.Features.Wallet
                         $"Account '{walletAccountReference.AccountName}' in wallet '{walletAccountReference.WalletName}' not found.");
                 }
 
-                res = account.GetSpendableTransactions(this.chain.Tip.Height, this.network, confirmations).ToArray();
+                res = account.GetSpendableTransactions(this.ChainIndexer.Tip.Height, this.network.Consensus.CoinbaseMaturity, confirmations).ToArray();
             }
-            
+
             return res;
         }
 
@@ -799,6 +954,9 @@ namespace Xels.Bitcoin.Features.Wallet
                 }
 
                 this.UpdateLastBlockSyncedHeight(fork);
+
+                // Reload the lookup dictionaries.
+                this.RefreshInputKeysLookupLock();
             }
         }
 
@@ -812,6 +970,7 @@ namespace Xels.Bitcoin.Features.Wallet
             if (!this.Wallets.Any())
             {
                 this.WalletTipHash = chainedHeader.HashBlock;
+                this.WalletTipHeight = chainedHeader.Height;
                 this.logger.LogTrace("(-)[NO_WALLET]");
                 return;
             }
@@ -821,17 +980,9 @@ namespace Xels.Bitcoin.Features.Wallet
             {
                 this.logger.LogTrace("New block's previous hash '{0}' does not match current wallet's tip hash '{1}'.", chainedHeader.Header.HashPrevBlock, this.WalletTipHash);
 
-                // Are we still on the main chain.
-                ChainedHeader current = this.chain.GetBlock(this.WalletTipHash);
-                if (current == null)
-                {
-                    this.logger.LogTrace("(-)[REORG]");
-                    throw new WalletException("Reorg");
-                }
-
                 // The block coming in to the wallet should never be ahead of the wallet.
                 // If the block is behind, let it pass.
-                if (chainedHeader.Height > current.Height)
+                if (chainedHeader.Height > this.WalletTipHeight)
                 {
                     this.logger.LogTrace("(-)[BLOCK_TOO_FAR]");
                     throw new WalletException("block too far in the future has arrived to the wallet");
@@ -840,13 +991,13 @@ namespace Xels.Bitcoin.Features.Wallet
 
             lock (this.lockObject)
             {
-                bool walletUpdated = false;
+                bool trxFoundInBlock = false;
                 foreach (Transaction transaction in block.Transactions)
                 {
                     bool trxFound = this.ProcessTransaction(transaction, chainedHeader.Height, block, true);
                     if (trxFound)
                     {
-                        walletUpdated = true;
+                        trxFoundInBlock = true;
                     }
                 }
 
@@ -855,9 +1006,9 @@ namespace Xels.Bitcoin.Features.Wallet
                 // as if the node is stopped, on re-opening it will start updating from the previous height.
                 this.UpdateLastBlockSyncedHeight(chainedHeader);
 
-                if (walletUpdated)
+                if (trxFoundInBlock)
                 {
-                    this.SaveWallets();
+                    this.logger.LogDebug("Block {0} contains at least one transaction affecting the user's wallet(s).", chainedHeader);
                 }
             }
         }
@@ -868,10 +1019,36 @@ namespace Xels.Bitcoin.Features.Wallet
             Guard.NotNull(transaction, nameof(transaction));
             uint256 hash = transaction.GetHash();
 
-            bool foundReceivingTrx = false, foundSendingTrx = false;
+            bool foundReceivingTrx = false, foundSendingTrx = false;//, isChangeAddress = false;
 
             lock (this.lockObject)
             {
+                if (block != null)
+                {
+                    // Do a pre-scan of the incoming transaction's inputs to see if they're used in other wallet transactions already.
+                    foreach (TxIn input in transaction.Inputs)
+                    {
+                        // See if this input is being used by another wallet transaction present in the index.
+                        // The inputs themselves may not belong to the wallet, but the transaction data in the index has to be for a wallet transaction.
+                        if (this.inputLookup.TryGetValue(input.PrevOut, out TransactionData indexData))
+                        {
+                            // It's the same transaction, which can occur if the transaction had been added to the wallet previously. Ignore.
+                            if (indexData.Id == hash)
+                                continue;
+
+                            if (indexData.BlockHash != null)
+                            {
+                                // This should not happen as pre checks are done in mempool and consensus.
+                                throw new WalletException("The same inputs were found in two different confirmed transactions");
+                            }
+
+                            // This is a double spend we remove the unconfirmed trx
+                            this.RemoveTransactionsByIds(new[] { indexData.Id });
+                            this.inputLookup.Remove(input.PrevOut);
+                        }
+                    }
+                }
+
                 // Check the outputs, ignoring the ones with a 0 amount.
                 foreach (TxOut utxo in transaction.Outputs.Where(o => o.Value != Money.Zero))
                 {
@@ -880,6 +1057,7 @@ namespace Xels.Bitcoin.Features.Wallet
                     {
                         this.AddTransactionToWallet(transaction, utxo, blockHeight, block, isPropagated);
                         foundReceivingTrx = true;
+                        this.logger.LogDebug("Transaction '{0}' contained funds received by the user's wallet(s).", hash);
                     }
                 }
 
@@ -901,6 +1079,8 @@ namespace Xels.Bitcoin.Features.Wallet
                         // Check if the destination script is one of the wallet's.
                         bool found = this.scriptToAddressLookup.TryGetValue(o.ScriptPubKey, out HdAddress addr);
 
+                        //isChangeAddress = addr.IsChangeAddress();
+
                         // Include the keys not included in our wallets (external payees).
                         if (!found)
                             return true;
@@ -913,19 +1093,16 @@ namespace Xels.Bitcoin.Features.Wallet
 
                     this.AddSpendingTransactionToWallet(transaction, paidOutTo, tTx.Id, tTx.Index, blockHeight, block);
                     foundSendingTrx = true;
+                    this.logger.LogDebug("Transaction '{0}' contained funds sent by the user's wallet(s).", hash);
                 }
             }
-
-            // Figure out what to do when this transaction is found to affect the wallet.
-            if (foundSendingTrx || foundReceivingTrx)
-            {
-                // Save the wallet when the transaction was not included in a block.
-                if (blockHeight == null)
-                {
-                    this.SaveWallets();
-                }
-            }
-            
+            //if (foundReceivingTrx)
+            //{
+            //    using (var fcm = new FcmSender("AIzaSyAE8V8q3yCpIFhZvfhD-qgMDUxn4UdHvCQ", "1063007170867"))
+            //    {
+            //        fcm.SendAsync("", "Xels Received");
+            //    }
+            //}
             return foundSendingTrx || foundReceivingTrx;
         }
 
@@ -965,12 +1142,13 @@ namespace Xels.Bitcoin.Features.Wallet
                     IsCoinStake = transaction.IsCoinStake == false ? (bool?)null : true,
                     BlockHeight = blockHeight,
                     BlockHash = block?.GetHash(),
+                    BlockIndex = block?.Transactions.FindIndex(t => t.GetHash() == transactionHash),
                     Id = transactionHash,
                     CreationTime = DateTimeOffset.FromUnixTimeSeconds(block?.Header.Time ?? transaction.Time),
                     Index = index,
                     ScriptPubKey = script,
                     Hex = this.walletSettings.SaveTransactionHex ? transaction.ToHex() : null,
-                    IsPropagated = isPropagated
+                    IsPropagated = isPropagated,
                 };
 
                 // Add the Merkle proof to the (non-spending) transaction.
@@ -981,6 +1159,12 @@ namespace Xels.Bitcoin.Features.Wallet
 
                 addressTransactions.Add(newTransaction);
                 this.AddInputKeysLookupLocked(newTransaction);
+
+                if (block == null)
+                {
+                    // Unconfirmed inputs track for double spends.
+                    this.AddTxLookupLocked(newTransaction, transaction);
+                }
             }
             else
             {
@@ -991,6 +1175,7 @@ namespace Xels.Bitcoin.Features.Wallet
                 {
                     foundTransaction.BlockHeight = blockHeight;
                     foundTransaction.BlockHash = block?.GetHash();
+                    foundTransaction.BlockIndex = block?.Transactions.FindIndex(t => t.GetHash() == transactionHash);
                 }
 
                 // Update the block time.
@@ -1007,7 +1192,14 @@ namespace Xels.Bitcoin.Features.Wallet
 
                 if (isPropagated)
                     foundTransaction.IsPropagated = true;
+
+                if (block != null)
+                {
+                    // Inputs are in a block no need to track them anymore.
+                    this.RemoveTxLookupLocked(transaction);
+                }
             }
+
 
             this.TransactionFoundInternal(script);
         }
@@ -1027,6 +1219,8 @@ namespace Xels.Bitcoin.Features.Wallet
         {
             Guard.NotNull(transaction, nameof(transaction));
             Guard.NotNull(paidToOutputs, nameof(paidToOutputs));
+
+            uint256 transactionHash = transaction.GetHash();
 
             // Get the transaction being spent.
             TransactionData spentTransaction = this.scriptToAddressLookup.Values.Distinct().SelectMany(v => v.Transactions)
@@ -1048,7 +1242,7 @@ namespace Xels.Bitcoin.Features.Wallet
                 {
                     // Figure out how to retrieve the destination address.
                     string destinationAddress = this.scriptAddressReader.GetAddressFromScriptPubKey(this.network, paidToOutput.ScriptPubKey);
-                    if (destinationAddress == string.Empty)
+                    if (string.IsNullOrEmpty(destinationAddress))
                         if (this.scriptToAddressLookup.TryGetValue(paidToOutput.ScriptPubKey, out HdAddress destination))
                             destinationAddress = destination.Address;
 
@@ -1056,16 +1250,18 @@ namespace Xels.Bitcoin.Features.Wallet
                     {
                         DestinationScriptPubKey = paidToOutput.ScriptPubKey,
                         DestinationAddress = destinationAddress,
-                        Amount = paidToOutput.Value
+                        Amount = paidToOutput.Value,
+                        OutputIndex = transaction.Outputs.IndexOf(paidToOutput)
                     });
                 }
 
                 var spendingDetails = new SpendingDetails
                 {
-                    TransactionId = transaction.GetHash(),
+                    TransactionId = transactionHash,
                     Payments = payments,
                     CreationTime = DateTimeOffset.FromUnixTimeSeconds(block?.Header.Time ?? transaction.Time),
                     BlockHeight = blockHeight,
+                    BlockIndex = block?.Transactions.FindIndex(t => t.GetHash() == transactionHash),
                     Hex = this.walletSettings.SaveTransactionHex ? transaction.ToHex() : null,
                     IsCoinStake = transaction.IsCoinStake == false ? (bool?)null : true
                 };
@@ -1087,7 +1283,14 @@ namespace Xels.Bitcoin.Features.Wallet
                 if (block != null)
                 {
                     spentTransaction.SpendingDetails.CreationTime = DateTimeOffset.FromUnixTimeSeconds(block.Header.Time);
+                    spentTransaction.BlockIndex = block?.Transactions.FindIndex(t => t.GetHash() == transactionHash);
                 }
+            }
+
+            // If the transaction is spent and confirmed, we remove the UTXO from the lookup dictionary.
+            if (spentTransaction.SpendingDetails.BlockHeight != null)
+            {
+                this.RemoveInputKeysLookupLock(spentTransaction);
             }
         }
 
@@ -1095,7 +1298,7 @@ namespace Xels.Bitcoin.Features.Wallet
         {
             foreach (Wallet wallet in this.Wallets)
             {
-                foreach (HdAccount account in wallet.GetAccountsByCoinType(this.coinType, accountFilter ?? Wallet.NormalAccounts))
+                foreach (HdAccount account in wallet.GetAccounts(accountFilter ?? Wallet.NormalAccounts))
                 {
                     bool isChange;
                     if (account.ExternalAddresses.Any(address => address.ScriptPubKey == script))
@@ -1151,7 +1354,7 @@ namespace Xels.Bitcoin.Features.Wallet
 
             lock (this.lockObject)
             {
-                this.fileStorage.SaveToFile(wallet, $"{wallet.Name}.{WalletFileExtension}");
+                this.fileStorage.SaveToFile(wallet, $"{wallet.Name}.{WalletFileExtension}", new FileStorageOption { SerializeNullValues = false });
             }
         }
 
@@ -1173,6 +1376,7 @@ namespace Xels.Bitcoin.Features.Wallet
             }
 
             this.WalletTipHash = chainedHeader.HashBlock;
+            this.WalletTipHeight = chainedHeader.Height;
         }
 
         /// <inheritdoc />
@@ -1187,7 +1391,7 @@ namespace Xels.Bitcoin.Features.Wallet
 
             lock (this.lockObject)
             {
-                wallet.SetLastBlockDetailsByCoinType(this.coinType, chainedHeader);
+                wallet.SetLastBlockDetails(chainedHeader);
             }
         }
 
@@ -1234,7 +1438,7 @@ namespace Xels.Bitcoin.Features.Wallet
 
             // Create a folder if none exists and persist the file.
             this.SaveWallet(walletFile);
-            
+
             return walletFile;
         }
 
@@ -1268,12 +1472,12 @@ namespace Xels.Bitcoin.Features.Wallet
 
             // Create a folder if none exists and persist the file.
             this.SaveWallet(walletFile);
-            
+
             return walletFile;
         }
 
         /// <summary>
-        /// Loads the wallet to be used by the manager.
+        /// Loads the wallet to be used by the manager if a wallet with this name has not already been loaded.
         /// </summary>
         /// <param name="wallet">The wallet to load.</param>
         private void Load(Wallet wallet)
@@ -1298,16 +1502,23 @@ namespace Xels.Bitcoin.Features.Wallet
             {
                 foreach (Wallet wallet in this.Wallets)
                 {
-                    IEnumerable<HdAddress> addresses = wallet.GetAllAddressesByCoinType(this.coinType, a => true);
-                    foreach (HdAddress address in addresses)
+                    foreach (HdAccount account in wallet.GetAccounts(a => true))
                     {
-                        this.scriptToAddressLookup[address.ScriptPubKey] = address;
-                        if (address.Pubkey != null)
-                            this.scriptToAddressLookup[address.Pubkey] = address;
-
-                        foreach (TransactionData transaction in address.Transactions)
+                        foreach (HdAddress address in account.GetCombinedAddresses())
                         {
-                            this.outpointLookup[new OutPoint(transaction.Id, transaction.Index)] = transaction;
+                            this.scriptToAddressLookup[address.ScriptPubKey] = address;
+                            if (address.Pubkey != null)
+                                this.scriptToAddressLookup[address.Pubkey] = address;
+
+                            foreach (TransactionData transaction in address.Transactions)
+                            {
+                                // Get the UTXOs that are unspent or spent but not confirmed.
+                                // We only exclude from the list the confirmed spent UTXOs.
+                                if (transaction.SpendingDetails?.BlockHeight == null)
+                                {
+                                    this.outpointLookup[new OutPoint(transaction.Id, transaction.Index)] = transaction;
+                                }
+                            }
                         }
                     }
                 }
@@ -1348,6 +1559,74 @@ namespace Xels.Bitcoin.Features.Wallet
             }
         }
 
+        /// <summary>
+        /// Remove from the list of unspent outputs kept in memory.
+        /// </summary>
+        private void RemoveInputKeysLookupLock(TransactionData transactionData)
+        {
+            Guard.NotNull(transactionData, nameof(transactionData));
+            Guard.NotNull(transactionData.SpendingDetails, nameof(transactionData.SpendingDetails));
+
+            lock (this.lockObject)
+            {
+                this.outpointLookup.Remove(new OutPoint(transactionData.Id, transactionData.Index));
+            }
+        }
+
+        /// <summary>
+        /// Reloads the UTXOs we're tracking in memory for faster lookups.
+        /// </summary>
+        public void RefreshInputKeysLookupLock()
+        {
+            lock (this.lockObject)
+            {
+                this.outpointLookup = new Dictionary<OutPoint, TransactionData>();
+
+                foreach (Wallet wallet in this.Wallets)
+                {
+                    foreach (HdAddress address in wallet.GetAllAddresses(a => true))
+                    {
+                        // Get the UTXOs that are unspent or spent but not confirmed.
+                        // We only exclude from the list the confirmed spent UTXOs.
+                        foreach (TransactionData transaction in address.Transactions.Where(t => t.SpendingDetails?.BlockHeight == null))
+                        {
+                            this.outpointLookup[new OutPoint(transaction.Id, transaction.Index)] = transaction;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Add to the mapping of transactions kept in memory for faster lookups.
+        /// </summary>
+        private void AddTxLookupLocked(TransactionData transactionData, Transaction transaction)
+        {
+            Guard.NotNull(transaction, nameof(transaction));
+            Guard.NotNull(transactionData, nameof(transactionData));
+
+            lock (this.lockObject)
+            {
+                foreach (OutPoint input in transaction.Inputs.Select(s => s.PrevOut))
+                {
+                    this.inputLookup[input] = transactionData;
+                }
+            }
+        }
+
+        private void RemoveTxLookupLocked(Transaction transaction)
+        {
+            Guard.NotNull(transaction, nameof(transaction));
+
+            lock (this.lockObject)
+            {
+                foreach (OutPoint input in transaction.Inputs.Select(s => s.PrevOut))
+                {
+                    this.inputLookup.Remove(input);
+                }
+            }
+        }
+
         /// <inheritdoc />
         public IEnumerable<string> GetWalletsNames()
         {
@@ -1376,7 +1655,7 @@ namespace Xels.Bitcoin.Features.Wallet
         /// <inheritdoc />
         public int? GetEarliestWalletHeight()
         {
-            return this.Wallets.Min(w => w.AccountsRoot.Single(a => a.CoinType == this.coinType).LastBlockSyncedHeight);
+            return this.Wallets.Min(w => w.AccountsRoot.Single().LastBlockSyncedHeight);
         }
 
         /// <inheritdoc />
@@ -1385,8 +1664,21 @@ namespace Xels.Bitcoin.Features.Wallet
             return this.Wallets.Min(w => w.CreationTime);
         }
 
+        /// <summary>
+        /// Search all wallets and removes the specified transactions from the wallet and persist it.
+        /// </summary>
+        private void RemoveTransactionsByIds(IEnumerable<uint256> transactionsIds)
+        {
+            Guard.NotNull(transactionsIds, nameof(transactionsIds));
+
+            foreach (Wallet wallet in this.Wallets)
+            {
+                this.RemoveTransactionsByIds(wallet.Name, transactionsIds);
+            }
+        }
+
         /// <inheritdoc />
-        public HashSet<(uint256, DateTimeOffset)> RemoveTransactionsByIdsLocked(string walletName, IEnumerable<uint256> transactionsIds)
+        public HashSet<(uint256, DateTimeOffset)> RemoveTransactionsByIds(string walletName, IEnumerable<uint256> transactionsIds)
         {
             Guard.NotNull(transactionsIds, nameof(transactionsIds));
             Guard.NotEmpty(walletName, nameof(walletName));
@@ -1398,7 +1690,7 @@ namespace Xels.Bitcoin.Features.Wallet
 
             lock (this.lockObject)
             {
-                IEnumerable<HdAccount> accounts = wallet.GetAccountsByCoinType(this.coinType);
+                IEnumerable<HdAccount> accounts = wallet.GetAccounts(a => true);
                 foreach (HdAccount account in accounts)
                 {
                     foreach (HdAddress address in account.GetCombinedAddresses())
@@ -1429,6 +1721,9 @@ namespace Xels.Bitcoin.Features.Wallet
 
             if (result.Any())
             {
+                // Reload the lookup dictionaries.
+                this.RefreshInputKeysLookupLock();
+
                 this.SaveWallet(wallet);
             }
 
@@ -1445,7 +1740,7 @@ namespace Xels.Bitcoin.Features.Wallet
 
             lock (this.lockObject)
             {
-                IEnumerable<HdAccount> accounts = wallet.GetAccountsByCoinType(this.coinType);
+                IEnumerable<HdAccount> accounts = wallet.GetAccounts();
                 foreach (HdAccount account in accounts)
                 {
                     foreach (HdAddress address in account.GetCombinedAddresses())
@@ -1454,6 +1749,45 @@ namespace Xels.Bitcoin.Features.Wallet
                         address.Transactions.Clear();
                     }
                 }
+
+                // Reload the lookup dictionaries.
+                this.RefreshInputKeysLookupLock();
+            }
+
+            if (removedTransactions.Any())
+            {
+                this.SaveWallet(wallet);
+            }
+
+            return removedTransactions;
+        }
+
+        /// <inheritdoc />
+        public HashSet<(uint256, DateTimeOffset)> RemoveTransactionsFromDate(string walletName, DateTimeOffset fromDate)
+        {
+            Guard.NotEmpty(walletName, nameof(walletName));
+            Wallet wallet = this.GetWallet(walletName);
+
+            var removedTransactions = new HashSet<(uint256, DateTimeOffset)>();
+
+            lock (this.lockObject)
+            {
+                IEnumerable<HdAccount> accounts = wallet.GetAccounts();
+                foreach (HdAccount account in accounts)
+                {
+                    foreach (HdAddress address in account.GetCombinedAddresses())
+                    {
+                        var toRemove = address.Transactions.Where(t => t.CreationTime > fromDate).ToList();
+                        foreach (var trx in toRemove)
+                        {
+                            removedTransactions.Add((trx.Id, trx.CreationTime));
+                            address.Transactions.Remove(trx);
+                        }
+                    }
+                }
+
+                // Reload the lookup dictionaries.
+                this.RefreshInputKeysLookupLock();
             }
 
             if (removedTransactions.Any())
@@ -1471,16 +1805,21 @@ namespace Xels.Bitcoin.Features.Wallet
         /// <param name="date">The creation date of the block with which to update the wallet.</param>
         private void UpdateWhenChainDownloaded(IEnumerable<Wallet> wallets, DateTime date)
         {
-            this.asyncLoopFactory.RunUntil("WalletManager.DownloadChain", this.nodeLifetime.ApplicationStopping,
-                () => this.chain.IsDownloaded(),
+            if (this.asyncProvider.IsAsyncLoopRunning(DownloadChainLoop))
+            {
+                return;
+            }
+
+            this.asyncProvider.CreateAndRunAsyncLoopUntil(DownloadChainLoop, this.nodeLifetime.ApplicationStopping,
+                () => this.ChainIndexer.IsDownloaded(),
                 () =>
                 {
-                    int heightAtDate = this.chain.GetHeightAtTime(date);
+                    int heightAtDate = this.ChainIndexer.GetHeightAtTime(date);
 
                     foreach (Wallet wallet in wallets)
                     {
                         this.logger.LogTrace("The chain of headers has finished downloading, updating wallet '{0}' with height {1}", wallet.Name, heightAtDate);
-                        this.UpdateLastBlockSyncedHeight(wallet, this.chain.GetBlock(heightAtDate));
+                        this.UpdateLastBlockSyncedHeight(wallet, this.ChainIndexer.GetHeader(heightAtDate));
                         this.SaveWallet(wallet);
                     }
                 },
@@ -1492,10 +1831,37 @@ namespace Xels.Bitcoin.Features.Wallet
 
                     foreach (Wallet wallet in wallets)
                     {
-                        this.UpdateLastBlockSyncedHeight(wallet, this.chain.Tip);
+                        this.UpdateLastBlockSyncedHeight(wallet, this.ChainIndexer.Tip);
                     }
                 },
                 TimeSpans.FiveSeconds);
+        }
+
+        /// <inheritdoc />
+        [NoTrace]
+        public ExtKey GetExtKey(WalletAccountReference accountReference, string password = "", bool cache = false)
+        {
+            Wallet wallet = this.GetWalletByName(accountReference.WalletName);
+            string cacheKey = wallet.EncryptedSeed;
+            Key privateKey;
+
+            if (this.privateKeyCache.TryGetValue(cacheKey, out SecureString secretValue))
+            {
+                privateKey = wallet.Network.CreateBitcoinSecret(secretValue.FromSecureString()).PrivateKey;
+            }
+            else
+            {
+                privateKey = Key.Parse(wallet.EncryptedSeed, password, wallet.Network);
+            }
+
+            if (cache)
+            {
+                // The default duration the secret is cached is 5 minutes.
+                var timeOutDuration = new TimeSpan(0, 5, 0);
+                this.UnlockWallet(password, accountReference.WalletName, (int)timeOutDuration.TotalSeconds);
+            }
+
+            return new ExtKey(privateKey, wallet.ChainCode);
         }
     }
 }

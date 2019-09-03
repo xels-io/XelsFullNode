@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using NBitcoin;
+﻿using NBitcoin;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Consensus.Rules;
 

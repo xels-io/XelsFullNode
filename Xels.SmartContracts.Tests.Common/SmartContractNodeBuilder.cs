@@ -2,34 +2,59 @@
 using NBitcoin;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Features.PoA;
-using Xels.Bitcoin.Features.SmartContracts.Networks;
+using Xels.Bitcoin.Features.PoA.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.Tests.Common;
 using Xels.SmartContracts.Networks;
-using Xels.SmartContracts.Tests.Common.MockChain;
 
 namespace Xels.SmartContracts.Tests.Common
 {
     public class SmartContractNodeBuilder : NodeBuilder
     {
-        public TargetSpacingDateTimeProvider PoATimeProvider { get; }
+        public EditableTimeProvider TimeProvider { get; }
 
         public SmartContractNodeBuilder(string rootFolder) : base(rootFolder)
         {
-            this.PoATimeProvider = new TargetSpacingDateTimeProvider(new SmartContractsPoARegTest()); // TODO: Inject
+            this.TimeProvider = new EditableTimeProvider();
         }
 
         public CoreNode CreateSmartContractPoANode(SmartContractsPoARegTest network, int nodeIndex)
         {
             string dataFolder = this.GetNextDataFolderName();
 
-            CoreNode node = this.CreateNode(new SmartContractPoARunner(dataFolder, network, this.PoATimeProvider), "poa.conf");
+            CoreNode node = this.CreateNode(new SmartContractPoARunner(dataFolder, network, this.TimeProvider), "poa.conf");
 
             var settings = new NodeSettings(network, args: new string[] { "-conf=poa.conf", "-datadir=" + dataFolder });
 
             var tool = new KeyTool(settings.DataFolder);
             tool.SavePrivateKey(network.FederationKeys[nodeIndex]);
 
+            return node;
+        }
+
+        public CoreNode CreateSignedContractPoANode(SignedContractsPoARegTest network, int nodeIndex)
+        {
+            string dataFolder = this.GetNextDataFolderName();
+
+            CoreNode node = this.CreateNode(new SignedContractPoARunner(dataFolder, network, this.TimeProvider), "poa.conf");
+
+            var settings = new NodeSettings(network, args: new string[] { "-conf=poa.conf", "-datadir=" + dataFolder });
+
+            var tool = new KeyTool(settings.DataFolder);
+            tool.SavePrivateKey(network.FederationKeys[nodeIndex]);
+
+            return node;
+        }
+
+        public CoreNode CreateWhitelistedContractPoANode(SmartContractsPoARegTest network, int nodeIndex)
+        {
+            string dataFolder = this.GetNextDataFolderName();
+
+            CoreNode node = this.CreateNode(new WhitelistedContractPoARunner(dataFolder, network, this.TimeProvider), "poa.conf");
+            var settings = new NodeSettings(network, args: new string[] { "-conf=poa.conf", "-datadir=" + dataFolder });
+
+            var tool = new KeyTool(settings.DataFolder);
+            tool.SavePrivateKey(network.FederationKeys[nodeIndex]);
             return node;
         }
 

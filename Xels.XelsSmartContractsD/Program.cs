@@ -8,9 +8,7 @@ using Xels.Bitcoin.Features.BlockStore;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.RPC;
 using Xels.Bitcoin.Features.SmartContracts;
-using Xels.Bitcoin.Features.SmartContracts.Networks;
 using Xels.Bitcoin.Features.SmartContracts.PoA;
-using Xels.Bitcoin.Features.SmartContracts.PoS;
 using Xels.Bitcoin.Features.SmartContracts.Wallet;
 using Xels.Bitcoin.Utilities;
 using Xels.SmartContracts.Networks;
@@ -34,11 +32,13 @@ namespace Xels.XelsSmartContractsD
                     .UseNodeSettings(nodeSettings)
                     .UseBlockStore()
                     .AddRPC()
-                        .AddSmartContracts()
+                        .AddSmartContracts(options =>
+                        {
+                            options.UseReflectionExecutor();
+                        })
                         .UseSmartContractPoAConsensus()
                         .UseSmartContractPoAMining()
                         .UseSmartContractWallet()
-                        .UseReflectionExecutor()
                     .UseApi()
                     .UseMempool()
                     .Build();

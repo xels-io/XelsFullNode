@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using NBitcoin;
+using Xels.SmartContracts.CLR.ContractLogging;
 using Xels.SmartContracts.Core.State;
 using Xels.SmartContracts.Core.State.AccountAbstractionLayer;
-using Xels.SmartContracts.CLR.ContractLogging;
 
 namespace Xels.SmartContracts.CLR
 {

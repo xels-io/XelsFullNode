@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
-using Xels.SmartContracts.CLR.Validation.Validators.Method;
 
 namespace Xels.SmartContracts.CLR.Validation.Validators.Type
 {

@@ -63,9 +63,15 @@ namespace Xels.Bitcoin.Properties {
         /// <summary>
         ///   Looks up a localized string similar to 
         ///
-        ///
-        ///
-        ///.
+        ///                 
+        ///ooooooo  ooooo oooooooooooo ooooo         .oooooo..o   
+        /// `8888    d8&apos;  `888&apos;     `8 `888&apos;        d8P&apos;    `Y8   
+        ///   Y888..8P     888          888         Y88bo.        
+        ///    `8888&apos;      888oooo8     888          `&quot;Y8888o.    
+        ///   .8PY888.     888    &quot;     888              `&quot;Y88b   
+        ///  d8&apos;  `888b    888       o  888       o oo     .d8P   
+        ///o888o  o88888o o888ooooood8 o888ooooood8 8&quot;&quot;88888P&apos;    
+        ///                                                                                           [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AsciiLogo {
             get {

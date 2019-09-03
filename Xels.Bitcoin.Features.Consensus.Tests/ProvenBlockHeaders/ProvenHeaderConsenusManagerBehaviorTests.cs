@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Moq;
 using NBitcoin;
 using Xels.Bitcoin.Base;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Configuration.Settings;
@@ -17,6 +18,7 @@ using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.P2P.Protocol;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common.Logging;
 using Xels.Bitcoin.Utilities;
 using Xunit;
@@ -32,6 +34,8 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.ProvenBlockHeaders
         private readonly IInitialBlockDownloadState initialBlockDownloadState;
         private readonly IPeerBanning peerBanning;
         private readonly IProvenBlockHeaderStore provenBlockHeaderStore;
+        private readonly ISignals signals;
+        private readonly IAsyncProvider asyncProvider;
 
         public ProvenHeaderConsenusManagerBehaviorTests() : base(new XelsTest())
         {
@@ -42,13 +46,16 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.ProvenBlockHeaders
             this.initialBlockDownloadState = new Mock<IInitialBlockDownloadState>().Object;
             this.peerBanning = new Mock<IPeerBanning>().Object;
             this.provenBlockHeaderStore = new Mock<IProvenBlockHeaderStore>().Object;
+
+            this.signals = new Signals.Signals(this.extendedLoggerFactory, null);
+            this.asyncProvider = new AsyncProvider(this.extendedLoggerFactory, this.signals, new Mock<INodeLifetime>().Object);
         }
 
         private Mock<INetworkPeer> CreatePeerMock()
         {
             var peer = new Mock<INetworkPeer>();
 
-            var connection = new NetworkPeerConnection(this.Network, peer.Object, new TcpClient(), 0, (message, token) => Task.CompletedTask, DateTimeProvider.Default, this.extendedLoggerFactory, new PayloadProvider());
+            var connection = new NetworkPeerConnection(this.Network, peer.Object, new TcpClient(), 0, (message, token) => Task.CompletedTask, DateTimeProvider.Default, this.extendedLoggerFactory, new PayloadProvider(), this.asyncProvider);
 
             peer.SetupGet(networkPeer => networkPeer.Connection).Returns(connection);
 
@@ -77,9 +84,9 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.ProvenBlockHeaders
         [Fact]
         public void ConstructProvenHeaderPayload_Consecutive_Headers()
         {
-            var provenHeaderChain = BuildChainWithProvenHeaders(10);
+            var provenHeaderChain = BuildProvenHeaderChain(10);
 
-            var chain = new ConcurrentChain(this.Network, provenHeaderChain);
+            var chain = new ChainIndexer(this.Network, provenHeaderChain);
 
             var consensusManager = new Mock<IConsensusManager>();
             consensusManager.Setup(c => c.Tip).Returns(provenHeaderChain);
@@ -89,7 +96,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.ProvenBlockHeaders
             var hashes = new List<uint256>();
             for (int i = 1; i < 5; i++)
             {
-                var chainedHeaderToAdd = chain.GetBlock(i);
+                var chainedHeaderToAdd = chain.GetHeader(i);
                 hashes.Add(chainedHeaderToAdd.HashBlock);
             }
             hashes.Reverse();

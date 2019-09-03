@@ -5,8 +5,9 @@ using NBitcoin.BouncyCastle.Math;
 using NBitcoin.DataEncoders;
 using NBitcoin.Protocol;
 using Xels.Bitcoin.Features.SmartContracts.PoS;
+using Xels.SmartContracts.Networks.Policies;
 
-namespace Xels.Bitcoin.Features.SmartContracts.Networks
+namespace Xels.SmartContracts.Networks
 {
     public sealed class SmartContractPosRegTest : Network
     {
@@ -16,14 +17,16 @@ namespace Xels.Bitcoin.Features.SmartContracts.Networks
         public SmartContractPosRegTest()
         {
             this.Name = "SmartContractsPosRegTest";
-            this.RootFolderName = SmartContractNetwork.XelsRootFolderName;
-            this.DefaultConfigFilename = SmartContractNetwork.XelsDefaultConfigFilename;
+            this.NetworkType = NetworkType.Regtest;
+            this.RootFolderName = SmartContractNetworkUtils.XelsRootFolderName;
+            this.DefaultConfigFilename = SmartContractNetworkUtils.XelsDefaultConfigFilename;
             this.Magic = 0xDAB5BFFA;
             this.DefaultPort = 18444;
             this.DefaultMaxOutboundConnections = 16;
             this.DefaultMaxInboundConnections = 109;
-            this.RPCPort = 18332;
-            this.MaxTipAge = SmartContractNetwork.BitcoinDefaultMaxTipAgeInSeconds;
+            this.DefaultRPCPort = 18332;
+            this.DefaultAPIPort = 38221;
+            this.MaxTipAge = SmartContractNetworkUtils.BitcoinDefaultMaxTipAgeInSeconds;
             this.MinTxFee = 1000;
             this.FallbackFee = 20000;
             this.MinRelayTxFee = 1000;
@@ -31,7 +34,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.Networks
 
             var consensusFactory = new SmartContractPosConsensusFactory();
 
-            this.Genesis = SmartContractNetwork.CreateGenesis(consensusFactory, 1296688602, 2, 0x207fffff, 1, Money.Coins(50m));
+            this.Genesis = SmartContractNetworkUtils.CreateGenesis(consensusFactory, 1296688602, 2, 0x207fffff, 1, Money.Coins(50m));
 
             // Taken from XelsX.
             var consensusOptions = new PosConsensusOptions(
@@ -75,6 +78,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.Networks
                 powTargetTimespan: TimeSpan.FromSeconds(14 * 24 * 60 * 60), // two weeks
                 powTargetSpacing: TimeSpan.FromSeconds(10 * 60),
                 powAllowMinDifficultyBlocks: true,
+                posNoRetargeting: true,
                 powNoRetargeting: true,
                 powLimit: new Target(new uint256("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")),
                 minimumChainWork: uint256.Zero,
@@ -108,6 +112,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.Networks
 
             this.DNSSeeds = new List<DNSSeedData>();
             this.SeedNodes = new List<NetworkAddress>();
+
+            this.StandardScriptsRegistry = new SmartContractsStandardScriptsRegistry();
         }
     }
 }

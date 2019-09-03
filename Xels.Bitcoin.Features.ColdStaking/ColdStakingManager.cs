@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
 using NBitcoin.BuilderExtensions;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
@@ -57,11 +58,11 @@ namespace Xels.Bitcoin.Features.ColdStaking
         /// Constructs the cold staking manager which is used by the cold staking controller.
         /// </summary>
         /// <param name="network">The network that the manager is running on.</param>
-        /// <param name="chain">Thread safe class representing a chain of headers from genesis.</param>
+        /// <param name="chainIndexer">Thread safe class representing a chain of headers from genesis.</param>
         /// <param name="walletSettings">The wallet settings.</param>
         /// <param name="dataFolder">Contains path locations to folders and files on disk.</param>
         /// <param name="walletFeePolicy">The wallet fee policy.</param>
-        /// <param name="asyncLoopFactory">Factory for creating and also possibly starting application defined tasks inside async loop.</param>
+        /// <param name="asyncProvider">Factory for creating and also possibly starting application defined tasks inside async loop.</param>
         /// <param name="nodeLifeTime">Allows consumers to perform cleanup during a graceful shutdown.</param>
         /// <param name="scriptAddressReader">A reader for extracting an address from a <see cref="Script"/>.</param>
         /// <param name="loggerFactory">The logger factory to use to create the custom logger.</param>
@@ -69,11 +70,11 @@ namespace Xels.Bitcoin.Features.ColdStaking
         /// <param name="broadcasterManager">The broadcaster manager.</param>
         public ColdStakingManager(
             Network network,
-            ConcurrentChain chain,
+            ChainIndexer chainIndexer,
             WalletSettings walletSettings,
             DataFolder dataFolder,
             IWalletFeePolicy walletFeePolicy,
-            IAsyncLoopFactory asyncLoopFactory,
+            IAsyncProvider asyncProvider,
             INodeLifetime nodeLifeTime,
             IScriptAddressReader scriptAddressReader,
             ILoggerFactory loggerFactory,
@@ -81,11 +82,11 @@ namespace Xels.Bitcoin.Features.ColdStaking
             IBroadcasterManager broadcasterManager = null) : base(
                 loggerFactory,
                 network,
-                chain,
+                chainIndexer,
                 walletSettings,
                 dataFolder,
                 walletFeePolicy,
-                asyncLoopFactory,
+                asyncProvider,
                 nodeLifeTime,
                 dateTimeProvider,
                 scriptAddressReader,
@@ -174,13 +175,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
             this.logger.LogTrace("({0}:'{1}',{2}:{3})", nameof(wallet), wallet.Name, nameof(isColdWalletAccount), isColdWalletAccount);
 
             var coinType = (CoinType)wallet.Network.Consensus.CoinType;
-            HdAccount account = null;
-            try
-            {
-                account = wallet.GetAccountByCoinType(isColdWalletAccount ? ColdWalletAccountName : HotWalletAccountName, coinType);
-            }
-            catch (Exception) { }
-
+            HdAccount account = wallet.GetAccount(isColdWalletAccount ? ColdWalletAccountName : HotWalletAccountName);
             if (account == null)
             {
                 this.logger.LogTrace("(-)[ACCOUNT_DOES_NOT_EXIST]:null");
@@ -236,10 +231,11 @@ namespace Xels.Bitcoin.Features.ColdStaking
                 accountName = HotWalletAccountName;
             }
 
-            account = wallet.AddNewAccount(walletPassword, this.coinType, this.dateTimeProvider.GetTimeOffset(), accountIndex, accountName);
+            account = wallet.AddNewAccount(walletPassword, this.dateTimeProvider.GetTimeOffset(), accountIndex, accountName);
 
             // Maintain at least one unused address at all times. This will ensure that wallet recovery will also work.
-            account.CreateAddresses(wallet.Network, 1, false);
+            IEnumerable<HdAddress> newAddresses = account.CreateAddresses(wallet.Network, 1, false);
+            this.UpdateKeysLookupLocked(newAddresses);
 
             // Save the changes to the file.
             this.SaveWallet(wallet);
@@ -272,7 +268,9 @@ namespace Xels.Bitcoin.Features.ColdStaking
             if (address == null)
             {
                 this.logger.LogTrace("No unused address exists on account '{0}'. Adding new address.", account.Name);
-                address = account.CreateAddresses(wallet.Network, 1).First();
+                IEnumerable<HdAddress> newAddresses = account.CreateAddresses(wallet.Network, 1);
+                this.UpdateKeysLookupLocked(newAddresses);
+                address = newAddresses.First();
             }
 
             this.logger.LogTrace("(-):'{0}'", address.Address);
@@ -447,6 +445,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
                 TransactionFee = feeAmount,
                 MinConfirmations = 0,
                 Shuffle = false,
+                Sign = false,
                 Recipients = new[] { new Recipient { Amount = amount, ScriptPubKey = destination } }.ToList()
             };
 
@@ -474,11 +473,10 @@ namespace Xels.Bitcoin.Features.ColdStaking
                 changeOutput.ScriptPubKey = mapOutPointToUnspentOutput[largestInput.PrevOut].Transaction.ScriptPubKey;
             }
 
-            // Add keys for signing inputs.
-            foreach (TxIn input in transaction.Inputs)
+            // Add keys for signing inputs. This takes time so only add keys for distinct addresses.
+            foreach (HdAddress address in transaction.Inputs.Select(i => mapOutPointToUnspentOutput[i.PrevOut].Address).Distinct())
             {
-                UnspentOutputReference unspent = mapOutPointToUnspentOutput[input.PrevOut];
-                context.TransactionBuilder.AddKeys(wallet.GetExtendedPrivateKeyForAddress(walletPassword, unspent.Address));
+                context.TransactionBuilder.AddKeys(wallet.GetExtendedPrivateKeyForAddress(walletPassword, address));
             }
 
             // Sign the transaction.
@@ -504,7 +502,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
             UnspentOutputReference[] res = null;
             lock (this.lockObject)
             {
-                res = wallet.GetAllSpendableTransactions(this.coinType, this.chain.Tip.Height, confirmations,
+                res = wallet.GetAllSpendableTransactions(this.ChainIndexer.Tip.Height, confirmations,
                     a => a.Index == (isColdWalletAccount ? ColdWalletAccountIndex : HotWalletAccountIndex)).ToArray();
             }
 

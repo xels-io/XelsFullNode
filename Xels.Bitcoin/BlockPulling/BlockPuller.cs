@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
-using NBitcoin.Protocol;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.P2P.Peer;
@@ -265,7 +264,7 @@ namespace Xels.Bitcoin.BlockPulling
                     INetworkPeer peer = peerIdToBehavior.Value.AttachedPeer;
                     string reason = string.Empty;
 
-                    if ((peer == null) || !this.networkPeerRequirement.Check(peer.PeerVersion, out reason))
+                    if ((peer == null) || !this.networkPeerRequirement.Check(peer.PeerVersion, peer.Inbound, out reason))
                     {
                         this.logger.LogDebug("Peer Id {0} does not meet requirements, reason: {1}", peerIdToBehavior.Key, reason);
                         peerIdsToRemove.Add(peerIdToBehavior.Key);
@@ -287,7 +286,14 @@ namespace Xels.Bitcoin.BlockPulling
         {
             lock (this.peerLock)
             {
-                return this.pullerBehaviorsByPeerId.Sum(x => x.Value.SpeedBytesPerSecond);
+                try
+                {
+                    return this.pullerBehaviorsByPeerId.Sum(x => x.Value.SpeedBytesPerSecond);
+                }
+                catch (OverflowException)
+                {
+                    return long.MaxValue;
+                }
             }
         }
 
@@ -317,7 +323,7 @@ namespace Xels.Bitcoin.BlockPulling
                 }
                 else
                 {
-                    bool supportsRequirments = this.networkPeerRequirement.Check(peer.PeerVersion, out string reason);
+                    bool supportsRequirments = this.networkPeerRequirement.Check(peer.PeerVersion, peer.Inbound, out string reason);
 
                     if (supportsRequirments)
                     {
@@ -598,7 +604,7 @@ namespace Xels.Bitcoin.BlockPulling
 
         /// <summary>Distributes download job's headers to peers that can provide blocks represented by those headers.</summary>
         /// <remarks>
-        /// If some of the blocks from the job can't be provided by any peer those headers will be added to a <param name="failedHashes">.</param>
+        /// If some of the blocks from the job can't be provided by any peer those headers will be added to a <param name="failedHashes"></param>.
         /// <para>
         /// Have to be locked by <see cref="queueLock"/>.
         /// </para>
@@ -965,7 +971,7 @@ namespace Xels.Bitcoin.BlockPulling
                 foreach (DownloadJob downloadJob in this.downloadJobsQueue)
                     unassignedDownloads += downloadJob.Headers.Count;
 
-                statsBuilder.AppendLine($"Queueued downloads: {unassignedDownloads}");
+                statsBuilder.AppendLine($"Queued downloads: {unassignedDownloads}");
             }
 
             double avgBlockSizeBytes = this.GetAverageBlockSizeBytes();

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
 using NBitcoin.Protocol;
-using Xels.Bitcoin.Configuration;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Utilities;
@@ -74,12 +74,13 @@ namespace Xels.Bitcoin.P2P.Peer
             ILoggerFactory loggerFactory,
             INetworkPeerFactory networkPeerFactory,
             IInitialBlockDownloadState initialBlockDownloadState,
-            ConnectionManagerSettings connectionManagerSettings)
+            ConnectionManagerSettings connectionManagerSettings,
+            IAsyncProvider asyncProvider)
         {
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName, $"[{localEndPoint}] ");
 
             this.networkPeerFactory = networkPeerFactory;
-            this.networkPeerDisposer = new NetworkPeerDisposer(loggerFactory);
+            this.networkPeerDisposer = new NetworkPeerDisposer(loggerFactory, asyncProvider);
             this.initialBlockDownloadState = initialBlockDownloadState;
             this.connectionManagerSettings = connectionManagerSettings;
 
@@ -225,17 +226,17 @@ namespace Xels.Bitcoin.P2P.Peer
                 return true;
             }
 
-            var clientRemoteEndPoint = tcpClient.Client.RemoteEndPoint as IPEndPoint;
+            var clientLocalEndPoint = tcpClient.Client.LocalEndPoint as IPEndPoint;
 
-            NodeServerEndpoint endpoint = this.connectionManagerSettings.Listen.FirstOrDefault(e => e.Endpoint.Match(clientRemoteEndPoint));
+            bool endpointCanBeWhiteListed = this.connectionManagerSettings.Bind.Where(x => x.Whitelisted).Any(x => x.Endpoint.Contains(clientLocalEndPoint));
 
-            if ((endpoint != null) && endpoint.Whitelisted)
+            if (endpointCanBeWhiteListed)
             {
                 this.logger.LogTrace("(-)[ENDPOINT_WHITELISTED_ALLOW_CONNECTION]:true");
                 return true;
             }
 
-            this.logger.LogTrace("Node '{0}' is not white listed during initial block download.", clientRemoteEndPoint);
+            this.logger.LogTrace("Node '{0}' is not white listed during initial block download.", clientLocalEndPoint);
 
             return false;
         }

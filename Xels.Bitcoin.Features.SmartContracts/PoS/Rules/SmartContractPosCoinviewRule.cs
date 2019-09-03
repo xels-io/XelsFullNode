@@ -6,10 +6,15 @@ using NBitcoin;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus;
+using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.Interfaces;
 using Xels.Bitcoin.Features.SmartContracts.Rules;
 using Xels.Bitcoin.Utilities;
+using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.Core;
+using Xels.SmartContracts.Core.Receipts;
+using Xels.SmartContracts.Core.State;
+using Xels.SmartContracts.Core.Util;
 
 namespace Xels.Bitcoin.Features.SmartContracts.PoS.Rules
 {
@@ -18,20 +23,19 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoS.Rules
     /// </summary>
     public sealed class SmartContractPosCoinviewRule : SmartContractCoinviewRule
     {
-        private IConsensus consensus;
-        private SmartContractPosConsensusRuleEngine smartContractPosParent;
-        private IStakeChain stakeChain;
-        private IStakeValidator stakeValidator;
-
-        /// <inheritdoc />
-        public override void Initialize()
+        private readonly IConsensus consensus;
+        private readonly IStakeChain stakeChain;
+        private readonly IStakeValidator stakeValidator;
+        
+        public SmartContractPosCoinviewRule(Network network, IStateRepositoryRoot stateRepositoryRoot,
+            IContractExecutorFactory executorFactory, ICallDataSerializer callDataSerializer,
+            ISenderRetriever senderRetriever, IReceiptRepository receiptRepository, ICoinView coinView,
+            IStakeChain stakeChain, IStakeValidator stakeValidator) 
+            : base(network, stateRepositoryRoot, executorFactory, callDataSerializer, senderRetriever, receiptRepository, coinView)
         {
-            base.Initialize();
-
-            this.consensus = this.Parent.Network.Consensus;
-            this.smartContractPosParent = (SmartContractPosConsensusRuleEngine)this.Parent;
-            this.stakeChain = this.smartContractPosParent.StakeChain;
-            this.stakeValidator = this.smartContractPosParent.StakeValidator;
+            this.consensus = network.Consensus;
+            this.stakeChain = stakeChain;
+            this.stakeValidator = stakeValidator;
         }
 
         /// <inheritdoc />
@@ -45,13 +49,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoS.Rules
 
             await base.RunAsync(context);
 
-            await this.stakeChain.SetAsync(context.ValidationContext.ChainedHeaderToValidate, (context as PosRuleContext).BlockStake).ConfigureAwait(false);
-        }
-
-        /// <inheritdoc/>
-        protected override bool IsProtocolTransaction(Transaction transaction)
-        {
-            return transaction.IsCoinBase || transaction.IsCoinStake;
+            this.stakeChain.Set(context.ValidationContext.ChainedHeaderToValidate, (context as PosRuleContext).BlockStake);
         }
 
         /// <inheritdoc />
@@ -80,6 +78,12 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoS.Rules
                     ConsensusErrors.BadCoinbaseAmount.Throw();
                 }
             }
+        }
+
+        /// <inheritdoc />
+        protected override Money GetTransactionFee(UnspentOutputSet view, Transaction tx)
+        {
+            return tx.IsCoinStake ? Money.Zero : view.GetValueIn(tx) - tx.TotalOut;
         }
 
         /// <inheritdoc />

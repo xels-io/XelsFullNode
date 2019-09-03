@@ -2,7 +2,6 @@
 using System.Linq;
 using NBitcoin.DataEncoders;
 using NBitcoin.Stealth;
-using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Tests.Common;
 using Xunit;
 

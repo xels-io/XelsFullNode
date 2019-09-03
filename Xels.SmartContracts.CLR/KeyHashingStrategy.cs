@@ -1,4 +1,6 @@
-﻿namespace Xels.SmartContracts.CLR
+﻿using Xels.SmartContracts.Core.Hashing;
+
+namespace Xels.SmartContracts.CLR
 {
     /// <summary>
     /// Encodes keys by applying a Keccak256 hash, returning 32-bytes.

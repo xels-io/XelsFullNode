@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="BenchmarkDotNet.Artifacts\**" />
+    <EmbeddedResource Remove="BenchmarkDotNet.Artifacts\**" />
+    <None Remove="BenchmarkDotNet.Artifacts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.4" />
+    <PackageReference Include="FASTER" Version="2019.3.16.1" />
+    <PackageReference Include="LiteDB" Version="4.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NBitcoin\NBitcoin.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Api\Xels.Bitcoin.Features.Api.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Apps\Xels.Bitcoin.Features.Apps.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.BlockStore\Xels.Bitcoin.Features.BlockStore.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.ColdStaking\Xels.Bitcoin.Features.ColdStaking.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Consensus\Xels.Bitcoin.Features.Consensus.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Dns\Xels.Bitcoin.Features.Dns.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.LightWallet\Xels.Bitcoin.Features.LightWallet.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.MemoryPool\Xels.Bitcoin.Features.MemoryPool.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Miner\Xels.Bitcoin.Features.Miner.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Notifications\Xels.Bitcoin.Features.Notifications.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.PoA\Xels.Bitcoin.Features.PoA.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.RPC\Xels.Bitcoin.Features.RPC.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.SmartContracts\Xels.Bitcoin.Features.SmartContracts.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Wallet\Xels.Bitcoin.Features.Wallet.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Networks\Xels.Bitcoin.Networks.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin\Xels.Bitcoin.csproj" />
+    <ProjectReference Include="..\Xels.Features.FederatedPeg\Xels.Features.FederatedPeg.csproj" />
+    <ProjectReference Include="..\Xels.PoAChainD\Xels.PoAChainD.csproj" />
+    <ProjectReference Include="..\Xels.Sidechains.Networks\Xels.Sidechains.Networks.csproj" />
+    <ProjectReference Include="..\Xels.SmartContracts.CLR.Validation\Xels.SmartContracts.CLR.Validation.csproj" />
+    <ProjectReference Include="..\Xels.SmartContracts.CLR\Xels.SmartContracts.CLR.csproj" />
+    <ProjectReference Include="..\Xels.SmartContracts.Core\Xels.SmartContracts.Core.csproj" />
+    <ProjectReference Include="..\Xels.SmartContracts.Networks\Xels.SmartContracts.Networks.csproj" />
+    <ProjectReference Include="..\Xels.SmartContracts.RuntimeObserver\Xels.SmartContracts.RuntimeObserver.csproj" />
+  </ItemGroup>
+
+</Project>

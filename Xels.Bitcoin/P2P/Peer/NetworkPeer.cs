@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
 using NBitcoin.Protocol;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.P2P.Protocol;
 using Xels.Bitcoin.P2P.Protocol.Behaviors;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
@@ -67,9 +68,10 @@ namespace Xels.Bitcoin.P2P.Peer
         /// Checks a version payload from a peer against the requirements.
         /// </summary>
         /// <param name="version">Version payload to check.</param>
+        /// <param name="inbound">Set to <c>true</c> if this is an inbound connection and <c>false</c> otherwise.</param>
         /// <param name="reason">The reason the check failed.</param>
         /// <returns><c>true</c> if the version payload satisfies the protocol requirements, <c>false</c> otherwise.</returns>
-        public virtual bool Check(VersionPayload version, out string reason)
+        public virtual bool Check(VersionPayload version, bool inbound, out string reason)
         {
             reason = string.Empty;
             if (this.MinVersion != null)
@@ -81,7 +83,7 @@ namespace Xels.Bitcoin.P2P.Peer
                 }
             }
 
-            if ((this.RequiredServices & version.Services) != this.RequiredServices)
+            if (!inbound && ((this.RequiredServices & version.Services) != this.RequiredServices))
             {
                 reason = "network service not supported";
                 return false;
@@ -114,6 +116,7 @@ namespace Xels.Bitcoin.P2P.Peer
 
         /// <summary>Tracker for endpoints known to be self. </summary>
         private readonly ISelfEndpointTracker selfEndpointTracker;
+        private readonly IAsyncProvider asyncProvider;
 
         /// <summary>Instance logger.</summary>
         private readonly ILogger logger;
@@ -125,7 +128,7 @@ namespace Xels.Bitcoin.P2P.Peer
         public NetworkPeerState State { get; private set; }
 
         /// <summary>Table of valid transitions between peer states.</summary>
-        private static readonly Dictionary<NetworkPeerState, NetworkPeerState[]> stateTransitionTable = new Dictionary<NetworkPeerState, NetworkPeerState[]>()
+        private static readonly Dictionary<NetworkPeerState, NetworkPeerState[]> StateTransitionTable = new Dictionary<NetworkPeerState, NetworkPeerState[]>()
         {
             { NetworkPeerState.Created, new[] { NetworkPeerState.Connected, NetworkPeerState.Offline, NetworkPeerState.Failed} },
             { NetworkPeerState.Connected, new[] { NetworkPeerState.HandShaked, NetworkPeerState.Disconnecting, NetworkPeerState.Offline, NetworkPeerState.Failed} },
@@ -250,7 +253,7 @@ namespace Xels.Bitcoin.P2P.Peer
         private readonly Action<IPEndPoint, Payload> onSendingMessage;
 
         /// <summary>A queue for sending payload messages to peers.</summary>
-        private readonly AsyncQueue<Payload> asyncQueue;
+        private readonly IAsyncDelegateDequeuer<Payload> asyncPayloadsQueue;
 
         /// <summary>
         /// Initializes parts of the object that are common for both inbound and outbound peers.
@@ -270,6 +273,7 @@ namespace Xels.Bitcoin.P2P.Peer
             IDateTimeProvider dateTimeProvider,
             ILoggerFactory loggerFactory,
             ISelfEndpointTracker selfEndpointTracker,
+            IAsyncProvider asyncProvider,
             Action<INetworkPeer> onDisconnected = null,
             Action<IPEndPoint, Payload> onSendingMessage = null)
         {
@@ -288,7 +292,7 @@ namespace Xels.Bitcoin.P2P.Peer
             this.Network = network;
             this.Behaviors = new List<INetworkPeerBehavior>();
             this.selfEndpointTracker = selfEndpointTracker;
-
+            this.asyncProvider = asyncProvider;
             this.onDisconnectedAsyncContext = new AsyncLocal<DisconnectedExecutionAsyncContext>();
 
             this.ConnectionParameters = parameters ?? new NetworkPeerConnectionParameters();
@@ -299,7 +303,8 @@ namespace Xels.Bitcoin.P2P.Peer
             this.onDisconnected = onDisconnected;
             this.onSendingMessage = onSendingMessage;
 
-            this.asyncQueue = new AsyncQueue<Payload>(this.SendMessageHandledAsync);
+            string dequeuerName = $"{nameof(NetworkPeer)}-{nameof(this.asyncPayloadsQueue)}-{this.PeerEndPoint.ToString()}";
+            this.asyncPayloadsQueue = asyncProvider.CreateAndRunAsyncDelegateDequeuer<Payload>(dequeuerName, this.SendMessageHandledAsync);
         }
 
         /// <summary>
@@ -320,9 +325,11 @@ namespace Xels.Bitcoin.P2P.Peer
             IDateTimeProvider dateTimeProvider,
             ILoggerFactory loggerFactory,
             ISelfEndpointTracker selfEndpointTracker,
+            IAsyncProvider asyncProvider,
             Action<INetworkPeer> onDisconnected = null,
-            Action<IPEndPoint, Payload> onSendingMessage = null)
-            : this(false, peerEndPoint, network, parameters, dateTimeProvider, loggerFactory, selfEndpointTracker, onDisconnected, onSendingMessage)
+            Action<IPEndPoint, Payload> onSendingMessage = null
+            )
+            : this(false, peerEndPoint, network, parameters, dateTimeProvider, loggerFactory, selfEndpointTracker, asyncProvider, onDisconnected, onSendingMessage)
         {
             var client = new TcpClient(AddressFamily.InterNetworkV6);
             client.Client.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
@@ -354,9 +361,10 @@ namespace Xels.Bitcoin.P2P.Peer
             INetworkPeerFactory networkPeerFactory,
             ILoggerFactory loggerFactory,
             ISelfEndpointTracker selfEndpointTracker,
+            IAsyncProvider asyncProvider,
             Action<INetworkPeer> onDisconnected = null,
             Action<IPEndPoint, Payload> onSendingMessage = null)
-            : this(true, peerEndPoint, network, parameters, dateTimeProvider, loggerFactory, selfEndpointTracker, onDisconnected, onSendingMessage)
+            : this(true, peerEndPoint, network, parameters, dateTimeProvider, loggerFactory, selfEndpointTracker, asyncProvider, onDisconnected, onSendingMessage)
         {
             this.Connection = networkPeerFactory.CreateNetworkPeerConnection(this, client, this.ProcessMessageAsync);
 
@@ -377,7 +385,7 @@ namespace Xels.Bitcoin.P2P.Peer
         {
             NetworkPeerState previous = this.State;
 
-            if (stateTransitionTable[previous].Contains(newState))
+            if (StateTransitionTable[previous].Contains(newState))
             {
                 this.State = newState;
 
@@ -588,11 +596,18 @@ namespace Xels.Bitcoin.P2P.Peer
                 {
                     await this.RespondToHandShakeAsync(cancellationSource.Token).ConfigureAwait(false);
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException ex)
                 {
-                    this.logger.LogTrace("Remote peer haven't responded within 10 seconds of the handshake completion, dropping connection.");
-
-                    this.Disconnect("Handshake timeout");
+                    if (ex.CancellationToken == cancellationSource.Token)
+                    {
+                        this.logger.LogTrace("Remote peer hasn't responded within 10 seconds of the handshake completion, dropping connection.");
+                        this.Disconnect("Handshake timeout");
+                    }
+                    else
+                    {
+                        this.logger.LogTrace("Handshake problem, dropping connection. Problem: '{0}'.", ex.Message);
+                        this.Disconnect($"Handshake problem, reason: '{ex.Message}'.");
+                    }
 
                     this.logger.LogTrace("(-)[HANDSHAKE_TIMEDOUT]");
                     throw;
@@ -643,11 +658,11 @@ namespace Xels.Bitcoin.P2P.Peer
                 throw new OperationCanceledException("The peer has been disconnected");
             }
 
-            this.asyncQueue.Enqueue(payload);
+            this.asyncPayloadsQueue.Enqueue(payload);
         }
 
         /// <summary>
-        /// This is used by the asyncQueue to send payloads messages to peers under a separate thread.
+        /// This is used by the <see cref="asyncPayloadsQueue"/> to send payloads messages to peers under a separate thread.
         /// If a message is sent inside the state change even and the send fails this could cause a deadlock,
         /// to avoid that if there is any danger of a deadlock it better to use the SendMessage method and go via the queue.
         /// </summary>
@@ -693,8 +708,10 @@ namespace Xels.Bitcoin.P2P.Peer
         /// <inheritdoc/>
         public async Task VersionHandshakeAsync(NetworkPeerRequirement requirements, CancellationToken cancellationToken)
         {
+            // In xelsX, the equivalent functionality is contained in main.cpp, method ProcessMessage()
+
             requirements = requirements ?? new NetworkPeerRequirement();
-            using (var listener = new NetworkPeerListener(this))
+            using (var listener = new NetworkPeerListener(this, this.asyncProvider))
             {
                 this.logger.LogTrace("Sending my version.");
                 await this.SendMessageAsync(this.MyVersion, cancellationToken).ConfigureAwait(false);
@@ -729,7 +746,7 @@ namespace Xels.Bitcoin.P2P.Peer
                                 return;
                             }
 
-                            if (!requirements.Check(versionPayload, out string reason))
+                            if (!requirements.Check(versionPayload, this.Inbound, out string reason))
                             {
                                 this.logger.LogTrace("(-)[UNSUPPORTED_REQUIREMENTS]");
                                 this.Disconnect("The peer does not support the required services requirement, reason: " + reason);
@@ -761,13 +778,16 @@ namespace Xels.Bitcoin.P2P.Peer
 
                     await this.SendMessageAsync(addrPayload, cancellationToken).ConfigureAwait(false);
                 }
+
+                // Ask the just-handshaked peer for the peers they know about to aid in our own peer discovery.
+                await this.SendMessageAsync(new GetAddrPayload(), cancellationToken).ConfigureAwait(false);
             }
         }
 
         /// <inheritdoc/>
         public async Task RespondToHandShakeAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            using (var listener = new NetworkPeerListener(this))
+            using (var listener = new NetworkPeerListener(this, this.asyncProvider))
             {
                 this.logger.LogTrace("Responding to handshake with my version.");
                 await this.SendMessageAsync(this.MyVersion, cancellationToken).ConfigureAwait(false);
@@ -870,7 +890,7 @@ namespace Xels.Bitcoin.P2P.Peer
                 }
             }
 
-            this.asyncQueue.Dispose();
+            this.asyncPayloadsQueue.Dispose();
             this.Connection.Dispose();
 
             this.MessageReceived.Dispose();

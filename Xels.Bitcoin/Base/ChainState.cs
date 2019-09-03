@@ -1,4 +1,3 @@
-using System;
 using NBitcoin;
 
 namespace Xels.Bitcoin.Base

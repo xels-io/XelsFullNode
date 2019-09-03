@@ -57,6 +57,10 @@ namespace NBitcoin
 
         public bool PowAllowMinDifficultyBlocks { get; }
 
+        /// <inheritdoc />
+        public bool PosNoRetargeting { get; }
+
+        /// <inheritdoc />
         public bool PowNoRetargeting { get; }
 
         public uint256 HashGenesisBlock { get; }
@@ -117,12 +121,13 @@ namespace NBitcoin
             uint256 defaultAssumeValid,
             long maxMoney,
             long coinbaseMaturity,
-            long premineHeight,            
+            long premineHeight,
             Money premineReward,
             Money proofOfWorkReward,
             TimeSpan powTargetTimespan,
             TimeSpan powTargetSpacing,
             bool powAllowMinDifficultyBlocks,
+            bool posNoRetargeting,
             bool powNoRetargeting,
             Target powLimit,
             uint256 minimumChainWork,
@@ -142,6 +147,7 @@ namespace NBitcoin
             this.FullValidationRules = new List<IFullValidationConsensusRule>();
             this.CoinbaseMaturity = coinbaseMaturity;
             this.PremineReward = premineReward;
+            this.PremineHeight = premineHeight;
             this.PremineHeight = premineHeight;
             this.FirstMiningPeriodHeight = firstMiningPeriodHeight;
             this.SecondMiningPeriodHeight = secondMiningPeriodHeight;
@@ -163,6 +169,7 @@ namespace NBitcoin
             this.PowTargetTimespan = powTargetTimespan;
             this.PowTargetSpacing = powTargetSpacing;
             this.PowAllowMinDifficultyBlocks = powAllowMinDifficultyBlocks;
+            this.PosNoRetargeting = posNoRetargeting;
             this.PowNoRetargeting = powNoRetargeting;
             this.HashGenesisBlock = hashGenesisBlock;
             this.MinimumChainWork = minimumChainWork;

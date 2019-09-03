@@ -1,8 +1,4 @@
-﻿using FluentAssertions;
-using NBitcoin;
-using Xels.Bitcoin.Consensus.Rules;
-using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
-using Xunit;
+﻿using Xunit;
 
 namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
 {

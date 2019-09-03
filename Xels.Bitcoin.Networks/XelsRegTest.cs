@@ -4,6 +4,7 @@ using NBitcoin;
 using NBitcoin.BouncyCastle.Math;
 using NBitcoin.Protocol;
 using Xels.Bitcoin.Networks.Deployments;
+using Xels.Bitcoin.Networks.Policies;
 
 namespace Xels.Bitcoin.Networks
 {
@@ -19,12 +20,14 @@ namespace Xels.Bitcoin.Networks
             uint magic = BitConverter.ToUInt32(messageStart, 0); // 0xefc0f2cd
 
             this.Name = "XelsRegTest";
+            this.NetworkType = NetworkType.Regtest;
             this.Magic = magic;
             this.DefaultPort = 18444;
             this.DefaultMaxOutboundConnections = 16;
             this.DefaultMaxInboundConnections = 109;
-            this.RPCPort = 18442;
-            this.CoinTicker = "XELS";
+            this.DefaultRPCPort = 18442;
+            this.DefaultAPIPort = 38221;
+            this.CoinTicker = "TSTRAT";
 
             var powLimit = new Target(new uint256("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"));
 
@@ -91,6 +94,7 @@ namespace Xels.Bitcoin.Networks
                 powTargetTimespan: TimeSpan.FromSeconds(14 * 24 * 60 * 60), // two weeks
                 powTargetSpacing: TimeSpan.FromSeconds(10 * 60),
                 powAllowMinDifficultyBlocks: true,
+                posNoRetargeting: true,
                 powNoRetargeting: true,
                 powLimit: powLimit,
                 minimumChainWork: null,
@@ -109,10 +113,12 @@ namespace Xels.Bitcoin.Networks
             {
                 // Fake checkpoint to prevent PH to be activated.
                 // TODO: Once PH is complete, this should be removed
-               // { 100_000 , new CheckpointInfo(uint256.Zero, uint256.Zero) }
+                // { 100_000 , new CheckpointInfo(uint256.Zero, uint256.Zero) }
             };
             this.DNSSeeds = new List<DNSSeedData>();
             this.SeedNodes = new List<NetworkAddress>();
+
+            this.StandardScriptsRegistry = new XelsStandardScriptsRegistry();
 
             Assert(this.Consensus.HashGenesisBlock == uint256.Parse("0x93925104d664314f581bc7ecb7b4bad07bcfabd1cfce4256dbd2faddcf53bd1f"));
         }

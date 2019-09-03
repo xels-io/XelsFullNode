@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using NBitcoin;
 using NBitcoin.Crypto;
 using Xels.Bitcoin.Consensus;
@@ -19,7 +18,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_ProofOfWorkBlockSignatureNotEmpty_ThrowsBadBlockSignatureConsensusErrorExceptionAsync()
+        public void RunAsync_ProofOfWorkBlockSignatureNotEmpty_ThrowsBadBlockSignatureConsensusErrorException()
         {
             this.ruleContext.ValidationContext.BlockToValidate = KnownNetworks.XelsMain.Consensus.ConsensusFactory.CreateBlock();
 
@@ -33,7 +32,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_ProofOfStakeBlockSignatureEmpty_ThrowsBadBlockSignatureConsensusErrorExceptionAsync()
+        public void RunAsync_ProofOfStakeBlockSignatureEmpty_ThrowsBadBlockSignatureConsensusErrorException()
         {
             this.ruleContext.ValidationContext.BlockToValidate = KnownNetworks.XelsMain.Consensus.ConsensusFactory.CreateBlock();
             this.ruleContext.ValidationContext.BlockToValidate.Transactions.Add(KnownNetworks.XelsMain.CreateTransaction());
@@ -56,7 +55,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_ProofOfStakeBlock_CoinStakePayToPubScriptKeyInvalid_ThrowsBadBlockSignatureConsensusErrorExceptionAsync()
+        public void RunAsync_ProofOfStakeBlock_CoinStakePayToPubScriptKeyInvalid_ThrowsBadBlockSignatureConsensusErrorException()
         {
             Block block = KnownNetworks.XelsMain.Consensus.ConsensusFactory.CreateBlock();
             block.Transactions.Add(KnownNetworks.XelsMain.CreateTransaction());
@@ -86,7 +85,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_ProofOfStakeBlock_NoOpsInScriptPubKey_ThrowsBadBlockSignatureConsensusErrorExceptionAsync()
+        public void RunAsync_ProofOfStakeBlock_NoOpsInScriptPubKey_ThrowsBadBlockSignatureConsensusErrorException()
         {
             Block block = KnownNetworks.XelsMain.Consensus.ConsensusFactory.CreateBlock();
             block.Transactions.Add(KnownNetworks.XelsMain.CreateTransaction());
@@ -114,7 +113,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_ProofOfStakeBlock_FirstOpInScriptPubKeyNotOP_Return_ThrowsBadBlockSignatureConsensusErrorExceptionAsync()
+        public void RunAsync_ProofOfStakeBlock_FirstOpInScriptPubKeyNotOP_Return_ThrowsBadBlockSignatureConsensusErrorException()
         {
             Block block = KnownNetworks.XelsMain.Consensus.ConsensusFactory.CreateBlock();
             block.Transactions.Add(KnownNetworks.XelsMain.CreateTransaction());
@@ -142,7 +141,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_ProofOfStakeBlock_OpCountBelowTwo_ThrowsBadBlockSignatureConsensusErrorExceptionAsync()
+        public void RunAsync_ProofOfStakeBlock_OpCountBelowTwo_ThrowsBadBlockSignatureConsensusErrorException()
         {
             Block block = KnownNetworks.XelsMain.Consensus.ConsensusFactory.CreateBlock();
             block.Transactions.Add(KnownNetworks.XelsMain.CreateTransaction());
@@ -170,7 +169,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_ProofOfStakeBlock_ScriptKeyDoesNotPassCompressedUncompresedKeyValidation_ThrowsBadBlockSignatureConsensusErrorExceptionAsync()
+        public void RunAsync_ProofOfStakeBlock_ScriptKeyDoesNotPassCompressedUncompresedKeyValidation_ThrowsBadBlockSignatureConsensusErrorException()
         {
             Block block = KnownNetworks.XelsMain.Consensus.ConsensusFactory.CreateBlock();
             block.Transactions.Add(KnownNetworks.XelsMain.CreateTransaction());
@@ -198,7 +197,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_ProofOfStakeBlock_ScriptKeyDoesNotPassBlockSignatureValidation_ThrowsBadBlockSignatureConsensusErrorExceptionAsync()
+        public void RunAsync_ProofOfStakeBlock_ScriptKeyDoesNotPassBlockSignatureValidation_ThrowsBadBlockSignatureConsensusErrorException()
         {
             Block block = KnownNetworks.XelsMain.Consensus.ConsensusFactory.CreateBlock();
             block.Transactions.Add(KnownNetworks.XelsMain.CreateTransaction());
@@ -230,7 +229,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_ProofOfStakeBlock_PayToPubKeyScriptPassesBlockSignatureValidation_DoesNotThrowExceptionAsync()
+        public void RunAsync_ProofOfStakeBlock_PayToPubKeyScriptPassesBlockSignatureValidation_DoesNotThrowException()
         {
             Block block = KnownNetworks.XelsMain.Consensus.ConsensusFactory.CreateBlock();
             block.Transactions.Add(KnownNetworks.XelsMain.CreateTransaction());
@@ -257,7 +256,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_ProofOfWorkBlock_BlockSignatureEmpty_DoesNotThrowExceptionAsync()
+        public void RunAsync_ProofOfWorkBlock_BlockSignatureEmpty_DoesNotThrowException()
         {
             Block block = KnownNetworks.XelsMain.Consensus.ConsensusFactory.CreateBlock();
             block.Transactions.Add(KnownNetworks.XelsMain.CreateTransaction());
@@ -345,7 +344,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         /// with the block signature correctly created with the corresponding private key expect success.
         /// </summary>
         [Fact]
-        public async Task ProofOfStakeBlock_ValidCoinStakeBlockDoesNotThrowExceptionAsync()
+        public void ProofOfStakeBlock_ValidCoinStakeBlockDoesNotThrowException()
         {
             ProofOfStakeBlock_CoinStakeTestHelper(useCompressedKey: true, includeSecondPush: false, expectFailure: false);
         }
@@ -355,7 +354,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         /// with the block signature correctly created with the corresponding private key expect failure.
         /// </summary>
         [Fact]
-        public async Task ProofOfStakeBlock_ValidCoinStakeBlockExceptUncompressedKeyThrowsExceptionAsync()
+        public void ProofOfStakeBlock_ValidCoinStakeBlockExceptUncompressedKeyThrowsException()
         {
             ProofOfStakeBlock_CoinStakeTestHelper(useCompressedKey: false, includeSecondPush: false, expectFailure: true);
         }
@@ -366,7 +365,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         /// expect failure.
         /// </summary>
         [Fact]
-        public async Task ProofOfStakeBlock_ValidCoinStakeBlockExceptExtraPushThrowsExceptionAsync()
+        public void ProofOfStakeBlock_ValidCoinStakeBlockExceptExtraPushThrowsException()
         {
             ProofOfStakeBlock_CoinStakeTestHelper(useCompressedKey: true, includeSecondPush: true, expectFailure: true);
         }

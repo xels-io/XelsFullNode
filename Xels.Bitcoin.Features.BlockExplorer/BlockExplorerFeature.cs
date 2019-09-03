@@ -11,9 +11,9 @@ namespace Xels.Bitcoin.Features.BlockExplorer
 {
     public class BlockExplorerFeature : FullNodeFeature
     {
-        private ConcurrentChain chain;
+        private ChainIndexer chain;
 
-        public BlockExplorerFeature(ConcurrentChain chain)
+        public BlockExplorerFeature(ChainIndexer chain)
         {
             this.chain = chain;
         }

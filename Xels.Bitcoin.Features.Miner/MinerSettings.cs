@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text;
+﻿using System.Text;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
 using Xels.Bitcoin.Configuration;
@@ -23,7 +22,7 @@ namespace Xels.Bitcoin.Features.Miner
         /// Enable the node to stake.
         /// </summary>
         public bool Stake { get; private set; }
-        
+
         /// <summary>
         /// Enable splitting coins when staking.
         /// </summary>
@@ -100,7 +99,7 @@ namespace Xels.Bitcoin.Features.Miner
             this.MinimumStakingCoinValue = config.GetOrDefault("minimumstakingcoinvalue", MinimumStakingCoinValueDefaultValue, this.logger);
             this.MinimumStakingCoinValue = this.MinimumStakingCoinValue == 0 ? 1 : this.MinimumStakingCoinValue;
         }
-        
+
         /// <summary>
         /// Displays mining help information on the console.
         /// </summary>

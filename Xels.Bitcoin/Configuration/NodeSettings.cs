@@ -19,7 +19,7 @@ namespace Xels.Bitcoin.Configuration
     internal static class NormalizeDirectorySeparatorExt
     {
         /// <summary>
-        /// Fixes incorrect directory separator characters in path (if any)
+        /// Fixes incorrect directory separator characters in path (if any).
         /// </summary>
         public static string NormalizeDirectorySeparator(this string path)
         {
@@ -29,56 +29,84 @@ namespace Xels.Bitcoin.Configuration
     }
 
     /// <summary>
-    /// Node configuration complied from both the application command line arguments and the configuration file.
+    /// Сontains the configuration settings for a Full Node. These settings are taken from both the application
+    /// command line arguments and the configuration file.
+    /// Unlike the settings held by <see cref="Network"/>, these settings are individualized for each Full Node.
     /// </summary>
     public class NodeSettings : IDisposable
     {
-        /// <summary>Version of the protocol the current implementation supports.</summary>
+        /// <summary>The version of the protocol supported by the current implementation of the Full Node.</summary>
         public const ProtocolVersion SupportedProtocolVersion = ProtocolVersion.SENDHEADERS_VERSION;
 
-        /// <summary>Factory to create instance logger.</summary>
+        /// <summary>A factory responsible for creating a Full Node logger instance.</summary>
         public ILoggerFactory LoggerFactory { get; private set; }
 
-        /// <summary>Instance logger.</summary>
+        /// <summary>An instance of the Full Node logger, which reports on the Full Node's activity.</summary>
         public ILogger Logger { get; private set; }
 
-        /// <summary>Configuration related to logging.</summary>
+        /// <summary>The settings of the Full Node's logger.</summary>
         public LogSettings Log { get; private set; }
 
-        /// <summary>List of paths to important files and folders.</summary>
+        /// <summary>A list of paths to folders which Full Node components use to store data. These folders are found
+        /// in the <see cref="DataDir"/>.
+        /// </summary>
         public DataFolder DataFolder { get; private set; }
 
-        /// <summary>Path to the data directory. This value is read-only and is set in the constructor's args.</summary>
+        /// <summary>The path to the data directory, which contains, for example, the configuration file, wallet files,
+        /// and the file containing the peers that the Node has connected to. This value is read-only and can only be
+        /// set via the NodeSettings constructor's arguments.
+        /// </summary>
         public string DataDir { get; private set; }
 
-        /// <summary>Path to the root data directory. This value is read-only and is set in the constructor's args.</summary>
+        /// <summary>The path to the root data directory, which holds all node data on the machine.
+        /// This includes separate subfolders for different nodes that run on the machine: a Xels folder for a
+        /// Xels node, a Bitcoin folder for a Bitcoin node, and folders for any sidechain nodes. This value is
+        /// read-only and can only be set via the NodeSettings constructor's arguments.
+        /// </summary>
         public string DataDirRoot { get; private set; }
 
-        /// <summary>Path to the configuration file. This value is read-only and is set in the constructor's args.</summary>
+        /// <summary>The path to the Full Node's configuration file.
+        /// This value is read-only and can only be set via the NodeSettings constructor's arguments.
+        /// </summary>
         public string ConfigurationFile { get; private set; }
 
-        /// <summary>Combined command line arguments and configuration file settings.</summary>
+        /// <summary>A combination of the settings from the Full Node's configuration file and the command
+        /// line arguments supplied to the Full Node when it was run. This places the settings from both sources
+        /// into a single object, which is referenced at runtime.
+        /// </summary>
         public TextFileConfiguration ConfigReader { get; private set; }
 
-        /// <summary>Supported protocol version.</summary>
+        /// <summary>The version of the protocol supported by the Full Node.</summary>
         public ProtocolVersion ProtocolVersion { get; private set; }
 
-        /// <summary>Lowest supported protocol version.</summary>
+        /// <summary>The lowest version of the protocol which the Full Node supports.</summary>
         public ProtocolVersion? MinProtocolVersion { get; set; }
 
-        /// <summary>Specification of the network the node runs on - regtest/testnet/mainnet.</summary>
+        /// <summary>The network which the node is configured to run on. The network can be a "mainnet", "testnet",
+        /// or "regtest" network. All three network configurations can be defined, and one is selected at the command
+        /// line (via the  <see cref="NetworksSelector"/> class) to connect to. A Full Node defaults to running on the
+        /// mainnet.
+        /// </summary>
         public Network Network { get; private set; }
 
-        /// <summary>The node's user agent.</summary>
+        /// <summary>A string that is used to help identify the Full Node when it connects to other peers on a network.
+        /// Defaults to "XelsNode".
+        /// </summary>
         public string Agent { get; private set; }
 
-        /// <summary>Minimum transaction fee for network.</summary>
+        /// <summary>The minimum fee for a kB of transactions on the node.</summary>
         public FeeRate MinTxFeeRate { get; private set; }
 
-        /// <summary>Fall back transaction fee for network.</summary>
+        /// <summary>The default fee for a kB of transactions on the node. This value is used if no fee is specified for
+        /// a transaction.
+        /// </summary>
         public FeeRate FallbackTxFeeRate { get; private set; }
 
-        /// <summary>Minimum relay transaction fee for network.</summary>
+        /// <summary>The minimum relay transaction fee for a kB of transactions on the node. A miner may not be prepared
+        /// to mine a transaction for a specified fee but might be prepared to forward the transaction to another miner
+        /// who will. In this situation, the transaction is propagated to other peers if the relay fee
+        /// is met. For this reason, the minimum relay transaction fee is usually lower than the minimum fee.
+        /// </summary>
         public FeeRate MinRelayTxFeeRate { get; private set; }
 
         /// <summary>
@@ -242,6 +270,8 @@ namespace Xels.Bitcoin.Configuration
 
                 var builder = new StringBuilder();
 
+                BuildDefaultConfigurationFile(builder, this.Network);
+
                 foreach (IFeatureRegistration featureRegistration in features)
                 {
                     MethodInfo getDefaultConfiguration = featureRegistration.FeatureType.GetMethod("BuildDefaultConfigurationFile", BindingFlags.Public | BindingFlags.Static);
@@ -348,6 +378,7 @@ namespace Xels.Bitcoin.Configuration
             builder.AppendLine($"-help/--help              Show this help.");
             builder.AppendLine($"-conf=<Path>              Path to the configuration file. Defaults to {defaults.ConfigurationFile}.");
             builder.AppendLine($"-datadir=<Path>           Path to the data directory. Defaults to {defaults.DataDir}.");
+            builder.AppendLine($"-datadirroot=<Path>       The path to the root data directory, which holds all node data on the machine. Defaults to 'XelsNode'.");
             builder.AppendLine($"-debug[=<string>]         Set 'Debug' logging level. Specify what to log via e.g. '-debug=Xels.Bitcoin.Miner,Xels.Bitcoin.Wallet'.");
             builder.AppendLine($"-loglevel=<string>        Direct control over the logging level: '-loglevel=trace/debug/info/warn/error/fatal'.");
 
@@ -370,6 +401,19 @@ namespace Xels.Bitcoin.Configuration
         /// <param name="network">The network to base the defaults off.</param>
         public static void BuildDefaultConfigurationFile(StringBuilder builder, Network network)
         {
+            //builder.AppendLine("connect=52.68.239.4");
+            //builder.AppendLine("connect=54.238.248.117");
+            //builder.AppendLine("connect=13.114.52.87");
+            //builder.AppendLine("connect=52.192.229.45");
+            //builder.AppendLine("connect=52.199.121.139");
+
+            //builder.AppendLine("whitelist=52.68.239.4");
+            //builder.AppendLine("whitelist=54.238.248.117");
+            //builder.AppendLine("whitelist=13.114.52.87");
+            //builder.AppendLine("whitelist=52.192.229.45");
+            //builder.AppendLine("whitelist=52.199.121.139");
+
+
             builder.AppendLine("####Node Settings####");
             builder.AppendLine($"#Test network. Defaults to 0.");
             builder.AppendLine($"testnet={((network.IsTest() && !network.IsRegTest()) ? 1 : 0)}");

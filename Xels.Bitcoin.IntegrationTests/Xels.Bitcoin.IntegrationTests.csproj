@@ -19,12 +19,17 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GenerateProgramFile>false</GenerateProgramFile>
-	<CodeAnalysisRuleSet>..\None.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;1705;IDE0008;</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Flurl" Version="2.8.0" />
@@ -52,7 +57,6 @@
     <ProjectReference Include="..\Xels.Bitcoin.Tests.Common\Xels.Bitcoin.Tests.Common.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin\Xels.Bitcoin.csproj" />
     <ProjectReference Include="..\Xels.SmartContracts.Core\Xels.SmartContracts.Core.csproj" />
-    <ProjectReference Include="..\XUnitRetry\XUnitRetry.csproj" />
   </ItemGroup>
 
   <ItemGroup>

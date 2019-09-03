@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using Moq;
 using NBitcoin;
 using Xels.Bitcoin.Features.SmartContracts.Models;
-using Xels.Bitcoin.Features.SmartContracts.Networks;
 using Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Consensus.Rules;
+using Xels.SmartContracts.Networks;
 using Xunit;
 
 namespace Xels.Bitcoin.Features.SmartContracts.Tests.Models
@@ -23,8 +22,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Models
                 Amount = "2",
                 ContractCode = "012345",
                 FeeAmount = "0.02",
-                GasLimit = SmartContractFormatRule.GasLimitCreateMinimum - 1, // Too low
-                GasPrice = SmartContractFormatRule.GasPriceMaximum + 1, // Too high
+                GasLimit = SmartContractFormatLogic.GasLimitCreateMinimum - 1, // Too low
+                GasPrice = SmartContractFormatLogic.GasPriceMaximum + 1, // Too high
                 Parameters = new string[0],
                 Password = "password",
                 WalletName = "Jordan",
@@ -36,16 +35,16 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Models
             Assert.Contains(results, x => x.MemberNames.First() == nameof(BuildCreateContractTransactionRequest.GasLimit));
             Assert.Contains(results, x => x.MemberNames.First() == nameof(BuildCreateContractTransactionRequest.GasPrice));
 
-            request.GasLimit = SmartContractFormatRule.GasLimitMaximum + 1;
-            request.GasPrice = SmartContractFormatRule.GasPriceMinimum - 1;
+            request.GasLimit = SmartContractFormatLogic.GasLimitMaximum + 1;
+            request.GasPrice = SmartContractMempoolValidator.MinGasPrice - 1;
 
             results = Validate(request);
             Assert.Equal(2, results.Count);
             Assert.Contains(results, x => x.MemberNames.First() == nameof(BuildCreateContractTransactionRequest.GasLimit));
             Assert.Contains(results, x => x.MemberNames.First() == nameof(BuildCreateContractTransactionRequest.GasPrice));
 
-            request.GasLimit = SmartContractFormatRule.GasLimitMaximum;
-            request.GasPrice = SmartContractFormatRule.GasPriceMinimum;
+            request.GasLimit = SmartContractFormatLogic.GasLimitMaximum;
+            request.GasPrice = SmartContractMempoolValidator.MinGasPrice;
             results = Validate(request);
             Assert.Empty(results);
         }
@@ -60,8 +59,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Models
                 ContractAddress = "moRRQqumoxYxFysoNuoJg5E1S99WvrNZRX",
                 MethodName = "MethodName",
                 FeeAmount = "0.02",
-                GasLimit = SmartContractFormatRule.GasLimitCallMinimum - 1, // Too low
-                GasPrice = SmartContractFormatRule.GasPriceMaximum + 1, // Too high
+                GasLimit = SmartContractFormatLogic.GasLimitCallMinimum - 1, // Too low
+                GasPrice = SmartContractFormatLogic.GasPriceMaximum + 1, // Too high
                 Parameters = new string[0],
                 Password = "password",
                 WalletName = "Jordan",
@@ -73,16 +72,16 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Models
             Assert.Contains(results, x => x.MemberNames.First() == nameof(BuildCallContractTransactionRequest.GasLimit));
             Assert.Contains(results, x => x.MemberNames.First() == nameof(BuildCallContractTransactionRequest.GasPrice));
 
-            request.GasLimit = SmartContractFormatRule.GasLimitMaximum + 1;
-            request.GasPrice = SmartContractFormatRule.GasPriceMinimum - 1;
+            request.GasLimit = SmartContractFormatLogic.GasLimitMaximum + 1;
+            request.GasPrice = SmartContractMempoolValidator.MinGasPrice - 1;
 
             results = Validate(request);
             Assert.Equal(2, results.Count);
             Assert.Contains(results, x => x.MemberNames.First() == nameof(BuildCallContractTransactionRequest.GasLimit));
             Assert.Contains(results, x => x.MemberNames.First() == nameof(BuildCallContractTransactionRequest.GasPrice));
 
-            request.GasLimit = SmartContractFormatRule.GasLimitMaximum;
-            request.GasPrice = SmartContractFormatRule.GasPriceMinimum;
+            request.GasLimit = SmartContractFormatLogic.GasLimitMaximum;
+            request.GasPrice = SmartContractMempoolValidator.MinGasPrice;
             results = Validate(request);
             Assert.Empty(results);
         }
@@ -96,8 +95,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Models
                 Amount = "2",
                 ContractCode = "012345",
                 FeeAmount = "0.02",
-                GasLimit = SmartContractFormatRule.GasLimitCreateMinimum,
-                GasPrice = SmartContractFormatRule.GasPriceMaximum,
+                GasLimit = SmartContractFormatLogic.GasLimitCreateMinimum,
+                GasPrice = SmartContractFormatLogic.GasPriceMaximum,
                 Parameters = new string[0],
                 Password = "password",
                 WalletName = "Jordan",
@@ -119,8 +118,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Models
                 ContractAddress = "Test",
                 MethodName = "Test",
                 FeeAmount = "0.02",
-                GasLimit = SmartContractFormatRule.GasLimitCallMinimum,
-                GasPrice = SmartContractFormatRule.GasPriceMaximum,
+                GasLimit = SmartContractFormatLogic.GasLimitCallMinimum,
+                GasPrice = SmartContractFormatLogic.GasPriceMaximum,
                 Parameters = new string[0],
                 Password = "password",
                 WalletName = "Jordan",

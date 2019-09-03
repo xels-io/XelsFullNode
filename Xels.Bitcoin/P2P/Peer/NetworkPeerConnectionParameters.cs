@@ -7,6 +7,7 @@ using NBitcoin;
 using NBitcoin.Protocol;
 using Xels.Bitcoin.P2P.Protocol.Behaviors;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
+using TracerAttributes;
 
 namespace Xels.Bitcoin.P2P.Peer
 {
@@ -85,6 +86,7 @@ namespace Xels.Bitcoin.P2P.Peer
             return this;
         }
 
+        [NoTrace]
         public NetworkPeerConnectionParameters Clone()
         {
             return new NetworkPeerConnectionParameters().SetFrom(this);

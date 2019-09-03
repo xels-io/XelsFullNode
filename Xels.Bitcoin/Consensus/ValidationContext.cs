@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Net;
 using NBitcoin;
 using Xels.Bitcoin.Configuration.Settings;
-using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
 
 namespace Xels.Bitcoin.Consensus

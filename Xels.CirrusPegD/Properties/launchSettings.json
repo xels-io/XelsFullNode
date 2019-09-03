@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Xels.CirrusPegD": {
+      "commandName": "Project",
+      "commandLineArgs": "-mainchain"
+    }
+  }
+}

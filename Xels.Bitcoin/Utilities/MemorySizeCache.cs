@@ -15,12 +15,15 @@ namespace Xels.Bitcoin.Utilities
         {
             get
             {
-                lock (this.lockObject)
+                lock (this.LockObject)
                 {
-                    return this.totalSize;
+                    return base.totalSize;
                 }
             }
         }
+
+        /// <summary>Gets max size in bytes that can be stored in the cache.</summary>
+        public long MaxSize => this.maxSize;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemoryCountCache{TKey, TValue}"/> class.
@@ -40,12 +43,12 @@ namespace Xels.Bitcoin.Utilities
         /// <param name="size">Value size in bytes.</param>
         public void AddOrUpdate(TKey key, TValue value, long size)
         {
-            var item = new MemoryCache<TKey, TValue>.CacheItem(key, value) { Size = size };
+            var item = new CacheItem(key, value) { Size = size };
 
             base.AddOrUpdate(item);
         }
 
-        protected override bool IsCacheFull(CacheItem item)
+        protected override bool IsCacheFullLocked(CacheItem item)
         {
             return this.TotalSize > (this.maxSize - item.Size);
         }

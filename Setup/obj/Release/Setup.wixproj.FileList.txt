@@ -1,0 +1,7 @@
+F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Setup\bin\Release\Xels-Backend-Setup.msi
+F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Setup\bin\Release\Xels-Backend-Setup.wixpdb
+obj\Release\Product.wixobj
+obj\Release\Xels.XelsD.wixobj
+obj\Release\Setup.wixproj.BindContentsFileListnull.txt
+obj\Release\Setup.wixproj.BindOutputsFileListnull.txt
+obj\Release\Setup.wixproj.BindBuiltOutputsFileListnull.txt

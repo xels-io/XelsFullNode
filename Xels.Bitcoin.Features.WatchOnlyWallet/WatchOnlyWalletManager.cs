@@ -2,7 +2,10 @@
 using Microsoft.Extensions.Logging;
 using NBitcoin;
 using Xels.Bitcoin.Configuration;
+using Xels.Bitcoin.EventBus;
+using Xels.Bitcoin.EventBus.CoreEvents;
 using Xels.Bitcoin.Features.Wallet;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin.Features.WatchOnlyWallet
@@ -36,6 +39,11 @@ namespace Xels.Bitcoin.Features.WatchOnlyWallet
         /// <summary>Provider of date time functionality.</summary>
         private readonly IDateTimeProvider dateTimeProvider;
 
+        private readonly ISignals signals;
+
+        private SubscriptionToken blockConnectedSubscription;
+        private SubscriptionToken transactionReceivedSubscription;
+
         /// <summary>
         /// Provides a rapid lookup of transactions appearing in the watch-only wallet.
         /// This includes both transactions under watched addresses, as well as stored
@@ -43,18 +51,22 @@ namespace Xels.Bitcoin.Features.WatchOnlyWallet
         /// </summary>
         private ConcurrentDictionary<uint256, TransactionData> txLookup;
 
-        public WatchOnlyWalletManager(IDateTimeProvider dateTimeProvider, ILoggerFactory loggerFactory, Network network, DataFolder dataFolder)
+        public WatchOnlyWalletManager(IDateTimeProvider dateTimeProvider, ILoggerFactory loggerFactory, Network network, DataFolder dataFolder, ISignals signals)
         {
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
             this.network = network;
             this.coinType = (CoinType)network.Consensus.CoinType;
             this.fileStorage = new FileStorage<WatchOnlyWallet>(dataFolder.WalletPath);
             this.dateTimeProvider = dateTimeProvider;
+            this.signals = signals;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+            this.signals.Unsubscribe(this.blockConnectedSubscription);
+            this.signals.Unsubscribe(this.transactionReceivedSubscription);
+
             this.SaveWatchOnlyWallet();
         }
 
@@ -64,7 +76,20 @@ namespace Xels.Bitcoin.Features.WatchOnlyWallet
             // load the watch only wallet into memory
             this.Wallet = this.LoadWatchOnlyWallet();
 
+            this.blockConnectedSubscription = this.signals.Subscribe<BlockConnected>(this.OnBlockConnected);
+            this.transactionReceivedSubscription = this.signals.Subscribe<TransactionReceived>(this.OnTransactionAvailable);
+
             this.LoadTransactionLookup();
+        }
+
+        private void OnTransactionAvailable(TransactionReceived transactionReceived)
+        {
+            this.ProcessTransaction(transactionReceived.ReceivedTransaction);
+        }
+
+        private void OnBlockConnected(BlockConnected blockConnected)
+        {
+            this.ProcessBlock(blockConnected.ConnectedBlock.Block);
         }
 
         /// <inheritdoc />
@@ -260,7 +285,7 @@ namespace Xels.Bitcoin.Features.WatchOnlyWallet
                 // So now update the block hash and Merkle proof since it has
                 // appeared in a block.
                 existingWatchedTransaction.BlockHash = block.GetHash();
-                existingWatchedTransaction.MerkleProof = new MerkleBlock(block, new[] {transaction.GetHash()}).PartialMerkleTree;
+                existingWatchedTransaction.MerkleProof = new MerkleBlock(block, new[] { transaction.GetHash() }).PartialMerkleTree;
 
                 // Update the lookup cache with the new transaction information.
                 this.txLookup.AddOrUpdate(existingWatchedTransaction.Id, existingWatchedTransaction, (key, oldValue) => existingWatchedTransaction);

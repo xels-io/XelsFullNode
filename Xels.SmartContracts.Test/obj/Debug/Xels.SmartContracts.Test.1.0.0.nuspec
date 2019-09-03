@@ -17,6 +17,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="F:\XelsPublicRepos\XelsFullNode\Xels.SmartContracts.Test\bin\Debug\netcoreapp2.1\Xels.SmartContracts.Test.dll" target="lib\netcoreapp2.1\Xels.SmartContracts.Test.dll" />
+    <file src="F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.Test\bin\Debug\netcoreapp2.1\Xels.SmartContracts.Test.dll" target="lib\netcoreapp2.1\Xels.SmartContracts.Test.dll" />
   </files>
 </package>

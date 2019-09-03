@@ -24,8 +24,8 @@ namespace Xels.Bitcoin.IntegrationTests.Miners
             {
                 var network = new XelsRegTest();
 
-                CoreNode node = nodeBuilder.CreateXelsPosNode(network).WithDummyWallet().Start();
-                CoreNode syncer = nodeBuilder.CreateXelsPosNode(network).Start();
+                CoreNode node = nodeBuilder.CreateXelsPosNode(network, "posmining-1-node").WithDummyWallet().Start();
+                CoreNode syncer = nodeBuilder.CreateXelsPosNode(network, "posmining-1-syncer").Start();
 
                 TestHelper.MineBlocks(node, 1);
                 Assert.NotEqual(node.FullNode.ConsensusManager().Tip, syncer.FullNode.ConsensusManager().Tip);
@@ -42,7 +42,7 @@ namespace Xels.Bitcoin.IntegrationTests.Miners
             {
                 var network = new XelsRegTestLastPowBlock();
 
-                CoreNode node = nodeBuilder.CreateXelsPosNode(network).WithDummyWallet().Start();
+                CoreNode node = nodeBuilder.CreateXelsPosNode(network, "posmining-2-node").WithDummyWallet().Start();
 
                 // Mine two blocks (OK).
                 TestHelper.MineBlocks(node, 2);

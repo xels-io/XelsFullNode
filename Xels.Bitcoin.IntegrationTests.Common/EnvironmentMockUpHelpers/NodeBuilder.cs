@@ -8,6 +8,7 @@ using NBitcoin;
 using NBitcoin.Protocol;
 using NLog;
 using Xels.Bitcoin.Builder;
+using Xels.Bitcoin.Features.Api;
 using Xels.Bitcoin.Features.BlockStore;
 using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.MemoryPool;
@@ -93,9 +94,9 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
             throw new FileNotFoundException($"Could not load the file {path}.");
         }
 
-        protected CoreNode CreateNode(NodeRunner runner, string configFile = "bitcoin.conf", bool useCookieAuth = false)
+        protected CoreNode CreateNode(NodeRunner runner, string configFile = "bitcoin.conf", bool useCookieAuth = false, NodeConfigParameters configParameters = null)
         {
-            var node = new CoreNode(runner, this.ConfigParameters, configFile, useCookieAuth);
+            var node = new CoreNode(runner, configParameters, configFile, useCookieAuth);
             this.Nodes.Add(node);
             return node;
         }
@@ -120,10 +121,11 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         /// </summary>
         /// <param name="network">The network the node will run on.</param>
         /// <param name="agent">Overrides the node's agent prefix.</param>
+        /// <param name="configParameters">Adds to the nodes configuration parameters.</param>
         /// <returns>The constructed PoW node.</returns>
-        public CoreNode CreateXelsPowNode(Network network, string agent = null)
+        public CoreNode CreateXelsPowNode(Network network, string agent = null, NodeConfigParameters configParameters = null)
         {
-            return CreateNode(new XelsBitcoinPowRunner(this.GetNextDataFolderName(), network, agent));
+            return CreateNode(new XelsBitcoinPowRunner(this.GetNextDataFolderName(), network, agent), configParameters: configParameters);
         }
 
         public CoreNode CreateXelsCustomPowNode(Network network, NodeConfigParameters configParameters)
@@ -135,6 +137,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
                .AddMining()
                .UseWallet()
                .AddRPC()
+               .UseApi()
                .UseTestChainedHeaderTree()
                .MockIBD());
 
@@ -147,10 +150,13 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         /// <see cref="P2P.PeerDiscovery"/> and <see cref="P2P.PeerConnectorDiscovery"/> are disabled by default.
         /// </para>
         /// </summary>
+        /// <param name="network">The network the node will run on.</param>
+        /// <param name="agent">Overrides the node's agent prefix.</param>
+        /// <param name="configParameters">Adds to the nodes configuration parameters.</param>
         /// <returns>The constructed PoS node.</returns>
-        public CoreNode CreateXelsPosNode(Network network, string agent = "XelsBitcoin")
+        public CoreNode CreateXelsPosNode(Network network, string agent = "XelsBitcoin", NodeConfigParameters configParameters = null)
         {
-            return CreateNode(new XelsBitcoinPosRunner(this.GetNextDataFolderName(), network, agent), "xels.conf");
+            return CreateNode(new XelsBitcoinPosRunner(this.GetNextDataFolderName(), network, agent), "xels.conf", configParameters: configParameters);
         }
 
         public CoreNode CloneXelsNode(CoreNode cloneNode, string agent = "XelsBitcoin")

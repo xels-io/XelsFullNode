@@ -1,5 +1,4 @@
-﻿using System;
-using Xels.SmartContracts;
+﻿using Xels.SmartContracts;
 
 public class XelsCollectible : SmartContract
 {

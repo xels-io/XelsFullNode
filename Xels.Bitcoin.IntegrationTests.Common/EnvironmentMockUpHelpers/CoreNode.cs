@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -11,10 +12,13 @@ using Moq;
 using NBitcoin;
 using NBitcoin.DataEncoders;
 using NBitcoin.Protocol;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Consensus;
+using Xels.Bitcoin.EventBus;
+using Xels.Bitcoin.EventBus.CoreEvents;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.RPC;
 using Xels.Bitcoin.Features.Wallet;
@@ -24,6 +28,7 @@ using Xels.Bitcoin.P2P;
 using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
 using Xels.Bitcoin.Primitives;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
 
@@ -51,15 +56,16 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
 
         public string Config { get; }
 
-        public NodeConfigParameters ConfigParameters { get; } = new NodeConfigParameters();
+        public NodeConfigParameters ConfigParameters { get; set; }
 
         public bool CookieAuth { get; set; }
 
         public Mnemonic Mnemonic { get; set; }
 
-        private Func<ChainedHeaderBlock, bool> builderDisconnectInterceptor;
-        private Func<ChainedHeaderBlock, bool> builderConnectInterceptor;
+        public string WalletName => this.builderWalletName;
+        public string WalletPassword => this.builderWalletPassword;
 
+        private bool builderAlwaysFlushBlocks;
         private bool builderEnablePeerDiscovery;
         private bool builderNoValidation;
         private bool builderOverrideDateTimeProvider;
@@ -68,6 +74,10 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         private string builderWalletName;
         private string builderWalletPassword;
         private string builderWalletPassphrase;
+        private string builderWalletMnemonic;
+
+        private SubscriptionToken blockConnectedSubscription;
+        private SubscriptionToken blockDisconnectedSubscription;
 
         public CoreNode(NodeRunner runner, NodeConfigParameters configParameters, string configfile, bool useCookieAuth = false)
         {
@@ -78,7 +88,11 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
             this.creds = new NetworkCredential(pass, pass);
             this.Config = Path.Combine(this.runner.DataFolder, configfile);
             this.CookieAuth = useCookieAuth;
-            this.ConfigParameters.Import(configParameters);
+
+            this.ConfigParameters = new NodeConfigParameters();
+            if (configParameters != null)
+                this.ConfigParameters.Import(configParameters);
+
             var randomFoundPorts = new int[3];
             IpHelper.FindPorts(randomFoundPorts);
             this.ConfigParameters.SetDefaultValueIfUndefined("port", randomFoundPorts[0].ToString());
@@ -111,24 +125,26 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         }
 
         /// <summary>
-        /// Executes a function when a block has disconnected.
+        /// Executes a function when a block has connected.
         /// </summary>
-        /// <param name="interceptor">A function that is called when a block disconnects, it will return true if it executed.</param>
+        /// <param name="interceptor">A function that is called everytime a block connects.</param>
         /// <returns>This node.</returns>
-        public CoreNode BlockDisconnectInterceptor(Func<ChainedHeaderBlock, bool> interceptor)
+        public CoreNode SetConnectInterceptor(Action<ChainedHeaderBlock> interceptor)
         {
-            this.builderDisconnectInterceptor = interceptor;
+            this.blockConnectedSubscription = this.FullNode.NodeService<ISignals>().Subscribe<BlockConnected>(ev => interceptor(ev.ConnectedBlock));
+
             return this;
         }
 
         /// <summary>
-        /// Executes a function when a block has connected.
+        /// Executes a function when a block has disconnected.
         /// </summary>
-        /// <param name="interceptor">A function that is called when a block connects, it will return true if it executed.</param>
+        /// <param name="interceptor">A function that is called when a block disconnects.</param>
         /// <returns>This node.</returns>
-        public CoreNode BlockConnectInterceptor(Func<ChainedHeaderBlock, bool> interceptor)
+        public CoreNode SetDisconnectInterceptor(Action<ChainedHeaderBlock> interceptor)
         {
-            this.builderConnectInterceptor = interceptor;
+            this.blockDisconnectedSubscription = this.FullNode.NodeService<ISignals>().Subscribe<BlockDisconnected>(ev => interceptor(ev.DisconnectedBlock));
+
             return this;
         }
 
@@ -139,6 +155,12 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         public CoreNode EnablePeerDiscovery()
         {
             this.builderEnablePeerDiscovery = true;
+            return this;
+        }
+
+        public CoreNode AlwaysFlushBlocks()
+        {
+            this.builderAlwaysFlushBlocks = true;
             return this;
         }
 
@@ -183,14 +205,24 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         /// <param name="walletPassword">Wallet password defaulted to "password".</param>
         /// <param name="walletName">Wallet name defaulted to "mywallet".</param>
         /// <param name="walletPassphrase">Wallet passphrase defaulted to "passphrase".</param>
+        /// <param name="walletMnemonic">Optional wallet mnemonic.</param>
         /// <returns>This node.</returns>
-        public CoreNode WithWallet(string walletPassword = "password", string walletName = "mywallet", string walletPassphrase = "passphrase")
+        public CoreNode WithWallet(string walletPassword = "password", string walletName = "mywallet", string walletPassphrase = "passphrase", string walletMnemonic = null)
         {
             this.builderWithDummyWallet = false;
             this.builderWithWallet = true;
             this.builderWalletName = walletName;
             this.builderWalletPassphrase = walletPassphrase;
             this.builderWalletPassword = walletPassword;
+            this.builderWalletMnemonic = walletMnemonic;
+            return this;
+        }
+
+        public CoreNode WithReadyBlockchainData(string readyDataName)
+        {
+            // Extract the zipped blockchain data to the node's DataFolder.
+            ZipFile.ExtractToDirectory(Path.GetFullPath(readyDataName), this.DataFolder, true);
+
             return this;
         }
 
@@ -201,14 +233,6 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
 
         public INetworkPeer CreateNetworkPeerClient()
         {
-            var selfEndPointTracker = new SelfEndpointTracker(this.loggerFactory);
-
-            // Needs to be initialized beforehand.
-            selfEndPointTracker.UpdateAndAssignMyExternalAddress(new IPEndPoint(IPAddress.Parse("0.0.0.0").MapToIPv6Ex(), this.ProtocolPort), false);
-
-            var ibdState = new Mock<IInitialBlockDownloadState>();
-            ibdState.Setup(x => x.IsInitialBlockDownload()).Returns(() => true);
-
             ConnectionManagerSettings connectionManagerSettings = null;
 
             if (this.runner is BitcoinCoreRunner)
@@ -221,29 +245,42 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
                 connectionManagerSettings = this.runner.FullNode.ConnectionManager.ConnectionSettings;
             }
 
+            var selfEndPointTracker = new SelfEndpointTracker(this.loggerFactory, connectionManagerSettings);
+
+            // Needs to be initialized beforehand.
+            selfEndPointTracker.UpdateAndAssignMyExternalAddress(new IPEndPoint(IPAddress.Parse("0.0.0.0").MapToIPv6Ex(), this.ProtocolPort), false);
+
+            var ibdState = new Mock<IInitialBlockDownloadState>();
+            ibdState.Setup(x => x.IsInitialBlockDownload()).Returns(() => true);
+
             var networkPeerFactory = new NetworkPeerFactory(this.runner.Network,
                 DateTimeProvider.Default,
                 this.loggerFactory,
                 new PayloadProvider().DiscoverPayloads(),
                 selfEndPointTracker,
                 ibdState.Object,
-                connectionManagerSettings);
+                connectionManagerSettings,
+                this.GetOrCreateAsyncProvider()
+                );
 
-            return networkPeerFactory.CreateConnectedNetworkPeerAsync("127.0.0.1:" + this.ProtocolPort).GetAwaiter().GetResult();
+            return networkPeerFactory.CreateConnectedNetworkPeerAsync("127.0.0.1:" + this.ProtocolPort).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        private IAsyncProvider GetOrCreateAsyncProvider()
+        {
+            if (this.runner.FullNode == null)
+                return new AsyncProvider(this.loggerFactory, new Signals.Signals(this.loggerFactory, null), new NodeLifetime());
+            else
+                return this.runner.FullNode.NodeService<IAsyncProvider>();
         }
 
         public CoreNode Start()
         {
             lock (this.lockObject)
             {
+                this.runner.AlwaysFlushBlocks = this.builderAlwaysFlushBlocks;
                 this.runner.EnablePeerDiscovery = this.builderEnablePeerDiscovery;
                 this.runner.OverrideDateTimeProvider = this.builderOverrideDateTimeProvider;
-
-                if (this.builderDisconnectInterceptor != null)
-                    this.runner.InterceptorDisconnect = this.builderDisconnectInterceptor;
-
-                if (this.builderConnectInterceptor != null)
-                    this.runner.InterceptorConnect = this.builderConnectInterceptor;
 
                 this.runner.BuildNode();
                 this.runner.Start();
@@ -307,7 +344,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         {
             TimeSpan duration = TimeSpan.FromMinutes(5);
             var cancellationToken = new CancellationTokenSource(duration).Token;
-            TestHelper.WaitLoop(() =>
+            TestBase.WaitLoop(() =>
             {
                 try
                 {
@@ -328,11 +365,11 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
             var timeToNodeInit = TimeSpan.FromMinutes(1);
             var timeToNodeStart = TimeSpan.FromMinutes(1);
 
-            TestHelper.WaitLoop(() => this.runner.FullNode != null,
+            TestBase.WaitLoop(() => this.runner.FullNode != null,
                 cancellationToken: new CancellationTokenSource(timeToNodeInit).Token,
                 failureReason: $"Failed to assign instance of FullNode within {timeToNodeInit}");
 
-            TestHelper.WaitLoop(() => this.runner.FullNode.State == FullNodeState.Started,
+            TestBase.WaitLoop(() => this.runner.FullNode.State == FullNodeState.Started,
                 cancellationToken: new CancellationTokenSource(timeToNodeStart).Token,
                 failureReason: $"Failed to achieve state = started within {timeToNodeStart}");
 
@@ -340,7 +377,13 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
                 this.SetMinerSecret(new BitcoinSecret(new Key(), this.FullNode.Network));
 
             if (this.builderWithWallet)
-                this.Mnemonic = this.FullNode.WalletManager().CreateWallet(this.builderWalletPassword, this.builderWalletName, this.builderWalletPassphrase);
+            {
+                this.Mnemonic = this.FullNode.WalletManager().CreateWallet(
+                    this.builderWalletPassword,
+                    this.builderWalletName,
+                    this.builderWalletPassphrase,
+                    string.IsNullOrEmpty(this.builderWalletMnemonic) ? null : new Mnemonic(this.builderWalletMnemonic));
+            }
 
             if (this.builderNoValidation)
                 DisableValidation();
@@ -378,7 +421,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         /// <returns>Latency.</returns>
         public async Task<TimeSpan> PingPongAsync(INetworkPeer peer, CancellationToken cancellation = default(CancellationToken))
         {
-            using (var listener = new NetworkPeerListener(peer))
+            using (var listener = new NetworkPeerListener(peer, this.GetOrCreateAsyncProvider()))
             {
                 var ping = new PingPayload()
                 {
@@ -386,7 +429,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
                 };
 
                 DateTimeOffset before = DateTimeOffset.UtcNow;
-                await peer.SendMessageAsync(ping, cancellation);
+                await peer.SendMessageAsync(ping, cancellation).ConfigureAwait(false);
 
                 while ((await listener.ReceivePayloadAsync<PongPayload>(cancellation).ConfigureAwait(false)).Nonce != ping.Nonce)
                 {
@@ -439,9 +482,9 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
 
             using (INetworkPeer peer = this.CreateNetworkPeerClient())
             {
-                peer.VersionHandshakeAsync().GetAwaiter().GetResult();
+                await peer.VersionHandshakeAsync().ConfigureAwait(false);
 
-                var chain = bestBlock == this.runner.Network.GenesisHash ? new ConcurrentChain(this.runner.Network) : this.GetChain(peer);
+                var chain = bestBlock == this.runner.Network.GenesisHash ? new ChainIndexer(this.runner.Network) : this.GetChain(peer);
 
                 for (int i = 0; i < blockCount; i++)
                 {
@@ -487,9 +530,9 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         /// <param name="hashStop">The highest block wanted.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>The chain of headers.</returns>
-        private ConcurrentChain GetChain(INetworkPeer peer, uint256 hashStop = null, CancellationToken cancellationToken = default(CancellationToken))
+        private ChainIndexer GetChain(INetworkPeer peer, uint256 hashStop = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var chain = new ConcurrentChain(peer.Network);
+            var chain = new ChainIndexer(peer.Network);
             this.SynchronizeChain(peer, chain, hashStop, cancellationToken);
             return chain;
         }
@@ -502,7 +545,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         /// <param name="hashStop">The location until which it synchronize.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private IEnumerable<ChainedHeader> SynchronizeChain(INetworkPeer peer, ChainBase chain, uint256 hashStop = null, CancellationToken cancellationToken = default(CancellationToken))
+        private IEnumerable<ChainedHeader> SynchronizeChain(INetworkPeer peer, ChainIndexer chain, uint256 hashStop = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             ChainedHeader oldTip = chain.Tip;
             List<ChainedHeader> headers = this.GetHeadersFromFork(peer, oldTip, hashStop, cancellationToken).ToList();
@@ -540,7 +583,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         {
             this.AssertStateAsync(peer, NetworkPeerState.HandShaked, cancellationToken).GetAwaiter().GetResult();
 
-            using (var listener = new NetworkPeerListener(peer))
+            using (var listener = new NetworkPeerListener(peer, this.GetOrCreateAsyncProvider()))
             {
                 int acceptMaxReorgDepth = 0;
                 while (true)

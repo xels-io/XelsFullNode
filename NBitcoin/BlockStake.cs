@@ -122,10 +122,10 @@ namespace NBitcoin
         /// <summary>
         /// Constructs a stake block from a set bytes and the given network.
         /// </summary>
-        public static BlockStake Load(byte[] bytes, Network network)
+        public static BlockStake Load(byte[] bytes, ConsensusFactory consensusFactory)
         {
             var blockStake = new BlockStake();
-            blockStake.ReadWrite(bytes, network.Consensus.ConsensusFactory);
+            blockStake.ReadWrite(bytes, consensusFactory);
             return blockStake;
         }
 
@@ -220,7 +220,12 @@ namespace NBitcoin
 
         public ProvenBlockHeader CreateProvenBlockHeader(PosBlock block)
         {
-            return new ProvenBlockHeader(block);
+            var provenBlockHeader = new ProvenBlockHeader(block);
+
+            // Serialize the size.
+            provenBlockHeader.ToBytes(this);
+
+            return provenBlockHeader;
         }
 
         /// <inheritdoc />

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Tests.Common.Logging;
 using Xunit;
 
@@ -33,7 +34,7 @@ namespace Xels.Bitcoin.Features.RPC.Tests
             this.response.Body = new MemoryStream();
             this.featureCollection = new FeatureCollection();
 
-            this.middleware = new RPCMiddleware(this.delegateContext.Object, this.authorization.Object, this.LoggerFactory.Object);
+            this.middleware = new RPCMiddleware(this.delegateContext.Object, this.authorization.Object, this.LoggerFactory.Object, new Mock<IHttpContextFactory>().Object, new DataFolder(string.Empty));
         }
 
         [Fact]

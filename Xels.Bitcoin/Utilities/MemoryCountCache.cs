@@ -19,7 +19,7 @@ namespace Xels.Bitcoin.Utilities
         {
             Guard.Assert(maxItemsCount > 0);
 
-            this.cache = new Dictionary<TKey, LinkedListNode<CacheItem>>(this.maxItemsCount, comparer);
+            this.Cache = new Dictionary<TKey, LinkedListNode<CacheItem>>(this.maxItemsCount, comparer);
 
             this.maxItemsCount = maxItemsCount;
         }
@@ -33,9 +33,9 @@ namespace Xels.Bitcoin.Utilities
         }
 
         /// <inheritdoc />
-        protected override bool IsCacheFull(CacheItem item)
+        protected override bool IsCacheFullLocked(CacheItem item)
         {
-            return (this.keys.Count == this.maxItemsCount);
+            return (this.Keys.Count == this.maxItemsCount);
         }
     }
 }

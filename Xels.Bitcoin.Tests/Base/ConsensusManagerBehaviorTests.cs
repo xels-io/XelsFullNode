@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using NBitcoin;
-using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.P2P.Protocol.Payloads;

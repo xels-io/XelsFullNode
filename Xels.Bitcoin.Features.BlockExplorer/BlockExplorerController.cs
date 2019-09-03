@@ -9,31 +9,32 @@ namespace Xels.Bitcoin.Features.BlockExplorer
     [Route("api/[controller]")]
     public class BlockExplorerController : Controller
     {
-        private readonly ConcurrentChain chain;
+        private readonly ChainIndexer chain;
         private readonly IBlockRepository blockStoreCache;
+        private readonly string network;
 
-        public BlockExplorerController(ConcurrentChain chain, IBlockRepository blockStoreCache)
+        public BlockExplorerController(ChainIndexer chain, IBlockRepository blockStoreCache)
         {
             this.chain = chain;
             this.blockStoreCache = blockStoreCache;
+            this.network = this.chain.Network.ToString();
         }
 
         [Route("GetBlockInfo")]
         [HttpGet]
         public IActionResult GetBlockInfo(int height)
         {
-            ChainedHeader chainedBlock = this.chain.GetBlock(height);
+            ChainedHeader chainedBlock = this.chain.GetHeader(height);
 
-            Block block = this.blockStoreCache.GetBlockAsync(chainedBlock.HashBlock).GetAwaiter().GetResult();
+            Block block = this.blockStoreCache.GetBlock(chainedBlock.HashBlock);
 
             //Neo: Find out alternate work around.
             while (block == null)
             {
-                block = this.blockStoreCache.GetBlockAsync(chainedBlock.HashBlock).GetAwaiter().GetResult();
+                block = this.blockStoreCache.GetBlock(chainedBlock.HashBlock);
                 System.Threading.Thread.Sleep(200);
             }
             BlockInformation blockInfo = new BlockInformation(chainedBlock.Header);
-
             foreach (Transaction tx in block.Transactions)
             {
                 //if (!tx.IsCoinStake)
@@ -42,7 +43,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
                     //{
                     //    tx.Outputs.RemoveAt(0);
                     //}
-                    blockInfo.Transactions.Add(new TransactionInfo(tx.GetHash(), tx.Version, tx.IsCoinStake, tx.Time, tx.vin, tx.vout, tx.nLockTime));
+                    blockInfo.Transactions.Add(new TransactionInfo(tx.GetHash(), tx.Version, tx.IsCoinStake, tx.Time, tx.Inputs, tx.Outputs, tx.LockTime, this.network));
                     blockInfo.TotalAmount += tx.TotalOut;
                     blockInfo.BlockReward = block.Transactions[0].TotalOut;
                // }
@@ -60,19 +61,18 @@ namespace Xels.Bitcoin.Features.BlockExplorer
         [HttpGet]
         public IActionResult GetAllBlockInfo()
         {
-            List<ChainedHeader> lstChainedBlocks = this.chain.GetAllBlocks();
+            //Dictionary<int, ChainedHeader>.ValueCollection lstChainedBlocks = this.chain.blocksByHeight.Values;
             List<BlockInformation> lstBlockInformation = new List<BlockInformation>();
-            foreach (ChainedHeader chainedBlock in lstChainedBlocks)
+            foreach (ChainedHeader chainedBlock in this.chain.blocksByHeight.Values)
             {
-                Block block = this.blockStoreCache.GetBlockAsync(chainedBlock.HashBlock).GetAwaiter().GetResult();
+                Block block = this.blockStoreCache.GetBlock(chainedBlock.HashBlock);
                 BlockInformation blockInfo = new BlockInformation(chainedBlock.Header);
-
                 if (block != null)
                 {
                     // blockInfo.Transactions = block.Transactions;
                     foreach (Transaction tx in block.Transactions)
                     {
-                        blockInfo.Transactions.Add(new TransactionInfo(tx.GetHash(), tx.Version, tx.IsCoinStake, tx.Time, tx.vin, tx.vout, tx.nLockTime));
+                        blockInfo.Transactions.Add(new TransactionInfo( tx.GetHash(), tx.Version, tx.IsCoinStake, tx.Time, tx.Inputs, tx.Outputs, tx.LockTime, this.network));
                         blockInfo.TotalAmount += tx.TotalOut;
                         blockInfo.BlockReward = block.Transactions[0].TotalOut;
                       
@@ -93,17 +93,18 @@ namespace Xels.Bitcoin.Features.BlockExplorer
         public IActionResult RestBlocks(int height)
         {
             List<ChainedHeader> lstChainedBlocks = this.chain.GetRestBlocks(height);
+
             List<BlockInformation> lstBlockInformation = new List<BlockInformation>();
             foreach (ChainedHeader chainedBlock in lstChainedBlocks)
             {
-                Block block = this.blockStoreCache.GetBlockAsync(chainedBlock.HashBlock).GetAwaiter().GetResult();
+                Block block = this.blockStoreCache.GetBlock(chainedBlock.HashBlock);
                 BlockInformation blockInfo = new BlockInformation(chainedBlock.Header);
-              
+
                 if (block != null)
                 {
                     foreach (Transaction tx in block.Transactions)
                     {
-                        blockInfo.Transactions.Add(new TransactionInfo(tx.GetHash(), tx.Version, tx.IsCoinStake, tx.Time, tx.vin, tx.vout, tx.nLockTime));
+                        blockInfo.Transactions.Add(new TransactionInfo(tx.GetHash(), tx.Version, tx.IsCoinStake, tx.Time, tx.Inputs, tx.Outputs, tx.LockTime, this.network));
                         blockInfo.TotalAmount += tx.TotalOut;
                         blockInfo.BlockReward = block.Transactions[0].TotalOut;
                         blockInfo.blockSize = block.BlockSize;
@@ -131,7 +132,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
 
             foreach (ChainedHeader chainedBlock in lstChainedBlocks)
             {
-                Block block = this.blockStoreCache.GetBlockAsync(chainedBlock.HashBlock).GetAwaiter().GetResult();
+                Block block = this.blockStoreCache.GetBlock(chainedBlock.HashBlock);
                 BlockInformation blockInfo = new BlockInformation(chainedBlock.Header);
                 //BlockInformation PrevBlockInfo = new BlockInformation(chainedBlock.Previous);
 
@@ -144,7 +145,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
                         // if (!tx.IsCoinStake)
                         //{
                       
-                        blockInfo.Transactions.Add(new TransactionInfo(tx.GetHash(), tx.Version, tx.IsCoinStake, tx.Time, tx.vin, tx.vout, tx.nLockTime));
+                        blockInfo.Transactions.Add(new TransactionInfo(tx.GetHash(), tx.Version, tx.IsCoinStake, tx.Time, tx.Inputs, tx.Outputs, tx.LockTime, this.network));
                         blockInfo.TotalAmount += tx.TotalOut;
                         blockInfo.BlockReward = block.Transactions[0].TotalOut;
                         //}

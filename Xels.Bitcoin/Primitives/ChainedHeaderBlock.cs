@@ -1,5 +1,4 @@
-﻿using System;
-using NBitcoin;
+﻿using NBitcoin;
 using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin.Primitives

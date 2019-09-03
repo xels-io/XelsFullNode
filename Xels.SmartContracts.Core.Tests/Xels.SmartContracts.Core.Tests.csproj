@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RuntimeFrameworkVersion>2.1.1</RuntimeFrameworkVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Xels.Bitcoin.Tests.Common\Xels.Bitcoin.Tests.Common.csproj" />
+    <ProjectReference Include="..\Xels.SmartContracts.Core\Xels.SmartContracts.Core.csproj" />
+    <ProjectReference Include="..\Xels.SmartContracts.Networks\Xels.SmartContracts.Networks.csproj" />
+  </ItemGroup>
+
+</Project>

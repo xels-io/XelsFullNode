@@ -3,7 +3,6 @@ using FluentAssertions;
 using NBitcoin;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Utilities;
-using Xunit.Sdk;
 
 namespace Xels.Bitcoin.Tests.Common
 {
@@ -41,6 +40,8 @@ namespace Xels.Bitcoin.Tests.Common
 
             block.GetHash();
 
+            // populate the size
+            block.ToBytes(network.Consensus.ConsensusFactory);
             return block;
         }
     }

@@ -18,16 +18,16 @@ namespace NBitcoin
         /// </summary>
         Money PremineReward { get; }
 
+        long FirstMiningPeriodHeight { get; }
+        long SecondMiningPeriodHeight { get; }
+        long ThirdMiningPeriodHeight { get; }
+        long ForthMiningPeriodHeight { get; }
+
         /// <summary>
         /// The height of the block in which the pre-mined coins should be.
         /// Set to 0 when there is no premine.
         /// </summary>
         long PremineHeight { get; }
-
-        long FirstMiningPeriodHeight { get; }
-        long SecondMiningPeriodHeight { get; }
-        long ThirdMiningPeriodHeight { get; }
-        long ForthMiningPeriodHeight { get; }
 
         /// <summary>
         /// The reward that goes to the miner when a block is mined using proof-of-work.
@@ -73,6 +73,20 @@ namespace NBitcoin
 
         bool PowAllowMinDifficultyBlocks { get; }
 
+        /// <summary>
+        /// If <c>true</c> disables checking the next block's difficulty (work required) target on a Proof-Of-Stake network.
+        /// <para>
+        /// This can be used in tests to enable fast mining of blocks.
+        /// </para>
+        /// </summary>
+        bool PosNoRetargeting { get; }
+
+        /// <summary>
+        /// If <c>true</c> disables checking the next block's difficulty (work required) target on a Proof-Of-Work network.
+        /// <para>
+        /// This can be used in tests to enable fast mining of blocks.
+        /// </para>
+        /// </summary>
         bool PowNoRetargeting { get; }
 
         uint256 HashGenesisBlock { get; }

@@ -1,5 +1,4 @@
 ﻿using NBitcoin;
-using NBitcoin.Formatters;
 using Newtonsoft.Json.Linq;
 
 namespace Xels.Bitcoin.Features.RPC

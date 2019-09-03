@@ -1,6 +1,5 @@
 ﻿using System;
 using NBitcoin;
-using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin.Features.MemoryPool

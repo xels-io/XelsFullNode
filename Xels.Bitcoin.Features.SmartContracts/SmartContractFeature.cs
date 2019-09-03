@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -12,16 +13,10 @@ using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.SmartContracts.PoA;
 using Xels.Bitcoin.Features.SmartContracts.PoS;
 using Xels.Bitcoin.Features.SmartContracts.PoW;
-using Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor;
 using Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Utilities;
 using Xels.SmartContracts;
-using Xels.SmartContracts.Core;
-using Xels.SmartContracts.Core.Receipts;
-using Xels.SmartContracts.Core.State;
-using Xels.SmartContracts.Core.Util;
-using Xels.SmartContracts.CLR.Validation;
 using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.CLR.Compilation;
 using Xels.SmartContracts.CLR.Decompilation;
@@ -29,6 +24,11 @@ using Xels.SmartContracts.CLR.Loader;
 using Xels.SmartContracts.CLR.Local;
 using Xels.SmartContracts.CLR.ResultProcessors;
 using Xels.SmartContracts.CLR.Serialization;
+using Xels.SmartContracts.CLR.Validation;
+using Xels.SmartContracts.Core;
+using Xels.SmartContracts.Core.Receipts;
+using Xels.SmartContracts.Core.State;
+using Xels.SmartContracts.Core.Util;
 
 namespace Xels.Bitcoin.Features.SmartContracts
 {
@@ -53,7 +53,9 @@ namespace Xels.Bitcoin.Features.SmartContracts
             if (this.network.Consensus.IsProofOfStake)
                 Guard.Assert(this.network.Consensus.ConsensusFactory is SmartContractPosConsensusFactory);
             else
-                Guard.Assert(this.network.Consensus.ConsensusFactory is SmartContractPowConsensusFactory || this.network.Consensus.ConsensusFactory is SmartContractPoAConsensusFactory);
+                Guard.Assert(this.network.Consensus.ConsensusFactory is SmartContractPowConsensusFactory
+                             || this.network.Consensus.ConsensusFactory is SmartContractPoAConsensusFactory
+                             || this.network.Consensus.ConsensusFactory is SmartContractCollateralPoAConsensusFactory);
 
             this.stateRoot.SyncToRoot(((ISmartContractBlockHeader)this.consensusManager.Tip.Header).HashStateRoot.ToBytes());
 
@@ -62,12 +64,24 @@ namespace Xels.Bitcoin.Features.SmartContracts
         }
     }
 
+    public class SmartContractOptions
+    {
+        public SmartContractOptions(IServiceCollection services, Network network)
+        {
+            this.Services = services;
+            this.Network = network;
+        }
+
+        public IServiceCollection Services { get; }
+        public Network Network { get; }
+    }
+
     public static partial class IFullNodeBuilderExtensions
     {
         /// <summary>
         /// Adds the smart contract feature to the node.
         /// </summary>
-        public static IFullNodeBuilder AddSmartContracts(this IFullNodeBuilder fullNodeBuilder)
+        public static IFullNodeBuilder AddSmartContracts(this IFullNodeBuilder fullNodeBuilder, Action<SmartContractOptions> options = null)
         {
             LoggingConfiguration.RegisterFeatureNamespace<SmartContractFeature>("smartcontracts");
 
@@ -113,6 +127,9 @@ namespace Xels.Bitcoin.Features.SmartContracts
                         // with SmartContractScriptAddressReader, which depends on the ScriptAddressReader concrete type.
                         services.AddSingleton<ScriptAddressReader>();
                         services.Replace(new ServiceDescriptor(typeof(IScriptAddressReader), typeof(SmartContractScriptAddressReader), ServiceLifetime.Singleton));
+
+                        // After setting up, invoke any additional options which can replace services as required.
+                        options?.Invoke(new SmartContractOptions(services, fullNodeBuilder.Network));
                     });
             });
 
@@ -125,33 +142,27 @@ namespace Xels.Bitcoin.Features.SmartContracts
         /// Should we require another executor, we will need to create a separate daemon and network.
         /// </para>
         /// </summary>
-        public static IFullNodeBuilder UseReflectionExecutor(this IFullNodeBuilder fullNodeBuilder)
+        public static SmartContractOptions UseReflectionExecutor(this SmartContractOptions options)
         {
-            fullNodeBuilder.ConfigureFeature(features =>
-            {
-                features
-                    .AddFeature<ReflectionVirtualMachineFeature>()
-                    .FeatureServices(services =>
-                    {
-                        // Validator
-                        services.AddSingleton<ISmartContractValidator, SmartContractValidator>();
+            IServiceCollection services = options.Services;
 
-                        // Executor et al.
-                        services.AddSingleton<IContractRefundProcessor, ContractRefundProcessor>();
-                        services.AddSingleton<IContractTransferProcessor, ContractTransferProcessor>();
-                        services.AddSingleton<IKeyEncodingStrategy, BasicKeyEncodingStrategy>();
-                        services.AddSingleton<IContractExecutorFactory, ReflectionExecutorFactory>();
-                        services.AddSingleton<IMethodParameterSerializer, MethodParameterByteSerializer>();
-                        services.AddSingleton<IContractPrimitiveSerializer, ContractPrimitiveSerializer>();
-                        services.AddSingleton<ISerializer, Serializer>();
+            // Validator
+            services.AddSingleton<ISmartContractValidator, SmartContractValidator>();
 
-                        // Controllers + utils
-                        services.AddSingleton<CSharpContractDecompiler>();
-                        services.AddSingleton<SmartContractsController>();
-                    });
-            });
+            // Executor et al.
+            services.AddSingleton<IContractRefundProcessor, ContractRefundProcessor>();
+            services.AddSingleton<IContractTransferProcessor, ContractTransferProcessor>();
+            services.AddSingleton<IKeyEncodingStrategy, BasicKeyEncodingStrategy>();
+            services.AddSingleton<IContractExecutorFactory, ReflectionExecutorFactory>();
+            services.AddSingleton<IMethodParameterSerializer, MethodParameterByteSerializer>();
+            services.AddSingleton<IContractPrimitiveSerializer, ContractPrimitiveSerializer>();
+            services.AddSingleton<ISerializer, Serializer>();
 
-            return fullNodeBuilder;
+            // Controllers + utils
+            services.AddSingleton<CSharpContractDecompiler>();
+            services.AddSingleton<SmartContractsController>();
+
+            return options;
         }
     }
 }

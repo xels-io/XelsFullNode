@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using NBitcoin;
-using Xels.Bitcoin.Primitives;
 
 namespace Xels.Bitcoin.IntegrationTests.Common.Runners
 {
@@ -19,10 +18,15 @@ namespace Xels.Bitcoin.IntegrationTests.Common.Runners
             }
         }
 
+        public bool AlwaysFlushBlocks { get; internal set; }
+
+        /// <summary>
+        /// By default peer discovery is turned off for integration tests.
+        /// </summary>
         public bool EnablePeerDiscovery { get; internal set; }
+
         public FullNode FullNode { get; set; }
-        public Func<ChainedHeaderBlock, bool> InterceptorDisconnect { get; internal set; }
-        public Func<ChainedHeaderBlock, bool> InterceptorConnect { get; internal set; }
+
         public Network Network { set; get; }
         public bool OverrideDateTimeProvider { get; internal set; }
         public Action<IServiceCollection> ServiceToOverride { get; internal set; }

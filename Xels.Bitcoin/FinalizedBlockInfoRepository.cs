@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using DBreeze;
-using DBreeze.DataTypes;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
-using Xels.Bitcoin.Configuration;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin
@@ -36,22 +33,19 @@ namespace Xels.Bitcoin
 
     public class FinalizedBlockInfoRepository : IFinalizedBlockInfoRepository
     {
-        private readonly DBreezeSerializer dBreezeSerializer;
-
         /// <summary>Instance logger.</summary>
         private readonly ILogger logger;
 
-        /// <summary>Access to DBreeze database.</summary>
-        private readonly DBreezeEngine dbreeze;
+        private readonly IKeyValueRepository keyValueRepo;
 
         /// <summary>Database key under which the block height of the last finalized block height is stored.</summary>
-        private static readonly byte[] finalizedBlockKey = new byte[0];
+        private const string FinalizedBlockKey = "finalizedBlock";
 
         /// <summary>Height and hash of a block that can't be reorged away from.</summary>
         private HashHeightPair finalizedBlockInfo;
 
         /// <summary>Queue of finalized infos to save.</summary>
-        /// <remarks>All access should be protected by <see cref="queueLock"/></remarks>
+        /// <remarks>All access should be protected by <see cref="queueLock"/>.</remarks>
         private readonly Queue<HashHeightPair> finalizedBlockInfosToSave;
 
         /// <summary>Protects access to <see cref="finalizedBlockInfosToSave"/>.</summary>
@@ -64,28 +58,22 @@ namespace Xels.Bitcoin
 
         private readonly AsyncManualResetEvent queueUpdatedEvent;
 
-        public FinalizedBlockInfoRepository(string folder, ILoggerFactory loggerFactory, DBreezeSerializer dBreezeSerializer)
+        public FinalizedBlockInfoRepository(IKeyValueRepository keyValueRepo, ILoggerFactory loggerFactory, IAsyncProvider asyncProvider)
         {
-            this.dBreezeSerializer = dBreezeSerializer;
-            Guard.NotEmpty(folder, nameof(folder));
+            Guard.NotNull(keyValueRepo, nameof(keyValueRepo));
             Guard.NotNull(loggerFactory, nameof(loggerFactory));
 
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
 
-            Directory.CreateDirectory(folder);
-            this.dbreeze = new DBreezeEngine(folder);
-
+            this.keyValueRepo = keyValueRepo;
             this.finalizedBlockInfosToSave = new Queue<HashHeightPair>();
             this.queueLock = new object();
 
             this.queueUpdatedEvent = new AsyncManualResetEvent(false);
             this.cancellation = new CancellationTokenSource();
             this.finalizedBlockInfoPersistingTask = this.PersistFinalizedBlockInfoContinuouslyAsync();
-        }
 
-        public FinalizedBlockInfoRepository(DataFolder dataFolder, ILoggerFactory loggerFactory, DBreezeSerializer dBreezeSerializer)
-            : this(dataFolder.FinalizedBlockInfoPath, loggerFactory, dBreezeSerializer)
-        {
+            asyncProvider.RegisterTask($"{nameof(FinalizedBlockInfoRepository)}.{nameof(this.finalizedBlockInfoPersistingTask)}", this.finalizedBlockInfoPersistingTask);
         }
 
         private async Task PersistFinalizedBlockInfoContinuouslyAsync()
@@ -116,11 +104,7 @@ namespace Xels.Bitcoin
                 if (lastFinalizedBlock == null)
                     continue;
 
-                using (DBreeze.Transactions.Transaction transaction = this.dbreeze.GetTransaction())
-                {
-                    transaction.Insert("FinalizedBlock", finalizedBlockKey, this.dBreezeSerializer.Serialize(lastFinalizedBlock));
-                    transaction.Commit();
-                }
+                this.keyValueRepo.SaveValue(FinalizedBlockKey, lastFinalizedBlock);
 
                 this.logger.LogTrace("Finalized info saved: '{0}'.", lastFinalizedBlock);
             }
@@ -137,19 +121,12 @@ namespace Xels.Bitcoin
         {
             Task task = Task.Run(() =>
             {
-                using (DBreeze.Transactions.Transaction transaction = this.dbreeze.GetTransaction())
-                {
-                    transaction.ValuesLazyLoadingIsOn = false;
+                var finalizedInfo = this.keyValueRepo.LoadValue<HashHeightPair>(FinalizedBlockKey);
 
-                    Row<byte[], byte[]> row = transaction.Select<byte[], byte[]>("FinalizedBlock", finalizedBlockKey);
-                    if (!row.Exists)
-                    {
-                        this.finalizedBlockInfo = new HashHeightPair(network.GenesisHash, 0);
-                        this.logger.LogTrace("Finalized block height doesn't exist in the database.");
-                    }
-                    else
-                        this.finalizedBlockInfo = this.dBreezeSerializer.Deserialize<HashHeightPair>(row.Value);
-                }
+                if (finalizedInfo == null)
+                    finalizedInfo = new HashHeightPair(network.GenesisHash, 0);
+
+                this.finalizedBlockInfo = finalizedInfo;
             });
             return task;
         }
@@ -184,8 +161,6 @@ namespace Xels.Bitcoin
         {
             this.cancellation.Cancel();
             this.finalizedBlockInfoPersistingTask.GetAwaiter().GetResult();
-
-            this.dbreeze?.Dispose();
         }
     }
 }

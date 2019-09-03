@@ -4,26 +4,20 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NBitcoin;
-using NBitcoin.Rules;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Base.Deployments;
-using Xels.Bitcoin.BlockPulling;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Settings;
-using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
-using Xels.Bitcoin.Consensus.Validators;
 using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
 using Xels.Bitcoin.Features.MemoryPool.Fee;
 using Xels.Bitcoin.Features.Miner;
-using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Mining;
-using Xels.Bitcoin.P2P;
-using Xels.Bitcoin.P2P.Peer;
-using Xels.Bitcoin.P2P.Protocol.Payloads;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
 
@@ -83,13 +77,15 @@ namespace Xels.Bitcoin.Features.MemoryPool.Tests
             network.Consensus.HeaderValidationRules.RemoveAll(x => x.GetType() == typeof(CheckDifficultyPowRule));
 
             var consensusSettings = new ConsensusSettings(nodeSettings);
-            var chain = new ConcurrentChain(network);
+            var chain = new ChainIndexer(network);
             var inMemoryCoinView = new InMemoryCoinView(chain.Tip.HashBlock);
+
+            var asyncProvider = new AsyncProvider(loggerFactory, new Mock<ISignals>().Object, new NodeLifetime());
 
             var chainState = new ChainState();
             var deployments = new NodeDeployments(network, chain);
             ConsensusRuleEngine consensusRules = new PowConsensusRuleEngine(network, loggerFactory, dateTimeProvider, chain, deployments, consensusSettings, new Checkpoints(),
-                inMemoryCoinView, chainState, new InvalidBlockHashStore(dateTimeProvider), new NodeStats(dateTimeProvider)).Register();
+                inMemoryCoinView, chainState, new InvalidBlockHashStore(dateTimeProvider), new NodeStats(dateTimeProvider), asyncProvider).Register();
 
             ConsensusManager consensus = ConsensusManagerHelper.CreateConsensusManager(network, dataDir, chainState);
 
@@ -116,7 +112,7 @@ namespace Xels.Bitcoin.Features.MemoryPool.Tests
             var srcTxs = new List<Transaction>();
             for (int i = 0; i < blockinfo.Count; ++i)
             {
-                Block currentBlock = Block.Load(newBlock.Block.ToBytes(network.Consensus.ConsensusFactory), network);
+                Block currentBlock = Block.Load(newBlock.Block.ToBytes(network.Consensus.ConsensusFactory), network.Consensus.ConsensusFactory);
                 currentBlock.Header.HashPrevBlock = chain.Tip.HashBlock;
                 currentBlock.Header.Version = 1;
                 currentBlock.Header.Time = Utils.DateTimeToUnixTime(chain.Tip.GetMedianTimePast()) + 1;
@@ -154,7 +150,7 @@ namespace Xels.Bitcoin.Features.MemoryPool.Tests
                 outputs.Add(output);
             }
 
-            await inMemoryCoinView.SaveChangesAsync(outputs, new List<TxOut[]>(), chain.GetBlock(0).HashBlock, chain.GetBlock(1).HashBlock, chain.GetBlock(0).Height);
+            inMemoryCoinView.SaveChanges(outputs, new List<TxOut[]>(), chain.GetHeader(0).HashBlock, chain.GetHeader(1).HashBlock, chain.GetHeader(0).Height);
 
             return new TestChainContext { MempoolValidator = mempoolValidator, SrcTxs = srcTxs };
         }

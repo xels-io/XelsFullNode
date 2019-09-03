@@ -4,20 +4,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
-using NLog.Config;
 using Xels.Bitcoin.Features.Consensus.ProvenBlockHeaders;
 using Xels.Bitcoin.Utilities;
 using TracerAttributes;
+using System.Threading.Tasks;
 
 namespace Xels.Bitcoin.Features.Consensus.CoinViews
 {
     /// <summary>
     /// Cache layer for coinview prevents too frequent updates of the data in the underlying storage.
     /// </summary>
-    public class CachedCoinView : ICoinView, IBackedCoinView, IDisposable
+    public class CachedCoinView : ICoinView, IBackedCoinView
     {
         /// <summary>
         /// Item of the coinview cache that holds information about the unspent outputs
@@ -73,7 +72,7 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
         private CachePerformanceCounter performanceCounter { get; set; }
 
         /// <summary>Lock object to protect access to <see cref="cachedUtxoItems"/>, <see cref="blockHash"/>, <see cref="cachedRewindDataIndex"/>, and <see cref="innerBlockHash"/>.</summary>
-        private readonly AsyncLock lockobj;
+        private readonly object lockobj;
 
         /// <summary>Hash of the block headers of the tip of the coinview.</summary>
         /// <remarks>All access to this object has to be protected by <see cref="lockobj"/>.</remarks>
@@ -174,7 +173,7 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
             this.stakeChainStore = stakeChainStore;
             this.rewindDataIndexCache = rewindDataIndexCache;
             this.MaxItems = CacheMaxItemsDefault;
-            this.lockobj = new AsyncLock();
+            this.lockobj = new object();
             this.cachedUtxoItems = new Dictionary<uint256, CacheItem>();
             this.performanceCounter = new CachePerformanceCounter(this.dateTimeProvider);
             this.lastCacheFlushTime = this.dateTimeProvider.GetUtcNow();
@@ -185,11 +184,11 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
         }
 
         /// <inheritdoc />
-        public async Task<uint256> GetTipHashAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public uint256 GetTipHash(CancellationToken cancellationToken = default(CancellationToken))
         {
             if (this.blockHash == null)
             {
-                FetchCoinsResponse response = await this.FetchCoinsAsync(new uint256[0], cancellationToken).ConfigureAwait(false);
+                FetchCoinsResponse response = this.FetchCoins(new uint256[0], cancellationToken);
 
                 this.innerBlockHash = response.BlockHash;
                 this.blockHash = this.innerBlockHash;
@@ -199,7 +198,7 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
         }
 
         /// <inheritdoc />
-        public async Task<FetchCoinsResponse> FetchCoinsAsync(uint256[] txIds, CancellationToken cancellationToken = default(CancellationToken))
+        public FetchCoinsResponse FetchCoins(uint256[] txIds, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guard.NotNull(txIds, nameof(txIds));
 
@@ -207,20 +206,21 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
             var outputs = new UnspentOutputs[txIds.Length];
             var miss = new List<int>();
             var missedTxIds = new List<uint256>();
-            using (await this.lockobj.LockAsync(cancellationToken).ConfigureAwait(false))
+
+            lock (this.lockobj)
             {
                 for (int i = 0; i < txIds.Length; i++)
                 {
                     CacheItem cache;
                     if (!this.cachedUtxoItems.TryGetValue(txIds[i], out cache))
                     {
-                        this.logger.LogTrace("Cache missed for transaction ID '{0}'.", txIds[i]);
+                        this.logger.LogTrace("Transaction '{0}' not found in cache.", txIds[i]);
                         miss.Add(i);
                         missedTxIds.Add(txIds[i]);
                     }
                     else
                     {
-                        this.logger.LogTrace("Cache hit for transaction ID '{0}'.", txIds[i]);
+                        this.logger.LogTrace("Transaction '{0}' found in cache, UTXOs:'{1}'.", txIds[i], cache.UnspentOutputs);
                         outputs[i] = cache.UnspentOutputs == null ? null :
                                      cache.UnspentOutputs.IsPrunable ? null :
                                      cache.UnspentOutputs.Clone();
@@ -229,18 +229,15 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
 
                 this.performanceCounter.AddMissCount(miss.Count);
                 this.performanceCounter.AddHitCount(txIds.Length - miss.Count);
-            }
 
-            FetchCoinsResponse fetchedCoins = null;
+                FetchCoinsResponse fetchedCoins = null;
 
-            if (missedTxIds.Count > 0 || this.blockHash == null)
-            {
-                this.logger.LogTrace("{0} cache missed transaction needs to be loaded from underlying CoinView.", missedTxIds.Count);
-                fetchedCoins = await this.Inner.FetchCoinsAsync(missedTxIds.ToArray(), cancellationToken).ConfigureAwait(false);
-            }
+                if (missedTxIds.Count > 0 || this.blockHash == null)
+                {
+                    this.logger.LogTrace("{0} cache missed transaction needs to be loaded from underlying CoinView.", missedTxIds.Count);
+                    fetchedCoins = this.Inner.FetchCoins(missedTxIds.ToArray(), cancellationToken);
+                }
 
-            using (await this.lockobj.LockAsync(cancellationToken).ConfigureAwait(false))
-            {
                 if (this.blockHash == null)
                 {
                     uint256 innerblockHash = fetchedCoins.BlockHash;
@@ -259,6 +256,8 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
                     cache.ExistInInner = unspent != null;
                     cache.IsDirty = false;
                     cache.UnspentOutputs = unspent?.Clone();
+
+                    this.logger.LogTrace("CacheItem added to the cache, Transaction Id '{0}', UTXO:'{1}'.", txIds[index], cache.UnspentOutputs);
                     this.cachedUtxoItems.TryAdd(txIds[index], cache);
                 }
 
@@ -283,7 +282,7 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
         /// WARNING: This method can only be run from <see cref="ConsensusLoop.Execute(System.Threading.CancellationToken)"/> thread context
         /// or when consensus loop is stopped. Otherwise, there is a risk of race condition when the consensus loop accepts new block.
         /// </remarks>
-        public async Task FlushAsync(bool force = true)
+        public void Flush(bool force = true)
         {
             DateTime now = this.dateTimeProvider.GetUtcNow();
             if (!force && ((now - this.lastCacheFlushTime).TotalSeconds < CacheFlushTimeIntervalSeconds))
@@ -296,16 +295,16 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
             // the stake store depends on the last block hash
             // to be stored after the stake store is persisted.
             if (this.stakeChainStore != null)
-                await this.stakeChainStore.FlushAsync(true);
+                this.stakeChainStore.Flush(true);
 
             // Before flushing the coinview persist the rewind data index store as well.
             if (this.rewindDataIndexCache != null)
                 this.rewindDataIndexCache.Flush(this.blockHeight);
 
             if (this.innerBlockHash == null)
-                this.innerBlockHash = await this.inner.GetTipHashAsync().ConfigureAwait(false);
+                this.innerBlockHash = this.inner.GetTipHash();
 
-            using (await this.lockobj.LockAsync().ConfigureAwait(false))
+            lock (this.lockobj)
             {
                 if (this.innerBlockHash == null)
                 {
@@ -321,12 +320,15 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
                     u.Value.ExistInInner = true;
                 }
 
-                await this.Inner.SaveChangesAsync(unspent.Select(u => u.Value.UnspentOutputs).ToArray(), null, this.innerBlockHash, this.blockHash, 0, this.cachedRewindDataIndex.Select(c => c.Value).ToList()).ConfigureAwait(false);
+                this.Inner.SaveChanges(unspent.Select(u => u.Value.UnspentOutputs).ToArray(), null, this.innerBlockHash, this.blockHash, 0, this.cachedRewindDataIndex.Select(c => c.Value).ToList());
 
                 // Remove prunable entries from cache as they were flushed down.
                 IEnumerable<KeyValuePair<uint256, CacheItem>> prunableEntries = unspent.Where(c => (c.Value.UnspentOutputs != null) && c.Value.UnspentOutputs.IsPrunable);
                 foreach (KeyValuePair<uint256, CacheItem> entry in prunableEntries)
+                {
                     this.cachedUtxoItems.Remove(entry.Key);
+                    this.logger.LogTrace("Removed prunable entry Transaction Id '{0}', CacheItem:'{1}'.", entry.Key, entry.Value.UnspentOutputs);
+                }
 
                 this.cachedRewindDataIndex.Clear();
                 this.innerBlockHash = this.blockHash;
@@ -348,7 +350,7 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
                 {
                     if ((this.random.Next() % 3) == 0)
                     {
-                        this.logger.LogTrace("Transaction ID '{0}' selected to be removed from the cache.", entry.Key);
+                        this.logger.LogTrace("Transaction Id '{0}' selected to be removed from the cache, CacheItem:'{1}'.", entry.Key, entry.Value.UnspentOutputs);
                         this.cachedUtxoItems.Remove(entry.Key);
                     }
                 }
@@ -356,16 +358,17 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
         }
 
         /// <inheritdoc />
-        public async Task SaveChangesAsync(IList<UnspentOutputs> unspentOutputs, IEnumerable<TxOut[]> originalOutputs, uint256 oldBlockHash, uint256 nextBlockHash, int height, List<RewindData> rewindDataList = null)
+        public void SaveChanges(IList<UnspentOutputs> unspentOutputs, IEnumerable<TxOut[]> originalOutputs, uint256 oldBlockHash, uint256 nextBlockHash, int height, List<RewindData> rewindDataList = null)
         {
             Guard.NotNull(oldBlockHash, nameof(oldBlockHash));
             Guard.NotNull(nextBlockHash, nameof(nextBlockHash));
             Guard.NotNull(unspentOutputs, nameof(unspentOutputs));
 
-            using (await this.lockobj.LockAsync().ConfigureAwait(false))
+            lock (this.lockobj)
             {
                 if ((this.blockHash != null) && (oldBlockHash != this.blockHash))
                 {
+                    this.logger.LogTrace("{0}:'{1}'", nameof(this.blockHash), this.blockHash);
                     this.logger.LogTrace("(-)[BLOCKHASH_MISMATCH]");
                     throw new InvalidOperationException("Invalid oldBlockHash");
                 }
@@ -373,7 +376,7 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
                 this.blockHeight = height;
                 this.blockHash = nextBlockHash;
                 var rewindData = new RewindData(oldBlockHash);
-                var indexItems = new Dictionary<string, int>();
+                var indexItems = new Dictionary<OutPoint, int>();
 
                 foreach (UnspentOutputs unspent in unspentOutputs)
                 {
@@ -384,21 +387,17 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
 
                         this.logger.LogTrace("Outputs of transaction ID '{0}' are not found in cache, creating them.", unspent.TransactionId);
 
-                        FetchCoinsResponse result = await this.inner.FetchCoinsAsync(new[] { unspent.TransactionId }).ConfigureAwait(false);
+                        FetchCoinsResponse result = this.inner.FetchCoins(new[] { unspent.TransactionId });
 
                         UnspentOutputs unspentOutput = result.UnspentOutputs[0];
 
                         cacheItem = new CacheItem();
                         cacheItem.ExistInInner = unspentOutput != null;
                         cacheItem.IsDirty = false;
-
                         cacheItem.UnspentOutputs = unspentOutput?.Clone();
 
                         this.cachedUtxoItems.TryAdd(unspent.TransactionId, cacheItem);
-                    }
-                    else
-                    {
-                        this.logger.LogTrace("Outputs of transaction ID '{0}' are in cache already, updating them.", unspent.TransactionId);
+                        this.logger.LogTrace("CacheItem added to the cache during save '{0}'.", cacheItem.UnspentOutputs);
                     }
 
                     // If cacheItem.UnspentOutputs is null this means the trx was not stored in the disk,
@@ -413,30 +412,43 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
 
                         // We take the original items that are in cache and put them in rewind data.
                         clone.Outputs = cacheItem.UnspentOutputs.Outputs.ToArray();
+
+                        this.logger.LogTrace("Modifying transaction '{0}' in OutputsToRestore rewind data.", unspent.TransactionId);
                         rewindData.OutputsToRestore.Add(clone);
+
+                        this.logger.LogTrace("Cache item before spend {0}:'{1}'.", nameof(cacheItem.UnspentOutputs), cacheItem.UnspentOutputs);
 
                         // Now modify the cached items with the mutated data.
                         cacheItem.UnspentOutputs.Spend(unspent);
+
+                        this.logger.LogTrace("Cache item after spend {0}:'{1}'.", nameof(cacheItem.UnspentOutputs), cacheItem.UnspentOutputs);
+
+                        if (this.rewindDataIndexCache != null)
+                        {
+                            for (int i = 0; i < unspent.Outputs.Length; i++)
+                            {
+                                // Only push to rewind data index UTXOs that are spent.
+                                // Checks against array length are needed in case problem like 3965 on VSTS appears.
+                                if ((i < clone.Outputs.Length) && (unspent.Outputs[i] == null) && (clone.Outputs[i] != null))
+                                {
+                                    var key = new OutPoint(unspent.TransactionId, i);
+                                    indexItems[key] = this.blockHeight;
+                                }
+                            }
+                        }
                     }
                     else
                     {
                         // New trx so it needs to be deleted if a rewind happens.
+                        this.logger.LogTrace("Adding transaction '{0}' to TransactionsToRemove rewind data.", unspent.TransactionId);
                         rewindData.TransactionsToRemove.Add(unspent.TransactionId);
 
                         // Put in the cache the new UTXOs.
+                        this.logger.LogTrace("Setting {0} to {1}: '{2}'.", nameof(cacheItem.UnspentOutputs), nameof(unspent), unspent);
                         cacheItem.UnspentOutputs = unspent;
                     }
 
                     cacheItem.IsDirty = true;
-
-                    if (this.rewindDataIndexCache != null)
-                    {
-                        for (int i = 0; i < unspent.Outputs.Length; i++)
-                        {
-                            string key = $"{unspent.TransactionId}-{i}";
-                            indexItems[key] = this.blockHeight;
-                        }
-                    }
 
                     // Inner does not need to know pruned unspent that it never saw.
                     if (cacheItem.UnspentOutputs.IsPrunable && !cacheItem.ExistInInner)
@@ -457,38 +469,28 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
         }
 
         /// <inheritdoc />
-        public async Task<uint256> RewindAsync()
+        public uint256 Rewind()
         {
             if (this.innerBlockHash == null)
-                this.innerBlockHash = await this.inner.GetTipHashAsync().ConfigureAwait(false);
-
-            using (await this.lockobj.LockAsync().ConfigureAwait(false))
             {
-                // Check if rewind data is available in local cache. If it is
-                // we can rewind and there is no need to check underlying storage.
-                if (this.cachedRewindDataIndex.Count > 0)
+                this.innerBlockHash = this.inner.GetTipHash();
+            }
+
+            // Flush the entire cache before rewinding
+            this.Flush(true);
+
+            lock (this.lockobj)
+            {
+                uint256 hash = this.inner.Rewind();
+
+                foreach (KeyValuePair<uint256, CacheItem> cachedUtxoItem in this.cachedUtxoItems)
                 {
-                    KeyValuePair<int, RewindData> lastRewindDataItem = this.cachedRewindDataIndex.Last();
-                    RewindData lastRewindData = lastRewindDataItem.Value;
+                    // This is a protection check to ensure we are
+                    // not deleting dirty items form the cache.
 
-                    this.RemoveTransactions(lastRewindData);
-                    this.RestoreOutputs(lastRewindData);
-
-                    // Change current block hash to the one from the rewind data.
-                    this.blockHash = lastRewindData.PreviousBlockHash;
-                    this.blockHeight = lastRewindDataItem.Key - 1;
-
-                    this.cachedRewindDataIndex.Remove(lastRewindDataItem.Key);
-
-                    if (this.rewindDataIndexCache != null)
-                        await this.rewindDataIndexCache.Remove(this.blockHeight, this);
-
-                    this.logger.LogTrace("(-)[REMOVED_FROM_BATCH]:'{0}'", this.blockHash);
-                    return this.blockHash;
+                    if (cachedUtxoItem.Value.IsDirty)
+                        throw new InvalidOperationException("Items in cache are modified");
                 }
-
-                // Rewind data was not found in cache, try underlying storage.
-                uint256 hash = await this.inner.RewindAsync().ConfigureAwait(false);
 
                 // All the cached utxos are now on disk so we can clear the cached entry list.
                 this.cachedUtxoItems.Clear();
@@ -498,60 +500,25 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
                 this.blockHeight -= 1;
 
                 if (this.rewindDataIndexCache != null)
-                    await this.rewindDataIndexCache.InitializeAsync(this.blockHeight, this);
+                    this.rewindDataIndexCache.Initialize(this.blockHeight, this);
 
                 return hash;
             }
         }
 
         /// <inheritdoc />
-        public async Task<RewindData> GetRewindData(int height)
+        public RewindData GetRewindData(int height)
         {
             if (this.cachedRewindDataIndex.TryGetValue(height, out RewindData existingRewindData))
                 return existingRewindData;
 
-            return await this.Inner.GetRewindData(height);
-        }
-
-        private void RestoreOutputs(RewindData rewindData)
-        {
-            foreach (UnspentOutputs unspentToRestore in rewindData.OutputsToRestore)
-            {
-                this.logger.LogTrace("Outputs of transaction ID '{0}' will be restored.", unspentToRestore.TransactionId);
-
-                if (this.cachedUtxoItems.TryGetValue(unspentToRestore.TransactionId, out CacheItem cacheItem))
-                {
-                    cacheItem.UnspentOutputs = unspentToRestore;
-                    cacheItem.IsDirty = true;
-                }
-                else
-                {
-                    this.logger.LogTrace("Outputs of transaction ID '{0}' not found in cache, inserting them.", unspentToRestore.TransactionId);
-
-                    cacheItem = new CacheItem
-                    {
-                        UnspentOutputs = unspentToRestore,
-                        IsDirty = true
-                    };
-
-                    this.cachedUtxoItems.Add(unspentToRestore.TransactionId, cacheItem);
-                }
-            }
-        }
-
-        private void RemoveTransactions(RewindData rewindData)
-        {
-            foreach (uint256 transactionToRemove in rewindData.TransactionsToRemove)
-            {
-                this.logger.LogTrace("Attempt to remove transaction with ID '{0}'.", transactionToRemove);
-                this.cachedUtxoItems.Remove(transactionToRemove);
-            }
+            return this.Inner.GetRewindData(height);
         }
 
         [NoTrace]
         private void AddBenchStats(StringBuilder log)
         {
-            log.AppendLine("======CashedCoinView Bench======");
+            log.AppendLine("======CachedCoinView Bench======");
 
             log.AppendLine("Cache entries".PadRight(20) + this.cacheEntryCount);
 
@@ -565,10 +532,9 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
             this.latestPerformanceSnapShot = snapShot;
         }
 
-        /// <inheritdoc />
-        public void Dispose()
+        public Task<FetchCoinsResponse> FetchAllCoinsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            this.lockobj.Dispose();
+            return this.inner.FetchAllCoinsAsync(cancellationToken);
         }
     }
 }

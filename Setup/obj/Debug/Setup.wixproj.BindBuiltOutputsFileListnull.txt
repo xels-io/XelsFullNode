@@ -1,0 +1,2 @@
+F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Setup\bin\Debug\Xels-Backend-Setup.msi
+F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Setup\bin\Debug\Xels-Backend-Setup.wixpdb

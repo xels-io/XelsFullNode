@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Moq;
 using NBitcoin;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
-using Xels.Bitcoin.Features.Wallet.Tests;
+using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Tests.Common.Logging;
 using Xels.Bitcoin.Tests.Wallet.Common;
 using Xels.Bitcoin.Utilities;
@@ -19,13 +18,14 @@ namespace Xels.Bitcoin.Features.ColdStaking.Tests
 {
     public class ColdStakingManagerTest : LogsTestBase, IClassFixture<WalletFixture>
     {
+        private readonly IBlockStore blockStore;
         private readonly WalletFixture walletFixture;
 
         public ColdStakingManagerTest(WalletFixture walletFixture)
         {
+            this.blockStore = new Mock<IBlockStore>().Object;
             this.walletFixture = walletFixture;
-
-            StandardScripts.RegisterStandardScriptTemplate(ColdStakingScriptTemplate.Instance);
+            this.Network.StandardScriptsRegistry.RegisterStandardScriptTemplate(ColdStakingScriptTemplate.Instance);
         }
 
         public Transaction CreateColdStakingSetupTransaction(Wallet.Wallet wallet, string password, HdAddress spendingAddress, PubKey destinationColdPubKey, PubKey destinationHotPubKey, HdAddress changeAddress, Money amount, Money fee)
@@ -149,7 +149,7 @@ namespace Xels.Bitcoin.Features.ColdStaking.Tests
             };
 
             // Generate a spendable transaction
-            (ConcurrentChain chain, uint256 blockhash, Block block) chainInfo = WalletTestsHelpers.CreateChainAndCreateFirstBlockWithPaymentToAddress(wallet.Network, spendingAddress);
+            (ChainIndexer chain, uint256 blockhash, Block block) chainInfo = WalletTestsHelpers.CreateChainAndCreateFirstBlockWithPaymentToAddress(wallet.Network, spendingAddress);
             TransactionData spendingTransaction = WalletTestsHelpers.CreateTransactionDataFromFirstBlock(chainInfo);
             spendingAddress.Transactions.Add(spendingTransaction);
 
@@ -190,14 +190,14 @@ namespace Xels.Bitcoin.Features.ColdStaking.Tests
             var walletSettings = new WalletSettings(new NodeSettings(network: this.Network));
 
             var coldWalletManager = new ColdStakingManager(this.Network, chainInfo.chain, walletSettings, dataFolder, walletFeePolicy.Object,
-                new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), new ScriptAddressReader(), this.LoggerFactory.Object, DateTimeProvider.Default, new Mock<IBroadcasterManager>().Object);
+                new Mock<IAsyncProvider>().Object, new NodeLifetime(), new ScriptAddressReader(), this.LoggerFactory.Object, DateTimeProvider.Default, new Mock<IBroadcasterManager>().Object);
             coldWalletManager.Wallets.Add(wallet);
             coldWalletManager.Wallets.Add(coldWallet);
             coldWalletManager.LoadKeysLookupLock();
 
             // Create another instance for the hot wallet as it is not allowed to have both wallets on the same instance.
             var hotWalletManager = new ColdStakingManager(this.Network, chainInfo.chain, walletSettings, dataFolder, walletFeePolicy.Object,
-                new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), new ScriptAddressReader(), this.LoggerFactory.Object, DateTimeProvider.Default, new Mock<IBroadcasterManager>().Object);
+                new Mock<IAsyncProvider>().Object, new NodeLifetime(), new ScriptAddressReader(), this.LoggerFactory.Object, DateTimeProvider.Default, new Mock<IBroadcasterManager>().Object);
             hotWalletManager.Wallets.Add(hotWallet);
             hotWalletManager.LoadKeysLookupLock();
 
@@ -269,7 +269,7 @@ namespace Xels.Bitcoin.Features.ColdStaking.Tests
 
             // Wallet manager for the wallet receiving the funds.
             var receivingWalletManager = new ColdStakingManager(this.Network, chainInfo.chain, walletSettings, dataFolder, walletFeePolicy.Object,
-                new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), new ScriptAddressReader(), this.LoggerFactory.Object, DateTimeProvider.Default, new Mock<IBroadcasterManager>().Object);
+                new Mock<IAsyncProvider>().Object, new NodeLifetime(), new ScriptAddressReader(), this.LoggerFactory.Object, DateTimeProvider.Default, new Mock<IBroadcasterManager>().Object);
             receivingWalletManager.Wallets.Add(withdrawalWallet);
             receivingWalletManager.LoadKeysLookupLock();
 

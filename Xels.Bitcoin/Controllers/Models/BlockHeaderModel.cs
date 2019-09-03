@@ -1,10 +1,27 @@
 ﻿using NBitcoin;
 using NBitcoin.DataEncoders;
 using Newtonsoft.Json;
+using Xels.Bitcoin.Controllers.Converters;
 using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin.Controllers.Models
 {
+    [JsonConverter(typeof(ToStringJsonConverter))]
+    public class HexModel
+    {
+        public string Hex { get; set; }
+
+        public HexModel(string hex)
+        {
+            this.Hex = hex;
+        }
+
+        public override string ToString()
+        {
+            return this.Hex;
+        }
+    }
+
     /// <summary>
     /// Data structure for block headers.
     /// Copied from RPC

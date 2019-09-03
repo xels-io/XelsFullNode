@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using CSharpFunctionalExtensions;
@@ -15,6 +16,7 @@ using Xels.Bitcoin.Features.Wallet.Models;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.Interfaces;
+using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities.JsonErrors;
 using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.CLR.Local;
@@ -155,19 +157,19 @@ namespace Xels.SmartContracts.Tests.Common.MockChain
         /// </summary>
         public BuildCreateContractTransactionResponse SendCreateContractTransaction(
             byte[] contractCode,
-            double amount,
+            decimal amount,
             string[] parameters = null,
-            ulong gasLimit = SmartContractFormatRule.GasLimitMaximum / 2, // half of maximum
+            ulong gasLimit = SmartContractFormatLogic.GasLimitMaximum / 2, // half of maximum
             ulong gasPrice = SmartContractMempoolValidator.MinGasPrice,
-            double feeAmount = 0.01,
+            decimal feeAmount = 0.01M,
             string sender = null)
         {
             var request = new BuildCreateContractTransactionRequest
             {
-                Amount = amount.ToString(),
+                Amount = amount.ToString(CultureInfo.InvariantCulture),
                 AccountName = this.AccountName,
                 ContractCode = contractCode.ToHexString(),
-                FeeAmount = feeAmount.ToString(),
+                FeeAmount = feeAmount.ToString(CultureInfo.InvariantCulture),
                 GasLimit = gasLimit,
                 GasPrice = gasPrice,
                 Parameters = parameters,
@@ -175,7 +177,43 @@ namespace Xels.SmartContracts.Tests.Common.MockChain
                 Sender = sender ?? this.MinerAddress.Address,
                 WalletName = this.WalletName
             };
-            JsonResult response = (JsonResult)this.smartContractsController.BuildAndSendCreateSmartContractTransaction(request);
+
+            IActionResult result = this.smartContractsController.BuildAndSendCreateSmartContractTransaction(request);
+            if (result is JsonResult response)
+            {
+                return (BuildCreateContractTransactionResponse)response.Value; 
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Sends a create contract transaction. Note that before this transaction can be mined it will need to reach the mempool.
+        /// You will likely want to call 'WaitMempoolCount' after this.
+        /// </summary>
+        public BuildCreateContractTransactionResponse BuildCreateContractTransaction(
+            byte[] contractCode,
+            double amount,
+            string[] parameters = null,
+            ulong gasLimit = SmartContractFormatLogic.GasLimitMaximum / 2, // half of maximum
+            ulong gasPrice = SmartContractMempoolValidator.MinGasPrice,
+            double feeAmount = 0.01,
+            string sender = null)
+        {
+            var request = new BuildCreateContractTransactionRequest
+            {
+                Amount = amount.ToString(CultureInfo.InvariantCulture),
+                AccountName = this.AccountName,
+                ContractCode = contractCode.ToHexString(),
+                FeeAmount = feeAmount.ToString(CultureInfo.InvariantCulture),
+                GasLimit = gasLimit,
+                GasPrice = gasPrice,
+                Parameters = parameters,
+                Password = this.Password,
+                Sender = sender ?? this.MinerAddress.Address,
+                WalletName = this.WalletName
+            };
+            JsonResult response = (JsonResult)this.smartContractsController.BuildCreateSmartContractTransaction(request);
             return (BuildCreateContractTransactionResponse)response.Value;
         }
 
@@ -201,19 +239,19 @@ namespace Xels.SmartContracts.Tests.Common.MockChain
         public BuildCallContractTransactionResponse SendCallContractTransaction(
             string methodName,
             string contractAddress,
-            double amount,
+            decimal amount,
             string[] parameters = null,
-            ulong gasLimit = SmartContractFormatRule.GasLimitMaximum / 2, // half of maximum
+            ulong gasLimit = SmartContractFormatLogic.GasLimitMaximum / 2, // half of maximum
             ulong gasPrice = SmartContractMempoolValidator.MinGasPrice,
-            double feeAmount = 0.01, 
+            decimal feeAmount = 0.01M, 
             string sender = null)
         {
             var request = new BuildCallContractTransactionRequest
             {
                 AccountName = this.AccountName,
-                Amount = amount.ToString(),
+                Amount = amount.ToString(CultureInfo.InvariantCulture),
                 ContractAddress = contractAddress,
-                FeeAmount = feeAmount.ToString(),
+                FeeAmount = feeAmount.ToString(CultureInfo.InvariantCulture),
                 GasLimit = gasLimit,
                 GasPrice = gasPrice,
                 MethodName = methodName,
@@ -222,22 +260,24 @@ namespace Xels.SmartContracts.Tests.Common.MockChain
                 Sender = sender ?? this.MinerAddress.Address,
                 WalletName = this.WalletName
             };
+
             JsonResult response = (JsonResult)this.smartContractsController.BuildAndSendCallSmartContractTransaction(request);
+
             return (BuildCallContractTransactionResponse)response.Value;
         }
 
         public ILocalExecutionResult CallContractMethodLocally(
             string methodName,
             string contractAddress,
-            double amount,
+            decimal amount,
             string[] parameters = null,
-            ulong gasLimit = SmartContractFormatRule.GasLimitMaximum / 2, // half of maximum
+            ulong gasLimit = SmartContractFormatLogic.GasLimitMaximum / 2, // half of maximum
             ulong gasPrice = SmartContractMempoolValidator.MinGasPrice,
             string sender = null)
         {
             var request = new LocalCallContractRequest
             {
-                Amount = amount.ToString(),
+                Amount = amount.ToString(CultureInfo.InvariantCulture),
                 ContractAddress = contractAddress,
                 GasLimit = gasLimit,
                 GasPrice = gasPrice,
@@ -278,7 +318,7 @@ namespace Xels.SmartContracts.Tests.Common.MockChain
         /// </summary
         public NBitcoin.Block GetLastBlock()
         {
-            return this.blockStore.GetBlockAsync(this.CoreNode.FullNode.Chain.Tip.HashBlock).Result;
+            return this.blockStore.GetBlock(this.CoreNode.FullNode.ChainIndexer.Tip.HashBlock);
         }
 
         /// <summary>
@@ -286,7 +326,7 @@ namespace Xels.SmartContracts.Tests.Common.MockChain
         /// </summary>
         public void WaitMempoolCount(int num)
         {
-            TestHelper.WaitLoop(() => this.CoreNode.CreateRPCClient().GetRawMempool().Length >= num);
+            TestBase.WaitLoop(() => this.CoreNode.CreateRPCClient().GetRawMempool().Length >= num);
         }
     }
 }

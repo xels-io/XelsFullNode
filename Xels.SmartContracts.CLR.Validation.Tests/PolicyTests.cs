@@ -1,5 +1,4 @@
-﻿using System;
-using Xels.SmartContracts.CLR.Validation.Policy;
+﻿using Xels.SmartContracts.CLR.Validation.Policy;
 using Xunit;
 
 namespace Xels.SmartContracts.CLR.Validation.Tests

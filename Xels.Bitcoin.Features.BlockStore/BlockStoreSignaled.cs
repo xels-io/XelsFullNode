@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Connection;
+using Xels.Bitcoin.EventBus;
+using Xels.Bitcoin.EventBus.CoreEvents;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.Primitives;
@@ -14,7 +17,7 @@ using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin.Features.BlockStore
 {
-    public class BlockStoreSignaled : SignalObserver<ChainedHeaderBlock>
+    public class BlockStoreSignaled : IDisposable
     {
         private readonly IBlockStoreQueue blockStoreQueue;
 
@@ -31,7 +34,7 @@ namespace Xels.Bitcoin.Features.BlockStore
         private readonly StoreSettings storeSettings;
 
         /// <summary>Queue of chained blocks that will be announced to the peers.</summary>
-        private readonly AsyncQueue<ChainedHeader> blocksToAnnounce;
+        private readonly IAsyncQueue<ChainedHeader> blocksToAnnounce;
 
         /// <summary>Provider of IBD state.</summary>
         private readonly IInitialBlockDownloadState initialBlockDownloadState;
@@ -42,6 +45,10 @@ namespace Xels.Bitcoin.Features.BlockStore
         /// <summary>Task that runs <see cref="DequeueContinuouslyAsync"/>.</summary>
         private readonly Task dequeueLoopTask;
 
+        private readonly ISignals signals;
+        private readonly IAsyncProvider asyncProvider;
+        private SubscriptionToken blockConnectedSubscription;
+
         public BlockStoreSignaled(
             IBlockStoreQueue blockStoreQueue,
             StoreSettings storeSettings,
@@ -49,7 +56,9 @@ namespace Xels.Bitcoin.Features.BlockStore
             IConnectionManager connection,
             INodeLifetime nodeLifetime,
             ILoggerFactory loggerFactory,
-            IInitialBlockDownloadState initialBlockDownloadState)
+            IInitialBlockDownloadState initialBlockDownloadState,
+            ISignals signals,
+            IAsyncProvider asyncProvider)
         {
             this.blockStoreQueue = blockStoreQueue;
             this.chainState = chainState;
@@ -58,13 +67,24 @@ namespace Xels.Bitcoin.Features.BlockStore
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
             this.storeSettings = storeSettings;
             this.initialBlockDownloadState = initialBlockDownloadState;
+            this.signals = signals;
+            this.asyncProvider = asyncProvider;
 
-            this.blocksToAnnounce = new AsyncQueue<ChainedHeader>();
+            this.blocksToAnnounce = asyncProvider.CreateAsyncQueue<ChainedHeader>();
             this.dequeueLoopTask = this.DequeueContinuouslyAsync();
+
+            this.asyncProvider.RegisterTask($"{nameof(BlockStoreSignaled)}.{nameof(this.dequeueLoopTask)}", this.dequeueLoopTask);
         }
 
-        protected override void OnNextCore(ChainedHeaderBlock blockPair)
+        public void Initialize()
         {
+            this.blockConnectedSubscription = this.signals.Subscribe<BlockConnected>(this.OnBlockConnected);
+        }
+
+        private void OnBlockConnected(BlockConnected blockConnected)
+        {
+            ChainedHeaderBlock blockPair = blockConnected.ConnectedBlock;
+
             ChainedHeader chainedHeader = blockPair.ChainedHeader;
             if (chainedHeader == null)
             {
@@ -231,13 +251,13 @@ namespace Xels.Bitcoin.Features.BlockStore
         }
 
         /// <inheritdoc />
-        protected override void Dispose(bool disposing)
+        public void Dispose()
         {
             // Let current batch sending task finish.
             this.blocksToAnnounce.Dispose();
             this.dequeueLoopTask.GetAwaiter().GetResult();
 
-            base.Dispose(disposing);
+            this.signals.Unsubscribe(this.blockConnectedSubscription);
         }
     }
 }

@@ -2,19 +2,17 @@
 using System.IO;
 using System.Threading;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Moq;
 using NBitcoin;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base;
-using Xels.Bitcoin.Builder;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
-using Xels.Bitcoin.Networks;
-using Xels.Bitcoin.P2P;
 using Xels.Bitcoin.P2P.Peer;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
 using Xunit;
@@ -35,7 +33,8 @@ namespace Xels.Bitcoin.Features.Dns.Tests
             public DnsSettings dnsSettings;
             public NodeSettings nodeSettings;
             public DataFolder dataFolder;
-            public IAsyncLoopFactory asyncLoopFactory;
+            public IAsyncProvider asyncProvider;
+            public ISignals signals;
             public Mock<IConnectionManager> connectionManager;
             public UnreliablePeerBehavior unreliablePeerBehavior;
 
@@ -52,9 +51,10 @@ namespace Xels.Bitcoin.Features.Dns.Tests
                 this.nodeSettings = new NodeSettings(network, args: new string[] { $"-datadir={Directory.GetCurrentDirectory()}" });
                 this.dnsSettings = new DnsSettings(this.nodeSettings);
                 this.dataFolder = CreateDataFolder(this);
-                this.asyncLoopFactory = new Mock<IAsyncLoopFactory>().Object;
+                this.asyncProvider = new Mock<IAsyncProvider>().Object;
                 this.connectionManager = this.BuildConnectionManager();
                 this.unreliablePeerBehavior = this.BuildUnreliablePeerBehavior();
+                this.signals = new Signals.Signals(this.loggerFactory.Object, null);
             }
 
             private Mock<IConnectionManager> BuildConnectionManager()
@@ -96,7 +96,7 @@ namespace Xels.Bitcoin.Features.Dns.Tests
                 this.defaultConstructorParameters.dnsSettings,
                 this.defaultConstructorParameters.nodeSettings,
                 this.defaultConstructorParameters.dataFolder,
-                this.defaultConstructorParameters.asyncLoopFactory,
+                this.defaultConstructorParameters.asyncProvider,
                 this.defaultConstructorParameters.connectionManager?.Object,
                 this.defaultConstructorParameters.unreliablePeerBehavior
             );
@@ -283,7 +283,7 @@ namespace Xels.Bitcoin.Features.Dns.Tests
             this.defaultConstructorParameters.nodeLifetime.Setup(n => n.StopApplication()).Callback(() => source.Cancel());
             this.defaultConstructorParameters.nodeLifetime.Setup(n => n.ApplicationStopping).Returns(source.Token);
 
-            this.defaultConstructorParameters.asyncLoopFactory = new AsyncLoopFactory(this.defaultConstructorParameters.loggerFactory.Object);
+            this.defaultConstructorParameters.asyncProvider = new AsyncProvider(this.defaultConstructorParameters.loggerFactory.Object, this.defaultConstructorParameters.signals, this.defaultConstructorParameters.nodeLifetime.Object);
 
             using (var feature = this.BuildDefaultDnsFeature())
             {

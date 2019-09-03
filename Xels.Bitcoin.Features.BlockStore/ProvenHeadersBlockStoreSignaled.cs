@@ -1,10 +1,11 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NBitcoin;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Primitives;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin.Features.BlockStore
@@ -28,8 +29,10 @@ namespace Xels.Bitcoin.Features.BlockStore
             INodeLifetime nodeLifetime,
             ILoggerFactory loggerFactory,
             IInitialBlockDownloadState initialBlockDownloadState,
-            IProvenBlockHeaderStore provenBlockHeaderStore)
-            : base(blockStoreQueue, storeSettings, chainState, connection, nodeLifetime, loggerFactory, initialBlockDownloadState)
+            IProvenBlockHeaderStore provenBlockHeaderStore,
+            ISignals signals,
+            IAsyncProvider asyncProvider)
+            : base(blockStoreQueue, storeSettings, chainState, connection, nodeLifetime, loggerFactory, initialBlockDownloadState, signals, asyncProvider)
         {
             this.network = Guard.NotNull(network, nameof(network));
             this.provenBlockHeaderStore = Guard.NotNull(provenBlockHeaderStore, nameof(provenBlockHeaderStore));

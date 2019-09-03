@@ -43,13 +43,7 @@ namespace Xels.Bitcoin.Features.Consensus.Rules.CommonRules
 
             await base.RunAsync(context).ConfigureAwait(false);
             var posRuleContext = context as PosRuleContext;
-            await this.stakeChain.SetAsync(context.ValidationContext.ChainedHeaderToValidate, posRuleContext.BlockStake).ConfigureAwait(false);
-        }
-
-        /// <inheritdoc/>
-        protected override bool IsProtocolTransaction(Transaction transaction)
-        {
-            return transaction.IsCoinBase || transaction.IsCoinStake;
+            this.stakeChain.Set(context.ValidationContext.ChainedHeaderToValidate, posRuleContext.BlockStake);
         }
 
         /// <inheritdoc />
@@ -78,6 +72,11 @@ namespace Xels.Bitcoin.Features.Consensus.Rules.CommonRules
                     ConsensusErrors.BadCoinbaseAmount.Throw();
                 }
             }
+        }
+
+        protected override Money GetTransactionFee(UnspentOutputSet view, Transaction tx)
+        {
+            return tx.IsCoinStake ? Money.Zero : view.GetValueIn(tx) - tx.TotalOut;
         }
 
         /// <inheritdoc />
@@ -110,6 +109,14 @@ namespace Xels.Bitcoin.Features.Consensus.Rules.CommonRules
                     ConsensusErrors.BadTransactionPrematureCoinstakeSpending.Throw();
                 }
             }
+        }
+
+        /// <inheritdoc />
+        protected override void CheckInputValidity(Transaction transaction, UnspentOutputs coins)
+        {
+            // Transaction timestamp earlier than input transaction - main.cpp, CTransaction::ConnectInputs
+            if (coins.Time > transaction.Time)
+                ConsensusErrors.BadTransactionEarlyTimestamp.Throw();
         }
 
         /// <summary>

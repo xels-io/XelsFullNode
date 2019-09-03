@@ -16,7 +16,7 @@ namespace Xels.SmartContracts.CLR.Validation
         public SmartContractValidationResult Validate(ModuleDefinition moduleDefinition)
         {
             var warnings = new List<ValidationResult>();
-            IEnumerable<TypeDefinition> contractTypes = moduleDefinition.GetDevelopedTypes();
+            IEnumerable<TypeDefinition> contractTypes = moduleDefinition.GetContractTypes();
 
             foreach(TypeDefinition contractType in contractTypes)
             {

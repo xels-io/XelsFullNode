@@ -46,7 +46,7 @@ namespace NBitcoin.Tests
         [Trait("UnitTest", "UnitTest")]
         public void CanGetMedianBlock()
         {
-            var chain = new ConcurrentChain(this.xelsMain);
+            var chain = new ChainIndexer(this.xelsMain);
             DateTimeOffset now = DateTimeOffset.UtcNow;
             chain.SetTip(CreateBlock(now, 0, chain));
             chain.SetTip(CreateBlock(now, -1, chain));
@@ -70,7 +70,7 @@ namespace NBitcoin.Tests
             Assert.Equal(CreateBlock(now, 5).Header.BlockTime, chain.Tip.GetMedianTimePast()); // x -1 0 1 2 3 4 5 6 7 8 9 10
         }
 
-        private ChainedHeader CreateBlock(DateTimeOffset now, int offset, ChainBase chain = null)
+        private ChainedHeader CreateBlock(DateTimeOffset now, int offset, ChainIndexer chain = null)
         {
             Block block = this.consensusFactory.CreateBlock();
             block.Header.BlockTime = now + TimeSpan.FromMinutes(offset);
@@ -989,10 +989,8 @@ namespace NBitcoin.Tests
         private void CanVerifySequenceLockCore(Sequence[] sequences, int[] prevHeights, int currentHeight, DateTimeOffset first, bool expected, SequenceLock expectedLock)
         {
             Network network = this.xelsMain;
-            BlockHeader blockHeader = network.Consensus.ConsensusFactory.CreateBlockHeader();
-            blockHeader.BlockTime = first;
 
-            var chain = new ConcurrentChain(network, new ChainedHeader(blockHeader, blockHeader.GetHash(), 0));
+            var chain = new ChainIndexer(network);
             first = first + TimeSpan.FromMinutes(10);
 
             while (currentHeight != chain.Height)
@@ -1625,72 +1623,72 @@ namespace NBitcoin.Tests
             Assert.True(errors[0] is DustPolicyError);
         }
 
-        [Fact]
-        [Trait("UnitTest", "UnitTest")]
-        //https://gist.github.com/gavinandresen/3966071
-        public void CanPartiallySignTransaction()
-        {
-            Key[] privKeys = new[]{"7R3MeCSVTTzp3w3Ny4g7RWpvMYu7CfuERZJcPqn1VRL3kyV9A2p",
-                        "7R41movhhKW2ZencnZvzcoDssFpKfNCv4yRqHnXco85rBLN1C2D",
-                        "7Qidst55wkYRJpJN4aEnGjz64Mnf7BrSehVuX2HqWWPpYNEkqQJ"}
-                        .Select(k => new BitcoinSecret(k).PrivateKey).ToArray();
+        //[Fact]
+        //[Trait("UnitTest", "UnitTest")]
+        ////https://gist.github.com/gavinandresen/3966071
+        //public void CanPartiallySignTransaction()
+        //{
+        //    Key[] privKeys = new[]{"7R3MeCSVTTzp3w3Ny4g7RWpvMYu7CfuERZJcPqn1VRL3kyV9A2p",
+        //                "7R41movhhKW2ZencnZvzcoDssFpKfNCv4yRqHnXco85rBLN1C2D",
+        //                "7Qidst55wkYRJpJN4aEnGjz64Mnf7BrSehVuX2HqWWPpYNEkqQJ"}
+        //                .Select(k => new BitcoinSecret(k).PrivateKey).ToArray();
 
-            //First: combine the three keys into a multisig address
-            Script redeem = PayToMultiSigTemplate.Instance.GenerateScriptPubKey(2, privKeys.Select(k => k.PubKey).ToArray());
-            BitcoinAddress scriptAddress = redeem.Hash.GetAddress(this.xelsMain);
-            Assert.Equal("sgs9e5cF7ykb3ZXRztgwMhiGwjRF7hRkvn", scriptAddress.ToString());
+        //    //First: combine the three keys into a multisig address
+        //    Script redeem = PayToMultiSigTemplate.Instance.GenerateScriptPubKey(2, privKeys.Select(k => k.PubKey).ToArray());
+        //    BitcoinAddress scriptAddress = redeem.Hash.GetAddress(this.xelsMain);
+        //    Assert.Equal("sgs9e5cF7ykb3ZXRztgwMhiGwjRF7hRkvn", scriptAddress.ToString());
 
-            // Next, create a transaction to send funds into that multisig. Transaction d6f72... is
-            // an unspent transaction in my wallet (which I got from the 'listunspent' RPC call):
-            // Taken from example
-            Transaction fundingTransaction = this.xelsMain.CreateTransaction("01000000ec7b1a580189632848f99722915727c5c75da8db2dbf194342a0429828f66ff88fab2af7d6000000008b483045022100abbc8a73fe2054480bda3f3281da2d0c51e2841391abd4c09f4f908a2034c18d02205bc9e4d68eafb918f3e9662338647a4419c0de1a650ab8983f1d216e2a31d8e30141046f55d7adeff6011c7eac294fe540c57830be80e9355c83869c9260a4b8bf4767a66bacbd70b804dc63d5beeb14180292ad7f3b083372b1d02d7a37dd97ff5c9effffffff0140420f000000000017a914f815b036d9bbbce5e9f2a00abd1bf3dc91e955108700000000");
+        //    // Next, create a transaction to send funds into that multisig. Transaction d6f72... is
+        //    // an unspent transaction in my wallet (which I got from the 'listunspent' RPC call):
+        //    // Taken from example
+        //    Transaction fundingTransaction = this.xelsMain.CreateTransaction("01000000ec7b1a580189632848f99722915727c5c75da8db2dbf194342a0429828f66ff88fab2af7d6000000008b483045022100abbc8a73fe2054480bda3f3281da2d0c51e2841391abd4c09f4f908a2034c18d02205bc9e4d68eafb918f3e9662338647a4419c0de1a650ab8983f1d216e2a31d8e30141046f55d7adeff6011c7eac294fe540c57830be80e9355c83869c9260a4b8bf4767a66bacbd70b804dc63d5beeb14180292ad7f3b083372b1d02d7a37dd97ff5c9effffffff0140420f000000000017a914f815b036d9bbbce5e9f2a00abd1bf3dc91e955108700000000");
 
-            // Create the spend-from-multisig transaction. Since the fund-the-multisig transaction
-            // hasn't been sent yet, I need to give txid, scriptPubKey and redeemScript:
-            Transaction spendTransaction = this.xelsMain.CreateTransaction();
-            spendTransaction.Inputs.Add(new TxIn()
-            {
-                PrevOut = new OutPoint(fundingTransaction.GetHash(), 0),
-            });
+        //    // Create the spend-from-multisig transaction. Since the fund-the-multisig transaction
+        //    // hasn't been sent yet, I need to give txid, scriptPubKey and redeemScript:
+        //    Transaction spendTransaction = this.xelsMain.CreateTransaction();
+        //    spendTransaction.Inputs.Add(new TxIn()
+        //    {
+        //        PrevOut = new OutPoint(fundingTransaction.GetHash(), 0),
+        //    });
 
-            spendTransaction.Outputs.Add(new TxOut()
-            {
-                Value = "0.01000000",
-                ScriptPubKey = new Script("OP_DUP OP_HASH160 ae56b4db13554d321c402db3961187aed1bbed5b OP_EQUALVERIFY OP_CHECKSIG")
-            });
+        //    spendTransaction.Outputs.Add(new TxOut()
+        //    {
+        //        Value = "0.01000000",
+        //        ScriptPubKey = new Script("OP_DUP OP_HASH160 ae56b4db13554d321c402db3961187aed1bbed5b OP_EQUALVERIFY OP_CHECKSIG")
+        //    });
 
-            spendTransaction.Inputs[0].ScriptSig = redeem; //The redeem should be in the scriptSig before signing
+        //    spendTransaction.Inputs[0].ScriptSig = redeem; //The redeem should be in the scriptSig before signing
 
-            Transaction partiallySigned = this.xelsMain.CreateTransaction(spendTransaction.ToBytes());
-            //... Now I can partially sign it using one private key:
-            partiallySigned.Sign(this.xelsMain, privKeys[0], true);
+        //    Transaction partiallySigned = this.xelsMain.CreateTransaction(spendTransaction.ToBytes());
+        //    //... Now I can partially sign it using one private key:
+        //    partiallySigned.Sign(this.xelsMain, privKeys[0], true);
 
-            //the other private keys (note the "hex" result getting longer):
-            partiallySigned.Sign(this.xelsMain, privKeys[1], true);
+        //    //the other private keys (note the "hex" result getting longer):
+        //    partiallySigned.Sign(this.xelsMain, privKeys[1], true);
 
-            AssertCorrectlySigned(partiallySigned, fundingTransaction.Outputs[0].ScriptPubKey, this.allowHighS);
+        //    AssertCorrectlySigned(partiallySigned, fundingTransaction.Outputs[0].ScriptPubKey, this.allowHighS);
 
-            //Verify the transaction from the gist is also correctly signed
-            Transaction gistTransaction = this.xelsMain.CreateTransaction("010000009d4f1b5801e1f87273f4e266d0f2d08a4a08807dc2c2e8f6e47bcc488201652a03778de19600000000fd5e0100483045022100d62e6327a72ca014778d87ba225ef8fc08610e2345fe1c543bb429777f82052a02207832b67b2f03bd8bfdfd79597a51a269c3f569fcd89a347db370a07146292c7501483045022100eff296780357c91f1b1334011e11150dac30de70be3d428e4799fd66456055ee02205313912c3c17e59533e1aa86c7526a365faef59c2dd55dd3bb5292cbada52eb9014cc952410491bba2510912a5bd37da1fb5b1673010e43d2c6d812c514e91bfa9f2eb129e1c183329db55bd868e209aac2fbc02cb33d98fe74bf23f0c235d6126b1d8334f864104865c40293a680cb9c020e7b1e106d8c1916d3cef99aa431a56d253e69256dac09ef122b1a986818a7cb624532f062c1d1f8722084861c5c3291ccffef4ec687441048d2455d2403e08708fc1f556002f1b6cd83f992d085097f9974ab08a28838f07896fbab08f39495e15fa6fad6edbfb1e754e35fa1c7844c41f322a1863d4621353aeffffffff0140420f00000000001976a914ae56b4db13554d321c402db3961187aed1bbed5b88ac00000000");
+        //    //Verify the transaction from the gist is also correctly signed
+        //    Transaction gistTransaction = this.xelsMain.CreateTransaction("010000009d4f1b5801e1f87273f4e266d0f2d08a4a08807dc2c2e8f6e47bcc488201652a03778de19600000000fd5e0100483045022100d62e6327a72ca014778d87ba225ef8fc08610e2345fe1c543bb429777f82052a02207832b67b2f03bd8bfdfd79597a51a269c3f569fcd89a347db370a07146292c7501483045022100eff296780357c91f1b1334011e11150dac30de70be3d428e4799fd66456055ee02205313912c3c17e59533e1aa86c7526a365faef59c2dd55dd3bb5292cbada52eb9014cc952410491bba2510912a5bd37da1fb5b1673010e43d2c6d812c514e91bfa9f2eb129e1c183329db55bd868e209aac2fbc02cb33d98fe74bf23f0c235d6126b1d8334f864104865c40293a680cb9c020e7b1e106d8c1916d3cef99aa431a56d253e69256dac09ef122b1a986818a7cb624532f062c1d1f8722084861c5c3291ccffef4ec687441048d2455d2403e08708fc1f556002f1b6cd83f992d085097f9974ab08a28838f07896fbab08f39495e15fa6fad6edbfb1e754e35fa1c7844c41f322a1863d4621353aeffffffff0140420f00000000001976a914ae56b4db13554d321c402db3961187aed1bbed5b88ac00000000");
 
-            AssertCorrectlySigned(gistTransaction, fundingTransaction.Outputs[0].ScriptPubKey, this.allowHighS); //One sig in the hard code tx is high
+        //    AssertCorrectlySigned(gistTransaction, fundingTransaction.Outputs[0].ScriptPubKey, this.allowHighS); //One sig in the hard code tx is high
 
-            //Can sign out of order
-            partiallySigned = this.xelsMain.CreateTransaction(spendTransaction.ToBytes());
-            partiallySigned.Sign(this.xelsMain, privKeys[2], true);
-            partiallySigned.Sign(this.xelsMain, privKeys[0], true);
-            AssertCorrectlySigned(partiallySigned, fundingTransaction.Outputs[0].ScriptPubKey);
+        //    //Can sign out of order
+        //    partiallySigned = this.xelsMain.CreateTransaction(spendTransaction.ToBytes());
+        //    partiallySigned.Sign(this.xelsMain, privKeys[2], true);
+        //    partiallySigned.Sign(this.xelsMain, privKeys[0], true);
+        //    AssertCorrectlySigned(partiallySigned, fundingTransaction.Outputs[0].ScriptPubKey);
 
-            //Can sign multiple inputs
-            partiallySigned = this.xelsMain.CreateTransaction(spendTransaction.ToBytes());
-            partiallySigned.Inputs.Add(new TxIn()
-            {
-                PrevOut = new OutPoint(fundingTransaction.GetHash(), 1),
-            });
-            partiallySigned.Inputs[1].ScriptSig = redeem; //The redeem should be in the scriptSig before signing
-            partiallySigned.Sign(this.xelsMain, privKeys[2], true);
-            partiallySigned.Sign(this.xelsMain, privKeys[0], true);
-        }
+        //    //Can sign multiple inputs
+        //    partiallySigned = this.xelsMain.CreateTransaction(spendTransaction.ToBytes());
+        //    partiallySigned.Inputs.Add(new TxIn()
+        //    {
+        //        PrevOut = new OutPoint(fundingTransaction.GetHash(), 1),
+        //    });
+        //    partiallySigned.Inputs[1].ScriptSig = redeem; //The redeem should be in the scriptSig before signing
+        //    partiallySigned.Sign(this.xelsMain, privKeys[2], true);
+        //    partiallySigned.Sign(this.xelsMain, privKeys[0], true);
+        //}
 
         private void AssertCorrectlySigned(Transaction tx, Script scriptPubKey, ScriptVerify scriptVerify = ScriptVerify.Standard)
         {
@@ -3057,13 +3055,13 @@ namespace NBitcoin.Tests
             t.Outputs[0].ScriptPubKey = new Script() + OpcodeType.OP_1;
             Assert.True(!StandardScripts.IsStandardTransaction(t, this.xelsMain));
 
-            // 80-byte TX_NULL_DATA (standard)
-            t.Outputs[0].ScriptPubKey = new Script() + OpcodeType.OP_RETURN + ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef3804678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38");
-            Assert.True(StandardScripts.IsStandardTransaction(t, this.xelsMain));
+            // 40-byte TX_NULL_DATA (standard)
+            t.Outputs[0].ScriptPubKey = new Script() + OpcodeType.OP_RETURN + ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f00");
+            Assert.True(this.xelsMain.StandardScriptsRegistry.IsStandardTransaction(t, this.xelsMain));
 
-            // 81-byte TX_NULL_DATA (non-standard)
-            t.Outputs[0].ScriptPubKey = new Script() + OpcodeType.OP_RETURN + ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef3804678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef3800");
-            Assert.True(!StandardScripts.IsStandardTransaction(t, this.xelsMain));
+            // 41-byte TX_NULL_DATA (non-standard)
+            t.Outputs[0].ScriptPubKey = new Script() + OpcodeType.OP_RETURN + ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f0000");
+            Assert.True(!this.xelsMain.StandardScriptsRegistry.IsStandardTransaction(t, this.xelsMain));
 
             // TX_NULL_DATA w/o PUSHDATA
             t.Outputs.Clear();

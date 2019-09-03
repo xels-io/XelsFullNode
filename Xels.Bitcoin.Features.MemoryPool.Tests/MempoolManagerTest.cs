@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NBitcoin;
 using Xels.Bitcoin.Configuration;
-using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.MemoryPool.Fee;
 using Xels.Bitcoin.Tests.Common;

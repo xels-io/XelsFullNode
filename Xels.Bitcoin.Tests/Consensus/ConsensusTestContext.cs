@@ -1,20 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NBitcoin;
 using Xels.Bitcoin.Base;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base.Deployments;
+using Xels.Bitcoin.BlockPulling;
 using Xels.Bitcoin.Configuration;
-using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
+using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Consensus.Validators;
-using Xels.Bitcoin.Features.Consensus.CoinViews;
+using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.Consensus.Rules;
+using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
 using Xels.Bitcoin.Interfaces;
+using Xels.Bitcoin.P2P;
+using Xels.Bitcoin.P2P.Peer;
+using Xels.Bitcoin.P2P.Protocol.Payloads;
 using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
@@ -27,52 +37,136 @@ namespace Xels.Bitcoin.Tests.Consensus
     {
         public Mock<IHeaderValidator> HeaderValidator { get; }
 
-        public Network Network = KnownNetworks.RegTest;
+        public Network Network;
 
-        public Mock<IChainState> ChainState = new Mock<IChainState>();
         internal ChainedHeaderTree ChainedHeaderTree;
-        public Mock<ICheckpoints> Checkpoints = new Mock<ICheckpoints>();
-        public ConsensusSettings ConsensusSettings = new ConsensusSettings(new NodeSettings(KnownNetworks.RegTest));
-        public IConsensusManager ConsensusManager;
-        public readonly Mock<IConsensusRuleEngine> ConsensusRulesEngine = new Mock<IConsensusRuleEngine>();
+        private INodeStats nodeStats;
+        private Mock<IInitialBlockDownloadState> ibd;
+        public readonly Mock<IBlockPuller> BlockPuller;
+        public readonly Mock<IBlockStore> BlockStore;
+        private Mock<ICheckpoints> checkpoints = new Mock<ICheckpoints>();
+        public TestConsensusManager TestConsensusManager;
         public Mock<IFinalizedBlockInfoRepository> FinalizedBlockMock = new Mock<IFinalizedBlockInfoRepository>();
-
         public readonly Mock<IInitialBlockDownloadState> ibdState = new Mock<IInitialBlockDownloadState>();
         internal ChainedHeader InitialChainTip;
         public Mock<IIntegrityValidator> IntegrityValidator = new Mock<IIntegrityValidator>();
-        public readonly IPartialValidator PartialValidation;
-        public readonly IFullValidator FullValidation;
-        public readonly Mock<IPeerBanning> PeerBanning = new Mock<IPeerBanning>();
-
+        public readonly Mock<IPartialValidator> PartialValidator;
+        public readonly Mock<IFullValidator> FullValidator;
+        public BlockPuller.OnBlockDownloadedCallback blockPullerBlockDownloadCallback;
+        private IPeerBanning peerBanning;
+        private IConnectionManager connectionManager;
         private static int nonceValue;
-        public Mock<ISignals> Signals = new Mock<ISignals>();
+        internal ChainIndexer chainIndexer;
+        private DateTimeProvider dateTimeProvider;
+        private InvalidBlockHashStore hashStore;
+        private NodeSettings nodeSettings;
+        private ILoggerFactory loggerFactory;
+        private IRuleRegistration ruleRegistration;
+        public ConsensusSettings ConsensusSettings;
+        private INetworkPeerFactory networkPeerFactory;
+        public Mock<IChainState> ChainState;
+        private readonly IConsensusRuleEngine consensusRules;
+        public readonly TestInMemoryCoinView coinView;
+        private NodeDeployments deployments;
+        private ISelfEndpointTracker selfEndpointTracker;
+        private INodeLifetime nodeLifetime;
+
+        private PeerAddressManager peerAddressManager;
+        private ISignals signals;
+        private IAsyncProvider asyncProvider;
 
         public TestContext()
         {
-            var chain = new ConcurrentChain(this.Network);
-            var extendedLoggerFactory = new ExtendedLoggerFactory();
-            var dateTimeProvider = new DateTimeProvider();
-            var hashStore = new InvalidBlockHashStore(dateTimeProvider);
-            var powConsensusRulesEngine = new PowConsensusRuleEngine(this.Network, extendedLoggerFactory, dateTimeProvider, chain,
-                new NodeDeployments(this.Network, chain), this.ConsensusSettings, this.Checkpoints.Object, new Mock<ICoinView>().Object,
-                this.ChainState.Object, hashStore, new NodeStats(dateTimeProvider));
+            this.Network = KnownNetworks.RegTest;
 
-            this.PartialValidation = new PartialValidator(powConsensusRulesEngine, extendedLoggerFactory);
-            this.FullValidation = new FullValidator(powConsensusRulesEngine, extendedLoggerFactory);
+            this.chainIndexer = new ChainIndexer(this.Network);
+            this.dateTimeProvider = new DateTimeProvider();
+            this.hashStore = new InvalidBlockHashStore(this.dateTimeProvider);
+
+            this.coinView = new TestInMemoryCoinView(this.chainIndexer.Tip.HashBlock);
             this.HeaderValidator = new Mock<IHeaderValidator>();
             this.HeaderValidator.Setup(hv => hv.ValidateHeader(It.IsAny<ChainedHeader>())).Returns(new ValidationContext());
 
-            this.ChainedHeaderTree = new ChainedHeaderTree(
-                this.Network,
-                extendedLoggerFactory,
-                this.HeaderValidator.Object,
-                this.Checkpoints.Object,
-                this.ChainState.Object,
-                this.FinalizedBlockMock.Object,
-                this.ConsensusSettings,
-                hashStore);
+            this.nodeLifetime = new NodeLifetime();
+            this.ibd = new Mock<IInitialBlockDownloadState>();
+            this.BlockPuller = new Mock<IBlockPuller>();
 
-            this.ConsensusManager = CreateConsensusManager();
+            this.BlockPuller.Setup(b => b.Initialize(It.IsAny<BlockPuller.OnBlockDownloadedCallback>()))
+                .Callback<BlockPuller.OnBlockDownloadedCallback>((d) => { this.blockPullerBlockDownloadCallback = d; });
+            this.BlockStore = new Mock<IBlockStore>();
+            this.checkpoints = new Mock<ICheckpoints>();
+            this.ChainState = new Mock<IChainState>();
+            this.nodeStats = new NodeStats(this.dateTimeProvider);
+
+
+            string[] param = new string[] { };
+            this.nodeSettings = new NodeSettings(this.Network, args: param);
+            this.ConsensusSettings = new ConsensusSettings(this.nodeSettings);
+
+            this.loggerFactory = this.nodeSettings.LoggerFactory;
+
+            var connectionSettings = new ConnectionManagerSettings(this.nodeSettings);
+            this.selfEndpointTracker = new SelfEndpointTracker(this.loggerFactory, connectionSettings);
+            this.Network.Consensus.Options = new ConsensusOptions();
+
+            this.ruleRegistration = new FullNodeBuilderConsensusExtension.PowConsensusRulesRegistration();
+            this.ruleRegistration.RegisterRules(this.Network.Consensus);
+
+            this.signals = new Bitcoin.Signals.Signals(this.loggerFactory, null);
+            this.asyncProvider = new AsyncProvider(this.loggerFactory, this.signals, this.nodeLifetime);
+
+            // Dont check PoW of a header in this test.
+            this.Network.Consensus.HeaderValidationRules.RemoveAll(x => x.GetType() == typeof(CheckDifficultyPowRule));
+
+            this.ChainedHeaderTree = new ChainedHeaderTree(
+                  this.Network,
+                  this.loggerFactory,
+                  this.HeaderValidator.Object,
+                  this.checkpoints.Object,
+                  this.ChainState.Object,
+                  this.FinalizedBlockMock.Object,
+                  this.ConsensusSettings,
+                  this.hashStore);
+
+            this.networkPeerFactory = new NetworkPeerFactory(this.Network,
+                this.dateTimeProvider,
+                this.loggerFactory, new PayloadProvider().DiscoverPayloads(),
+                this.selfEndpointTracker,
+                this.ibd.Object,
+                new ConnectionManagerSettings(this.nodeSettings), this.asyncProvider);
+
+            this.peerAddressManager = new PeerAddressManager(DateTimeProvider.Default, this.nodeSettings.DataFolder, this.loggerFactory, this.selfEndpointTracker);
+            var peerDiscovery = new PeerDiscovery(this.asyncProvider, this.loggerFactory, this.Network, this.networkPeerFactory, this.nodeLifetime, this.nodeSettings, this.peerAddressManager);
+
+            this.connectionManager = new ConnectionManager(this.dateTimeProvider, this.loggerFactory, this.Network, this.networkPeerFactory, this.nodeSettings,
+                this.nodeLifetime, new NetworkPeerConnectionParameters(), this.peerAddressManager, new IPeerConnector[] { },
+                peerDiscovery, this.selfEndpointTracker, connectionSettings, new VersionProvider(), this.nodeStats, this.asyncProvider);
+
+            this.deployments = new NodeDeployments(this.Network, this.chainIndexer);
+
+            this.consensusRules = new PowConsensusRuleEngine(this.Network, this.loggerFactory, this.dateTimeProvider, this.chainIndexer, this.deployments, this.ConsensusSettings,
+                     this.checkpoints.Object, this.coinView, this.ChainState.Object, this.hashStore, this.nodeStats, this.asyncProvider);
+
+            this.consensusRules.Register();
+
+            var tree = new ChainedHeaderTree(this.Network, this.loggerFactory, this.HeaderValidator.Object, this.checkpoints.Object,
+                this.ChainState.Object, this.FinalizedBlockMock.Object, this.ConsensusSettings, this.hashStore);
+
+            this.PartialValidator = new Mock<IPartialValidator>();
+            this.FullValidator = new Mock<IFullValidator>();
+
+
+            this.peerBanning = new PeerBanning(this.connectionManager, this.loggerFactory, this.dateTimeProvider, this.peerAddressManager);
+
+            this.IntegrityValidator.Setup(i => i.VerifyBlockIntegrity(It.IsAny<ChainedHeader>(), It.IsAny<Block>()))
+                .Returns(new ValidationContext());
+
+            ConsensusManager consensusManager = new ConsensusManager(tree, this.Network, this.loggerFactory, this.ChainState.Object, this.IntegrityValidator.Object,
+                this.PartialValidator.Object, this.FullValidator.Object, this.consensusRules,
+                this.FinalizedBlockMock.Object, this.signals, this.peerBanning, this.ibd.Object, this.chainIndexer,
+                this.BlockPuller.Object, this.BlockStore.Object, this.connectionManager, this.nodeStats, this.nodeLifetime, this.ConsensusSettings);
+
+            this.TestConsensusManager = new TestConsensusManager(consensusManager);
         }
 
         public Block CreateBlock(ChainedHeader previous)
@@ -88,13 +182,6 @@ namespace Xels.Bitcoin.Tests.Consensus
             block.Header.HashPrevBlock = previous.HashBlock;
 
             return block;
-        }
-
-        private IConsensusManager CreateConsensusManager()
-        {
-            this.ConsensusManager = ConsensusManagerHelper.CreateConsensusManager(this.Network);
-
-            return this.ConsensusManager;
         }
 
         internal Target ChangeDifficulty(ChainedHeader header, int difficultyAdjustmentDivisor)
@@ -115,16 +202,16 @@ namespace Xels.Bitcoin.Tests.Consensus
             foreach (CheckpointFixture checkpoint in checkpoints.OrderBy(h => h.Height))
             {
                 var checkpointInfo = new CheckpointInfo(checkpoint.Header.GetHash());
-                this.Checkpoints
+                this.checkpoints
                     .Setup(c => c.GetCheckpoint(checkpoint.Height))
                     .Returns(checkpointInfo);
             }
 
-            this.Checkpoints
+            this.checkpoints
                 .Setup(c => c.GetCheckpoint(It.IsNotIn(checkpoints.Select(h => h.Height))))
                 .Returns((CheckpointInfo)null);
 
-            this.Checkpoints
+            this.checkpoints
                 .Setup(c => c.GetLastCheckpointHeight())
                 .Returns(checkpoints.OrderBy(h => h.Height).Last().Height);
         }
@@ -134,7 +221,8 @@ namespace Xels.Bitcoin.Tests.Consensus
             ChainedHeader chainedHeader = null,
             int difficultyAdjustmentDivisor = 1,
             bool assignBlocks = true,
-            ValidationState? validationState = null)
+            ValidationState? validationState = null,
+            int? avgBlockSize = null)
         {
             if (difficultyAdjustmentDivisor == 0)
                 throw new ArgumentException("Divisor cannot be 0");
@@ -157,8 +245,36 @@ namespace Xels.Bitcoin.Tests.Consensus
 
                 if (assignBlocks)
                 {
-                    Block block = this.Network.CreateBlock();
+                    Block block = this.Network.Consensus.ConsensusFactory.CreateBlock();
+                    block.Header.Bits = header.Bits;
+                    block.Header.HashPrevBlock = header.HashPrevBlock;
+                    block.Header.Nonce = header.Nonce;
+
                     block.GetSerializedSize();
+
+                    if (avgBlockSize.HasValue)
+                    {
+                        var transaction = new Transaction();
+                        transaction.Outputs.Add(new TxOut(new Money(10000000000), new Script()));
+                        block.Transactions.Add(transaction);
+
+                        int blockWeight = block.GetSerializedSize();
+
+                        int requiredScriptWeight = avgBlockSize.Value - blockWeight;
+                        block.Transactions[0].Outputs.Clear();
+                        // generate nonsense script with required bytes to reach required weight.
+                        Script script = Script.FromBytesUnsafe(new string('A', requiredScriptWeight).Select(c => (byte)c).ToArray());
+                        transaction.Outputs.Add(new TxOut(new Money(10000000000), script));
+
+                        block.GetSerializedSize();
+
+                        if (block.BlockSize != avgBlockSize.Value)
+                        {
+                            throw new Exception("Unable to generate block with expected size.");
+                        }
+                    }
+
+
                     newHeader.Block = block;
                 }
 
@@ -198,6 +314,69 @@ namespace Xels.Bitcoin.Tests.Consensus
 
             return (connectNewHeadersResult.DownloadTo == null)
                    && (connectNewHeadersResult.DownloadFrom == null);
+        }
+
+        internal void SetupAverageBlockSize(int amount)
+        {
+            this.BlockPuller.Setup(b => b.GetAverageBlockSizeBytes())
+                .Returns(amount);
+        }
+
+
+        internal void VerifyNoBlocksAskedToBlockPuller()
+        {
+            this.BlockPuller.Verify(b => b.RequestBlocksDownload(It.IsAny<List<ChainedHeader>>(), It.IsAny<bool>()), Times.Exactly(0));
+        }
+
+        internal void AssertPeerBanned(INetworkPeer peer)
+        {
+            Assert.True(this.peerBanning.IsBanned(peer.PeerEndPoint));
+        }
+
+        internal void AssertExpectedBlockSizesEmpty()
+        {
+            Assert.Empty(this.TestConsensusManager.GetExpectedBlockSizes());
+        }
+
+        internal void AssertExpectedBlockSizes(uint expectedSize)
+        {
+            Assert.Equal(expectedSize, this.TestConsensusManager.GetExpectedBlockSizes().Sum(s => s.Value));
+        }
+
+        internal Mock<INetworkPeer> GetNetworkPeerWithConnection()
+        {
+            var networkPeer = new Mock<INetworkPeer>();
+
+            var signals = new Bitcoin.Signals.Signals(this.loggerFactory, null);
+            var asyncProvider = new AsyncProvider(this.loggerFactory, this.signals, new NodeLifetime());
+
+            var connection = new NetworkPeerConnection(this.Network, networkPeer.Object, new TcpClient(), 0, (message, token) => Task.CompletedTask,
+            this.dateTimeProvider, this.loggerFactory, new PayloadProvider().DiscoverPayloads(), asyncProvider);
+            networkPeer.Setup(n => n.Connection)
+                .Returns(connection);
+
+            networkPeer.Setup(n => n.PeerEndPoint)
+                .Returns(new System.Net.IPEndPoint(IPAddress.Loopback, 9999));
+
+            networkPeer.Setup(n => n.RemoteSocketAddress)
+                .Returns(IPAddress.Loopback.EnsureIPv6());
+            networkPeer.Setup(n => n.RemoteSocketPort)
+                .Returns(9999);
+
+            networkPeer.Setup(n => n.RemoteSocketEndpoint)
+                .Returns(new System.Net.IPEndPoint(IPAddress.Loopback.EnsureIPv6(), 9999));
+
+            networkPeer.Setup(n => n.State)
+                .Returns(NetworkPeerState.Connected);
+
+            var behavior = new Mock<IConnectionManagerBehavior>();
+            networkPeer.Setup(n => n.Behavior<IConnectionManagerBehavior>())
+                .Returns(behavior.Object);
+
+            this.peerAddressManager.AddPeer(networkPeer.Object.PeerEndPoint, networkPeer.Object.PeerEndPoint.Address);
+            this.connectionManager.AddConnectedPeer(networkPeer.Object);
+
+            return networkPeer;
         }
 
         /// <summary>

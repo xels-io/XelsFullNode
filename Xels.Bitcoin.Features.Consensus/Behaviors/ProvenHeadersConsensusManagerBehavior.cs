@@ -22,10 +22,6 @@ namespace Xels.Bitcoin.Features.Consensus.Behaviors
     /// </summary>
     public class ProvenHeadersConsensusManagerBehavior : ConsensusManagerBehavior
     {
-        private readonly IInitialBlockDownloadState initialBlockDownloadState;
-        private readonly IConsensusManager consensusManager;
-        private readonly IPeerBanning peerBanning;
-        private readonly ILoggerFactory loggerFactory;
         private readonly Network network;
 
         /// <summary>Instance logger.</summary>
@@ -45,7 +41,7 @@ namespace Xels.Bitcoin.Features.Consensus.Behaviors
         private readonly bool isGateway;
 
         public ProvenHeadersConsensusManagerBehavior(
-            ConcurrentChain chain,
+            ChainIndexer chainIndexer,
             IInitialBlockDownloadState initialBlockDownloadState,
             IConsensusManager consensusManager,
             IPeerBanning peerBanning,
@@ -54,14 +50,9 @@ namespace Xels.Bitcoin.Features.Consensus.Behaviors
             IChainState chainState,
             ICheckpoints checkpoints,
             IProvenBlockHeaderStore provenBlockHeaderStore,
-            ConnectionManagerSettings connectionManagerSettings) : base(chain, initialBlockDownloadState, consensusManager, peerBanning, loggerFactory)
+            ConnectionManagerSettings connectionManagerSettings) : base(chainIndexer, initialBlockDownloadState, consensusManager, peerBanning, loggerFactory)
         {
-            this.chain = chain;
-            this.initialBlockDownloadState = initialBlockDownloadState;
-            this.consensusManager = consensusManager;
-            this.peerBanning = peerBanning;
             this.network = network;
-            this.loggerFactory = loggerFactory;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName, $"[{this.GetHashCode():x}] ");
             this.chainState = chainState;
             this.checkpoints = checkpoints;
@@ -81,6 +72,7 @@ namespace Xels.Bitcoin.Features.Consensus.Behaviors
         /// </summary>
         /// <param name="peer">Peer from which the message was received.</param>
         /// <param name="message">Received message to process.</param>
+        [NoTrace]
         protected override async Task OnMessageReceivedAsync(INetworkPeer peer, IncomingMessage message)
         {
             switch (message.Message.Payload)
@@ -107,7 +99,7 @@ namespace Xels.Bitcoin.Features.Consensus.Behaviors
         /// <inheritdoc />
         protected override bool CanConsumeCache()
         {
-            int height = this.consensusManager.Tip.Height;
+            int height = this.ConsensusManager.Tip.Height;
 
             if (height == this.lastCheckpointHeight)
                 return true;
@@ -135,11 +127,17 @@ namespace Xels.Bitcoin.Features.Consensus.Behaviors
             {
                 var headersPayload = base.ConstructHeadersPayload(getHeadersPayload, out lastHeader) as HeadersPayload;
 
+                if (headersPayload == null)
+                {
+                    this.logger.LogTrace("(-)[INVALID_LOCATOR]:null");
+                    return null;
+                }
+
                 for (int i = 0; i < headersPayload.Headers.Count; i++)
                 {
                     if (headersPayload.Headers[i] is ProvenBlockHeader phHeader)
                     {
-                        BlockHeader newHeader = this.chain.Network.Consensus.ConsensusFactory.CreateBlockHeader();
+                        BlockHeader newHeader = this.ChainIndexer.Network.Consensus.ConsensusFactory.CreateBlockHeader();
                         newHeader.Bits = phHeader.Bits;
                         newHeader.Time = phHeader.Time;
                         newHeader.Nonce = phHeader.Nonce;
@@ -154,7 +152,7 @@ namespace Xels.Bitcoin.Features.Consensus.Behaviors
                 return headersPayload;
             }
 
-            ChainedHeader fork = this.chain.FindFork(getHeadersPayload.BlockLocator);
+            ChainedHeader fork = this.ChainIndexer.FindFork(getHeadersPayload.BlockLocator);
             lastHeader = null;
 
             if (fork == null)
@@ -172,8 +170,6 @@ namespace Xels.Bitcoin.Features.Consensus.Behaviors
             {
                 if (!(header.Header is ProvenBlockHeader provenBlockHeader))
                 {
-                    this.logger.LogTrace("Invalid proven header, try loading it from the store.");
-
                     provenBlockHeader = this.provenBlockHeaderStore.GetAsync(header.Height).GetAwaiter().GetResult();
 
                     if (provenBlockHeader == null)
@@ -183,6 +179,15 @@ namespace Xels.Bitcoin.Features.Consensus.Behaviors
                         // So at this moment proven header is not created or not yet saved to headers store for the block connected.
                         this.logger.LogDebug("No PH available for header '{0}'.", header);
                         this.logger.LogTrace("(-)[NO_PH_AVAILABLE]");
+                        break;
+                    }
+                    else if (provenBlockHeader.GetHash() != header.HashBlock)
+                    {
+                        // Proven header is in the store, but with a wrong hash.
+                        // This can happen in case of reorgs, when the store has not yet been updated.
+                        // Without this check, we may send headers that aren't consecutive because are built from different branches, and the other peer may ban us.
+                        this.logger.LogDebug("Stored PH hash is wrong. Expected: {0}, Found: {1}", header.Header.GetHash(), provenBlockHeader.GetHash());
+                        this.logger.LogTrace("(-)[WRONG STORED PH]");
                         break;
                     }
                 }
@@ -204,11 +209,11 @@ namespace Xels.Bitcoin.Features.Consensus.Behaviors
         public override object Clone()
         {
             return new ProvenHeadersConsensusManagerBehavior(
-                this.chain,
-                this.initialBlockDownloadState,
-                this.consensusManager,
-                this.peerBanning,
-                this.loggerFactory,
+                this.ChainIndexer,
+                this.InitialBlockDownloadState,
+                this.ConsensusManager,
+                this.PeerBanning,
+                this.LoggerFactory,
                 this.network,
                 this.chainState,
                 this.checkpoints,
@@ -234,7 +239,7 @@ namespace Xels.Bitcoin.Features.Consensus.Behaviors
         /// <returns> <c>true</c> if  we need to validate proven headers.</returns>
         private int GetCurrentHeight()
         {
-            int currentHeight = (this.BestReceivedTip ?? this.consensusManager.Tip).Height;
+            int currentHeight = (this.BestReceivedTip ?? this.ConsensusManager.Tip).Height;
 
             return currentHeight;
         }
@@ -279,7 +284,7 @@ namespace Xels.Bitcoin.Features.Consensus.Behaviors
             {
                 return new GetProvenHeadersPayload()
                 {
-                    BlockLocator = (this.BestReceivedTip ?? this.consensusManager.Tip).GetLocator(),
+                    BlockLocator = (this.BestReceivedTip ?? this.ConsensusManager.Tip).GetLocator(),
                     HashStop = null
                 };
             }

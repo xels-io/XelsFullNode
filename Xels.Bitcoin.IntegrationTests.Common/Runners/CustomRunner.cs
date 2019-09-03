@@ -1,6 +1,7 @@
 ﻿using System;
 using NBitcoin;
 using NBitcoin.Protocol;
+using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Builder;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
@@ -43,7 +44,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.Runners
             this.callback(builder);
 
             builder.RemoveImplementation<PeerConnectorDiscovery>();
-            builder.ReplaceService<IPeerDiscovery>(new PeerDiscoveryDisabled());
+            builder.ReplaceService<IPeerDiscovery, BaseFeature>(new PeerDiscoveryDisabled());
 
             this.FullNode = (FullNode)builder.Build();
         }

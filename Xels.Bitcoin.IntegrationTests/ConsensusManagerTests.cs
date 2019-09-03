@@ -2,18 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Flurl;
+using Flurl.Http;
 using Microsoft.Extensions.DependencyInjection;
 using NBitcoin;
 using Xels.Bitcoin.Base;
+using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.Miner.Interfaces;
 using Xels.Bitcoin.Features.Miner.Staking;
-using Xels.Bitcoin.Features.Wallet;
+using Xels.Bitcoin.Features.Wallet.Models;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
+using Xels.Bitcoin.IntegrationTests.Common.ReadyData;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Networks;
+using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
 using Xunit;
 
@@ -108,179 +113,126 @@ namespace Xels.Bitcoin.IntegrationTests
         {
             using (NodeBuilder builder = NodeBuilder.Create(this))
             {
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var minerB = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var syncer = builder.CreateXelsPowNode(this.powNetwork).Start();
-
-                // MinerA mines to height 10.
-                TestHelper.MineBlocks(minerA, 10);
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cm-1-minerA").WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Miner).Start();
+                var minerB = builder.CreateXelsPowNode(this.powNetwork, "cm-1-minerB").WithDummyWallet().Start();
+                var syncer = builder.CreateXelsPowNode(this.powNetwork, "cm-1-syncer").Start();
 
                 // Sync the network to height 10.
-                TestHelper.Connect(syncer, minerA);
-                TestHelper.Connect(syncer, minerB);
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerB));
+                TestHelper.ConnectAndSync(syncer, minerA);
+                TestHelper.ConnectAndSync(syncer, minerB);
 
                 // Disconnect Miner A and B.
                 TestHelper.Disconnect(syncer, minerA);
                 TestHelper.Disconnect(syncer, minerB);
 
                 // Ensure syncer does not have any connections.
-                TestHelper.WaitLoop(() => !TestHelper.IsNodeConnected(syncer));
+                TestBase.WaitLoop(() => !TestHelper.IsNodeConnected(syncer));
 
-                // Miner A continues to mine to height 20 whilst disconnected.
-                TestHelper.MineBlocks(minerA, 10);
+                // Miner A continues to mine to height 15 whilst disconnected.
+                TestHelper.MineBlocks(minerA, 5);
 
-                // Miner B continues to mine to height 14 whilst disconnected.
-                TestHelper.MineBlocks(minerB, 4);
+                // Miner B continues to mine to height 12 whilst disconnected.
+                TestHelper.MineBlocks(minerB, 2);
 
                 // Syncer now connects to both miners causing a re-org to occur for Miner B back to height 10
                 TestHelper.Connect(minerA, syncer);
                 TestHelper.Connect(minerB, minerA);
 
                 // Ensure that Syncer has synced with Miner A and Miner B.
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(minerA, syncer));
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(minerB, minerA));
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerB));
-                Assert.True(syncer.FullNode.ConsensusManager().Tip.Height == 20);
-                Assert.True(minerA.FullNode.ConsensusManager().Tip.Height == 20);
-                Assert.True(minerB.FullNode.ConsensusManager().Tip.Height == 20);
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(minerA, syncer));
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(minerB, minerA));
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerB));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(syncer, 15));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, 15));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 15));
             }
         }
+
+        //[Fact]
+        //public void ConsensusManager_Fork_Occurs_Node_Gets_Disconnected_Due_To_InvalidStakeDepth()
+        //{
+        //    using (NodeBuilder builder = NodeBuilder.Create(this))
+        //    {
+        //        var network = new XelsConsensusOptionsOverrideTest();
+
+        //        // MinerA requires a physical wallet to stake with.
+        //        var minerA = builder.CreateXelsPosNode(network, "cm-2-minerA").OverrideDateTimeProvider().WithWallet().Start();
+        //        var minerB = builder.CreateXelsPosNode(network, "cm-2-minerB").OverrideDateTimeProvider().Start();
+
+        //        // MinerA mines to height 55.
+        //        TestHelper.MineBlocks(minerA, 55);
+
+        //        // Connect and sync minerA and minerB.
+        //        TestHelper.ConnectAndSync(minerA, minerB);
+
+        //        // Disconnect Miner A and B.
+        //        TestHelper.Disconnect(minerA, minerB);
+
+        //        // Miner A stakes a coin that increases the network height to 56.
+        //        var minter = minerA.FullNode.NodeService<IPosMinting>();
+        //        minter.Stake(new WalletSecret() { WalletName = "mywallet", WalletPassword = "password" });
+
+        //        Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, 56));
+
+        //        minter.StopStake();
+
+        //        // Update the network consensus options so that the GetStakeMinConfirmations returns a higher value
+        //        // to ensure that the InvalidStakeDepth exception can be thrown.
+        //        minerB.FullNode.Network.Consensus.Options = new ConsensusOptionsTest();
+
+        //        // Ensure the correct height before the connect.
+        //        Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, 56));
+        //        Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 55));
+
+        //        // Connect minerA to minerB, this will cause an InvalidStakeDepth exception to be thrown on minerB.
+        //        TestHelper.ConnectNoCheck(minerA, minerB);
+
+        //        // Wait until minerA has disconnected minerB due to the InvalidStakeDepth exception.
+        //        TestBase.WaitLoop(() => !TestHelper.IsNodeConnectedTo(minerA, minerB));
+
+        //        Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, 56));
+        //        Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 55));
+        //    }
+        //}
 
         [Fact]
-        public void ConsensusManager_Fork_Occurs_Node_Gets_Disconnected_Due_To_InvalidStakeDepth()
-        {
-            using (NodeBuilder builder = NodeBuilder.Create(this))
-            {
-                var network = new XelsConsensusOptionsOverrideTest();
-
-                // MinerA requires an physical wallet to stake with.
-                var minerA = builder.CreateXelsPosNode(network, "minerA").OverrideDateTimeProvider().WithWallet().Start();
-                var minerB = builder.CreateXelsPosNode(network, "minerB").OverrideDateTimeProvider().Start();
-                var syncer = builder.CreateXelsPosNode(network, "syncer").OverrideDateTimeProvider().Start();
-
-                // MinerA mines to height 55.
-                TestHelper.MineBlocks(minerA, 55);
-
-                // Sync the network to height 55.
-                TestHelper.ConnectAndSync(syncer, minerA);
-                TestHelper.ConnectAndSync(syncer, minerB);
-
-                // Disconnect Miner A and B.
-                TestHelper.DisconnectAll(syncer, minerA, minerB);
-
-                // Miner A stakes a coin that increases the network height to 56.
-                var minter = minerA.FullNode.NodeService<IPosMinting>();
-                minter.Stake(new WalletSecret() { WalletName = "mywallet", WalletPassword = "password" });
-
-                TestHelper.WaitLoop(() =>
-                {
-                    return minerA.FullNode.ConsensusManager().Tip.Height == 56;
-                });
-
-                minter.StopStake();
-
-                // Update the network consensus options so that the GetStakeMinConfirmations returns a higher value
-                // to ensure that the InvalidStakeDepth exception can be thrown.
-                minerA.FullNode.Network.Consensus.Options = new ConsensusOptionsTest();
-                minerB.FullNode.Network.Consensus.Options = new ConsensusOptionsTest();
-                syncer.FullNode.Network.Consensus.Options = new ConsensusOptionsTest();
-
-                // Syncer now connects to both miners causing a InvalidStakeDepth exception to be thrown
-                // on Miner A.
-                TestHelper.Connect(syncer, minerA);
-                TestHelper.Connect(syncer, minerB);
-
-                // Wait until syncer has disconnected either minerA or minerB due to a InvalidStakeDepth exception.
-                TestHelper.WaitLoop(() => syncer.FullNode.ConnectionManager.ConnectedPeers.Where(p => !p.Inbound).Count() == 1);
-
-                // Determine which node was disconnected.
-                CoreNode survived = null;
-                CoreNode notSurvived = null;
-                if (TestHelper.IsNodeConnectedTo(syncer, minerA))
-                {
-                    survived = minerA;
-                    notSurvived = minerB;
-                }
-                else
-                {
-                    survived = minerB;
-                    notSurvived = minerA;
-                }
-
-                // Ensure that Syncer is synced with MinerB.
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, survived));
-
-                // Ensure that Syncer is not connected to MinerA.
-                TestHelper.WaitLoop(() => !TestHelper.IsNodeConnectedTo(syncer, notSurvived));
-
-                Assert.True(syncer.FullNode.ConsensusManager().Tip.Height == 55);
-                Assert.True(survived.FullNode.ConsensusManager().Tip.Height == 55);
-            }
-        }
-
-        [Retry]
         public void ConsensusManager_Fork_Occurs_Node_Gets_Disconnected_Due_To_MaxReorgViolation()
         {
             using (NodeBuilder builder = NodeBuilder.Create(this))
             {
                 var network = new BitcoinMaxReorgOverrideTest();
 
-                var minerA = builder.CreateXelsPowNode(network).WithDummyWallet().Start();
-                var minerB = builder.CreateXelsPowNode(network).WithDummyWallet().Start();
-                var syncer = builder.CreateXelsPowNode(network).Start();
+                var minerA = builder.CreateXelsPowNode(network, "cm-3-minerA").WithDummyWallet().Start();
+                var minerB = builder.CreateXelsPowNode(network, "cm-3-minerB").WithDummyWallet().Start();
 
-                // MinerA mines to height 20.
-                TestHelper.MineBlocks(minerA, 20);
+                // MinerA mines height 10.
+                TestHelper.MineBlocks(minerA, 10);
 
-                // Sync the network to height 20.
-                TestHelper.Connect(syncer, minerA);
-                TestHelper.Connect(syncer, minerB);
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerB));
+                // Connect and sync minerA and minerB.
+                TestHelper.ConnectAndSync(minerA, minerB);
 
-                // Disconnect Miner A and B.
-                TestHelper.Disconnect(syncer, minerA);
-                TestHelper.Disconnect(syncer, minerB);
+                // Disconnect minerA from minerB.
+                TestHelper.Disconnect(minerA, minerB);
 
-                // Ensure syncer does not have any connections.
-                TestHelper.WaitLoop(() => !TestHelper.IsNodeConnected(syncer));
+                // MinerA continues to mine to height 20 (10 + 10).
+                TestHelper.MineBlocks(minerA, 10);
 
-                // MinerA continues to mine to height 45.
-                TestHelper.MineBlocks(minerA, 25);
+                // MinerB continues to mine to height 40 (10 + 30).
+                TestHelper.MineBlocks(minerB, 30);
 
-                // MinerB continues to mine to height 65.
-                TestHelper.MineBlocks(minerB, 45);
+                // Ensure the correct height before the connect.
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, 20));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 40));
 
-                // Syncer now connects to both miners causing a MaxReorgViolation exception to be thrown
-                // on Miner B.
-                TestHelper.Connect(syncer, minerA);
-                TestHelper.Connect(syncer, minerB);
+                // Connect minerA to minerB.
+                TestHelper.ConnectNoCheck(minerA, minerB);
 
-                // Determine which node was disconnected.
-                CoreNode survived = null;
-                CoreNode notSurvived = null;
-                if (TestHelper.IsNodeConnectedTo(syncer, minerA))
-                {
-                    survived = minerA;
-                    notSurvived = minerB;
-                }
-                else
-                {
-                    survived = minerB;
-                    notSurvived = minerA;
-                }
+                // Wait until the nodes become disconnected due to the MaxReorgViolation.
+                TestBase.WaitLoop(() => !TestHelper.IsNodeConnectedTo(minerA, minerB));
 
-                // Ensure that Syncer is synced with MinerB.
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, survived));
-
-                // Ensure that Syncer is not connected to MinerA.
-                TestHelper.WaitLoop(() => !TestHelper.IsNodeConnectedTo(syncer, notSurvived));
-
-                Assert.True(syncer.FullNode.ConsensusManager().Tip.Height == 45);
-                Assert.True(survived.FullNode.ConsensusManager().Tip.Height == 45);
-
+                // Check that the heights did not change.
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, 20));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 40));
             }
         }
 
@@ -289,12 +241,9 @@ namespace Xels.Bitcoin.IntegrationTests
         {
             using (NodeBuilder builder = NodeBuilder.Create(this))
             {
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var minerB = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var syncer = builder.CreateXelsPowNode(this.powNetwork).Start();
-
-                // MinerA mines to height 10.
-                TestHelper.MineBlocks(minerA, 10);
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cm-4-minerA").WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Miner).Start();
+                var minerB = builder.CreateXelsPowNode(this.powNetwork, "cm-4-minerB").WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Listener).Start();
+                var syncer = builder.CreateXelsPowNode(this.powNetwork, "cm-4-syncer").WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Listener).Start();
 
                 // Sync the network to height 10.
                 TestHelper.ConnectAndSync(syncer, minerA, minerB);
@@ -302,9 +251,9 @@ namespace Xels.Bitcoin.IntegrationTests
                 // Disable syncer from sending blocks to miner B
                 TestHelper.DisableBlockPropagation(syncer, minerB);
 
-                // Miner A and syncer continues to mine to height 20.
-                TestHelper.MineBlocks(minerA, 10);
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
+                // Miner A and syncer continues to mine to height 15.
+                TestHelper.MineBlocks(minerA, 5);
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
 
                 // Enable syncer to send blocks to miner B
                 TestHelper.EnableBlockPropagation(syncer, minerB);
@@ -312,21 +261,21 @@ namespace Xels.Bitcoin.IntegrationTests
                 // Disable syncer from sending blocks to miner A
                 TestHelper.DisableBlockPropagation(syncer, minerA);
 
-                // Miner B continues to mine to height 30 on a new and longer chain whilst disconnected.
-                TestHelper.MineBlocks(minerB, 20);
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerB));
+                // Miner B continues to mine to height 20 on a new and longer chain whilst disconnected.
+                TestHelper.MineBlocks(minerB, 10);
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerB));
 
                 // Enable syncer to send blocks to miner B
                 TestHelper.EnableBlockPropagation(syncer, minerA);
 
-                // Miner A mines to height 40.
-                TestHelper.MineBlocks(minerA, 20);
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerB));
+                // Miner A mines to height 25.
+                TestHelper.MineBlocks(minerA, 10);
+                TestBase.WaitLoopMessage(() => TestHelper.AreNodesSyncedMessage(syncer, minerA), waitTimeSeconds: 120);
+                TestBase.WaitLoopMessage(() => TestHelper.AreNodesSyncedMessage(syncer, minerB), waitTimeSeconds: 120);
 
-                Assert.True(syncer.FullNode.ConsensusManager().Tip.Height == 40);
-                Assert.True(minerA.FullNode.ConsensusManager().Tip.Height == 40);
-                Assert.True(minerB.FullNode.ConsensusManager().Tip.Height == 40);
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(syncer, 25));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, 25));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 25));
             }
         }
 
@@ -337,12 +286,9 @@ namespace Xels.Bitcoin.IntegrationTests
             {
                 var syncerNetwork = new BitcoinOverrideRegTest();
 
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var minerB = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var syncer = builder.CreateXelsPowNode(syncerNetwork).Start();
-
-                // MinerA mines to height 10.
-                TestHelper.MineBlocks(minerA, 10);
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cm-5-minerA").WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Miner).Start();
+                var minerB = builder.CreateXelsPowNode(this.powNetwork, "cm-5-minerB").WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Listener).Start();
+                var syncer = builder.CreateXelsPowNode(syncerNetwork, "cm-5-syncer").Start();
 
                 // Sync the network to height 10.
                 TestHelper.ConnectAndSync(syncer, minerA, minerB);
@@ -352,11 +298,11 @@ namespace Xels.Bitcoin.IntegrationTests
 
                 // Miner A and syncer continues to mine to height 20.
                 TestHelper.MineBlocks(minerA, 10);
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
 
-                Assert.True(minerA.FullNode.ConsensusManager().Tip.Height == 20);
-                Assert.True(minerB.FullNode.ConsensusManager().Tip.Height == 10);
-                Assert.True(syncer.FullNode.ConsensusManager().Tip.Height == 20);
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, 20));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 10));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(syncer, 20));
 
                 // Inject a rule that will fail at block 15 of the new chain.
                 var engine = syncer.FullNode.NodeService<IConsensusRuleEngine>() as ConsensusRuleEngine;
@@ -367,16 +313,16 @@ namespace Xels.Bitcoin.IntegrationTests
                 TestHelper.MineBlocks(minerB, 20);
 
                 // check miner B at height 30.
-                Assert.True(minerB.FullNode.ConsensusManager().Tip.Height == 30);
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 30));
 
                 // Miner B should become disconnected.
-                TestHelper.WaitLoop(() => !TestHelper.IsNodeConnectedTo(syncer, minerB));
+                TestBase.WaitLoop(() => !TestHelper.IsNodeConnectedTo(syncer, minerB));
 
                 // Make sure syncer rolled back.
-                Assert.True(syncer.FullNode.ConsensusManager().Tip.Height == 20);
+                TestBase.WaitLoop(() => syncer.FullNode.ConsensusManager().Tip.Height == 20);
 
                 // Check syncer is still synced with Miner A.
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
             }
         }
 
@@ -387,12 +333,9 @@ namespace Xels.Bitcoin.IntegrationTests
             {
                 var syncerNetwork = new BitcoinOverrideRegTest();
 
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var minerB = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var syncer = builder.CreateXelsPowNode(syncerNetwork).Start();
-
-                // MinerA mines to height 10.
-                TestHelper.MineBlocks(minerA, 10);
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cm-6-minerA").WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Miner).Start();
+                var minerB = builder.CreateXelsPowNode(this.powNetwork, "cm-6-minerB").WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Listener).Start();
+                var syncer = builder.CreateXelsPowNode(syncerNetwork, "cm-6-syncer").Start();
 
                 // Sync the network to height 10.
                 TestHelper.ConnectAndSync(syncer, minerA, minerB);
@@ -402,7 +345,7 @@ namespace Xels.Bitcoin.IntegrationTests
 
                 // Miner A and syncer continues to mine to height 20.
                 TestHelper.MineBlocks(minerA, 10);
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
 
                 // Inject a rule that will fail at block 11 of the new chain
                 ConsensusRuleEngine engine = syncer.FullNode.NodeService<IConsensusRuleEngine>() as ConsensusRuleEngine;
@@ -413,16 +356,16 @@ namespace Xels.Bitcoin.IntegrationTests
                 TestHelper.MineBlocks(minerB, 20);
 
                 // check miner B at height 30.
-                Assert.True(minerB.FullNode.ConsensusManager().Tip.Height == 30);
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 30));
 
                 // Miner B should become disconnected.
-                TestHelper.WaitLoop(() => !TestHelper.IsNodeConnectedTo(syncer, minerB));
+                TestBase.WaitLoop(() => !TestHelper.IsNodeConnectedTo(syncer, minerB));
 
                 // Make sure syncer rolled back
-                Assert.True(syncer.FullNode.ConsensusManager().Tip.Height == 20);
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(syncer, 20));
 
                 // Check syncer is still synced with Miner A
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA));
             }
         }
 
@@ -431,9 +374,9 @@ namespace Xels.Bitcoin.IntegrationTests
         {
             using (NodeBuilder builder = NodeBuilder.Create(this))
             {
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var minerB = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var syncer = builder.CreateXelsPowNode(this.powNetwork);
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cm-7-minerA").WithDummyWallet().WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Miner).Start();
+                var minerB = builder.CreateXelsPowNode(this.powNetwork, "cm-7-minerB").WithDummyWallet().Start();
+                var syncer = builder.CreateXelsPowNode(this.powNetwork, "cm-7-syncer");
 
                 void flushCondition(IServiceCollection services)
                 {
@@ -450,9 +393,6 @@ namespace Xels.Bitcoin.IntegrationTests
 
                 syncer.OverrideService(flushCondition).Start();
 
-                // MinerA mines to height 10.
-                TestHelper.MineBlocks(minerA, 10);
-
                 // Sync the network to height 10.
                 TestHelper.ConnectAndSync(syncer, minerA, minerB);
 
@@ -461,22 +401,22 @@ namespace Xels.Bitcoin.IntegrationTests
 
                 // Syncer syncs to minerA's block of 11
                 TestHelper.MineBlocks(minerA, 1);
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 11);
-                TestHelper.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 10);
-                TestHelper.WaitLoop(() => syncer.FullNode.ConsensusManager().Tip.Height == 11);
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, 11));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 10));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(syncer, 11));
 
                 // Syncer jumps chain and reorgs to minerB's longer chain of 12
                 TestHelper.MineBlocks(minerB, 2);
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 11);
-                TestHelper.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 12);
-                TestHelper.WaitLoop(() => syncer.FullNode.ConsensusManager().Tip.Height == 12);
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, 11));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 12));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(syncer, 12));
 
                 // Syncer jumps chain and reorg to minerA's longer chain of 18
                 TestHelper.MineBlocks(minerA, 2);
                 TestHelper.TriggerSync(syncer);
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 13);
-                TestHelper.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 12);
-                TestHelper.WaitLoop(() => syncer.FullNode.ConsensusManager().Tip.Height == 13);
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, 13));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 12));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(syncer, 13));
             }
         }
 
@@ -487,11 +427,11 @@ namespace Xels.Bitcoin.IntegrationTests
             {
                 var syncerNetwork = new BitcoinOverrideRegTest();
 
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var syncer = builder.CreateXelsPowNode(syncerNetwork).Start();
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cm-8-minerA").WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Miner).Start();
+                var syncer = builder.CreateXelsPowNode(syncerNetwork, "cm-8-syncer").Start();
 
                 // Miner A mines to height 11.
-                TestHelper.MineBlocks(minerA, 11);
+                TestHelper.MineBlocks(minerA, 1);
 
                 // Inject a rule that will fail at block 11 of the new chain
                 ConsensusRuleEngine engine = syncer.FullNode.NodeService<IConsensusRuleEngine>() as ConsensusRuleEngine;
@@ -499,13 +439,13 @@ namespace Xels.Bitcoin.IntegrationTests
                 engine.Register();
 
                 // Connect syncer to Miner A, reorg should fail.
-                TestHelper.Connect(syncer, minerA);
+                TestHelper.ConnectNoCheck(syncer, minerA);
 
                 // Syncer should disconnect from miner A after the failed block.
-                TestHelper.WaitLoop(() => !TestHelper.IsNodeConnectedTo(syncer, minerA));
+                TestBase.WaitLoop(() => !TestHelper.IsNodeConnectedTo(syncer, minerA));
 
                 // Make sure syncer rolled back
-                Assert.True(syncer.FullNode.ConsensusManager().Tip.Height == 10);
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(syncer, 10));
             }
         }
 
@@ -514,169 +454,231 @@ namespace Xels.Bitcoin.IntegrationTests
         {
             using (NodeBuilder builder = NodeBuilder.Create(this))
             {
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var minerB = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var syncer = builder.CreateXelsPowNode(this.powNetwork).Start();
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cm-9-minerA").WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest100Miner).Start();
+                var minerB = builder.CreateXelsPowNode(this.powNetwork, "cm-9-minerB").WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest100Listener).Start();
+                var syncer = builder.CreateXelsPowNode(this.powNetwork, "cm-9-syncer").WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest100Listener).Start();
 
-                // MinerA mines to height 10.
-                TestHelper.MineBlocks(minerA, 10);
-
-                // Sync the network to height 10.
+                // Sync the network to height 100.
                 TestHelper.ConnectAndSync(syncer, minerA, minerB);
 
                 TestHelper.DisableBlockPropagation(syncer, minerA);
                 TestHelper.DisableBlockPropagation(syncer, minerB);
 
                 // Miner A mines 105 blocks to height 115.
-                TestHelper.MineBlocks(minerA, 105);
-                TestHelper.WaitForNodeToSync(syncer, minerA);
+                TestHelper.MineBlocks(minerA, 5);
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(syncer, minerA), waitTimeSeconds: 120);
 
                 // Miner B continues mines 110 blocks to a longer chain at height 120.
-                TestHelper.MineBlocks(minerB, 110);
-                TestHelper.WaitForNodeToSync(syncer, minerB);
+                TestHelper.MineBlocks(minerB, 10);
+                TestBase.WaitLoopMessage(() => TestHelper.AreNodesSyncedMessage(syncer, minerB), waitTimeSeconds: 120);
 
                 // Miner A mines an additional 10 blocks to height 125 that will create the longest chain.
                 TestHelper.MineBlocks(minerA, 10);
-                TestHelper.WaitForNodeToSync(syncer, minerA);
+                TestBase.WaitLoopMessage(() => TestHelper.AreNodesSyncedMessage(syncer, minerA), waitTimeSeconds: 120);
 
-                Assert.True(syncer.FullNode.ConsensusManager().Tip.Height == 125);
-                Assert.True(minerA.FullNode.ConsensusManager().Tip.Height == 125);
-                Assert.True(minerB.FullNode.ConsensusManager().Tip.Height == 120);
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(syncer, 115));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, 115));
+                Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, 110));
             }
         }
-
 
         /// <remarks>This test assumes CoinbaseMaturity is 10 and at block 2 there is a huge premine, adjust the test if this changes.</remarks>
-        [Fact(Skip = "Work in progress")]
-        public void ConsensusManager_Fork_Occurs_When_Stake_Coins_Are_Spent_And_Found_In_Rewind_Data()
-        {
-            using (NodeBuilder builder = NodeBuilder.Create(this))
-            {
-                var network = new XelsRegTest();
+        //[Fact]
+        //public void ConsensusManager_Fork_Occurs_When_Stake_Coins_Are_Spent_And_Found_In_Rewind_Data()
+        //{
+        //    using (NodeBuilder builder = NodeBuilder.Create(this))
+        //    {
+        //        var network = new XelsRegTest();
 
-                // MinerA requires an physical wallet to stake with.
-                var minerA = builder.CreateXelsPosNode(network, "minerA").OverrideDateTimeProvider().WithWallet().Start();
-                var minerB = builder.CreateXelsPosNode(network, "minerB").OverrideDateTimeProvider().WithWallet().Start();
+        //        var sharedMnemonic = new Mnemonic(Wordlist.English, WordCount.Twelve).ToString();
 
-                // MinerA mines 2 blocks to get the big premine coin.
-                TestHelper.MineBlocks(minerA, 2);
-                var powBlockWithBigPremine = minerA.FullNode.ConsensusManager().Tip.Block;
-                Transaction txWithBigPremine = powBlockWithBigPremine.Transactions[0];
+        //        // MinerA requires an physical wallet to stake with.
+        //        var minerA = builder.CreateXelsPosNode(network, "cm-10-minerA").OverrideDateTimeProvider().WithWallet(walletMnemonic: sharedMnemonic).Start();
+        //        var minerB = builder.CreateXelsPosNode(network, "cm-10-minerB").OverrideDateTimeProvider().WithWallet(walletMnemonic: sharedMnemonic).Start();
 
-                // MinerA mines another 10 blocks.
-                TestHelper.MineBlocks(minerA, 10);
+        //        // MinerA mines 2 blocks to get the big premine coin and mature them (regtest maturity is 10).
+        //        TestHelper.MineBlocks(minerA, 12);
 
-                // Sync the peers A and B (height 12)
-                TestHelper.ConnectAndSync(minerA, minerB);
+        //        // Sync the peers A and B (height 3)
+        //        TestHelper.ConnectAndSync(minerA, minerB);
 
-                // Disconnect Miner A and B.
-                TestHelper.DisconnectAll(minerA, minerB);
+        //        // Miner A will spend the coins 
+        //        WalletSendTransactionModel walletSendTransactionModel = $"http://localhost:{minerA.ApiPort}/api"
+        //            .AppendPathSegment("wallet/splitcoins")
+        //            .PostJsonAsync(new SplitCoinsRequest
+        //            {
+        //                WalletName = minerA.WalletName,
+        //                AccountName = "account 0",
+        //                WalletPassword = minerA.WalletPassword,
+        //                TotalAmountToSplit = network.Consensus.PremineReward.ToString(),
+        //                UtxosCount = 2
+        //            })
+        //            .ReceiveJson<WalletSendTransactionModel>().Result;
 
-                // Miner A stakes one coin. (height 13)
-                var minterA = minerA.FullNode.NodeService<IPosMinting>();
-                minterA.Stake(new WalletSecret() { WalletName = "mywallet", WalletPassword = "password" });
+        //        TestBase.WaitLoop(() => minerA.FullNode.MempoolManager().InfoAll().Count > 0);
+        //        TestHelper.MineBlocks(minerA, 12);
+        //        TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 24);
+        //        Assert.Empty(minerA.FullNode.MempoolManager().InfoAll());
 
-                TestHelper.WaitLoop(() =>
-                {
-                    return minerA.FullNode.ConsensusManager().Tip.Height == 13;
-                });
+        //        TestBase.WaitLoop(() => TestHelper.AreNodesSynced(minerA, minerB));
 
-                minterA.StopStake();
+        //        // Disconnect Miner A and B.
+        //        TestHelper.Disconnect(minerA, minerB);
 
-                var posBlock = minerA.FullNode.ConsensusManager().Tip.Block as PosBlock;
-                Assert.True(posBlock != null && minerA.FullNode.ConsensusManager().Tip.Height == 13);
+        //        // Miner A stakes one coin. (height 13)
+        //        var minterA = minerA.FullNode.NodeService<IPosMinting>();
+        //        minterA.Stake(new WalletSecret() { WalletName = "mywallet", WalletPassword = "password" });
+        //        TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 25);
+        //        minterA.StopStake();
 
-                var coinstakeTransactionA = posBlock.GetProtocolTransaction();
-                Assert.True(coinstakeTransactionA.IsCoinStake);
+        //        TestHelper.MineBlocks(minerB, 2); // this will push minerb total work to be highest
+        //        var minterB = minerB.FullNode.NodeService<IPosMinting>();
+        //        minterB.Stake(new WalletSecret() { WalletName = WalletName, WalletPassword = Password });
+        //        TestBase.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 27);
+        //        minterB.StopStake();
 
-                // MinerB mines 1 block on its own fork. (heightB 13)
-                TestHelper.MineBlocks(minerB, 1);
+        //        var expectedValidChainHeight = minerB.FullNode.ConsensusManager().Tip.Height;
 
-                // Ensure we are going to create a transaction that spend the coinstake coin
-                Assert.True(coinstakeTransactionA.Inputs[0].PrevOut.Hash == txWithBigPremine.GetHash());
+        //        // Sync the network, minerA should switch to minerB.
+        //        TestHelper.Connect(minerA, minerB);
 
-                // Create a transaction that spend the coinstake
-                Transaction txThatSpendCoinstake = CreateTransactionThatSpendCoinstake(network, minerA, minerB, null, txWithBigPremine);
+        //        TestBase.WaitLoop(() => TestHelper.IsNodeSyncedAtHeight(minerA, expectedValidChainHeight));
+        //        TestBase.WaitLoop(() => TestHelper.IsNodeSyncedAtHeight(minerB, expectedValidChainHeight));
+        //    }
+        //}
 
-                // Add the tx that spend coinstake, into the memory pool of minerB
-                Assert.True(minerB.AddToXelsMempool(txThatSpendCoinstake));
+        /// <summary>We test that two chains that used the same UTXO to stake, the shorter chain can still swap to the longer chain.</summary>
+        //[Fact]
+        //public void ConsensusManager_Fork_Occurs_When_Stake_Coins_Are_Mined_And_Found_In_Rewind_Data()
+        //{
+        //    using (NodeBuilder builder = NodeBuilder.Create(this))
+        //    {
+        //        var network = new XelsRegTest();
 
-                // Wait for the transaction to be picked up by the mempool
-                TestHelper.WaitLoop(() => minerB.CreateRPCClient().GetRawMempool().Length > 0);
+        //        var sharedMnemonic = new Mnemonic(Wordlist.English, WordCount.Twelve).ToString();
 
-                // MinerB mines 1 blocks on minerB to include the tx that spend coinstake. (heightB 14)
-                TestHelper.MineBlocks(minerB, 1);
-                Assert.True(minerB.FullNode.ConsensusManager().Tip.Height == 14);
+        //        // MinerA requires an physical wallet to stake with.
+        //        var minerA = builder.CreateXelsPosNode(network, "cm-10-minerA").OverrideDateTimeProvider().WithWallet(walletMnemonic: sharedMnemonic).Start();
+        //        var minerB = builder.CreateXelsPosNode(network, "cm-10-minerB").OverrideDateTimeProvider().WithWallet(walletMnemonic: sharedMnemonic).Start();
 
-                var powBlockWithSpentCoinstake = minerB.FullNode.ConsensusManager().Tip.Block;
-                // Ensure my transaction has been included in the block.
-                Assert.True(powBlockWithSpentCoinstake.Transactions.Count == 2);
+        //        // MinerA mines 2 blocks to get the big premine coin and mature them (regtest maturity is 10).
+        //        TestHelper.MineBlocks(minerA, 12);
 
-                TestHelper.MineBlocks(minerB, 10);
-                Assert.True(minerB.FullNode.ConsensusManager().Tip.Height == 24);
+        //        // Sync the peers A and B (height 12)
+        //        TestHelper.ConnectAndSync(minerA, minerB);
 
-                // Mine 1 PoS stake on minerB to increase chainwork.
-                // pos creates much work and without a pos block, minerB chain wouldn't be considered the legit one.
-                var minterB = minerB.FullNode.NodeService<IPosMinting>();
-                minterB.Stake(new WalletSecret() { WalletName = WalletName, WalletPassword = Password });
-                TestHelper.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 25);
-                minterB.StopStake();
+        //        // Disconnect Miner A and B.
+        //        TestHelper.DisconnectAll(minerA, minerB);
 
-                var expectedValidChainHeight = minerB.FullNode.ConsensusManager().Tip.Height;
+        //        // Miner A stakes one coin. (height 13)
+        //        var minterA = minerA.FullNode.NodeService<IPosMinting>();
+        //        minterA.Stake(new WalletSecret() { WalletName = "mywallet", WalletPassword = "password" });
+        //        TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 13);
+        //        minterA.StopStake();
 
-                // Sync the network, minerA should switch to minerB.
-                TestHelper.ConnectAndSync(minerA, minerB);
+        //        TestHelper.MineBlocks(minerB, 2); // this will push minerb total work to be highest
+        //        var minterB = minerB.FullNode.NodeService<IPosMinting>();
+        //        minterB.Stake(new WalletSecret() { WalletName = WalletName, WalletPassword = Password });
+        //        TestBase.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 15);
+        //        minterB.StopStake();
 
-                Assert.True(minerA.FullNode.ConsensusManager().Tip.Height == expectedValidChainHeight);
-                Assert.True(minerB.FullNode.ConsensusManager().Tip.Height == expectedValidChainHeight);
-            }
-        }
+        //        var expectedValidChainHeight = minerB.FullNode.ConsensusManager().Tip.Height;
+
+        //        // Sync the network, minerA should switch to minerB.
+        //        TestHelper.ConnectAndSync(minerA, minerB);
+
+        //        Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, expectedValidChainHeight));
+        //        Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, expectedValidChainHeight));
+        //    }
+        //}
+
+        //[Fact]
+        //public void ConsensusManager_Fork_Occurs_When_Same_Coins_Are_Staked_On_Different_Chains()
+        //{
+        //    using (NodeBuilder builder = NodeBuilder.Create(this))
+        //    {
+        //        var network = new XelsRegTest();
+
+        //        var minerA = builder.CreateXelsPosNode(network, "cm-11-minerA").OverrideDateTimeProvider().WithWallet().Start();
+        //        var minerB = builder.CreateXelsPosNode(network, "cm-11-minerB").OverrideDateTimeProvider().Start();
+
+        //        minerB.FullNode.WalletManager().CreateWallet(Password, WalletName, Passphrase, minerA.Mnemonic);
+
+        //        var coinbaseMaturity = (int)network.Consensus.CoinbaseMaturity;
+
+        //        // MinerA mines maturity +2 blocks to get the big premine coin and make it stakable.
+        //        TestHelper.MineBlocks(minerA, coinbaseMaturity + 2);
+
+        //        // Sync the peers A and B (height 12)
+        //        TestHelper.ConnectAndSync(minerA, minerB);
+
+        //        // Disconnect Miner A and B.
+        //        TestHelper.DisconnectAll(minerA, minerB);
+
+        //        // Miner A stakes one coin. (height 13)
+        //        var minterA = minerA.FullNode.NodeService<IPosMinting>();
+        //        var minterAHeigh = minerA.FullNode.ConsensusManager().Tip.Height;
+        //        minterA.Stake(new WalletSecret() { WalletName = WalletName, WalletPassword = Password });
+        //        Assert.True(TestHelper.IsNodeSyncedAtHeight(minerA, minterAHeigh + 1));
+
+        //        minterA.StopStake();
+
+        //        var minterB = minerB.FullNode.NodeService<IPosMinting>();
+        //        var minterBHeigh = minerB.FullNode.ConsensusManager().Tip.Height;
+        //        minterB.Stake(new WalletSecret() { WalletName = WalletName, WalletPassword = Password });
+        //        Assert.True(TestHelper.IsNodeSyncedAtHeight(minerB, minterBHeigh + 1));
+
+        //        minterB.StopStake();
+
+        //        // MinerB mines 1 block on its own fork. (heightB 13)
+        //        TestHelper.MineBlocks(minerA, 2);
+        //        TestHelper.MineBlocks(minerB, 3);
+
+        //        TestHelper.ConnectAndSync(minerA, minerB);
+
+        //        TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.HashBlock == minerB.FullNode.ConsensusManager().Tip.HashBlock);
+        //        Assert.True(minerA.FullNode.ConsensusManager().Tip.HashBlock == minerB.FullNode.ConsensusManager().Tip.HashBlock);
+        //    }
+        //}
 
         [Fact]
-        public void ConsensusManager_Fork_Occurs_When_Same_Coins_Are_Staked_On_Different_Chains()
+        public void ConsensusManager_Block_That_Failed_Partial_Validation_Is_Rejected()
         {
             using (NodeBuilder builder = NodeBuilder.Create(this))
             {
                 var network = new XelsRegTest();
 
-                var minerA = builder.CreateXelsPosNode(network, "minerA").OverrideDateTimeProvider().WithWallet().Start();
-                var minerB = builder.CreateXelsPosNode(network, "minerB").OverrideDateTimeProvider().Start();
+                // MinerA requires a physical wallet to stake with.
+                var minerA = builder.CreateXelsPosNode(network, "minerA").WithWallet().Start();
+                var minerB = builder.CreateXelsPosNode(network, "minerB").Start();
+                var minerC = builder.CreateXelsPosNode(network, "minerC").Start();
 
-                minerB.FullNode.WalletManager().CreateWallet(Password, WalletName, Passphrase, minerA.Mnemonic);
+                // MinerA mines to height 5.
+                TestHelper.MineBlocks(minerA, 5);
 
-                var coinbaseMaturity = (int)network.Consensus.CoinbaseMaturity;
-
-                // MinerA mines maturity +2 blocks to get the big premine coin and make it stakable.
-                TestHelper.MineBlocks(minerA, coinbaseMaturity + 2);
-
-                // Sync the peers A and B (height 12)
+                // Connect and sync minerA and minerB.
                 TestHelper.ConnectAndSync(minerA, minerB);
 
-                // Disconnect Miner A and B.
-                TestHelper.DisconnectAll(minerA, minerB);
+                TestHelper.Disconnect(minerA, minerB);
 
-                // Miner A stakes one coin. (height 13)
-                var minterA = minerA.FullNode.NodeService<IPosMinting>();
-                var minterAHeigh = minerA.FullNode.ConsensusManager().Tip.Height;
-                minterA.Stake(new WalletSecret() { WalletName = WalletName, WalletPassword = Password });
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == minterAHeigh + 1);
+                // Mark block 5 as invalid by changing the signature of the block in memory.
+                (minerB.FullNode.ChainIndexer.GetHeader(5).Block as PosBlock).BlockSignature.Signature = new byte[] { 0 };
 
-                minterA.StopStake();
+                // Connect and sync minerB and minerC.
+                TestHelper.ConnectNoCheck(minerB, minerC);
 
-                var minterB = minerB.FullNode.NodeService<IPosMinting>();
-                var minterBHeigh = minerB.FullNode.ConsensusManager().Tip.Height;
-                minterB.Stake(new WalletSecret() { WalletName = WalletName, WalletPassword = Password });
-                TestHelper.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == minterBHeigh + 1);
+                // TODO: when signaling failed blocks is enabled we should check this here.
 
-                minterB.StopStake();
+                // Wait for the nodes to disconnect due to invalid block.
+                TestBase.WaitLoop(() => !TestHelper.IsNodeConnectedTo(minerB, minerC));
 
-                // MinerB mines 1 block on its own fork. (heightB 13)
-                TestHelper.MineBlocks(minerA, 2);
-                TestHelper.MineBlocks(minerB, 3);
+                Assert.True(minerC.FullNode.NodeService<IPeerBanning>().IsBanned(minerB.Endpoint));
 
-                TestHelper.ConnectAndSync(minerA, minerB);
+                minerC.FullNode.NodeService<IPeerBanning>().UnBanPeer(minerA.Endpoint);
 
-                Assert.True(minerA.FullNode.ConsensusManager().Tip.HashBlock == minerB.FullNode.ConsensusManager().Tip.HashBlock);
+                TestHelper.ConnectAndSync(minerC, minerA);
+
+                TestBase.WaitLoop(() => TestHelper.AreNodesSyncedMessage(minerA, minerC).Passed);
             }
         }
 

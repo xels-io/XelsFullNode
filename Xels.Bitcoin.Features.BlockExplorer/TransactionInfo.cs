@@ -50,52 +50,54 @@ namespace Xels.Bitcoin.Features.BlockExplorer
         List<TxInInfo> vin;
         List<TxOutInfo> vout;
         LockTime nLockTime;
+        string networkType;
 
-        public TransactionInfo(uint256 hash, uint nVersion, bool isCoinStake, uint nTime, TxInList vin, TxOutList vout, LockTime nLockTime)
+        public TransactionInfo(uint256 hash, uint nVersion, bool isCoinStake, uint nTime, TxInList vin, TxOutList vout, LockTime nLockTime,  string networkType)
         {
             this.isCoinStake = isCoinStake;
             this.TxId = hash;
             this.nVersion = nVersion;
             this.nTime = nTime;
-            this.InitVIn(vin);
-            this.InitVOut(vout,this.isCoinStake);
-            InitInputOutput(vin, vout);
+            this.networkType = networkType;
+            this.InitVIn(vin, this.networkType);
+            this.InitVOut(vout,this.isCoinStake, this.networkType);
+            InitInputOutput(vin, vout, this.networkType);
           //  InitAddress(vin, vout);
             this.nLockTime = nLockTime;
         }
 
-        private void InitVIn(TxInList inList)
+        private void InitVIn(TxInList inList, string networkType)
         {
             this.vin = new List<TxInInfo>();
             foreach (TxIn txIn in inList)
             {
-                this.vin.Add(new TxInInfo(txIn.PrevOut, txIn.ScriptSig, txIn.WitScript));
+                this.vin.Add(new TxInInfo(txIn.PrevOut, txIn.ScriptSig, txIn.WitScript, networkType));
             }
         }
 
-        private void InitVOut(TxOutList outList, bool isCoinStake)
+        private void InitVOut(TxOutList outList, bool isCoinStake , string networkType)
         {
             this.vout = new List<TxOutInfo>();
             foreach (TxOut txOut in outList)
             {
                 //if (txOut.ScriptPubKey.GetDestinationAddress(Network.XelsMain) != null)
                 //{
-                    this.vout.Add(new TxOutInfo(txOut.ScriptPubKey, isCoinStake, txOut.Value));
+                    this.vout.Add(new TxOutInfo(txOut.ScriptPubKey, isCoinStake, txOut.Value, networkType));
                 //}
             }
         }
         
 
-        private void InitInputOutput(TxInList vin, TxOutList vout)
+        private void InitInputOutput(TxInList vin, TxOutList vout , string networkType)
         {
             foreach(TxIn txIn in vin)
             {
-                this.inputs += txIn.ScriptSig.GetScriptAddress(NetworkRegistration.GetNetwork("XelsMain")) + " ";
+                this.inputs += txIn.ScriptSig.GetScriptAddress(NetworkRegistration.GetNetwork(networkType)) + " ";
             }
             foreach(TxOut txOut in vout)
             {
                 //this.outputs += "dest:  " + txOut.ScriptPubKey.GetDestinationAddress(Network.XelsMain) + "  ";
-                this.outputs += txOut.ScriptPubKey.GetScriptAddress(NetworkRegistration.GetNetwork("XelsMain")) + "  ";
+                this.outputs += txOut.ScriptPubKey.GetScriptAddress(NetworkRegistration.GetNetwork(networkType)) + "  ";
                 this.outputs += txOut.Value.ToString() + "  ";
             }
         }
@@ -193,12 +195,12 @@ namespace Xels.Bitcoin.Features.BlockExplorer
         
         WitScript witScript = WitScript.Empty;
 
-        public TxInInfo(OutPoint prevout, Script scriptSig, WitScript witScript)
+        public TxInInfo(OutPoint prevout, Script scriptSig, WitScript witScript , string networkType)
         {
             this.prevout = prevout;
             this.scriptSig = scriptSig;
             this.witScript = witScript;
-            this.address = scriptSig.PaymentScript.GetDestinationAddress(NetworkRegistration.GetNetwork("XelsMain"));  //scriptSig.GetScriptAddress(Network.XelsMain);witScript.ToScript().GetDestinationAddress(Network.XelsMain);//
+            this.address = scriptSig.PaymentScript.GetDestinationAddress(NetworkRegistration.GetNetwork(networkType));  //scriptSig.GetScriptAddress(Network.XelsMain);witScript.ToScript().GetDestinationAddress(Network.XelsMain);//
         }
 
         /// <summary>
@@ -249,13 +251,13 @@ namespace Xels.Bitcoin.Features.BlockExplorer
         Money _Value = NullMoney;
         public bool cStake;
 
-        public TxOutInfo(Script scriptPubKey, bool coinStake,  Money Value)
+        public TxOutInfo(Script scriptPubKey, bool coinStake,  Money Value, string networkType)
         {
             this.cStake = coinStake;
             this.publicKey = scriptPubKey;
             this.ScriptPubKey = scriptPubKey.PaymentScript.Hash.ScriptPubKey ;
             this._Value = Value;
-            this.address = scriptPubKey.PaymentScript.GetDestinationAddress(NetworkRegistration.GetNetwork("XelsMain"));
+            this.address = scriptPubKey.PaymentScript.GetDestinationAddress(NetworkRegistration.GetNetwork(networkType));
             //this.address = scriptPubKey.GetDestinationAddress(Network.XelsMain);
         }
 

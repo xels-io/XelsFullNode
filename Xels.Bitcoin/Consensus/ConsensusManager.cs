@@ -7,14 +7,19 @@ using NBitcoin;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.BlockPulling;
 using Xels.Bitcoin.Configuration.Logging;
+using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus.PerformanceCounters.ConsensusManager;
 using Xels.Bitcoin.Consensus.ValidationResults;
 using Xels.Bitcoin.Consensus.Validators;
+using Xels.Bitcoin.EventBus.CoreEvents;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.Primitives;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Utilities;
+using Xels.Bitcoin.Utilities.Extensions;
+using TracerAttributes;
 
 namespace Xels.Bitcoin.Consensus
 {
@@ -25,11 +30,11 @@ namespace Xels.Bitcoin.Consensus
         /// Maximum memory in bytes that can be taken by the blocks that were downloaded but
         /// not yet validated or included to the consensus chain.
         /// </summary>
-        private const long MaxUnconsumedBlocksDataBytes = 200 * 1024 * 1024;
+        private long maxUnconsumedBlocksDataBytes { get; set; }
 
         /// <summary>Queue consumption threshold in bytes.</summary>
         /// <remarks><see cref="toDownloadQueue"/> consumption will start if only we have more than this value of free memory.</remarks>
-        private const long ConsumptionThresholdBytes = MaxUnconsumedBlocksDataBytes / 10;
+        private long ConsumptionThresholdBytes => this.maxUnconsumedBlocksDataBytes / 10;
 
         /// <summary>The maximum amount of blocks that can be assigned to <see cref="IBlockPuller"/> at the same time.</summary>
         private const int MaxBlocksToAskFromPuller = 10000;
@@ -41,16 +46,29 @@ namespace Xels.Bitcoin.Consensus
         private const int ConsensusIsConsideredToBeSyncedMargin = 5;
 
         private readonly Network network;
+
         private readonly ILogger logger;
+
+        /// <remarks>All access should be protected by <see cref="peerLock"/>.</remarks>
         private readonly IChainedHeaderTree chainedHeaderTree;
+
         private readonly IChainState chainState;
+
         private readonly IPartialValidator partialValidator;
+
         private readonly IFullValidator fullValidator;
-        private readonly Signals.Signals signals;
+
+        private readonly ISignals signals;
+
         private readonly IPeerBanning peerBanning;
+
         private readonly IBlockStore blockStore;
+
         private readonly IFinalizedBlockInfoRepository finalizedBlockInfo;
+
+        /// <remarks>All access should be protected by <see cref="peerLock"/>.</remarks>
         private readonly IBlockPuller blockPuller;
+
         private readonly IIntegrityValidator integrityValidator;
         private readonly INodeLifetime nodeLifetime;
 
@@ -63,7 +81,20 @@ namespace Xels.Bitcoin.Consensus
         /// <inheritdoc />
         public IConsensusRuleEngine ConsensusRules { get; private set; }
 
-        private readonly Dictionary<uint256, List<OnBlockDownloadedCallback>> callbacksByBlocksRequestedHash;
+        /// <summary>
+        /// A container of call backs used by the download processes.
+        /// </summary>
+        internal class DownloadedCallbacks
+        {
+            /// <summary>The consensus code has requested this block, invoke the method <see cref="ProcessDownloadedBlock"/> when block is delivered.</summary>
+            public bool ConsensusRequested { get; set; }
+
+            /// <summary>List of delegates to call when block is delivered.</summary>
+            public List<OnBlockDownloadedCallback> Callbacks { get; set; }
+        }
+
+        /// <remarks>All access should be protected by <see cref="blockRequestedLock"/>.</remarks>
+        private readonly Dictionary<uint256, DownloadedCallbacks> callbacksByBlocksRequestedHash;
 
         /// <summary>Peers mapped by their ID.</summary>
         /// <remarks>This object has to be protected by <see cref="peerLock"/>.</remarks>
@@ -80,17 +111,19 @@ namespace Xels.Bitcoin.Consensus
 
         private readonly AsyncLock reorgLock;
 
+        /// <remarks>All access should be protected by <see cref="peerLock"/>.</remarks>
         private long expectedBlockDataBytes;
 
+        /// <remarks>All access should be protected by <see cref="peerLock"/>.</remarks>
         private readonly Dictionary<uint256, long> expectedBlockSizes;
 
-        private readonly ConcurrentChain chain;
+        private readonly ChainIndexer chainIndexer;
 
         private readonly ConsensusManagerPerformanceCounter performanceCounter;
 
         private bool isIbd;
 
-        public ConsensusManager(
+        internal ConsensusManager(
             IChainedHeaderTree chainedHeaderTree,
             Network network,
             ILoggerFactory loggerFactory,
@@ -100,16 +133,36 @@ namespace Xels.Bitcoin.Consensus
             IFullValidator fullValidator,
             IConsensusRuleEngine consensusRules,
             IFinalizedBlockInfoRepository finalizedBlockInfo,
-            Signals.Signals signals,
+            ISignals signals,
             IPeerBanning peerBanning,
             IInitialBlockDownloadState ibdState,
-            ConcurrentChain chain,
+            ChainIndexer chainIndexer,
             IBlockPuller blockPuller,
             IBlockStore blockStore,
             IConnectionManager connectionManager,
             INodeStats nodeStats,
-            INodeLifetime nodeLifetime)
+            INodeLifetime nodeLifetime,
+            ConsensusSettings consensusSettings)
         {
+            Guard.NotNull(chainedHeaderTree, nameof(chainedHeaderTree));
+            Guard.NotNull(network, nameof(network));
+            Guard.NotNull(loggerFactory, nameof(loggerFactory));
+            Guard.NotNull(chainState, nameof(chainState));
+            Guard.NotNull(integrityValidator, nameof(integrityValidator));
+            Guard.NotNull(partialValidator, nameof(partialValidator));
+            Guard.NotNull(fullValidator, nameof(fullValidator));
+            Guard.NotNull(consensusRules, nameof(consensusRules));
+            Guard.NotNull(finalizedBlockInfo, nameof(finalizedBlockInfo));
+            Guard.NotNull(signals, nameof(signals));
+            Guard.NotNull(peerBanning, nameof(peerBanning));
+            Guard.NotNull(ibdState, nameof(ibdState));
+            Guard.NotNull(chainIndexer, nameof(chainIndexer));
+            Guard.NotNull(blockPuller, nameof(blockPuller));
+            Guard.NotNull(blockStore, nameof(blockStore));
+            Guard.NotNull(connectionManager, nameof(connectionManager));
+            Guard.NotNull(nodeStats, nameof(nodeStats));
+            Guard.NotNull(nodeLifetime, nameof(nodeLifetime));
+
             this.network = network;
             this.chainState = chainState;
             this.integrityValidator = integrityValidator;
@@ -120,7 +173,7 @@ namespace Xels.Bitcoin.Consensus
             this.peerBanning = peerBanning;
             this.blockStore = blockStore;
             this.finalizedBlockInfo = finalizedBlockInfo;
-            this.chain = chain;
+            this.chainIndexer = chainIndexer;
             this.connectionManager = connectionManager;
             this.nodeLifetime = nodeLifetime;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
@@ -133,13 +186,15 @@ namespace Xels.Bitcoin.Consensus
             this.expectedBlockDataBytes = 0;
             this.expectedBlockSizes = new Dictionary<uint256, long>();
 
-            this.callbacksByBlocksRequestedHash = new Dictionary<uint256, List<OnBlockDownloadedCallback>>();
+            this.callbacksByBlocksRequestedHash = new Dictionary<uint256, DownloadedCallbacks>();
             this.peersByPeerId = new Dictionary<int, INetworkPeer>();
             this.toDownloadQueue = new Queue<BlockDownloadRequest>();
             this.performanceCounter = new ConsensusManagerPerformanceCounter();
             this.ibdState = ibdState;
 
             this.blockPuller = blockPuller;
+
+            this.maxUnconsumedBlocksDataBytes = consensusSettings.MaxBlockMemoryInMB * 1024 * 1024;
 
             nodeStats.RegisterStats(this.AddInlineStats, StatsType.Inline, 1000);
             nodeStats.RegisterStats(this.AddComponentStats, StatsType.Component, 1000);
@@ -155,11 +210,13 @@ namespace Xels.Bitcoin.Consensus
         /// </remarks>
         public async Task InitializeAsync(ChainedHeader chainTip)
         {
+            Guard.NotNull(chainTip, nameof(chainTip));
+
             // TODO: consensus store
             // We should consider creating a consensus store class that will internally contain
             // coinview and it will abstract the methods `RewindAsync()` `GetBlockHashAsync()`
 
-            uint256 consensusTipHash = await this.ConsensusRules.GetBlockHashAsync().ConfigureAwait(false);
+            uint256 consensusTipHash = this.ConsensusRules.GetBlockHash();
 
             ChainedHeader pendingTip;
 
@@ -182,6 +239,9 @@ namespace Xels.Bitcoin.Consensus
 
             this.SetConsensusTip(pendingTip);
 
+            if (this.chainIndexer.Tip != pendingTip)
+                this.chainIndexer.Initialize(pendingTip);
+
             this.blockPuller.Initialize(this.BlockDownloaded);
 
             this.isIbd = this.ibdState.IsInitialBlockDownload();
@@ -191,6 +251,9 @@ namespace Xels.Bitcoin.Consensus
         /// <inheritdoc />
         public ConnectNewHeadersResult HeadersPresented(INetworkPeer peer, List<BlockHeader> headers, bool triggerDownload = true)
         {
+            Guard.NotNull(peer, nameof(peer));
+            Guard.NotNull(headers, nameof(headers));
+
             ConnectNewHeadersResult connectNewHeadersResult;
 
             lock (this.peerLock)
@@ -198,6 +261,12 @@ namespace Xels.Bitcoin.Consensus
                 int peerId = peer.Connection.Id;
 
                 connectNewHeadersResult = this.chainedHeaderTree.ConnectNewHeaders(peerId, headers);
+
+                if (!this.peersByPeerId.ContainsKey(peerId))
+                {
+                    this.peersByPeerId.Add(peerId, peer);
+                    this.logger.LogTrace("New peer with ID {0} was added.", peerId);
+                }
 
                 if (connectNewHeadersResult == null)
                 {
@@ -214,16 +283,10 @@ namespace Xels.Bitcoin.Consensus
                 this.chainState.IsAtBestChainTip = this.IsConsensusConsideredToBeSyncedLocked();
 
                 this.blockPuller.NewPeerTipClaimed(peer, connectNewHeadersResult.Consumed);
-
-                if (!this.peersByPeerId.ContainsKey(peerId))
-                {
-                    this.peersByPeerId.Add(peerId, peer);
-                    this.logger.LogTrace("New peer with ID {0} was added.", peerId);
-                }
             }
 
             if (triggerDownload && (connectNewHeadersResult.DownloadTo != null))
-                this.DownloadBlocks(connectNewHeadersResult.ToArray(), this.ProcessDownloadedBlock);
+                this.DownloadBlocks(connectNewHeadersResult.ToArray());
 
             return connectNewHeadersResult;
         }
@@ -240,6 +303,8 @@ namespace Xels.Bitcoin.Consensus
         /// <inheritdoc />
         public async Task<ChainedHeader> BlockMinedAsync(Block block)
         {
+            Guard.NotNull(block, nameof(block));
+
             ValidationContext validationContext;
 
             using (await this.reorgLock.LockAsync().ConfigureAwait(false))
@@ -338,10 +403,9 @@ namespace Xels.Bitcoin.Consensus
         /// </summary>
         private void ProcessDownloadedBlock(ChainedHeaderBlock chainedHeaderBlock)
         {
-            if (chainedHeaderBlock == null)
+            if (chainedHeaderBlock.Block == null)
             {
-                // Peers failed to deliver the block.
-                this.logger.LogTrace("(-)[DOWNLOAD_FAILED]");
+                this.logger.LogTrace("(-)[DOWNLOAD_FAILED_NO_PEERS_CLAIMED_BLOCK]:'{0}'", chainedHeaderBlock.ChainedHeader);
                 return;
             }
 
@@ -375,16 +439,18 @@ namespace Xels.Bitcoin.Consensus
                 var peersToBan = new List<INetworkPeer>();
 
                 if (validationContext.MissingServices != null)
-                {
                     this.connectionManager.AddDiscoveredNodesRequirement(validationContext.MissingServices.Value);
-                    this.blockPuller.RequestPeerServices(validationContext.MissingServices.Value);
-
-                    this.logger.LogTrace("(-)[MISSING_SERVICES]");
-                    return;
-                }
 
                 lock (this.peerLock)
                 {
+                    if (validationContext.MissingServices != null)
+                    {
+                        this.blockPuller.RequestPeerServices(validationContext.MissingServices.Value);
+
+                        this.logger.LogTrace("(-)[MISSING_SERVICES]");
+                        return;
+                    }
+
                     List<int> peerIdsToBan = this.chainedHeaderTree.PartialOrFullValidationFailed(validationContext.ChainedHeaderToValidate);
 
                     this.logger.LogDebug("Validation of block '{0}' failed, banning and disconnecting {1} peers.", validationContext.ChainedHeaderToValidate, peerIdsToBan.Count);
@@ -422,7 +488,7 @@ namespace Xels.Bitcoin.Consensus
                         chainedHeaderBlocksToValidate = this.chainedHeaderTree.PartialValidationSucceeded(chainedHeader, out fullValidationRequired);
                     }
 
-                    this.logger.LogTrace("Full validation is{0} required.", fullValidationRequired ? "" : " NOT");
+                    this.logger.LogTrace("Full validation is{0} required.", fullValidationRequired ? string.Empty : " NOT");
 
                     if (fullValidationRequired)
                     {
@@ -513,7 +579,7 @@ namespace Xels.Bitcoin.Consensus
             }
 
             foreach (ConnectNewHeadersResult newHeaders in blocksToDownload)
-                this.DownloadBlocks(newHeaders.ToArray(), this.ProcessDownloadedBlock);
+                this.DownloadBlocks(newHeaders.ToArray());
         }
 
         /// <summary>Attempt to switch to new chain, which may require rewinding blocks from the current chain.</summary>
@@ -546,7 +612,7 @@ namespace Xels.Bitcoin.Consensus
             if (!isExtension)
                 disconnectedBlocks = await this.RewindToForkPointAsync(fork, oldTip).ConfigureAwait(false);
 
-            List<ChainedHeaderBlock> blocksToConnect = await this.TryGetBlocksToConnectAsync(newTip, fork.Height + 1).ConfigureAwait(false);
+            List<ChainedHeaderBlock> blocksToConnect = this.TryGetBlocksToConnect(newTip, fork.Height + 1);
 
             // Sanity check. This should never happen.
             if (blocksToConnect == null)
@@ -571,8 +637,7 @@ namespace Xels.Bitcoin.Consensus
                         this.logger.LogTrace("[DISCONNECTED_BLOCK_STATE]{0}", disconnectedBlock.ChainedHeader);
                         this.logger.LogTrace("[DISCONNECTED_BLOCK_STATE]{0}", disconnectedBlock.ChainedHeader.Previous);
 
-                        if (disconnectedBlock.ChainedHeader.Block == null)
-                            disconnectedBlock.ChainedHeader.Block = disconnectedBlock.Block;
+                        this.chainedHeaderTree.BlockRewinded(disconnectedBlock);
                     }
                 }
 
@@ -624,19 +689,13 @@ namespace Xels.Bitcoin.Consensus
 
             while (current != fork)
             {
-                await this.ConsensusRules.RewindAsync().ConfigureAwait(false);
-
-                lock (this.peerLock)
-                {
-                    this.SetConsensusTipInternalLocked(current.Previous);
-                }
-
+                // Access the block before rewinding.
                 Block block = current.Block;
 
                 if (block == null)
                 {
                     this.logger.LogTrace("Block '{0}' wasn't cached. Loading it from the database.", current.HashBlock);
-                    block = await this.blockStore.GetBlockAsync(current.HashBlock).ConfigureAwait(false);
+                    block = this.blockStore.GetBlock(current.HashBlock);
 
                     if (block == null)
                     {
@@ -646,13 +705,21 @@ namespace Xels.Bitcoin.Consensus
                     }
                 }
 
+                await this.ConsensusRules.RewindAsync().ConfigureAwait(false);
+
+                lock (this.peerLock)
+                {
+                    this.SetConsensusTipInternalLocked(current.Previous);
+                    this.chainIndexer.Remove(current);
+                }
+
                 var disconnectedBlock = new ChainedHeaderBlock(block, current);
 
                 disconnectedBlocks.Add(disconnectedBlock);
 
                 using (this.performanceCounter.MeasureBlockDisconnectedSignal())
                 {
-                    this.signals.SignalBlockDisconnected(disconnectedBlock);
+                    this.signals.Publish(new BlockDisconnected(disconnectedBlock));
                 }
 
                 current = current.Previous;
@@ -693,6 +760,7 @@ namespace Xels.Bitcoin.Consensus
                     lock (this.peerLock)
                     {
                         this.SetConsensusTipInternalLocked(lastValidatedBlockHeader);
+                        this.chainIndexer.Add(lastValidatedBlockHeader);
                     }
 
                     if (this.network.Consensus.MaxReorgLength != 0)
@@ -710,7 +778,7 @@ namespace Xels.Bitcoin.Consensus
 
                 using (this.performanceCounter.MeasureBlockConnectedSignal())
                 {
-                    this.signals.SignalBlockConnected(blockToConnect);
+                    this.signals.Publish(new BlockConnected(blockToConnect));
                 }
             }
 
@@ -795,11 +863,15 @@ namespace Xels.Bitcoin.Consensus
 
             if (validationContext.Error != null)
             {
-                List<int> badPeers;
+                var badPeers = new List<int>();
 
-                lock (this.peerLock)
+                // Ban the peers only in case block is invalid and not temporary rejected.
+                if (validationContext.RejectUntil == null)
                 {
-                    badPeers = this.chainedHeaderTree.PartialOrFullValidationFailed(blockToConnect.ChainedHeader);
+                    lock (this.peerLock)
+                    {
+                        badPeers = this.chainedHeaderTree.PartialOrFullValidationFailed(blockToConnect.ChainedHeader);
+                    }
                 }
 
                 var failureResult = new ConnectBlocksResult(false)
@@ -829,14 +901,14 @@ namespace Xels.Bitcoin.Consensus
 
         /// <summary>Try to find all blocks between two headers.</summary>
         /// <returns>Collection of blocks that were loaded. In case at least one block was not present <c>null</c> will be returned.</returns>
-        private async Task<List<ChainedHeaderBlock>> TryGetBlocksToConnectAsync(ChainedHeader proposedNewTip, int heightOfFirstBlock)
+        private List<ChainedHeaderBlock> TryGetBlocksToConnect(ChainedHeader proposedNewTip, int heightOfFirstBlock)
         {
             ChainedHeader currentHeader = proposedNewTip;
             var chainedHeaderBlocks = new List<ChainedHeaderBlock>();
 
             while (currentHeader.Height >= heightOfFirstBlock)
             {
-                ChainedHeaderBlock chainedHeaderBlock = await this.GetBlockDataAsync(currentHeader.HashBlock).ConfigureAwait(false);
+                ChainedHeaderBlock chainedHeaderBlock = this.GetBlockData(currentHeader.HashBlock);
 
                 if (chainedHeaderBlock?.Block == null)
                 {
@@ -884,7 +956,6 @@ namespace Xels.Bitcoin.Consensus
             this.Tip = newTip;
 
             this.chainState.ConsensusTip = this.Tip;
-            this.chain.SetTip(this.Tip);
         }
 
         /// <summary>
@@ -895,7 +966,7 @@ namespace Xels.Bitcoin.Consensus
         /// </summary>
         /// <param name="chainedHeaders">Array of chained headers to download.</param>
         /// <param name="onBlockDownloadedCallback">A callback to call when the block was downloaded.</param>
-        private void DownloadBlocks(ChainedHeader[] chainedHeaders, OnBlockDownloadedCallback onBlockDownloadedCallback)
+        private void DownloadBlocks(ChainedHeader[] chainedHeaders, OnBlockDownloadedCallback onBlockDownloadedCallback = null)
         {
             var downloadRequests = new List<BlockDownloadRequest>();
 
@@ -906,19 +977,29 @@ namespace Xels.Bitcoin.Consensus
             {
                 foreach (ChainedHeader chainedHeader in chainedHeaders)
                 {
-                    bool blockAlreadyAsked = this.callbacksByBlocksRequestedHash.TryGetValue(chainedHeader.HashBlock, out List<OnBlockDownloadedCallback> callbacks);
+                    bool blockAlreadyAsked = this.callbacksByBlocksRequestedHash.TryGetValue(chainedHeader.HashBlock, out DownloadedCallbacks downloadedCallbacks);
 
                     if (!blockAlreadyAsked)
                     {
-                        callbacks = new List<OnBlockDownloadedCallback>();
-                        this.callbacksByBlocksRequestedHash.Add(chainedHeader.HashBlock, callbacks);
+                        downloadedCallbacks = new DownloadedCallbacks();
+                        this.callbacksByBlocksRequestedHash.Add(chainedHeader.HashBlock, downloadedCallbacks);
                     }
                     else
                     {
                         this.logger.LogTrace("Registered additional callback for the block '{0}'.", chainedHeader);
                     }
 
-                    callbacks.Add(onBlockDownloadedCallback);
+                    if (onBlockDownloadedCallback == null)
+                    {
+                        downloadedCallbacks.ConsensusRequested = true;
+                    }
+                    else
+                    {
+                       if (downloadedCallbacks.Callbacks == null)
+                           downloadedCallbacks.Callbacks = new List<OnBlockDownloadedCallback>();
+
+                       downloadedCallbacks.Callbacks.Add(onBlockDownloadedCallback);
+                    }
 
                     bool blockIsNotConsecutive = (previousHeader != null) && (chainedHeader.Previous.HashBlock != previousHeader.HashBlock);
 
@@ -946,17 +1027,18 @@ namespace Xels.Bitcoin.Consensus
 
                 if (request != null)
                     downloadRequests.Add(request);
+            }
 
-                lock (this.peerLock)
-                {
-                    foreach (BlockDownloadRequest downloadRequest in downloadRequests)
-                        this.toDownloadQueue.Enqueue(downloadRequest);
+            lock (this.peerLock)
+            {
+                foreach (BlockDownloadRequest downloadRequest in downloadRequests)
+                    this.toDownloadQueue.Enqueue(downloadRequest);
 
-                    this.ProcessDownloadQueueLocked();
-                }
+                this.ProcessDownloadQueueLocked();
             }
         }
 
+        /// <summary>Method that is provided as a callback to <see cref="IBlockPuller"/>.</summary>
         private void BlockDownloaded(uint256 blockHash, Block block, int peerId)
         {
             if (this.nodeLifetime.ApplicationStopping.IsCancellationRequested)
@@ -966,10 +1048,12 @@ namespace Xels.Bitcoin.Consensus
             }
 
             ChainedHeader chainedHeader = null;
+            bool reassignDownload = false;
+            long expectedSize;
 
             lock (this.peerLock)
             {
-                if (this.expectedBlockSizes.TryGetValue(blockHash, out long expectedSize))
+                if (this.expectedBlockSizes.TryGetValue(blockHash, out expectedSize))
                 {
                     this.expectedBlockDataBytes -= expectedSize;
                     this.expectedBlockSizes.Remove(blockHash);
@@ -983,25 +1067,43 @@ namespace Xels.Bitcoin.Consensus
                     throw new InvalidOperationException("Unsolicited block");
                 }
 
-                if (block != null)
+                chainedHeader = this.chainedHeaderTree.GetChainedHeader(blockHash);
+                if (chainedHeader == null)
                 {
-                    chainedHeader = this.chainedHeaderTree.GetChainedHeader(blockHash);
-
-                    if (chainedHeader == null)
+                    lock (this.blockRequestedLock)
                     {
+                        this.callbacksByBlocksRequestedHash.Remove(blockHash);
+                    }
+
+                    this.logger.LogTrace("(-)[CHAINED_HEADER_NOT_FOUND]");
+                    return;
+                }
+
+                if (block == null)
+                {
+                    // A race conditions exists where if we attempted a download of a block but all the peers disconnected and then a peer presented the header
+                    // again, we dont re-download the block.
+                    if (chainedHeader.BlockDataAvailability == BlockDataAvailabilityState.BlockRequired)
+                    {
+                        // We need to remove the current callback so that it can be re-assigned for download.
                         lock (this.blockRequestedLock)
                         {
                             this.callbacksByBlocksRequestedHash.Remove(blockHash);
                         }
 
-                        this.logger.LogTrace("(-)[CHAINED_HEADER_NOT_FOUND]");
-                        return;
+                        reassignDownload = true;
                     }
+                    else
+                        this.logger.LogTrace("Block download failed but will not be reassigned as it's state is {0}", chainedHeader.BlockDataAvailability);
                 }
-                else
-                {
-                    this.logger.LogDebug("Block '{0}' failed to be delivered.", blockHash);
-                }
+            }
+
+            if (reassignDownload)
+            {
+                this.DownloadBlocks(new[] { chainedHeader });
+                this.logger.LogWarning("Downloading block for '{0}' failed, it will be enqueued again.", chainedHeader);
+                this.logger.LogTrace("(-)[BLOCK_DOWNLOAD_FAILED_REASSIGNED]");
+                return;
             }
 
             if (block != null)
@@ -1020,42 +1122,56 @@ namespace Xels.Bitcoin.Consensus
                     {
                         // Ask block puller to deliver this block again. Do it with high priority and avoid normal queue.
                         this.blockPuller.RequestBlocksDownload(new List<ChainedHeader>() { chainedHeader }, true);
+                        this.expectedBlockSizes.Add(chainedHeader.HashBlock, expectedSize);
+                        this.expectedBlockDataBytes += expectedSize;
                     }
 
                     this.logger.LogTrace("(-)[INTEGRITY_VERIFICATION_FAILED]");
                     return;
                 }
             }
+            else
+            {
+                this.logger.LogDebug("Block '{0}' failed to be delivered.", blockHash);
+            }
 
-            List<OnBlockDownloadedCallback> listOfCallbacks = null;
+            DownloadedCallbacks downloadedCallbacks = null;
 
             lock (this.blockRequestedLock)
             {
-                if (this.callbacksByBlocksRequestedHash.TryGetValue(blockHash, out listOfCallbacks))
+                if (this.callbacksByBlocksRequestedHash.TryGetValue(blockHash, out downloadedCallbacks))
                     this.callbacksByBlocksRequestedHash.Remove(blockHash);
             }
 
-            if (listOfCallbacks != null)
+            if (downloadedCallbacks != null)
             {
-                ChainedHeaderBlock chainedHeaderBlock = null;
+                var chainedHeaderBlock = new ChainedHeaderBlock(block, chainedHeader);
 
-                if (block != null)
-                    chainedHeaderBlock = new ChainedHeaderBlock(block, chainedHeader);
+                if (downloadedCallbacks.ConsensusRequested)
+                {
+                    this.ProcessDownloadedBlock(chainedHeaderBlock);
+                }
 
-                this.logger.LogTrace("Calling {0} callbacks for block '{1}'.", listOfCallbacks.Count, chainedHeader);
-                foreach (OnBlockDownloadedCallback blockDownloadedCallback in listOfCallbacks)
-                    blockDownloadedCallback(chainedHeaderBlock);
+                if (downloadedCallbacks.Callbacks != null)
+                {
+                    this.logger.LogTrace("Calling {0} callbacks for block '{1}'.", downloadedCallbacks.Callbacks.Count, chainedHeader);
+                    foreach (OnBlockDownloadedCallback blockDownloadedCallback in downloadedCallbacks.Callbacks)
+                        blockDownloadedCallback(chainedHeaderBlock);
+                }
             }
         }
 
         /// <inheritdoc />
-        public async Task GetOrDownloadBlocksAsync(List<uint256> blockHashes, OnBlockDownloadedCallback onBlockDownloadedCallback)
+        public void GetOrDownloadBlocks(List<uint256> blockHashes, OnBlockDownloadedCallback onBlockDownloadedCallback)
         {
+            Guard.NotNull(blockHashes, nameof(blockHashes));
+            Guard.NotNull(onBlockDownloadedCallback, nameof(onBlockDownloadedCallback));
+
             var blocksToDownload = new List<ChainedHeader>();
 
             foreach (uint256 blockHash in blockHashes)
             {
-                ChainedHeaderBlock chainedHeaderBlock = await this.GetBlockDataAsync(blockHash).ConfigureAwait(false);
+                ChainedHeaderBlock chainedHeaderBlock = this.GetBlockData(blockHash);
 
                 if ((chainedHeaderBlock == null) || (chainedHeaderBlock.Block != null))
                 {
@@ -1076,13 +1192,15 @@ namespace Xels.Bitcoin.Consensus
             if (blocksToDownload.Count != 0)
             {
                 this.logger.LogTrace("Asking block puller for {0} blocks.", blocksToDownload.Count);
-                this.DownloadBlocks(blocksToDownload.ToArray(), this.ProcessDownloadedBlock);
+                this.DownloadBlocks(blocksToDownload.ToArray(), onBlockDownloadedCallback);
             }
         }
 
         /// <inheritdoc />
-        public async Task<ChainedHeaderBlock> GetBlockDataAsync(uint256 blockHash)
+        public ChainedHeaderBlock GetBlockData(uint256 blockHash)
         {
+            Guard.NotNull(blockHash, nameof(blockHash));
+
             ChainedHeaderBlock chainedHeaderBlock;
 
             lock (this.peerLock)
@@ -1105,7 +1223,7 @@ namespace Xels.Bitcoin.Consensus
                 return chainedHeaderBlock;
             }
 
-            Block block = await this.blockStore.GetBlockAsync(blockHash).ConfigureAwait(false);
+            Block block = this.blockStore.GetBlock(blockHash);
             if (block != null)
             {
                 var newBlockPair = new ChainedHeaderBlock(block, chainedHeaderBlock.ChainedHeader);
@@ -1113,8 +1231,8 @@ namespace Xels.Bitcoin.Consensus
                 this.logger.LogTrace("(-)[FOUND_IN_BLOCK_STORE]:'{0}'", newBlockPair);
                 return newBlockPair;
             }
-            else
-                this.logger.LogDebug("Block '{0}' was not found in block store.", blockHash);
+
+            this.logger.LogDebug("Block '{0}' was not found in block store.", blockHash);
 
             return chainedHeaderBlock;
         }
@@ -1143,10 +1261,10 @@ namespace Xels.Bitcoin.Consensus
                     return;
                 }
 
-                long freeBytes = MaxUnconsumedBlocksDataBytes - this.chainedHeaderTree.UnconsumedBlocksDataBytes - this.expectedBlockDataBytes;
+                long freeBytes = this.maxUnconsumedBlocksDataBytes - this.chainedHeaderTree.UnconsumedBlocksDataBytes - this.expectedBlockDataBytes;
                 this.logger.LogTrace("{0} bytes worth of blocks is available for download.", freeBytes);
 
-                if (freeBytes <= ConsumptionThresholdBytes)
+                if (freeBytes <= this.ConsumptionThresholdBytes)
                 {
                     this.logger.LogTrace("(-)[THRESHOLD_NOT_MET]");
                     return;
@@ -1200,7 +1318,7 @@ namespace Xels.Bitcoin.Consensus
         /// Returns <c>true</c> if consensus' height is within <see cref="ConsensusIsConsideredToBeSyncedMargin"/>
         /// blocks from the best tip's height.
         /// </summary>
-        /// <remarks>Should be locked by <see cref="peerLock"/></remarks>
+        /// <remarks>Should be locked by <see cref="peerLock"/>.</remarks>
         private bool IsConsensusConsideredToBeSyncedLocked()
         {
             ChainedHeader bestTip = this.chainedHeaderTree.GetBestPeerTip();
@@ -1216,6 +1334,7 @@ namespace Xels.Bitcoin.Consensus
             return isConsideredSynced;
         }
 
+        [NoTrace]
         private void AddInlineStats(StringBuilder log)
         {
             lock (this.peerLock)
@@ -1242,6 +1361,7 @@ namespace Xels.Bitcoin.Consensus
             benchLog.AppendLine(this.performanceCounter.TakeSnapshot().ToString());
         }
 
+        [NoTrace]
         private void AddComponentStats(StringBuilder log)
         {
             log.AppendLine();
@@ -1251,19 +1371,24 @@ namespace Xels.Bitcoin.Consensus
             {
                 if (this.isIbd) log.AppendLine("IBD Stage");
 
+                log.AppendLine($"Chained header tree size: {this.chainedHeaderTree.ChainedBlocksDataBytes.BytesToMegaBytes()} MB");
+
                 string unconsumedBlocks = this.FormatBigNumber(this.chainedHeaderTree.UnconsumedBlocksCount);
 
-                string unconsumedBytes = this.FormatBigNumber(this.chainedHeaderTree.UnconsumedBlocksDataBytes);
-                string maxUnconsumedBytes = this.FormatBigNumber(MaxUnconsumedBlocksDataBytes);
+                double filledPercentage = Math.Round((this.chainedHeaderTree.UnconsumedBlocksDataBytes / (double)this.maxUnconsumedBlocksDataBytes) * 100, 2);
 
-                double filledPercentage = Math.Round((this.chainedHeaderTree.UnconsumedBlocksDataBytes / (double)MaxUnconsumedBlocksDataBytes) * 100, 2);
+                log.AppendLine($"Unconsumed blocks: {unconsumedBlocks} -- ({this.chainedHeaderTree.UnconsumedBlocksDataBytes.BytesToMegaBytes()} / {this.maxUnconsumedBlocksDataBytes.BytesToMegaBytes()} MB). Cache is filled by: {filledPercentage}%");
 
-                log.AppendLine($"Unconsumed blocks: {unconsumedBlocks} -- ({unconsumedBytes} / {maxUnconsumedBytes} bytes). Cache is filled by: {filledPercentage}%");
+                int pendingDownloadCount = this.callbacksByBlocksRequestedHash.Count;
+                int currentlyDownloadingCount = this.expectedBlockSizes.Count;
+
+                log.AppendLine($"Downloading blocks: {currentlyDownloadingCount} queued out of {pendingDownloadCount} pending");
             }
         }
 
         /// <summary>Formats the big number.</summary>
-        /// <remarks><c>123456789</c> => <c>123,456,789</c></remarks>
+        /// <remarks><c>123456789</c> => <c>123,456,789</c>.</remarks>
+        [NoTrace]
         private string FormatBigNumber(long number)
         {
             return $"{number:#,##0}";

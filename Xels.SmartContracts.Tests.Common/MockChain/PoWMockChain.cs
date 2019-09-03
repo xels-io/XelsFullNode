@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
+using Xels.Bitcoin.Tests.Common;
 
 namespace Xels.SmartContracts.Tests.Common.MockChain
 {
@@ -47,13 +48,13 @@ namespace Xels.SmartContracts.Tests.Common.MockChain
         {
             if (this.nodes.Length == 1)
             {
-                TestHelper.WaitLoop(() => TestHelper.IsNodeSynced(this.nodes[0].CoreNode));
+                TestBase.WaitLoop(() => TestHelper.IsNodeSynced(this.nodes[0].CoreNode));
                 return;
             }
 
             for (int i = 0; i < this.nodes.Length - 1; i++)
             {
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(this.nodes[i].CoreNode, this.nodes[i + 1].CoreNode));
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(this.nodes[i].CoreNode, this.nodes[i + 1].CoreNode));
             }
         }
 

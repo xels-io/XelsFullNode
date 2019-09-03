@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using NBitcoin;
 using Xels.Bitcoin.Features.SmartContracts;
 using Xels.Bitcoin.Features.SmartContracts.Models;
-using Xels.SmartContracts.Core;
-using Xels.SmartContracts.Core.Util;
 using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.CLR.Compilation;
 using Xels.SmartContracts.CLR.Serialization;
+using Xels.SmartContracts.Core;
 using Xels.SmartContracts.Tests.Common.MockChain;
 using Xunit;
 
@@ -30,13 +28,13 @@ namespace Xels.SmartContracts.IntegrationTests
             this.serializer = new ContractPrimitiveSerializer(this.node1.CoreNode.FullNode.Network);
         }
 
-        [Fact]
+        [Retry]
         public void CreateContract_OneOfEachParameterType()
         {
             // Ensure fixture is funded.
             this.mockChain.MineBlocks(1);
 
-            double amount = 25;
+            decimal amount = 25;
             uint256 currentHash = this.node1.GetLastBlock().GetHash();
 
             ContractCompilationResult compilationResult = ContractCompiler.CompileFile("SmartContracts/CreateWithAllParameters.cs");
@@ -123,7 +121,7 @@ namespace Xels.SmartContracts.IntegrationTests
             Assert.Null(receipt.Error);
         }
 
-        [Fact]
+        [Retry]
         public void CallContract_SerializeEachParameterType()
         {
             // Ensure fixture is funded.
@@ -137,7 +135,7 @@ namespace Xels.SmartContracts.IntegrationTests
             this.mockChain.MineBlocks(1);
             Assert.NotNull(this.node1.GetCode(preResponse.NewContractAddress));
 
-            double amount = 25;
+            decimal amount = 25;
             uint256 currentHash = this.node1.GetLastBlock().GetHash();
 
             const char testChar = 'c';
@@ -187,7 +185,7 @@ namespace Xels.SmartContracts.IntegrationTests
             Assert.Null(receipt.Error);
         }
 
-        [Fact]
+        [Retry]
         public void Internal_CallContract_SerializeEachParameterType()
         {
             // Ensure fixture is funded.
@@ -201,7 +199,7 @@ namespace Xels.SmartContracts.IntegrationTests
             this.mockChain.MineBlocks(1);
             Assert.NotNull(this.node1.GetCode(preResponse.NewContractAddress));
 
-            double amount = 25;
+            decimal amount = 25;
             uint256 currentHash = this.node1.GetLastBlock().GetHash();
 
             const char testChar = 'c';
@@ -253,13 +251,13 @@ namespace Xels.SmartContracts.IntegrationTests
             Assert.Null(receipt.Error);
         }
 
-        [Fact]
+        [Retry]
         public void SerializeArrays_ForEachMethodParamType()
         {
             // Ensure fixture is funded.
             this.mockChain.MineBlocks(1);
 
-            double amount = 25;
+            decimal amount = 25;
             uint256 currentHash = this.node1.GetLastBlock().GetHash();
 
             ContractCompilationResult compilationResult = ContractCompiler.CompileFile("SmartContracts/CreateWithAllArrays.cs");

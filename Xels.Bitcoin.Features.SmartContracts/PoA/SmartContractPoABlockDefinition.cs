@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using NBitcoin;
-using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.MemoryPool.Interfaces;
 using Xels.Bitcoin.Features.Miner;
-using Xels.Bitcoin.Features.PoA.ConsensusRules;
+using Xels.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules;
 using Xels.Bitcoin.Features.SmartContracts.PoW;
 using Xels.Bitcoin.Utilities;
 using Xels.SmartContracts.Core;
@@ -32,9 +31,9 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoA
             Network network,
             ISenderRetriever senderRetriever,
             IStateRepositoryRoot stateRoot,
-            NodeSettings nodeSettings)
+            MinerSettings minerSettings)
             : base(blockBufferGenerator, coinView, consensusManager, dateTimeProvider, executorFactory, loggerFactory, mempool,
-                mempoolLock, new MinerSettings(nodeSettings), network, senderRetriever, stateRoot)
+                mempoolLock, minerSettings, network, senderRetriever, stateRoot)
         {
             // TODO: Fix gross MinerSettings injection ^^
         }

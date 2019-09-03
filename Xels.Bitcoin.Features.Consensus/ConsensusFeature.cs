@@ -1,9 +1,11 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using NBitcoin;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Builder.Feature;
+using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
@@ -19,7 +21,7 @@ namespace Xels.Bitcoin.Features.Consensus
 
         private readonly IConnectionManager connectionManager;
 
-        private readonly Signals.Signals signals;
+        private readonly Signals.ISignals signals;
 
         private readonly IConsensusManager consensusManager;
 
@@ -29,7 +31,7 @@ namespace Xels.Bitcoin.Features.Consensus
             Network network,
             IChainState chainState,
             IConnectionManager connectionManager,
-            Signals.Signals signals,
+            Signals.ISignals signals,
             IConsensusManager consensusManager,
             NodeDeployments nodeDeployments)
         {
@@ -50,6 +52,25 @@ namespace Xels.Bitcoin.Features.Consensus
                 this.connectionManager.AddDiscoveredNodesRequirement(NetworkPeerServices.NODE_WITNESS);
 
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Prints command-line help.
+        /// </summary>
+        /// <param name="network">The network to extract values from.</param>
+        public static void PrintHelp(Network network)
+        {
+            ConsensusSettings.PrintHelp(network);
+        }
+
+        /// <summary>
+        /// Get the default configuration.
+        /// </summary>
+        /// <param name="builder">The string builder to add the settings to.</param>
+        /// <param name="network">The network to base the defaults off.</param>
+        public static void BuildDefaultConfigurationFile(StringBuilder builder, Network network)
+        {
+            ConsensusSettings.BuildDefaultConfigurationFile(builder, network);
         }
 
         /// <inheritdoc />

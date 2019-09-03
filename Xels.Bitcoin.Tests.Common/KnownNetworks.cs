@@ -1,7 +1,5 @@
 ﻿using NBitcoin;
 using NBitcoin.Networks;
-using NBitcoin.Protocol;
-using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Networks;
 
 namespace Xels.Bitcoin.Tests.Common

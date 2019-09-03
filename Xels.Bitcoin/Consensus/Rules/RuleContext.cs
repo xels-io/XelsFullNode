@@ -1,5 +1,4 @@
 ﻿using System;
-using NBitcoin;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Utilities;
 

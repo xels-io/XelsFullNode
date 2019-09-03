@@ -45,7 +45,7 @@ namespace Xels.Bitcoin.IntegrationTests
                 // Minimum number of 'votes' required within the conformation window to reach 'LockedIn' state.
                 network.Consensus.RuleChangeActivationThreshold = 8;
 
-                CoreNode xelsNode = builder.CreateXelsPosNode(network).WithWallet();
+                CoreNode xelsNode = builder.CreateXelsPosNode(network, "cs-1-xelsNode").WithWallet();
                 xelsNode.Start();
 
                 // ColdStaking activation:
@@ -63,19 +63,19 @@ namespace Xels.Bitcoin.IntegrationTests
 
                 // Check that coldstaking states got updated as expected.
                 ThresholdConditionCache cache = (xelsNode.FullNode.NodeService<IConsensusRuleEngine>() as ConsensusRuleEngine).NodeDeployments.BIP9;
-                Assert.Equal(ThresholdState.Defined, cache.GetState(xelsNode.FullNode.Chain.GetBlock(startedHeight - 1), XelsBIP9Deployments.ColdStaking));
-                Assert.Equal(ThresholdState.Started, cache.GetState(xelsNode.FullNode.Chain.GetBlock(startedHeight), XelsBIP9Deployments.ColdStaking));
-                Assert.Equal(ThresholdState.LockedIn, cache.GetState(xelsNode.FullNode.Chain.GetBlock(lockedInHeight), XelsBIP9Deployments.ColdStaking));
-                Assert.Equal(ThresholdState.Active, cache.GetState(xelsNode.FullNode.Chain.GetBlock(activeHeight), XelsBIP9Deployments.ColdStaking));
+                Assert.Equal(ThresholdState.Defined, cache.GetState(xelsNode.FullNode.ChainIndexer.GetHeader(startedHeight - 1), XelsBIP9Deployments.ColdStaking));
+                Assert.Equal(ThresholdState.Started, cache.GetState(xelsNode.FullNode.ChainIndexer.GetHeader(startedHeight), XelsBIP9Deployments.ColdStaking));
+                Assert.Equal(ThresholdState.LockedIn, cache.GetState(xelsNode.FullNode.ChainIndexer.GetHeader(lockedInHeight), XelsBIP9Deployments.ColdStaking));
+                Assert.Equal(ThresholdState.Active, cache.GetState(xelsNode.FullNode.ChainIndexer.GetHeader(activeHeight), XelsBIP9Deployments.ColdStaking));
 
                 // Verify that the block created before activation does not have the 'CheckColdStakeVerify' flag set.
                 var rulesEngine = xelsNode.FullNode.NodeService<IConsensusRuleEngine>();
-                ChainedHeader prevHeader = xelsNode.FullNode.Chain.GetBlock(activeHeight - 1);
+                ChainedHeader prevHeader = xelsNode.FullNode.ChainIndexer.GetHeader(activeHeight - 1);
                 DeploymentFlags flags1 = (rulesEngine as ConsensusRuleEngine).NodeDeployments.GetFlags(prevHeader);
                 Assert.Equal(0, (int)(flags1.ScriptFlags & ScriptVerify.CheckColdStakeVerify));
 
                 // Verify that the block created after activation has the 'CheckColdStakeVerify' flag set.
-                DeploymentFlags flags2 = (rulesEngine as ConsensusRuleEngine).NodeDeployments.GetFlags(xelsNode.FullNode.Chain.Tip);
+                DeploymentFlags flags2 = (rulesEngine as ConsensusRuleEngine).NodeDeployments.GetFlags(xelsNode.FullNode.ChainIndexer.Tip);
                 Assert.NotEqual(0, (int)(flags2.ScriptFlags & ScriptVerify.CheckColdStakeVerify));
             }
         }

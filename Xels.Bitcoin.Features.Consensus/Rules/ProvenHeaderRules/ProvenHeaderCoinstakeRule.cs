@@ -1,7 +1,5 @@
-﻿using System.Linq;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NBitcoin;
-using NBitcoin.Crypto;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.Interfaces;
@@ -123,7 +121,7 @@ namespace Xels.Bitcoin.Features.Consensus.Rules.ProvenHeaderRules
 
             UnspentOutputs prevUtxo = null;
 
-            FetchCoinsResponse coins = this.PosParent.UtxoSet.FetchCoinsAsync(new[] { txIn.PrevOut.Hash }).GetAwaiter().GetResult();
+            FetchCoinsResponse coins = this.PosParent.UtxoSet.FetchCoins(new[] {txIn.PrevOut.Hash});
             if (coins.UnspentOutputs[0] == null)
             {
                 // We did not find the previous trx in the database, look in rewind data.
@@ -137,7 +135,7 @@ namespace Xels.Bitcoin.Features.Consensus.Rules.ProvenHeaderRules
                 TxOut utxo = null;
                 if (txIn.PrevOut.N < prevUtxo.Outputs.Length)
                 {
-                    // Check that the size of the outs collection is the same as the expected position of the UTXO 
+                    // Check that the size of the outs collection is the same as the expected position of the UTXO
                     // Note the collection will not always represent the original size of the transaction unspent
                     // outputs because when we store outputs do disk the last spent items are removed from the collection.
                     utxo = prevUtxo.Outputs[txIn.PrevOut.N];
@@ -237,15 +235,6 @@ namespace Xels.Bitcoin.Features.Consensus.Rules.ProvenHeaderRules
 
         private uint256 GetPreviousStakeModifier(ChainedHeader chainedHeader)
         {
-            var previousProvenHeader = chainedHeader.Previous.Header as ProvenBlockHeader;
-
-            if (previousProvenHeader != null)
-            {
-                //Stake modifier acquired from prev PH.
-                this.Logger.LogTrace("(-)[PREV_PH]");
-                return previousProvenHeader.StakeModifierV2;
-            }
-
             if (chainedHeader.Previous.Height == 0)
             {
                 this.Logger.LogTrace("(-)[GENESIS]");
@@ -256,6 +245,20 @@ namespace Xels.Bitcoin.Features.Consensus.Rules.ProvenHeaderRules
             {
                 this.Logger.LogTrace("(-)[FROM_CHECKPOINT]");
                 return this.LastCheckpoint.StakeModifierV2;
+            }
+
+            var previousProvenHeader = chainedHeader.Previous.Header as ProvenBlockHeader;
+            if (previousProvenHeader != null)
+            {
+                if (previousProvenHeader.StakeModifierV2 == null)
+                {
+                    this.Logger.LogTrace("(-)[MODIF_IS_NULL]");
+                    ConsensusErrors.InvalidPreviousProvenHeaderStakeModifier.Throw();
+                }
+
+                //Stake modifier acquired from prev PH.
+                this.Logger.LogTrace("(-)[PREV_PH]");
+                return previousProvenHeader.StakeModifierV2;
             }
 
             uint256 previousStakeModifier = this.PosParent.StakeChain.Get(chainedHeader.Previous.HashBlock)?.StakeModifierV2;
@@ -284,16 +287,17 @@ namespace Xels.Bitcoin.Features.Consensus.Rules.ProvenHeaderRules
 
             uint256 previousStakeModifier = this.GetPreviousStakeModifier(chainedHeader);
 
-            if (previousStakeModifier == null)
-            {
-                this.Logger.LogTrace("(-)[MODIF_IS_NULL]");
-                ConsensusErrors.InvalidPreviousProvenHeaderStakeModifier.Throw();
-            }
-
             if (header.Coinstake.IsCoinStake)
             {
                 this.Logger.LogTrace("Found coinstake checking kernal hash.");
-                this.stakeValidator.CheckStakeKernelHash(context, headerBits, previousStakeModifier, stakingCoins, prevOut, transactionTime);
+
+                var validKernel = this.stakeValidator.CheckStakeKernelHash(context, headerBits, previousStakeModifier, stakingCoins, prevOut, transactionTime);
+
+                if (!validKernel)
+                {
+                    this.Logger.LogTrace("(-)[INVALID_STAKE_HASH_TARGET]");
+                    ConsensusErrors.StakeHashInvalidTarget.Throw();
+                }
             }
 
             this.ComputeNextStakeModifier(header, chainedHeader, previousStakeModifier);
@@ -324,13 +328,8 @@ namespace Xels.Bitcoin.Features.Consensus.Rules.ProvenHeaderRules
         /// </exception>
         private void CheckHeaderSignatureWithCoinstakeKernel(ProvenBlockHeader header)
         {
-            Script script = header.Coinstake.Outputs[1].ScriptPubKey;
-            PubKey pubKey = PayToPubkeyTemplate.Instance.ExtractScriptPubKeyParameters(script);
-
-            var signature = new ECDSASignature(header.Signature.Signature);
-            uint256 headerHash = header.GetHash();
-
-            if (!pubKey.Verify(headerHash, signature))
+            var consensusRules = (PosConsensusRuleEngine)this.Parent;
+            if (!consensusRules.StakeValidator.CheckStakeSignature(header.Signature, header.GetHash(), header.Coinstake))
             {
                 this.Logger.LogTrace("(-)[BAD_HEADER_SIGNATURE]");
                 ConsensusErrors.BadBlockSignature.Throw();
@@ -356,7 +355,7 @@ namespace Xels.Bitcoin.Features.Consensus.Rules.ProvenHeaderRules
                 ConsensusErrors.ReadTxPrevFailedInsufficient.Throw();
             }
 
-            RewindData rewindData = this.PosParent.UtxoSet.GetRewindData(rewindDataIndex.Value).GetAwaiter().GetResult();
+            RewindData rewindData = this.PosParent.UtxoSet.GetRewindData(rewindDataIndex.Value);
 
             if (rewindData == null)
             {

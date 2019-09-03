@@ -3,8 +3,10 @@ using NBitcoin;
 using Xels.Bitcoin.Builder;
 using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Consensus;
+using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
+using Xels.Bitcoin.Features.Consensus.Rules;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.Miner;
 using Xels.Bitcoin.Features.Miner.Controllers;
@@ -36,9 +38,16 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoW
                     services.AddSingleton<DBreezeCoinView>();
                     services.AddSingleton<ICoinView, CachedCoinView>();
                     services.AddSingleton<ConsensusController>();
-                    services.AddSingleton<IConsensusRuleEngine, SmartContractPowConsensusRuleEngine>();
 
-                    new SmartContractPowRuleRegistration(fullNodeBuilder.Network).RegisterRules(fullNodeBuilder.Network.Consensus);
+                    services.AddSingleton<PowConsensusRuleEngine>();
+                    services.AddSingleton<IRuleRegistration, SmartContractPowRuleRegistration>();
+                    services.AddSingleton<IConsensusRuleEngine>(f =>
+                    {
+                        var concreteRuleEngine = f.GetService<PowConsensusRuleEngine>();
+                        var ruleRegistration = f.GetService<IRuleRegistration>();
+
+                        return new DiConsensusRuleEngine(concreteRuleEngine, ruleRegistration);
+                    });
                 });
             });
 

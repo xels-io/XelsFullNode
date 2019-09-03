@@ -4,8 +4,8 @@ using NBitcoin;
 using NBitcoin.DataEncoders;
 using NBitcoin.Protocol;
 using Xels.Bitcoin.Features.PoA;
-using Xels.Bitcoin.Features.SmartContracts;
 using Xels.Bitcoin.Features.SmartContracts.PoA;
+using Xels.SmartContracts.Networks.Policies;
 
 namespace Xels.SmartContracts.Networks
 {
@@ -19,6 +19,7 @@ namespace Xels.SmartContracts.Networks
         public SmartContractsPoARegTest()
         {
             this.Name = "SmartContractsPoARegTest";
+            this.NetworkType = NetworkType.Regtest;
             this.CoinTicker = "SCPOA";
 
             var consensusFactory = new SmartContractPoAConsensusFactory();
@@ -43,10 +44,10 @@ namespace Xels.SmartContracts.Networks
                 //new Mnemonic("high neither night category fly wasp inner kitchen phone current skate hair").DeriveExtKey().PrivateKey
             };
 
-            var federationPubKeys = new List<PubKey>
+            var genesisFederationMembers = new List<IFederationMember>
             {
-                this.FederationKeys[0].PubKey, // 029528e83f065153d7fa655e73a07fc96fc759162f1e2c8936fa592f2942f39af0
-                this.FederationKeys[1].PubKey, // 03b539807c64abafb2d14c52a0d1858cc29d7c7fad0598f92a1274789c18d74d2d
+                new FederationMember(this.FederationKeys[0].PubKey), // 029528e83f065153d7fa655e73a07fc96fc759162f1e2c8936fa592f2942f39af0
+                new FederationMember(this.FederationKeys[1].PubKey), // 03b539807c64abafb2d14c52a0d1858cc29d7c7fad0598f92a1274789c18d74d2d
                 // this.FederationKeys[2].PubKey  // 02d6792cf941b68edd1e9056653573917cbaf974d46e9eeb9801d6fcedf846477a
             };
 
@@ -56,8 +57,10 @@ namespace Xels.SmartContracts.Networks
                 maxStandardTxWeight: 100_000,
                 maxBlockSigopsCost: 20_000,
                 maxStandardTxSigopsCost: 20_000 / 5,
-                federationPublicKeys: federationPubKeys,
-                targetSpacingSeconds: 3
+                genesisFederationMembers: genesisFederationMembers,
+                targetSpacingSeconds: 60,
+                votingEnabled: true,
+                autoKickIdleMembers: false
             );
 
             var buriedDeployments = new BuriedDeploymentsArray
@@ -83,7 +86,7 @@ namespace Xels.SmartContracts.Networks
                 bip34Hash: new uint256("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8"),
                 ruleChangeActivationThreshold: 1916, // 95% of 2016
                 minerConfirmationWindow: 2016, // nPowTargetTimespan / nPowTargetSpacing
-                maxReorgLength: 0, // No max reorg limit on PoA networks.
+                maxReorgLength: 500,
                 defaultAssumeValid: null,
                 maxMoney: long.MaxValue,
                 coinbaseMaturity: 1,
@@ -93,6 +96,7 @@ namespace Xels.SmartContracts.Networks
                 powTargetTimespan: TimeSpan.FromSeconds(14 * 24 * 60 * 60), // two weeks
                 powTargetSpacing: TimeSpan.FromSeconds(60),
                 powAllowMinDifficultyBlocks: false,
+                posNoRetargeting: true,
                 powNoRetargeting: true,
                 powLimit: null,
                 minimumChainWork: null,
@@ -127,6 +131,8 @@ namespace Xels.SmartContracts.Networks
 
             this.DNSSeeds = new List<DNSSeedData>();
             this.SeedNodes = new List<NetworkAddress>();
+
+            this.StandardScriptsRegistry = new SmartContractsStandardScriptsRegistry();
 
             // TODO: Do we need Asserts for block hash
         }

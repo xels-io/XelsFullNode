@@ -1751,6 +1751,7 @@
       "path": "runtime.native.system.security.cryptography/4.0.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
@@ -2718,6 +2719,7 @@
       "path": "system.globalization.extensions/4.0.1",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -3050,7 +3052,7 @@
       ]
     },
     "System.Net.Http/4.1.0": {
-      "sha512": "Ve8vcneE50S6BpvAzdFYbtcUy5I5q3JMZQYpBV9PLp+ISTr9F26DPUbRSTl0qOlcgFxO1NmJ8JXW3vjTkyL9fA==",
+      "sha512": "ULq9g3SOPVuupt+Y3U+A37coXzdNisB1neFCSKzBwo182u0RDddKJF8I5+HfyXqK6OhJPgeoAwWXrbiUXuRDsg==",
       "type": "package",
       "path": "system.net.http/4.1.0",
       "files": [
@@ -4067,7 +4069,7 @@
       ]
     },
     "System.Runtime.Serialization.Primitives/4.1.1": {
-      "sha512": "+mqQrrJsDx5yxIq+wLYKHr6pVc08ETOzJFwE3QvWmEwM4CU5RNKGdqu47bk+HGScaT58ZCVFmjwpp0OBUxy1QA==",
+      "sha512": "HZ6Du5QrTG8MNJbf4e4qMO3JRAkIboGT5Fk804uZtg3Gq516S7hAqTm2UZKUHa7/6HUGdVy3AqMQKbns06G/cg==",
       "type": "package",
       "path": "system.runtime.serialization.primitives/4.1.1",
       "files": [
@@ -5155,11 +5157,11 @@
   "project": {
     "version": "3.0.0.4-beta",
     "restore": {
-      "projectUniqueName": "F:\\XelsPublicRepos\\XelsFullNode\\FodyNlogAdapter\\FodyNlogAdapter.csproj",
+      "projectUniqueName": "F:\\XelCodeRepo\\XelsCore-master\\XelsBitcoinFullNode\\src\\FodyNlogAdapter\\FodyNlogAdapter.csproj",
       "projectName": "Xels.FodyNlogAdapter",
-      "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\FodyNlogAdapter\\FodyNlogAdapter.csproj",
+      "projectPath": "F:\\XelCodeRepo\\XelsCore-master\\XelsBitcoinFullNode\\src\\FodyNlogAdapter\\FodyNlogAdapter.csproj",
       "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-      "outputPath": "F:\\XelsPublicRepos\\XelsFullNode\\FodyNlogAdapter\\obj\\",
+      "outputPath": "F:\\XelCodeRepo\\XelsCore-master\\XelsBitcoinFullNode\\src\\FodyNlogAdapter\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

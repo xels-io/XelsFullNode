@@ -1,6 +1,4 @@
-﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using Xels.Bitcoin.Controllers.Converters;
 
 namespace Xels.Bitcoin.Features.Wallet.Models

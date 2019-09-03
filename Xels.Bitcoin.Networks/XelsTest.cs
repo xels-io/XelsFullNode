@@ -5,6 +5,7 @@ using NBitcoin;
 using NBitcoin.BouncyCastle.Math;
 using NBitcoin.Protocol;
 using Xels.Bitcoin.Networks.Deployments;
+using Xels.Bitcoin.Networks.Policies;
 
 namespace Xels.Bitcoin.Networks
 {
@@ -23,12 +24,14 @@ namespace Xels.Bitcoin.Networks
             uint magic = BitConverter.ToUInt32(messageStart, 0); // 0x11213171;
 
             this.Name = "XelsTest";
+            this.NetworkType = NetworkType.Testnet;
             this.Magic = magic;
             this.DefaultPort = 38221;
             this.DefaultMaxOutboundConnections = 16;
             this.DefaultMaxInboundConnections = 109;
-            this.RPCPort = 26174;
-            this.CoinTicker = "XELS";
+            this.DefaultRPCPort = 26174;
+            this.DefaultAPIPort = 38221;
+            this.CoinTicker = "TXELS";
 
             var powLimit = new Target(new uint256("0000ffff00000000000000000000000000000000000000000000000000000000"));
 
@@ -69,7 +72,7 @@ namespace Xels.Bitcoin.Networks
             {
                 [XelsBIP9Deployments.ColdStaking] = new BIP9DeploymentsParameters(2,
                     new DateTime(2018, 11, 1, 0, 0, 0, DateTimeKind.Utc),
-                    new DateTime(2019, 2, 1, 0, 0, 0, DateTimeKind.Utc))
+                    new DateTime(2019, 6, 1, 0, 0, 0, DateTimeKind.Utc))
             };
 
             this.Consensus = new NBitcoin.Consensus(
@@ -87,55 +90,59 @@ namespace Xels.Bitcoin.Networks
                 ruleChangeActivationThreshold: 1916, // 95% of 2016
                 minerConfirmationWindow: 2016, // nPowTargetTimespan / nPowTargetSpacing
                 maxReorgLength: 500,
+                //defaultAssumeValid: new uint256("0xc9a15c9dd87c6219b273f93442b87fdaf9eebb4f3059d8ed8239c41a4ab3e730"), // 780785
                 defaultAssumeValid: new uint256("0x00000e246d7b73b88c9ab55f2e5e94d9e22d471def3df5ea448f5576b1d156b9"), // 372652
                 maxMoney: 2537175000 * Money.COIN,  //long.MaxValue,
-                coinbaseMaturity: 1,
-                premineHeight: 10,
+                coinbaseMaturity: 1, //10,
+                premineHeight: 13, //2,
                 firstMiningPeriodHeight: 850000,
                 secondMiningPeriodHeight: 850000 + 500000,
                 thirdMiningPeriodHeight: 850000 + 500000 + 850000,
                 forthMiningPeriodHeight: 850000 + 500000 + 850000 + 500000,
-                premineReward: Money.Coins(187155000),
-                proofOfWorkReward: Money.Coins(375),
-                powTargetTimespan: TimeSpan.FromSeconds(24 * 60 * 60), // two weeks
-                powTargetSpacing: TimeSpan.FromSeconds(150),
+                premineReward: Money.Coins(187155000),  //Money.Coins(98000000),
+                proofOfWorkReward: Money.Coins(375), //(4),
+                powTargetTimespan: TimeSpan.FromSeconds(24 * 60 * 60), //(14 * 24 * 60 * 60), // two weeks
+                powTargetSpacing: TimeSpan.FromSeconds(150), //(10 * 60),
                 powAllowMinDifficultyBlocks: false,
+                posNoRetargeting: false,
                 powNoRetargeting: false,
                 powLimit: powLimit,
                 minimumChainWork: null,
                 isProofOfStake: true,
-                lastPowBlock: 10,
+                lastPowBlock: 3, //12500,
                 proofOfStakeLimit: new BigInteger(uint256.Parse("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff").ToBytes(false)),
                 proofOfStakeLimitV2: new BigInteger(uint256.Parse("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff").ToBytes(false)),
-                proofOfStakeReward: Money.Coins(375)
+                proofOfStakeReward: Money.Coins(375) //.COIN
             );
 
-            this.Base58Prefixes = new byte[12][];
-            this.Base58Prefixes[(int)Base58Type.PUBKEY_ADDRESS] = new byte[] { (75) };      // 75 for capital X
-            this.Base58Prefixes[(int)Base58Type.SCRIPT_ADDRESS] = new byte[] { (137) };     // 137 for small x
-            this.Base58Prefixes[(int)Base58Type.SECRET_KEY] = new byte[] { (63 + 128) };
-            this.Base58Prefixes[(int)Base58Type.ENCRYPTED_SECRET_KEY_NO_EC] = new byte[] { 0x01, 0x42 };
-            this.Base58Prefixes[(int)Base58Type.ENCRYPTED_SECRET_KEY_EC] = new byte[] { 0x01, 0x43 };
-            this.Base58Prefixes[(int)Base58Type.EXT_PUBLIC_KEY] = new byte[] { (0x04), (0x88), (0xB2), (0x1E) };
-            this.Base58Prefixes[(int)Base58Type.EXT_SECRET_KEY] = new byte[] { (0x04), (0x88), (0xAD), (0xE4) };
-            this.Base58Prefixes[(int)Base58Type.PASSPHRASE_CODE] = new byte[] { 0x2C, 0xE9, 0xB3, 0xE1, 0xFF, 0x39, 0xE2 };
-            this.Base58Prefixes[(int)Base58Type.CONFIRMATION_CODE] = new byte[] { 0x64, 0x3B, 0xF6, 0xA8, 0x9A };
-            this.Base58Prefixes[(int)Base58Type.STEALTH_ADDRESS] = new byte[] { 0x2a };
-            this.Base58Prefixes[(int)Base58Type.ASSET_ID] = new byte[] { 23 };
-            this.Base58Prefixes[(int)Base58Type.COLORED_ADDRESS] = new byte[] { 0x13 };
-
+            this.Base58Prefixes[(int)Base58Type.PUBKEY_ADDRESS] = new byte[] { (75) };      // 75 for capital X    { (65) };
+            this.Base58Prefixes[(int)Base58Type.SCRIPT_ADDRESS] = new byte[] { (137) };     // 137 for small x    { (196) };
+            this.Base58Prefixes[(int)Base58Type.SECRET_KEY] = new byte[] { (65 + 128) };
 
             this.Checkpoints = new Dictionary<int, CheckpointInfo>
             {
+                //{ 0, new CheckpointInfo(new uint256("0x0000033ab02dbdf95788721b78fcbaac559fde8bdc0948ad2dbeeedf45c99c4e"), new uint256("0x0000000000000000000000000000000000000000000000000000000000000000")) }
                 { 0, new CheckpointInfo(new uint256("0x00000e246d7b73b88c9ab55f2e5e94d9e22d471def3df5ea448f5576b1d156b9"), new uint256("0x0000000000000000000000000000000000000000000000000000000000000000")) }
             };
 
-            this.DNSSeeds = new List<DNSSeedData>
-            {
-                new DNSSeedData("", "")
-            };
+            this.DNSSeeds = new List<DNSSeedData>();
+            //this.DNSSeeds = new List<DNSSeedData>
+            //{
+            //    new DNSSeedData("testnet1.xelsplatform.com", "testnet1.xelsplatform.com"),
+            //    new DNSSeedData("testnet2.xelsplatform.com", "testnet2.xelsplatform.com"),
+            //    new DNSSeedData("testnet3.xelsplatform.com", "testnet3.xelsplatform.com"),
+            //    new DNSSeedData("testnet4.xelsplatform.com", "testnet4.xelsplatform.com")
+            //};
 
             this.SeedNodes = new List<NetworkAddress>();
+            //this.SeedNodes = new List<NetworkAddress>
+            //{
+            //    new NetworkAddress(IPAddress.Parse("51.140.231.125"), 26178), // danger cloud node
+            //    new NetworkAddress(IPAddress.Parse("13.70.81.5"), 26178), // beard cloud node
+            //    new NetworkAddress(IPAddress.Parse("191.235.85.131"), 26178), // fassa cloud node
+            //};
+
+            this.StandardScriptsRegistry = new XelsStandardScriptsRegistry();
 
             Assert(this.Consensus.HashGenesisBlock == uint256.Parse("0x00000e246d7b73b88c9ab55f2e5e94d9e22d471def3df5ea448f5576b1d156b9"));
         }

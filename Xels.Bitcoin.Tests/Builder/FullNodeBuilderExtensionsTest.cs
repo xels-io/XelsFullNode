@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Xels.Bitcoin.Builder;
 using Xels.Bitcoin.Builder.Feature;
 using Xels.Bitcoin.Configuration;
-using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Tests.Common;
 using Xunit;
 

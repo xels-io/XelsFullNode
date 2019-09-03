@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Xels.Bitcoin.IntegrationTests.Miners;
 using Xels.Bitcoin.IntegrationTests.Wallet;
 using Xunit;
 

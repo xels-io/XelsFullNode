@@ -115,7 +115,7 @@
     public class PosConsensusOptions : ConsensusOptions
     {
         /// <summary>Coinstake minimal confirmations softfork activation height for mainnet.</summary>
-        public const int CoinstakeMinConfirmationActivationHeightMainnet = 5000;
+        public const int CoinstakeMinConfirmationActivationHeightMainnet = 1005000;
 
         /// <summary>Coinstake minimal confirmations softfork activation height for testnet.</summary>
         public const int CoinstakeMinConfirmationActivationHeightTestnet = 436000;
@@ -182,7 +182,7 @@
         public virtual int GetStakeMinConfirmations(int height, Network network)
         {
             if (network.Name.ToLowerInvariant().Contains("test")) // TODO: When rules are moved to network, we can use the extension method IsTest() from Xels.Bitcoin.
-                return height < CoinstakeMinConfirmationActivationHeightTestnet ? 10 : 20;
+                return height < CoinstakeMinConfirmationActivationHeightTestnet ? 1 : 1;
 
             return height < CoinstakeMinConfirmationActivationHeightMainnet ? 1 : 1;
         }

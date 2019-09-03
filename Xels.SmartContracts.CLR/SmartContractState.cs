@@ -12,7 +12,6 @@ namespace Xels.SmartContracts.CLR
             IMessage message,
             IPersistentState persistentState,
             ISerializer serializer,
-            IGasMeter gasMeter,
             IContractLogger contractLogger,
             IInternalTransactionExecutor internalTransactionExecutor,
             IInternalHashHelper internalHashHelper,
@@ -22,7 +21,6 @@ namespace Xels.SmartContracts.CLR
             this.Message = message;
             this.PersistentState = persistentState;
             this.Serializer = serializer;
-            this.GasMeter = gasMeter;
             this.ContractLogger = contractLogger;
             this.InternalTransactionExecutor = internalTransactionExecutor;
             this.InternalHashHelper = internalHashHelper;
@@ -37,8 +35,6 @@ namespace Xels.SmartContracts.CLR
 
         public ISerializer Serializer { get; }
 
-        public IGasMeter GasMeter { get; }
-
         public IContractLogger ContractLogger { get; }
 
         public IInternalTransactionExecutor InternalTransactionExecutor { get; }
@@ -46,5 +42,7 @@ namespace Xels.SmartContracts.CLR
         public IInternalHashHelper InternalHashHelper { get; }
 
         public Func<ulong> GetBalance { get; }
+
+        public IGasMeter GasMeter => throw new NotImplementedException();
     }
 }

@@ -3,12 +3,12 @@ using System.Linq;
 using NBitcoin;
 using Xels.Bitcoin.Features.SmartContracts;
 using Xels.Bitcoin.Features.SmartContracts.Models;
-using Xels.SmartContracts.Core;
-using Xels.SmartContracts.Core.Util;
 using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.CLR.Compilation;
 using Xels.SmartContracts.CLR.Local;
 using Xels.SmartContracts.CLR.Serialization;
+using Xels.SmartContracts.Core;
+using Xels.SmartContracts.Core.Util;
 using Xels.SmartContracts.Tests.Common.MockChain;
 using Xunit;
 
@@ -32,7 +32,7 @@ namespace Xels.SmartContracts.IntegrationTests
             this.senderRetriever = new SenderRetriever();
         }
 
-        [Retry]
+        [Fact]
         public void InternalTransfer_ToWalletAddress()
         {
             // Ensure fixture is funded.
@@ -46,7 +46,7 @@ namespace Xels.SmartContracts.IntegrationTests
             this.mockChain.MineBlocks(1);
             Assert.NotNull(this.node1.GetCode(preResponse.NewContractAddress));
 
-            double amount = 25;
+            decimal amount = 25;
             Money senderBalanceBefore = this.node1.WalletSpendableBalance;
             uint256 currentHash = this.node1.GetLastBlock().GetHash();
 
@@ -113,7 +113,7 @@ namespace Xels.SmartContracts.IntegrationTests
             this.mockChain.MineBlocks(1);
             Assert.NotNull(this.node1.GetCode(preResponse.NewContractAddress));
 
-            double amount = 25;
+            decimal amount = 25;
             Money senderBalanceBefore = this.node1.WalletSpendableBalance;
             uint256 currentHash = this.node1.GetLastBlock().GetHash();
 
@@ -174,7 +174,7 @@ namespace Xels.SmartContracts.IntegrationTests
             // Ensure fixture is funded.
             this.mockChain.MineBlocks(1);
 
-            double amount = 25;
+            decimal amount = 25;
             Money senderBalanceBefore = this.node1.WalletSpendableBalance;
             uint256 currentHash = this.node1.GetLastBlock().GetHash();
 
@@ -248,7 +248,7 @@ namespace Xels.SmartContracts.IntegrationTests
             this.mockChain.MineBlocks(1);
             Assert.NotNull(this.node1.GetCode(preResponse.NewContractAddress));
 
-            double amount = 25;
+            decimal amount = 25;
             Money senderBalanceBefore = this.node1.WalletSpendableBalance;
             uint256 currentHash = this.node1.GetLastBlock().GetHash();
             string[] parameters = new string[]
@@ -301,7 +301,7 @@ namespace Xels.SmartContracts.IntegrationTests
             // Ensure fixture is funded.
             this.mockChain.MineBlocks(1);
 
-            double amount = 25;
+            decimal amount = 25;
 
             // Deploy contract
             ContractCompilationResult compilationResult = ContractCompiler.CompileFile("SmartContracts/MultipleNestedCalls.cs");
@@ -352,7 +352,7 @@ namespace Xels.SmartContracts.IntegrationTests
             this.mockChain.MineBlocks(1);
             Assert.NotNull(this.node1.GetCode(preResponse.NewContractAddress));
 
-            double amount = 25;
+            decimal amount = 25;
             Money senderBalanceBefore = this.node1.WalletSpendableBalance;
             uint256 currentHash = this.node1.GetLastBlock().GetHash();
 
@@ -407,7 +407,7 @@ namespace Xels.SmartContracts.IntegrationTests
             // Ensure fixture is funded.
             this.mockChain.MineBlocks(1);
 
-            double amount = 25;
+            decimal amount = 25;
 
             // Deploy contract
             ContractCompilationResult compilationResult = ContractCompiler.CompileFile("SmartContracts/NonceTest.cs");
@@ -490,7 +490,7 @@ namespace Xels.SmartContracts.IntegrationTests
             // Ensure fixture is funded.
             this.mockChain.MineBlocks(1);
 
-            double amount = 25;
+            decimal amount = 25;
 
             // Deploy contract
             ContractCompilationResult compilationResult = ContractCompiler.CompileFile("SmartContracts/BalanceTest.cs");
@@ -543,7 +543,7 @@ namespace Xels.SmartContracts.IntegrationTests
             // Ensure fixture is funded.
             this.mockChain.MineBlocks(1);
 
-            double amount = 25;
+            decimal amount = 25;
 
             // Deploy contract
             ContractCompilationResult compilationResult = ContractCompiler.CompileFile("SmartContracts/ReceiveFundsTest.cs");
@@ -638,7 +638,7 @@ namespace Xels.SmartContracts.IntegrationTests
             this.mockChain.MineBlocks(1);
             Assert.NotNull(this.node1.GetCode(preResponse.NewContractAddress));
 
-            double amount = 0;
+            decimal amount = 0;
 
             // Send amount to contract, which will send to wallet address (address without code)
             var base58Address = this.node1.MinerAddress.Address;

@@ -2,9 +2,11 @@
 using Xels.Bitcoin.Builder;
 using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Consensus;
+using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.Interfaces;
+using Xels.Bitcoin.Features.Consensus.Rules;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.Miner;
 using Xels.Bitcoin.Features.Miner.Controllers;
@@ -37,9 +39,15 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoS
                         services.AddSingleton<StakeChainStore>().AddSingleton<IStakeChain, StakeChainStore>(provider => provider.GetService<StakeChainStore>());
                         services.AddSingleton<IStakeValidator, StakeValidator>();
                         services.AddSingleton<ConsensusController>();
-                        services.AddSingleton<IConsensusRuleEngine, SmartContractPosConsensusRuleEngine>();
 
-                        new SmartContractPosRuleRegistration().RegisterRules(fullNodeBuilder.Network.Consensus);
+                        services.AddSingleton<PosConsensusRuleEngine>();
+                        services.AddSingleton<IConsensusRuleEngine>(f =>
+                        {
+                            var concreteRuleEngine = f.GetService<PosConsensusRuleEngine>();
+                            var ruleRegistration = f.GetService<IRuleRegistration>();
+
+                            return new DiConsensusRuleEngine(concreteRuleEngine, ruleRegistration);
+                        });
                     });
             });
 

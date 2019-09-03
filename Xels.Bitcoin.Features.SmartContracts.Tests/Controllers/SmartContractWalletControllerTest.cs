@@ -7,16 +7,15 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NBitcoin;
 using Xels.Bitcoin.Connection;
-using Xels.Bitcoin.Features.SmartContracts.Networks;
 using Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Consensus.Rules;
 using Xels.Bitcoin.Features.SmartContracts.Wallet;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.Tests.Wallet.Common;
-using Xels.SmartContracts;
 using Xels.SmartContracts.Core.Receipts;
 using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.CLR.Serialization;
+using Xels.SmartContracts.Networks;
 using Xunit;
 
 namespace Xels.Bitcoin.Features.SmartContracts.Tests.Controllers
@@ -49,8 +48,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Controllers
         {
             ulong gasPrice = SmartContractMempoolValidator.MinGasPrice;
             int vmVersion = 1;
-            Gas gasLimit = (Gas)(SmartContractFormatRule.GasLimitMaximum / 2);
-            var contractTxData = new ContractTxData(vmVersion, gasPrice, gasLimit,new byte[]{0, 1, 2, 3});
+            var gasLimit = (Xels.SmartContracts.RuntimeObserver.Gas)(SmartContractFormatLogic.GasLimitMaximum / 2);
+            var contractTxData = new ContractTxData(vmVersion, gasPrice, gasLimit, new byte[]{0, 1, 2, 3});
             var callDataSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(new SmartContractsRegTest()));
             var contractCreateScript = new Script(callDataSerializer.Serialize(contractTxData));
 
@@ -91,10 +90,11 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Controllers
             this.walletManager.Setup(w => w.GetWalletByName(walletName)).Returns(wallet);
             this.walletManager.Setup(w => w.GetAccounts(walletName)).Returns(new List<HdAccount> {account});
 
+            var receipt = new Receipt(null, 12345, new Log[0], null, null, null, uint160.Zero, true, null, null, 2, 100000);
             this.receiptRepository.Setup(x => x.Retrieve(It.IsAny<uint256>()))
-                .Returns(new Receipt(null, 0, new Log[0], null, null, null, uint160.Zero, true, null, null));
+                .Returns(receipt);
             this.callDataSerializer.Setup(x => x.Deserialize(It.IsAny<byte[]>()))
-                .Returns(Result.Ok(new ContractTxData(0, 0, (Gas) 0, new uint160(0), null, null)));
+                .Returns(Result.Ok(new ContractTxData(0, 0, (Xels.SmartContracts.RuntimeObserver.Gas) 0, new uint160(0), null, null)));
 
             var controller = new SmartContractWalletController(
                 this.broadcasterManager.Object,
@@ -112,66 +112,18 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Controllers
             var model = viewResult.Value as IEnumerable<ContractTransactionItem>;
 
             Assert.NotNull(model);
-            Assert.Equal(3, model.Count());
+            Assert.Equal(1, model.Count());
 
-            ContractTransactionItem resultingTransaction = model.ElementAt(2);
+            ContractTransactionItem resultingTransaction = model.ElementAt(0);
 
             ContractTransactionItem resultingCreate = model.ElementAt(0);
-            Assert.Equal(ContractTransactionItemType.ContractCreate, resultingCreate.Type);
-            Assert.Equal(createTransaction.SpendingDetails.TransactionId, resultingCreate.Hash);
-            Assert.Equal(createTransaction.SpendingDetails.Payments.First().Amount.ToUnit(MoneyUnit.Satoshi), resultingCreate.Amount);
-            Assert.Equal(uint160.Zero.ToBase58Address(this.network), resultingCreate.To);
-            Assert.Equal(createTransaction.SpendingDetails.BlockHeight, resultingCreate.BlockHeight);
-
-            Assert.Equal(ContractTransactionItemType.Received, resultingTransaction.Type);
-            Assert.Equal(address.Address, resultingTransaction.To);
-            Assert.Equal(normalTransaction.Id, resultingTransaction.Hash);
-            Assert.Equal(normalTransaction.Amount.ToUnit(MoneyUnit.Satoshi), resultingTransaction.Amount);
-            Assert.Equal(1, resultingTransaction.BlockHeight);
-        }
-
-        [Fact]
-        public void ReceivedType_Is_Receive()
-        {
-            var transactionData = new TransactionData();
-            transactionData.IsCoinBase = false;
-            transactionData.Index = 1;
-
-            Assert.Equal(ContractTransactionItemType.Received, SmartContractWalletController.ReceivedTransactionType(transactionData));
-        }
-
-        [Fact]
-        public void ReceivedType_Is_Receive_Null_Coinbase()
-        {
-            var transactionData = new TransactionData();
-            transactionData.IsCoinBase = null;
-
-            // Should be true for all indexes
-            for (var i = 0; i < 10; i++)
-            {
-                transactionData.Index = i;
-                Assert.Equal(ContractTransactionItemType.Received, SmartContractWalletController.ReceivedTransactionType(transactionData));
-            }
-        }
-
-        [Fact]
-        public void ReceivedType_Is_GasRefund()
-        {
-            var transactionData = new TransactionData();
-            transactionData.IsCoinBase = true;
-            transactionData.Index = 1;
-
-            Assert.Equal(ContractTransactionItemType.GasRefund, SmartContractWalletController.ReceivedTransactionType(transactionData));
-        }
-
-        [Fact]
-        public void ReceivedType_Is_MiningReward()
-        {
-            var transactionData = new TransactionData();
-            transactionData.IsCoinBase = true;
-            transactionData.Index = 0;
-
-            Assert.Equal(ContractTransactionItemType.Staked, SmartContractWalletController.ReceivedTransactionType(transactionData));
+            Assert.Equal(ContractTransactionItemType.ContractCreate, resultingTransaction.Type);
+            Assert.Equal(createTransaction.SpendingDetails.TransactionId, resultingTransaction.Hash);
+            Assert.Equal(createTransaction.SpendingDetails.Payments.First().Amount.ToUnit(MoneyUnit.Satoshi), resultingTransaction.Amount);
+            Assert.Equal(uint160.Zero.ToBase58Address(this.network), resultingTransaction.To);
+            Assert.Equal(createTransaction.SpendingDetails.BlockHeight, resultingTransaction.BlockHeight);
+            Assert.Equal((createTransaction.Amount - createTransaction.SpendingDetails.Payments.First().Amount).ToUnit(MoneyUnit.Satoshi), resultingTransaction.TransactionFee);
+            Assert.Equal(receipt.GasPrice * receipt.GasUsed, resultingTransaction.GasFee);
         }
     }
 }

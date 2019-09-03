@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DBreeze.Utils;
 using NBitcoin;
-using NBitcoin.BitcoinCore;
 
 namespace Xels.Bitcoin.Utilities
 {
@@ -11,12 +11,12 @@ namespace Xels.Bitcoin.Utilities
     /// </summary>
     public class DBreezeSerializer
     {
-        public DBreezeSerializer(Network network)
-        {
-            this.Network = network;
-        }
+        private readonly ConsensusFactory consensusFactory;
 
-        public Network Network { get; }
+        public DBreezeSerializer(ConsensusFactory consensusFactory)
+        {
+            this.consensusFactory = consensusFactory;
+        }
 
         /// <summary>
         /// Serializes object to a binary data format.
@@ -25,28 +25,25 @@ namespace Xels.Bitcoin.Utilities
         /// <returns>Binary data representing the serialized object.</returns>
         public byte[] Serialize(object obj)
         {
-            var serializable = obj as IBitcoinSerializable;
-            if (serializable != null)
-                return serializable.ToBytes(this.Network.Consensus.ConsensusFactory);
+            if (obj is IBitcoinSerializable serializable)
+                return serializable.ToBytes(this.consensusFactory);
 
-            var u256 = obj as uint256;
-            if (u256 != null)
+            if (obj is uint256 u256)
                 return u256.ToBytes();
 
-            var u160 = obj as uint160;
-            if (u160 != null)
+            if (obj is uint160 u160)
                 return u160.ToBytes();
 
-            var u32 = obj as uint?;
-            if (u32 != null)
+            if (obj is uint u32)
                 return u32.ToBytes();
 
-            var arr = obj as object[];
-            if (arr != null)
+            if (obj is IEnumerable<object> collection)
             {
-                var serializedItems = new byte[arr.Length][];
+                object[] array = obj as object[] ?? collection.ToArray();
+
+                var serializedItems = new byte[array.Length][];
                 int itemIndex = 0;
-                foreach (object arrayObject in arr)
+                foreach (object arrayObject in array)
                 {
                     byte[] serializedObject = this.Serialize(arrayObject);
                     serializedItems[itemIndex] = serializedObject;
@@ -91,52 +88,45 @@ namespace Xels.Bitcoin.Utilities
         /// <returns>Deserialized object.</returns>
         public object Deserialize(byte[] bytes, Type type)
         {
-            if (type == typeof(Coins))
-            {
-                var coin = new Coins();
-                coin.ReadWrite(bytes, this.Network.Consensus.ConsensusFactory);
-                return coin;
-            }
-
             if (type == typeof(BlockHeader))
             {
-                BlockHeader header = this.Network.Consensus.ConsensusFactory.CreateBlockHeader();
-                header.ReadWrite(bytes, this.Network.Consensus.ConsensusFactory);
+                BlockHeader header = this.consensusFactory.CreateBlockHeader();
+                header.ReadWrite(bytes, this.consensusFactory);
                 return header;
             }
 
-            if (type == typeof(RewindData))
+            if (type == typeof(Transaction))
             {
-                var rewind = new RewindData();
-                rewind.ReadWrite(bytes, this.Network.Consensus.ConsensusFactory);
-                return rewind;
+                Transaction transaction = this.consensusFactory.CreateTransaction();
+                transaction.ReadWrite(bytes, this.consensusFactory);
+                return transaction;
             }
 
             if (type == typeof(uint256))
                 return new uint256(bytes);
 
             if (type == typeof(Block))
-                return Block.Load(bytes, this.Network);
+                return Block.Load(bytes, this.consensusFactory);
 
             if (type == typeof(BlockStake))
-                return BlockStake.Load(bytes, this.Network);
-
-            if (type == typeof(HashHeightPair))
-                return HashHeightPair.Load(bytes);
+                return BlockStake.Load(bytes, this.consensusFactory);
 
             if (type == typeof(ProvenBlockHeader))
             {
                 ProvenBlockHeader provenBlockHeader =
-                    ((PosConsensusFactory)this.Network.Consensus.ConsensusFactory).CreateProvenBlockHeader();
+                    ((PosConsensusFactory)this.consensusFactory).CreateProvenBlockHeader();
 
-                provenBlockHeader.ReadWrite(bytes, this.Network.Consensus.ConsensusFactory);
+                provenBlockHeader.ReadWrite(bytes, this.consensusFactory);
                 return provenBlockHeader;
             }
+
+            if (type == typeof(HashHeightPair))
+                return HashHeightPair.Load(bytes, this.consensusFactory);
 
             if (typeof(IBitcoinSerializable).IsAssignableFrom(type))
             {
                 var result = (IBitcoinSerializable)Activator.CreateInstance(type);
-                result.ReadWrite(bytes);
+                result.ReadWrite(bytes, this.consensusFactory);
                 return result;
             }
 

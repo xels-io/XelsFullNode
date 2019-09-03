@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Xels.Bitcoin.Consensus.Rules;
 
 namespace Xels.Bitcoin.Features.Consensus.Rules.CommonRules

@@ -12,15 +12,19 @@ using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Consensus.Rules;
+using Xels.Bitcoin.Features.BlockStore;
 using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
 using Xels.Bitcoin.Features.Miner;
-using Xels.Bitcoin.Features.PoA.ConsensusRules;
+using Xels.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules;
+using Xels.Bitcoin.Features.PoA.Behaviors;
+using Xels.Bitcoin.Features.PoA.Voting;
+using Xels.Bitcoin.Features.PoA.Voting.ConsensusRules;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P.Peer;
+using Xels.Bitcoin.P2P.Protocol.Behaviors;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
-using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin.Features.PoA
 {
@@ -30,9 +34,9 @@ namespace Xels.Bitcoin.Features.PoA
         private readonly IConnectionManager connectionManager;
 
         /// <summary>Thread safe chain of block headers from genesis.</summary>
-        private readonly ConcurrentChain chain;
+        private readonly ChainIndexer chainIndexer;
 
-        private readonly FederationManager federationManager;
+        private readonly IFederationManager federationManager;
 
         /// <summary>Provider of IBD state.</summary>
         private readonly IInitialBlockDownloadState initialBlockDownloadState;
@@ -47,18 +51,37 @@ namespace Xels.Bitcoin.Features.PoA
 
         private readonly IPoAMiner miner;
 
-        public PoAFeature(FederationManager federationManager, PayloadProvider payloadProvider, IConnectionManager connectionManager, ConcurrentChain chain,
+        private readonly VotingManager votingManager;
+
+        private readonly Network network;
+
+        private readonly IWhitelistedHashesRepository whitelistedHashesRepository;
+
+        private readonly IdleFederationMembersKicker idleFederationMembersKicker;
+
+        private readonly IChainState chainState;
+
+        private readonly IBlockStoreQueue blockStoreQueue;
+
+        public PoAFeature(IFederationManager federationManager, PayloadProvider payloadProvider, IConnectionManager connectionManager, ChainIndexer chainIndexer,
             IInitialBlockDownloadState initialBlockDownloadState, IConsensusManager consensusManager, IPeerBanning peerBanning, ILoggerFactory loggerFactory,
-            IPoAMiner miner)
+            IPoAMiner miner, VotingManager votingManager, Network network, IWhitelistedHashesRepository whitelistedHashesRepository,
+            IdleFederationMembersKicker idleFederationMembersKicker, IChainState chainState, IBlockStoreQueue blockStoreQueue)
         {
             this.federationManager = federationManager;
             this.connectionManager = connectionManager;
-            this.chain = chain;
+            this.chainIndexer = chainIndexer;
             this.initialBlockDownloadState = initialBlockDownloadState;
             this.consensusManager = consensusManager;
             this.peerBanning = peerBanning;
             this.loggerFactory = loggerFactory;
             this.miner = miner;
+            this.votingManager = votingManager;
+            this.whitelistedHashesRepository = whitelistedHashesRepository;
+            this.network = network;
+            this.idleFederationMembersKicker = idleFederationMembersKicker;
+            this.chainState = chainState;
+            this.blockStoreQueue = blockStoreQueue;
 
             payloadProvider.DiscoverPayloads(this.GetType().Assembly);
         }
@@ -68,31 +91,64 @@ namespace Xels.Bitcoin.Features.PoA
         {
             NetworkPeerConnectionParameters connectionParameters = this.connectionManager.Parameters;
 
-            var defaultConsensusManagerBehavior = connectionParameters.TemplateBehaviors.FirstOrDefault(behavior => behavior is ConsensusManagerBehavior);
+            this.ReplaceConsensusManagerBehavior(connectionParameters);
+
+            this.ReplaceBlockStoreBehavior(connectionParameters);
+
+            this.federationManager.Initialize();
+            this.whitelistedHashesRepository.Initialize();
+
+            var options = (PoAConsensusOptions)this.network.Consensus.Options;
+
+            if (options.VotingEnabled)
+            {
+                this.votingManager.Initialize();
+
+                if (options.AutoKickIdleMembers)
+                    this.idleFederationMembersKicker.Initialize();
+            }
+
+            this.miner.InitializeMining();
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>Replaces default <see cref="ConsensusManagerBehavior"/> with <see cref="PoAConsensusManagerBehavior"/>.</summary>
+        private void ReplaceConsensusManagerBehavior(NetworkPeerConnectionParameters connectionParameters)
+        {
+            INetworkPeerBehavior defaultConsensusManagerBehavior = connectionParameters.TemplateBehaviors.FirstOrDefault(behavior => behavior is ConsensusManagerBehavior);
+
             if (defaultConsensusManagerBehavior == null)
             {
                 throw new MissingServiceException(typeof(ConsensusManagerBehavior), "Missing expected ConsensusManagerBehavior.");
             }
 
-            // Replace default ConsensusManagerBehavior with ProvenHeadersConsensusManagerBehavior
             connectionParameters.TemplateBehaviors.Remove(defaultConsensusManagerBehavior);
-            connectionParameters.TemplateBehaviors.Add(new PoAConsensusManagerBehavior(this.chain, this.initialBlockDownloadState, this.consensusManager, this.peerBanning, this.loggerFactory));
+            connectionParameters.TemplateBehaviors.Add(new PoAConsensusManagerBehavior(this.chainIndexer, this.initialBlockDownloadState, this.consensusManager, this.peerBanning, this.loggerFactory));
+        }
 
-            this.federationManager.Initialize();
+        /// <summary>Replaces default <see cref="PoABlockStoreBehavior"/> with <see cref="PoABlockStoreBehavior"/>.</summary>
+        private void ReplaceBlockStoreBehavior(NetworkPeerConnectionParameters connectionParameters)
+        {
+            INetworkPeerBehavior defaultBlockStoreBehavior = connectionParameters.TemplateBehaviors.FirstOrDefault(behavior => behavior is BlockStoreBehavior);
 
-            if (this.federationManager.IsFederationMember)
+            if (defaultBlockStoreBehavior == null)
             {
-                // Enable mining because we are a federation member.
-                this.miner.InitializeMining();
+                throw new MissingServiceException(typeof(BlockStoreBehavior), "Missing expected BlockStoreBehavior.");
             }
 
-            return Task.CompletedTask;
+            connectionParameters.TemplateBehaviors.Remove(defaultBlockStoreBehavior);
+            connectionParameters.TemplateBehaviors.Add(new PoABlockStoreBehavior(this.chainIndexer, this.chainState, this.loggerFactory, this.consensusManager, this.blockStoreQueue));
         }
 
         /// <inheritdoc />
         public override void Dispose()
         {
             this.miner.Dispose();
+
+            this.votingManager.Dispose();
+
+            this.idleFederationMembersKicker.Dispose();
         }
     }
 
@@ -127,6 +183,8 @@ namespace Xels.Bitcoin.Features.PoA
                 new EnsureCoinbaseRule(),
                 new CheckPowTransactionRule(),
                 new CheckSigOpsRule(),
+
+                new PoAVotingCoinbaseOutputFormatRule(),
             };
 
             consensus.FullValidationRules = new List<IFullValidationConsensusRule>()
@@ -157,10 +215,12 @@ namespace Xels.Bitcoin.Features.PoA
                     .DependOn<ConsensusFeature>()
                     .FeatureServices(services =>
                     {
-                        services.AddSingleton<FederationManager>();
+                        services.AddSingleton<IFederationManager, FederationManager>();
                         services.AddSingleton<PoABlockHeaderValidator>();
                         services.AddSingleton<IPoAMiner, PoAMiner>();
-                        services.AddSingleton<SlotsManager>();
+                        services.AddSingleton<MinerSettings>();
+                        services.AddSingleton<PoAMinerSettings>();
+                        services.AddSingleton<ISlotsManager, SlotsManager>();
                         services.AddSingleton<BlockDefinition, PoABlockDefinition>();
                     });
             });
@@ -180,7 +240,16 @@ namespace Xels.Bitcoin.Features.PoA
                         services.AddSingleton<ConsensusQuery>()
                             .AddSingleton<INetworkDifficulty, ConsensusQuery>(provider => provider.GetService<ConsensusQuery>())
                             .AddSingleton<IGetUnspentTransaction, ConsensusQuery>(provider => provider.GetService<ConsensusQuery>());
+
                         new PoAConsensusRulesRegistration().RegisterRules(fullNodeBuilder.Network.Consensus);
+
+                        // Voting.
+                        services.AddSingleton<VotingManager>();
+                        services.AddSingleton<DefaultVotingController>();
+                        services.AddSingleton<FederationVotingController>();
+                        services.AddSingleton<IPollResultExecutor, PollResultExecutor>();
+                        services.AddSingleton<IWhitelistedHashesRepository, WhitelistedHashesRepository>();
+                        services.AddSingleton<IdleFederationMembersKicker>();
                     });
             });
 

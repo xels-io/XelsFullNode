@@ -8,7 +8,6 @@ using NBitcoin.Crypto;
 using NBitcoin.DataEncoders;
 using NBitcoin.Protocol;
 using Newtonsoft.Json.Linq;
-using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Tests.Common;
 using Xunit;
 

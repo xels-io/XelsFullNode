@@ -3,6 +3,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Moq;
 using NBitcoin;
+using Xels.Bitcoin.AsyncWork;
+using Xels.Bitcoin.Configuration.Logging;
+using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin.Tests.Common.Logging
 {
@@ -90,6 +93,16 @@ namespace Xels.Bitcoin.Tests.Common.Logging
                 It.Is<object>(l => ((FormattedLogValues)l)[0].Value.ToString().EndsWith(message)),
                 null,
                 It.IsAny<Func<object, Exception, string>>()));
+        }
+
+        protected IAsyncProvider CreateAsyncProvider()
+        {
+            var loggerFactory = new ExtendedLoggerFactory();
+            var signals = new Signals.Signals(loggerFactory, null);
+            var nodeLifetime = new NodeLifetime();
+            var asyncProvider = new AsyncProvider(loggerFactory, signals, nodeLifetime);
+
+            return asyncProvider;
         }
     }
 }

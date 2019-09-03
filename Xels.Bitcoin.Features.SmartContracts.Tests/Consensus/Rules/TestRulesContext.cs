@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Configuration;
@@ -12,6 +14,8 @@ using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.Consensus.Rules;
 using Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Consensus.Rules;
+using Xels.Bitcoin.Features.SmartContracts.Rules;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Utilities;
 using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.CLR.Serialization;
@@ -34,13 +38,17 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Consensus.Rules
 
         public NodeSettings NodeSettings { get; set; }
 
-        public ConcurrentChain Chain { get; set; }
+        public ChainIndexer ChainIndexer { get; set; }
 
         public Network Network { get; set; }
 
         public ICheckpoints Checkpoints { get; set; }
 
         public IChainState ChainState { get; set; }
+
+        public ISignals Signals { get; set; }
+
+        public IAsyncProvider AsyncProvider { get; internal set; }
 
         public ICallDataSerializer CallDataSerializer { get; set; }
 
@@ -53,12 +61,13 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Consensus.Rules
             return rule;
         }
 
-        public SmartContractFormatRule CreateSmartContractFormatRule()
+        public ContractTransactionPartialValidationRule CreateContractValidationRule()
         {
-            var rule = new SmartContractFormatRule(this.CallDataSerializer);
-            rule.Parent = this.Consensus;
-            rule.Logger = this.LoggerFactory.CreateLogger(rule.GetType().FullName);
-            rule.Initialize();
+            var rule = new ContractTransactionPartialValidationRule(this.CallDataSerializer, new List<IContractTransactionPartialValidationRule>
+            {
+                new SmartContractFormatLogic()
+            });
+
             return rule;
         }
     }
@@ -84,37 +93,40 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Consensus.Rules
             testRulesContext.LoggerFactory.AddConsoleWithFilters();
             testRulesContext.DateTimeProvider = DateTimeProvider.Default;
 
-            network.Consensus.Options = new ConsensusOptions();
             new FullNodeBuilderConsensusExtension.PowConsensusRulesRegistration().RegisterRules(network.Consensus);
 
             ConsensusSettings consensusSettings = new ConsensusSettings(testRulesContext.NodeSettings);
             testRulesContext.Checkpoints = new Checkpoints();
-            testRulesContext.Chain = new ConcurrentChain(network);
+            testRulesContext.ChainIndexer = new ChainIndexer(network);
             testRulesContext.ChainState = new ChainState();
 
-            NodeDeployments deployments = new NodeDeployments(testRulesContext.Network, testRulesContext.Chain);
+            testRulesContext.Signals = new Signals.Signals(testRulesContext.LoggerFactory, null);
+            testRulesContext.AsyncProvider = new AsyncProvider(testRulesContext.LoggerFactory, testRulesContext.Signals, new NodeLifetime());
+
+            NodeDeployments deployments = new NodeDeployments(testRulesContext.Network, testRulesContext.ChainIndexer);
+
             testRulesContext.Consensus = new PowConsensusRuleEngine(testRulesContext.Network, testRulesContext.LoggerFactory, testRulesContext.DateTimeProvider,
-                testRulesContext.Chain, deployments, consensusSettings, testRulesContext.Checkpoints, null, testRulesContext.ChainState,
-                new InvalidBlockHashStore(new DateTimeProvider()), new NodeStats(new DateTimeProvider())).Register();
+                testRulesContext.ChainIndexer, deployments, consensusSettings, testRulesContext.Checkpoints, null, testRulesContext.ChainState,
+                new InvalidBlockHashStore(new DateTimeProvider()), new NodeStats(new DateTimeProvider()), testRulesContext.AsyncProvider).Register();
 
             testRulesContext.CallDataSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(network));
             return testRulesContext;
         }
 
-        public static Block MineBlock(Network network, ConcurrentChain chain)
+        public static Block MineBlock(Network network, ChainIndexer chainIndexer)
         {
             Block block = network.Consensus.ConsensusFactory.CreateBlock();
 
             var coinbase = new Transaction();
-            coinbase.AddInput(TxIn.CreateCoinbase(chain.Height + 1));
+            coinbase.AddInput(TxIn.CreateCoinbase(chainIndexer.Height + 1));
             coinbase.AddOutput(new TxOut(Money.Zero, new Key()));
             block.AddTransaction(coinbase);
 
             block.Header.Version = (int)ThresholdConditionCache.VersionbitsTopBits;
 
-            block.Header.HashPrevBlock = chain.Tip.HashBlock;
-            block.Header.UpdateTime(DateTimeProvider.Default.GetTimeOffset(), network, chain.Tip);
-            block.Header.Bits = block.Header.GetWorkRequired(network, chain.Tip);
+            block.Header.HashPrevBlock = chainIndexer.Tip.HashBlock;
+            block.Header.UpdateTime(DateTimeProvider.Default.GetTimeOffset(), network, chainIndexer.Tip);
+            block.Header.Bits = block.Header.GetWorkRequired(network, chainIndexer.Tip);
             block.Header.Nonce = 0;
 
             var maxTries = int.MaxValue;

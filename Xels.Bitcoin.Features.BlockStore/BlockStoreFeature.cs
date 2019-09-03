@@ -10,7 +10,9 @@ using Xels.Bitcoin.Builder.Feature;
 using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
+using Xels.Bitcoin.Features.BlockStore.AddressIndexing;
 using Xels.Bitcoin.Features.BlockStore.Controllers;
+using Xels.Bitcoin.Features.BlockStore.Pruning;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
 using Xels.Bitcoin.Utilities;
@@ -22,9 +24,7 @@ namespace Xels.Bitcoin.Features.BlockStore
     public class BlockStoreFeature : FullNodeFeature
     {
         private readonly Network network;
-        private readonly ConcurrentChain chain;
-
-        private readonly Signals.Signals signals;
+        private readonly ChainIndexer chainIndexer;
 
         private readonly BlockStoreSignaled blockStoreSignaled;
 
@@ -48,11 +48,12 @@ namespace Xels.Bitcoin.Features.BlockStore
 
         private readonly IPrunedBlockRepository prunedBlockRepository;
 
+        private readonly IAddressIndexer addressIndexer;
+
         public BlockStoreFeature(
             Network network,
-            ConcurrentChain chain,
+            ChainIndexer chainIndexer,
             IConnectionManager connectionManager,
-            Signals.Signals signals,
             BlockStoreSignaled blockStoreSignaled,
             ILoggerFactory loggerFactory,
             StoreSettings storeSettings,
@@ -61,12 +62,12 @@ namespace Xels.Bitcoin.Features.BlockStore
             INodeStats nodeStats,
             IConsensusManager consensusManager,
             ICheckpoints checkpoints,
-            IPrunedBlockRepository prunedBlockRepository)
+            IPrunedBlockRepository prunedBlockRepository,
+            IAddressIndexer addressIndexer)
         {
             this.network = network;
-            this.chain = chain;
+            this.chainIndexer = chainIndexer;
             this.blockStoreQueue = blockStoreQueue;
-            this.signals = signals;
             this.blockStoreSignaled = blockStoreSignaled;
             this.connectionManager = connectionManager;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
@@ -76,6 +77,7 @@ namespace Xels.Bitcoin.Features.BlockStore
             this.consensusManager = consensusManager;
             this.checkpoints = checkpoints;
             this.prunedBlockRepository = prunedBlockRepository;
+            this.addressIndexer = addressIndexer;
 
             nodeStats.RegisterStats(this.AddInlineStats, StatsType.Inline, 900);
         }
@@ -93,9 +95,28 @@ namespace Xels.Bitcoin.Features.BlockStore
             }
         }
 
+        /// <summary>
+        /// Prints command-line help. Invoked via reflection.
+        /// </summary>
+        /// <param name="network">The network to extract values from.</param>
+        public static void PrintHelp(Network network)
+        {
+            StoreSettings.PrintHelp(network);
+        }
+
+        /// <summary>
+        /// Get the default configuration. Invoked via reflection.
+        /// </summary>
+        /// <param name="builder">The string builder to add the settings to.</param>
+        /// <param name="network">The network to base the defaults off.</param>
+        public static void BuildDefaultConfigurationFile(StringBuilder builder, Network network)
+        {
+            StoreSettings.BuildDefaultConfigurationFile(builder, network);
+        }
+
         public override async Task InitializeAsync()
         {
-            this.prunedBlockRepository.InitializeAsync().GetAwaiter().GetResult();
+            await this.prunedBlockRepository.InitializeAsync().ConfigureAwait(false);
 
             if (!this.storeSettings.PruningEnabled && this.prunedBlockRepository.PrunedTip != null)
                 throw new BlockStoreException("The node cannot start as it has been previously pruned, please clear the data folders and resync.");
@@ -112,11 +133,11 @@ namespace Xels.Bitcoin.Features.BlockStore
             // Use ProvenHeadersBlockStoreBehavior for PoS Networks
             if (this.network.Consensus.IsProofOfStake)
             {
-                this.connectionManager.Parameters.TemplateBehaviors.Add(new ProvenHeadersBlockStoreBehavior(this.network, this.chain, this.chainState, this.loggerFactory, this.consensusManager, this.checkpoints, this.blockStoreQueue));
+                this.connectionManager.Parameters.TemplateBehaviors.Add(new ProvenHeadersBlockStoreBehavior(this.network, this.chainIndexer, this.chainState, this.loggerFactory, this.consensusManager, this.checkpoints, this.blockStoreQueue));
             }
             else
             {
-                this.connectionManager.Parameters.TemplateBehaviors.Add(new BlockStoreBehavior(this.chain, this.chainState, this.loggerFactory, this.consensusManager, this.blockStoreQueue));
+                this.connectionManager.Parameters.TemplateBehaviors.Add(new BlockStoreBehavior(this.chainIndexer, this.chainState, this.loggerFactory, this.consensusManager, this.blockStoreQueue));
             }
 
             // Signal to peers that this node can serve blocks.
@@ -129,9 +150,9 @@ namespace Xels.Bitcoin.Features.BlockStore
             if (!this.network.Consensus.IsProofOfStake)
                 this.connectionManager.Parameters.Services |= NetworkPeerServices.NODE_WITNESS;
 
-            this.signals.SubscribeForBlocksConnected(this.blockStoreSignaled);
+            this.blockStoreSignaled.Initialize();
 
-            return;
+            this.addressIndexer.Initialize();
         }
 
         /// <inheritdoc />
@@ -143,9 +164,11 @@ namespace Xels.Bitcoin.Features.BlockStore
                 this.prunedBlockRepository.PruneAndCompactDatabase(this.chainState.BlockStoreTip, this.network, false);
             }
 
-            this.logger.LogInformation("Stopping BlockStore.");
-
+            this.logger.LogInformation("Stopping BlockStoreSignaled.");
             this.blockStoreSignaled.Dispose();
+
+            this.logger.LogInformation("Stopping AddressIndexer.");
+            this.addressIndexer.Dispose();
         }
     }
 
@@ -176,6 +199,7 @@ namespace Xels.Bitcoin.Features.BlockStore
                         services.AddSingleton<StoreSettings>();
                         services.AddSingleton<BlockStoreController>();
                         services.AddSingleton<IBlockStoreQueueFlushCondition, BlockStoreQueueFlushCondition>();
+                        services.AddSingleton<IAddressIndexer, AddressIndexer>();
                     });
             });
 

@@ -105,6 +105,10 @@ namespace Xels.Bitcoin.Tests.Builder.Feature
 
         private class FeatureRegistrationFullNodeFeature : IFullNodeFeature
         {
+            public bool InitializeBeforeBase { get; set; }
+
+            public string State { get; set; }
+
             public void LoadConfiguration()
             {
                 throw new NotImplementedException();

@@ -7,10 +7,12 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NBitcoin;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Features.BlockStore;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.Interfaces;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Tests.Common.Logging;
 using Xels.Bitcoin.Tests.Wallet.Common;
@@ -21,19 +23,25 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
 {
     public class WalletSyncManagerTest : LogsTestBase
     {
-        private ConcurrentChain chain;
+        private ChainIndexer chainIndexer;
         private readonly Mock<IWalletManager> walletManager;
         private readonly Mock<IBlockStore> blockStore;
         private readonly Mock<INodeLifetime> nodeLifetime;
+        private readonly ILoggerFactory loggerFactory;
         private readonly StoreSettings storeSettings;
+        private readonly ISignals signals;
+        private readonly IAsyncProvider asyncProvider;
 
         public WalletSyncManagerTest()
         {
             this.storeSettings = new StoreSettings(new NodeSettings(KnownNetworks.XelsMain));
-            this.chain = new ConcurrentChain(KnownNetworks.XelsMain);
+            this.chainIndexer = new ChainIndexer(KnownNetworks.XelsMain);
             this.walletManager = new Mock<IWalletManager>();
             this.blockStore = new Mock<IBlockStore>();
             this.nodeLifetime = new Mock<INodeLifetime>();
+            this.loggerFactory = new LoggerFactory();
+            this.signals = new Signals.Signals(new LoggerFactory(), null);
+            this.asyncProvider = new AsyncProvider(new LoggerFactory(), this.signals, this.nodeLifetime.Object);
 
             this.walletManager.Setup(w => w.ContainsWallets).Returns(true);
         }
@@ -44,8 +52,8 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
             this.storeSettings.AmountOfBlocksToKeep = 1;
             this.storeSettings.PruningEnabled = true;
 
-            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-                this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+                this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
 
             Assert.Throws<WalletException>(() =>
             {
@@ -57,12 +65,12 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         public void Start_BlockOnChain_DoesNotReorgWalletManager()
         {
             this.storeSettings.AmountOfBlocksToKeep = 0;
-            this.chain = WalletTestsHelpers.PrepareChainWithBlock();
+            this.chainIndexer = WalletTestsHelpers.PrepareChainWithBlock();
             this.walletManager.Setup(w => w.WalletTipHash)
-                .Returns(this.chain.Tip.Header.GetHash());
+                .Returns(this.chainIndexer.Tip.Header.GetHash());
 
-            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-                this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+                this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
 
             walletSyncManager.Start();
 
@@ -74,17 +82,17 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         public void Start_BlockNotChain_ReorgsWalletManagerUsingWallet()
         {
             this.storeSettings.AmountOfBlocksToKeep = 0;
-            this.chain = WalletTestsHelpers.GenerateChainWithHeight(5, KnownNetworks.XelsMain);
+            this.chainIndexer = WalletTestsHelpers.GenerateChainWithHeight(5, KnownNetworks.XelsMain);
             this.walletManager.SetupGet(w => w.WalletTipHash)
                 .Returns(new uint256(125)); // try to load non-existing block to get chain to return null.
 
-            ChainedHeader forkBlock = this.chain.GetBlock(3); // use a block as the fork to recover to.
+            ChainedHeader forkBlock = this.chainIndexer.GetHeader(3); // use a block as the fork to recover to.
             uint256 forkBlockHash = forkBlock.Header.GetHash();
             this.walletManager.Setup(w => w.GetFirstWalletBlockLocator())
                 .Returns(new Collection<uint256> { forkBlockHash });
 
-            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-                this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+                this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
 
             walletSyncManager.Start();
 
@@ -101,12 +109,12 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         [Fact]
         public void ProcessBlock_NewBlock_PreviousHashSameAsWalletTip_PassesBlockToManagerWithoutReorg()
         {
-            (ConcurrentChain Chain, List<Block> Blocks) result = WalletTestsHelpers.GenerateChainAndBlocksWithHeight(5, KnownNetworks.XelsMain);
-            this.chain = result.Chain;
+            (ChainIndexer Chain, List<Block> Blocks) result = WalletTestsHelpers.GenerateChainAndBlocksWithHeight(5, KnownNetworks.XelsMain);
+            this.chainIndexer = result.Chain;
             List<Block> blocks = result.Blocks;
-            var walletSyncManager = new WalletSyncManagerOverride(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-                this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
-            walletSyncManager.SetWalletTip(this.chain.GetBlock(3));
+            var walletSyncManager = new WalletSyncManagerOverride(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+                this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
+            walletSyncManager.SetWalletTip(this.chainIndexer.GetHeader(3));
 
             Block blockToProcess = blocks[3];
             blockToProcess.SetPrivatePropertyValue("BlockSize", 1L);
@@ -129,22 +137,22 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         [Fact]
         public void ProcessBlock_NewBlock_BlockNotOnBestChain_ReOrgWalletManagerUsingBlockStoreCache()
         {
-            (ConcurrentChain LeftChain, ConcurrentChain RightChain, List<Block> LeftForkBlocks, List<Block> RightForkBlocks) result = WalletTestsHelpers.GenerateForkedChainAndBlocksWithHeight(5, KnownNetworks.XelsMain, 2);
+            (ChainIndexer LeftChain, ChainIndexer RightChain, List<Block> LeftForkBlocks, List<Block> RightForkBlocks) result = WalletTestsHelpers.GenerateForkedChainAndBlocksWithHeight(5, KnownNetworks.XelsMain, 2);
             // left side chain containing the 'old' fork.
-            ConcurrentChain leftChain = result.LeftChain;
+            ChainIndexer leftChainIndexer = result.LeftChain;
             // right side chain containing the 'new' fork. Work on this.
-            this.chain = result.RightChain;
-            var walletSyncManager = new WalletSyncManagerOverride(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-                this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            this.chainIndexer = result.RightChain;
+            var walletSyncManager = new WalletSyncManagerOverride(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+                this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
             // setup blockstore to return blocks on the chain.
-            this.blockStore.Setup(b => b.GetBlockAsync(It.IsAny<uint256>()))
-                .ReturnsAsync((uint256 hashblock) =>
+            this.blockStore.Setup(b => b.GetBlock(It.IsAny<uint256>()))
+                .Returns((uint256 hashblock) =>
                 {
                     return result.LeftForkBlocks.Union(result.RightForkBlocks).Single(b => b.GetHash() == hashblock);
                 });
 
             // set 4th block of the old chain as tip. 2 ahead of the fork thus not being on the right chain.
-            walletSyncManager.SetWalletTip(leftChain.GetBlock(result.LeftForkBlocks[3].Header.GetHash()));
+            walletSyncManager.SetWalletTip(leftChainIndexer.GetHeader(result.LeftForkBlocks[3].Header.GetHash()));
             //process 5th block from the right side of the fork in the list does not have same prevhash as which is loaded.
             Block blockToProcess = result.RightForkBlocks[4];
             blockToProcess.SetPrivatePropertyValue("BlockSize", 1L);
@@ -154,15 +162,15 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
             this.AssertTipBlockHash(walletSyncManager, 5);
 
             // walletmanager removes all blocks up to the fork.
-            this.walletManager.Verify(w => w.RemoveBlocks(ExpectChainedBlock(this.chain.GetBlock(2))));
+            this.walletManager.Verify(w => w.RemoveBlocks(ExpectChainedBlock(this.chainIndexer.GetHeader(2))));
 
             //verify manager processes each missing block until caught up.
             // height 3
-            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(result.RightForkBlocks[2]), ExpectChainedBlock(this.chain.GetBlock(3))));
+            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(result.RightForkBlocks[2]), ExpectChainedBlock(this.chainIndexer.GetHeader(3))));
             // height 4
-            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(result.RightForkBlocks[3]), ExpectChainedBlock(this.chain.GetBlock(4))));
+            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(result.RightForkBlocks[3]), ExpectChainedBlock(this.chainIndexer.GetHeader(4))));
             // height 5
-            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(result.RightForkBlocks[4]), ExpectChainedBlock(this.chain.GetBlock(5))), Times.Exactly(2));
+            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(result.RightForkBlocks[4]), ExpectChainedBlock(this.chainIndexer.GetHeader(5))), Times.Exactly(2));
         }
 
         /// <summary>
@@ -173,20 +181,20 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         [Fact]
         public void ProcessBlock_NewBlock__BlockOnBestChain_ReOrgWalletManagerUsingBlockStoreCache()
         {
-            (ConcurrentChain Chain, List<Block> Blocks) result = WalletTestsHelpers.GenerateChainAndBlocksWithHeight(5, KnownNetworks.XelsMain);
-            this.chain = result.Chain;
+            (ChainIndexer Chain, List<Block> Blocks) result = WalletTestsHelpers.GenerateChainAndBlocksWithHeight(5, KnownNetworks.XelsMain);
+            this.chainIndexer = result.Chain;
             List<Block> blocks = result.Blocks;
-            var walletSyncManager = new WalletSyncManagerOverride(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-                this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            var walletSyncManager = new WalletSyncManagerOverride(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+                this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
             // setup blockstore to return blocks on the chain.
-            this.blockStore.Setup(b => b.GetBlockAsync(It.IsAny<uint256>()))
-                .ReturnsAsync((uint256 hashblock) =>
+            this.blockStore.Setup(b => b.GetBlock(It.IsAny<uint256>()))
+                .Returns((uint256 hashblock) =>
                 {
                     return blocks.Single(b => b.GetHash() == hashblock);
                 });
 
             // set 2nd block as tip
-            walletSyncManager.SetWalletTip(this.chain.GetBlock(2));
+            walletSyncManager.SetWalletTip(this.chainIndexer.GetHeader(2));
             //process 4th block in the list does not have same prevhash as which is loaded
             Block blockToProcess = blocks[3];
             blockToProcess.SetPrivatePropertyValue("BlockSize", 1L);
@@ -197,9 +205,9 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
 
             //verify manager processes each missing block until caught up.
             // height 3
-            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(blocks[2]), ExpectChainedBlock(this.chain.GetBlock(3))));
+            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(blocks[2]), ExpectChainedBlock(this.chainIndexer.GetHeader(3))));
             // height 4
-            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(blocks[3]), ExpectChainedBlock(this.chain.GetBlock(4))), Times.Exactly(2));
+            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(blocks[3]), ExpectChainedBlock(this.chainIndexer.GetHeader(4))), Times.Exactly(2));
         }
 
         /// <summary>
@@ -209,15 +217,15 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         [Fact]
         public void ProcessBlock_NewBlock_BlockArrivesLateInBlockStoreCache_ReOrgWalletManagerUsingBlockStoreCache()
         {
-            (ConcurrentChain Chain, List<Block> Blocks) result = WalletTestsHelpers.GenerateChainAndBlocksWithHeight(5, KnownNetworks.XelsMain);
-            this.chain = result.Chain;
+            (ChainIndexer Chain, List<Block> Blocks) result = WalletTestsHelpers.GenerateChainAndBlocksWithHeight(5, KnownNetworks.XelsMain);
+            this.chainIndexer = result.Chain;
             List<Block> blocks = result.Blocks;
-            var walletSyncManager = new WalletSyncManagerOverride(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-                this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            var walletSyncManager = new WalletSyncManagerOverride(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+                this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
             var blockEmptyCounters = new Dictionary<uint256, int>();
             // setup blockstore to return blocks on the chain but postpone by 3 rounds for each block.
-            this.blockStore.Setup(b => b.GetBlockAsync(It.IsAny<uint256>()))
-                .ReturnsAsync((uint256 hashblock) =>
+            this.blockStore.Setup(b => b.GetBlock(It.IsAny<uint256>()))
+                .Returns((uint256 hashblock) =>
                 {
                     if (!blockEmptyCounters.ContainsKey(hashblock))
                     {
@@ -236,7 +244,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
                 });
 
             // set 2nd block as tip
-            walletSyncManager.SetWalletTip(this.chain.GetBlock(2));
+            walletSyncManager.SetWalletTip(this.chainIndexer.GetHeader(2));
             //process 4th block in the list  does not have same prevhash as which is loaded
             Block blockToProcess = blocks[3];
             blockToProcess.SetPrivatePropertyValue("BlockSize", 1L);
@@ -247,16 +255,16 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
 
             //verify manager processes each missing block until caught up.
             // height 3
-            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(blocks[2]), ExpectChainedBlock(this.chain.GetBlock(3))));
+            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(blocks[2]), ExpectChainedBlock(this.chainIndexer.GetHeader(3))));
             // height 4
-            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(blocks[3]), ExpectChainedBlock(this.chain.GetBlock(4))), Times.Exactly(2));
+            this.walletManager.Verify(w => w.ProcessBlock(ExpectBlock(blocks[3]), ExpectChainedBlock(this.chainIndexer.GetHeader(4))), Times.Exactly(2));
         }
 
         [Fact]
         public void ProcessTransaction_CallsWalletManager()
         {
-            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-               this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+               this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
 
             var transaction = new Transaction
             {
@@ -274,14 +282,14 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         [Fact]
         public void SyncFromDate_GivenDateMatchingBlocksOnChain_UpdatesUsingClosestBlock()
         {
-            this.chain = WalletTestsHelpers.GenerateChainWithHeight(3, KnownNetworks.XelsMain);
+            this.chainIndexer = WalletTestsHelpers.GenerateChainWithHeight(3, KnownNetworks.XelsMain);
 
-            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-             this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+             this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
 
-            walletSyncManager.SyncFromDate(this.chain.GetBlock(3).Header.BlockTime.DateTime.AddDays(2));
+            walletSyncManager.SyncFromDate(this.chainIndexer.GetHeader(3).Header.BlockTime.DateTime.AddDays(2));
 
-            uint256 expectedHash = this.chain.GetBlock(3).HashBlock;
+            uint256 expectedHash = this.chainIndexer.GetHeader(3).HashBlock;
             Assert.Equal(walletSyncManager.WalletTip.HashBlock, expectedHash);
             this.walletManager.VerifySet(w => w.WalletTipHash = expectedHash);
         }
@@ -292,14 +300,14 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         [Fact]
         public void SyncFromDate_GivenDateNotMatchingBlocksOnChain_UpdatesUsingFirstBlock()
         {
-            this.chain = WalletTestsHelpers.GenerateChainWithHeight(3, KnownNetworks.XelsMain);
+            this.chainIndexer = WalletTestsHelpers.GenerateChainWithHeight(3, KnownNetworks.XelsMain);
 
-            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-             this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+             this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
 
             walletSyncManager.SyncFromDate(new DateTime(1900, 1, 1)); // date before any block.
 
-            uint256 expectedHash = this.chain.GetBlock(1).HashBlock;
+            uint256 expectedHash = this.chainIndexer.GetHeader(1).HashBlock;
             Assert.Equal(walletSyncManager.WalletTip.HashBlock, expectedHash);
             this.walletManager.VerifySet(w => w.WalletTipHash = expectedHash);
         }
@@ -310,14 +318,14 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         [Fact]
         public void SyncFromDate_EmptyChain_UpdateUsingGenesisBlock()
         {
-            this.chain = new ConcurrentChain(KnownNetworks.XelsMain);
+            this.chainIndexer = new ChainIndexer(KnownNetworks.XelsMain);
 
-            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-             this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+             this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
 
             walletSyncManager.SyncFromDate(new DateTime(1900, 1, 1)); // date before any block.
 
-            uint256 expectedHash = this.chain.Genesis.HashBlock;
+            uint256 expectedHash = this.chainIndexer.Genesis.HashBlock;
             Assert.Equal(walletSyncManager.WalletTip.HashBlock, expectedHash);
             this.walletManager.VerifySet(w => w.WalletTipHash = expectedHash);
         }
@@ -325,14 +333,14 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         [Fact]
         public void SyncFromHeight_BlockWithHeightOnChain_UpdatesWalletTipOnWalletAndWalletSyncManagers()
         {
-            this.chain = WalletTestsHelpers.GenerateChainWithHeight(3, KnownNetworks.XelsMain);
+            this.chainIndexer = WalletTestsHelpers.GenerateChainWithHeight(3, KnownNetworks.XelsMain);
 
-            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-             this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+             this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
 
             walletSyncManager.SyncFromHeight(2);
 
-            uint256 expectedHash = this.chain.GetBlock(2).HashBlock;
+            uint256 expectedHash = this.chainIndexer.GetHeader(2).HashBlock;
             Assert.Equal(walletSyncManager.WalletTip.HashBlock, expectedHash);
             this.walletManager.VerifySet(w => w.WalletTipHash = expectedHash);
         }
@@ -340,10 +348,10 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         [Fact]
         public void SyncFromHeight_NoBlockWithGivenHeightOnChain_ThrowsWalletException()
         {
-            this.chain = WalletTestsHelpers.GenerateChainWithHeight(1, KnownNetworks.XelsMain);
+            this.chainIndexer = WalletTestsHelpers.GenerateChainWithHeight(1, KnownNetworks.XelsMain);
 
-            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-             this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            var walletSyncManager = new WalletSyncManager(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+             this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
 
             Assert.Throws<WalletException>(() =>
             {
@@ -357,16 +365,16 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         [Fact]
         public void ProcessBlock_With_No_Wallet_Processing_Is_Ignored()
         {
-            (ConcurrentChain Chain, List<Block> Blocks) result = WalletTestsHelpers.GenerateChainAndBlocksWithHeight(1, KnownNetworks.XelsMain);
+            (ChainIndexer Chain, List<Block> Blocks) result = WalletTestsHelpers.GenerateChainAndBlocksWithHeight(1, KnownNetworks.XelsMain);
 
-            this.chain = result.Chain;
+            this.chainIndexer = result.Chain;
 
             this.walletManager.Setup(w => w.ContainsWallets).Returns(false);
 
-            var walletSyncManager = new WalletSyncManagerOverride(this.LoggerFactory.Object, this.walletManager.Object, this.chain, KnownNetworks.XelsMain,
-                this.blockStore.Object, this.storeSettings, this.nodeLifetime.Object);
+            var walletSyncManager = new WalletSyncManagerOverride(this.LoggerFactory.Object, this.walletManager.Object, this.chainIndexer, KnownNetworks.XelsMain,
+                this.blockStore.Object, this.storeSettings, this.signals, this.asyncProvider);
 
-            walletSyncManager.SetWalletTip(this.chain.GetBlock(1));
+            walletSyncManager.SetWalletTip(this.chainIndexer.GetHeader(1));
 
             walletSyncManager.ProcessBlock(result.Blocks[0]);
 
@@ -385,9 +393,9 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
 
         private class WalletSyncManagerOverride : WalletSyncManager
         {
-            public WalletSyncManagerOverride(ILoggerFactory loggerFactory, IWalletManager walletManager, ConcurrentChain chain,
-                Network network, IBlockStore blockStore, StoreSettings storeSettings, INodeLifetime nodeLifetime)
-                : base(loggerFactory, walletManager, chain, network, blockStore, storeSettings, nodeLifetime)
+            public WalletSyncManagerOverride(ILoggerFactory loggerFactory, IWalletManager walletManager, ChainIndexer chainIndexer,
+                Network network, IBlockStore blockStore, StoreSettings storeSettings, ISignals signals, IAsyncProvider asyncProvider)
+                : base(loggerFactory, walletManager, chainIndexer, network, blockStore, storeSettings, signals, asyncProvider)
             {
             }
 
@@ -419,7 +427,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
 
         private uint256 AssertTipBlockHash(IWalletSyncManager walletSyncManager, int blockHeight)
         {
-            uint256 expectedBlockHash = this.chain.GetBlock(blockHeight).Header.GetHash();
+            uint256 expectedBlockHash = this.chainIndexer.GetHeader(blockHeight).Header.GetHash();
 
             WaitLoop(() => expectedBlockHash == walletSyncManager.WalletTip.Header.GetHash(),
                 $"Expected block {expectedBlockHash} does not match tip {walletSyncManager.WalletTip.Header.GetHash()}.");

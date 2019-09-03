@@ -15,7 +15,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
         {
             BlockId = header.GetHash();
             BlockHeader = header;
-            BlockTime = header.BlockTime.DateTime;
+            BlockTime = header.BlockTime.UtcDateTime;
             Height = -1;
             Confirmations = -1;
             BlockData = new Block();

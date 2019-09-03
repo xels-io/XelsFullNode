@@ -1003,7 +1003,7 @@
           "lib/netstandard1.3/System.Threading.Thread.dll": {}
         }
       },
-      "NStratis/4.0.0.73": {
+      "NStratis/4.0.0.74": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1046,6 +1046,7 @@
       "path": "microsoft.netcore.targets/1.1.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
@@ -1382,6 +1383,7 @@
       "path": "runtime.osx.10.10-x64.runtime.native.system.security.cryptography.apple/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "runtime.osx.10.10-x64.runtime.native.system.security.cryptography.apple.4.3.0.nupkg.sha512",
@@ -2175,7 +2177,7 @@
       ]
     },
     "System.Net.Http/4.3.0": {
-      "sha512": "6BBc6BUa7pWFL7KUI/c8wb18IobTZHTtcQKksxJI5F9DRDShdtOvBEJzg5jJbFdTll7gRE+5yXUlq72ciLE+QQ==",
+      "sha512": "sYg+FtILtRQuYWSIAuNOELwVuVsxVyJGWQyOnlAzhV4xvhyFnON1bAzYYC+jjRW8JREM45R0R5Dgi8MTC5sEwA==",
       "type": "package",
       "path": "system.net.http/4.3.0",
       "files": [
@@ -3127,6 +3129,7 @@
       "path": "system.security.cryptography.cng/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/net46/System.Security.Cryptography.Cng.dll",
@@ -3702,7 +3705,7 @@
         "system.threading.thread.nuspec"
       ]
     },
-    "NStratis/4.0.0.73": {
+    "NStratis/4.0.0.74": {
       "type": "project",
       "path": "../NBitcoin/NBitcoin.csproj",
       "msbuildProject": "../NBitcoin/NBitcoin.csproj"
@@ -3711,7 +3714,7 @@
   "projectFileDependencyGroups": {
     ".NETStandard,Version=v2.0": [
       "NETStandard.Library >= 2.0.3",
-      "NStratis >= 4.0.0.73"
+      "NStratis >= 4.0.0.74"
     ]
   },
   "packageFolders": {
@@ -3719,13 +3722,13 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "3.0.0.4-beta",
+    "version": "3.0.4",
     "restore": {
-      "projectUniqueName": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Networks\\Xels.Bitcoin.Networks.csproj",
+      "projectUniqueName": "F:\\XelCodeRepo\\XelsCore-master\\XelsBitcoinFullNode\\src\\Xels.Bitcoin.Networks\\Xels.Bitcoin.Networks.csproj",
       "projectName": "Xels.Bitcoin.Networks",
-      "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Networks\\Xels.Bitcoin.Networks.csproj",
+      "projectPath": "F:\\XelCodeRepo\\XelsCore-master\\XelsBitcoinFullNode\\src\\Xels.Bitcoin.Networks\\Xels.Bitcoin.Networks.csproj",
       "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-      "outputPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Networks\\obj\\",
+      "outputPath": "F:\\XelCodeRepo\\XelsCore-master\\XelsBitcoinFullNode\\src\\Xels.Bitcoin.Networks\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -3744,8 +3747,8 @@
       "frameworks": {
         "netstandard2.0": {
           "projectReferences": {
-            "F:\\XelsPublicRepos\\XelsFullNode\\NBitcoin\\NBitcoin.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\NBitcoin\\NBitcoin.csproj"
+            "F:\\XelCodeRepo\\XelsCore-master\\XelsBitcoinFullNode\\src\\NBitcoin\\NBitcoin.csproj": {
+              "projectPath": "F:\\XelCodeRepo\\XelsCore-master\\XelsBitcoinFullNode\\src\\NBitcoin\\NBitcoin.csproj"
             }
           }
         }

@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using NBitcoin;
 using NBitcoin.BouncyCastle.Math;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Consensus.Rules;
-using Xels.Bitcoin.Features.PoA.ConsensusRules;
+using Xels.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules;
 using Xels.Bitcoin.Tests.Common;
 using Xunit;
 
 namespace Xels.Bitcoin.Features.PoA.Tests.Rules
 {
-    public class PoAHeaderDifficultyRuleTests : PoARulesTestsBase
+    public class PoAHeaderDifficultyRuleTests : PoATestsBase
     {
         [Fact]
         public void CumulativeWorkForALotOfBlocksIsLowerThanMaxValue()
@@ -50,9 +49,7 @@ namespace Xels.Bitcoin.Features.PoA.Tests.Rules
         public void VerifyHeaderDifficulty()
         {
             var rule = new PoAHeaderDifficultyRule();
-            rule.Parent = this.rulesEngine;
-            rule.Logger = this.loggerFactory.CreateLogger(rule.GetType().FullName);
-            rule.Initialize();
+            this.InitRule(rule);
 
             var validationContext = new ValidationContext() { ChainedHeaderToValidate = this.currentHeader };
             var ruleContext = new RuleContext(validationContext, DateTimeOffset.Now);

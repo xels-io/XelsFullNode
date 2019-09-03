@@ -1,14 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Consensus.Validators;
 using Xels.Bitcoin.Features.Miner;
+using Xels.Bitcoin.Features.PoA.Voting;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.Interfaces;
@@ -25,14 +28,12 @@ namespace Xels.Bitcoin.Features.PoA
     /// Blocks can be created only for particular timestamps- once per round.
     /// Round length in seconds is equal to amount of fed members multiplied by target spacing.
     /// Miner's slot in each round is the same and is determined by the index
-    /// of current key in <see cref="PoANetwork.FederationPublicKeys"/>
+    /// of current key in <see cref="IFederationManager.GetFederationMembers"/>
     /// </remarks>
     public interface IPoAMiner : IDisposable
     {
         /// <summary>Starts mining loop.</summary>
         void InitializeMining();
-
-        bool IsMining();
     }
 
     /// <inheritdoc cref="IPoAMiner"/>
@@ -42,9 +43,9 @@ namespace Xels.Bitcoin.Features.PoA
 
         private readonly IDateTimeProvider dateTimeProvider;
 
-        private readonly ILogger logger;
+        protected readonly ILogger logger;
 
-        private readonly PoANetwork network;
+        protected readonly PoANetwork network;
 
         /// <summary>
         /// A cancellation token source that can cancel the mining processes and is linked to the <see cref="INodeLifetime.ApplicationStopping"/>.
@@ -55,17 +56,24 @@ namespace Xels.Bitcoin.Features.PoA
 
         private readonly BlockDefinition blockDefinition;
 
-        private readonly SlotsManager slotsManager;
+        private readonly ISlotsManager slotsManager;
 
         private readonly IConnectionManager connectionManager;
 
         private readonly PoABlockHeaderValidator poaHeaderValidator;
 
-        private readonly FederationManager federationManager;
+        protected readonly IFederationManager federationManager;
 
         private readonly IIntegrityValidator integrityValidator;
 
         private readonly IWalletManager walletManager;
+
+        private readonly VotingManager votingManager;
+
+        private readonly VotingDataEncoder votingDataEncoder;
+
+        private readonly PoAMinerSettings settings;
+        private readonly IAsyncProvider asyncProvider;
 
         private Task miningTask;
 
@@ -77,13 +85,16 @@ namespace Xels.Bitcoin.Features.PoA
             ILoggerFactory loggerFactory,
             IInitialBlockDownloadState ibdState,
             BlockDefinition blockDefinition,
-            SlotsManager slotsManager,
+            ISlotsManager slotsManager,
             IConnectionManager connectionManager,
             PoABlockHeaderValidator poaHeaderValidator,
-            FederationManager federationManager,
+            IFederationManager federationManager,
             IIntegrityValidator integrityValidator,
             IWalletManager walletManager,
-            INodeStats nodeStats)
+            INodeStats nodeStats,
+            VotingManager votingManager,
+            PoAMinerSettings poAMinerSettings,
+            IAsyncProvider asyncProvider)
         {
             this.consensusManager = consensusManager;
             this.dateTimeProvider = dateTimeProvider;
@@ -96,25 +107,25 @@ namespace Xels.Bitcoin.Features.PoA
             this.federationManager = federationManager;
             this.integrityValidator = integrityValidator;
             this.walletManager = walletManager;
+            this.votingManager = votingManager;
+            this.settings = poAMinerSettings;
+            this.asyncProvider = asyncProvider;
 
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
             this.cancellation = CancellationTokenSource.CreateLinkedTokenSource(new[] { nodeLifetime.ApplicationStopping });
+            this.votingDataEncoder = new VotingDataEncoder(loggerFactory);
 
             nodeStats.RegisterStats(this.AddComponentStats, StatsType.Component);
         }
 
         /// <inheritdoc />
-        public void InitializeMining()
+        public virtual void InitializeMining()
         {
             if (this.miningTask == null)
             {
                 this.miningTask = this.CreateBlocksAsync();
+                this.asyncProvider.RegisterTask($"{nameof(PoAMiner)}.{nameof(this.miningTask)}", this.miningTask);
             }
-        }
-
-        public bool IsMining()
-        {
-            return this.miningTask != null;
         }
 
         private async Task CreateBlocksAsync()
@@ -123,28 +134,22 @@ namespace Xels.Bitcoin.Features.PoA
             {
                 try
                 {
-                    // Don't mine in IBD in case we are connected to any node.
-                    if (this.ibdState.IsInitialBlockDownload() && this.connectionManager.ConnectedPeers.Any())
+                    this.logger.LogTrace("IsInitialBlockDownload={0}, AnyConnectedPeers={1}, BootstrappingMode={2}, IsFederationMember={3}",
+                        this.ibdState.IsInitialBlockDownload(), this.connectionManager.ConnectedPeers.Any(), this.settings.BootstrappingMode, this.federationManager.IsFederationMember);
+
+                    // Don't mine in IBD in case we are connected to any node unless bootstrapping mode is enabled.
+                    if (((this.ibdState.IsInitialBlockDownload() || !this.connectionManager.ConnectedPeers.Any()) && !this.settings.BootstrappingMode)
+                        || !this.federationManager.IsFederationMember)
                     {
-                        int attemptDelayMs = 20_000;
+                        int attemptDelayMs = 30_000;
                         await Task.Delay(attemptDelayMs, this.cancellation.Token).ConfigureAwait(false);
 
                         continue;
                     }
 
-                    uint timeNow = (uint) this.dateTimeProvider.GetAdjustedTimeAsUnixTimestamp();
+                    uint miningTimestamp =  await this.WaitUntilMiningSlotAsync().ConfigureAwait(false);
 
-                    if (timeNow <= this.consensusManager.Tip.Header.Time)
-                    {
-                        await this.TaskDelayAsync(500).ConfigureAwait(false);
-                        continue;
-                    }
-
-                    uint myTimestamp = this.slotsManager.GetMiningTimestamp(timeNow);
-
-                    await this.WaitUntilWeCanMineAsync(myTimestamp).ConfigureAwait(false);
-
-                    ChainedHeader chainedHeader = await this.MineBlockAtTimestampAsync(myTimestamp).ConfigureAwait(false);
+                    ChainedHeader chainedHeader = await this.MineBlockAtTimestampAsync(miningTimestamp).ConfigureAwait(false);
 
                     if (chainedHeader == null)
                     {
@@ -160,6 +165,11 @@ namespace Xels.Bitcoin.Features.PoA
                 catch (OperationCanceledException)
                 {
                 }
+                // TODO: Find a better way to do this.
+                catch (ConsensusErrorException ce) when (ce.ConsensusError.Code == "invalid-collateral-amount")
+                {
+                    this.logger.LogInformation("Miner failed to mine block due to: '{0}'.", ce.ConsensusError.Message);
+                }
                 catch (Exception exception)
                 {
                     this.logger.LogCritical("Exception occurred during mining: {0}", exception.ToString());
@@ -168,48 +178,54 @@ namespace Xels.Bitcoin.Features.PoA
             }
         }
 
-        /// <summary>
-        /// Doesn't let the node progress until the given time slot.
-        /// </summary>
-        /// <param name="myTimestamp">The next time slot this node should mine at.</param>
-        protected virtual async Task WaitUntilWeCanMineAsync(uint myTimestamp)
+        private async Task<uint> WaitUntilMiningSlotAsync()
         {
-            int waitingTime = this.GetWaitingTimeInSeconds(myTimestamp);
-
-            this.logger.LogInformation("Waiting {0} seconds until block can be mined.", waitingTime);
-
-            // Accounts for different IDateTimeProvider implementations. The standard implementation would progress
-            // after one iteration, but for other cases where we are emulating time, this may loop more than once.
-            while (waitingTime > 0)
+            while (!this.cancellation.IsCancellationRequested)
             {
-                await this.TaskDelayAsync(waitingTime * 1000, this.cancellation.Token).ConfigureAwait(false);
+                uint timeNow = (uint)this.dateTimeProvider.GetAdjustedTimeAsUnixTimestamp();
 
-                waitingTime = this.GetWaitingTimeInSeconds(myTimestamp);
+                if (timeNow <= this.consensusManager.Tip.Header.Time)
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
+                    continue;
+                }
+
+                uint myTimestamp;
+
+                try
+                {
+                    myTimestamp = this.slotsManager.GetMiningTimestamp(timeNow);
+                }
+                catch (NotAFederationMemberException)
+                {
+                    this.logger.LogWarning("This node is no longer a federation member!");
+
+                    throw new OperationCanceledException();
+                }
+
+                int estimatedWaitingTime = (int)(myTimestamp - timeNow) - 1;
+
+                if (estimatedWaitingTime <= 0)
+                    return myTimestamp;
+
+                await Task.Delay(TimeSpan.FromMilliseconds(500), this.cancellation.Token).ConfigureAwait(false);
             }
-        }
 
-        /// <summary>
-        /// Retrieve the amount of seconds the node should wait until its turn to mine.
-        /// </summary>
-        /// <param name="myTimestamp">The next time slot this node should mine at.</param>
-        private int GetWaitingTimeInSeconds(uint myTimestamp)
-        {
-            uint timeNow = (uint)this.dateTimeProvider.GetAdjustedTimeAsUnixTimestamp();
-            return (int)(myTimestamp - timeNow) - 1;
-        }
-
-        /// <summary>
-        /// Pauses execution for the given time. A wrapper for <see cref="Task.Delay(int)"/>.
-        /// </summary>
-        /// <param name="delayMs">Milliseconds to sleep for.</param>
-        protected virtual async Task TaskDelayAsync(int delayMs, CancellationToken cancellation = default(CancellationToken))
-        {
-            await Task.Delay(delayMs, cancellation).ConfigureAwait(false);
+            throw new OperationCanceledException();
         }
 
         protected async Task<ChainedHeader> MineBlockAtTimestampAsync(uint timestamp)
         {
             ChainedHeader tip = this.consensusManager.Tip;
+
+            // Timestamp should always be greater than prev one.
+            if (timestamp <= tip.Header.Time)
+            {
+                // Can happen only when target spacing had crazy low value or key was compromised and someone is mining with our key.
+                this.logger.LogWarning("Somehow another block was connected with greater timestamp. Dropping current block.");
+                this.logger.LogTrace("(-)[ANOTHER_BLOCK_CONNECTED]:null");
+                return null;
+            }
 
             Script walletScriptPubKey = this.GetScriptPubKeyFromWallet();
 
@@ -221,28 +237,29 @@ namespace Xels.Bitcoin.Features.PoA
 
             BlockTemplate blockTemplate = this.blockDefinition.Build(tip, walletScriptPubKey);
 
-            blockTemplate.Block.Header.Time = timestamp;
+            this.FillBlockTemplate(blockTemplate, out bool dropTemplate);
 
-            // Timestamp should always be greater than prev one.
-            if (blockTemplate.Block.Header.Time <= tip.Header.Time)
+            if (dropTemplate)
             {
-                // Can happen only when target spacing had crazy low value or key was compromised and someone is mining with our key.
-                this.logger.LogWarning("Somehow another block was connected with greater timestamp. Dropping current block.");
+                this.logger.LogTrace("(-)[DROPPED]:null");
                 return null;
             }
+
+            blockTemplate.Block.Header.Time = timestamp;
 
             // Update merkle root.
             blockTemplate.Block.UpdateMerkleRoot();
 
             // Sign block with our private key.
             var header = blockTemplate.Block.Header as PoABlockHeader;
-            this.poaHeaderValidator.Sign(this.federationManager.FederationMemberKey, header);
+            this.poaHeaderValidator.Sign(this.federationManager.CurrentFederationKey, header);
 
             ChainedHeader chainedHeader = await this.consensusManager.BlockMinedAsync(blockTemplate.Block).ConfigureAwait(false);
 
             if (chainedHeader == null)
             {
                 // Block wasn't accepted because we already connected block from the network.
+                this.logger.LogTrace("(-)[FAILED_TO_CONNECT]:null");
                 return null;
             }
 
@@ -250,10 +267,20 @@ namespace Xels.Bitcoin.Features.PoA
             if (result.Error != null)
             {
                 // Sanity check. Should never happen.
+                this.logger.LogTrace("(-)[INTEGRITY_FAILURE]");
                 throw new Exception(result.Error.ToString());
             }
 
             return chainedHeader;
+        }
+
+        /// <summary>Fills block template with custom non-standard data.</summary>
+        protected virtual void FillBlockTemplate(BlockTemplate blockTemplate, out bool dropTemplate)
+        {
+            if (this.network.ConsensusOptions.VotingEnabled)
+                this.AddVotingData(blockTemplate);
+
+            dropTemplate = false;
         }
 
         /// <summary>Gets scriptPubKey from the wallet.</summary>
@@ -276,6 +303,28 @@ namespace Xels.Bitcoin.Features.PoA
             return address.Pubkey;
         }
 
+        /// <summary>Adds OP_RETURN output to a coinbase transaction which contains encoded voting data.</summary>
+        /// <remarks>If there are no votes scheduled output will not be added.</remarks>
+        private void AddVotingData(BlockTemplate blockTemplate)
+        {
+            List<VotingData> scheduledVotes = this.votingManager.GetAndCleanScheduledVotes();
+
+            if (scheduledVotes.Count == 0)
+            {
+                this.logger.LogTrace("(-)[NO_DATA]");
+                return;
+            }
+
+            var votingData = new List<byte>(VotingDataEncoder.VotingOutputPrefixBytes);
+
+            byte[] encodedVotingData = this.votingDataEncoder.Encode(scheduledVotes);
+            votingData.AddRange(encodedVotingData);
+
+            var votingOutputScript = new Script(OpcodeType.OP_RETURN, Op.GetPushOp(votingData.ToArray()));
+
+            blockTemplate.Block.Transactions[0].AddOutput(Money.Zero, votingOutputScript);
+        }
+
         private void AddComponentStats(StringBuilder log)
         {
             log.AppendLine();
@@ -285,9 +334,10 @@ namespace Xels.Bitcoin.Features.PoA
             ChainedHeader currentHeader = tip;
             uint currentTime = currentHeader.Header.Time;
 
-            int maxDepth = 20;
+            int maxDepth = 46;
             int pubKeyTakeCharacters = 4;
             int depthReached = 0;
+            int hitCount = 0;
 
             log.AppendLine($"Mining information for the last {maxDepth} blocks.");
             log.AppendLine("MISS means that miner didn't produce a block at the timestamp he was supposed to.");
@@ -295,10 +345,11 @@ namespace Xels.Bitcoin.Features.PoA
             for (int i = tip.Height; (i > 0) && (i > tip.Height - maxDepth); i--)
             {
                 // Add stats for current header.
-                string pubKeyRepresentation = this.slotsManager.GetPubKeyForTimestamp(currentTime).ToString().Substring(0, pubKeyTakeCharacters);
+                string pubKeyRepresentation = this.slotsManager.GetFederationMemberForTimestamp(currentTime).PubKey.ToString().Substring(0, pubKeyTakeCharacters);
 
                 log.Append("[" + pubKeyRepresentation + "]-");
                 depthReached++;
+                hitCount++;
 
                 currentHeader = currentHeader.Previous;
                 currentTime -= this.network.ConsensusOptions.TargetSpacingSeconds;
@@ -318,10 +369,14 @@ namespace Xels.Bitcoin.Features.PoA
             }
 
             log.Append("...");
+            log.AppendLine();
+            log.AppendLine($"Block producers hits      : {hitCount} of {maxDepth}({(((float)hitCount / (float)maxDepth)).ToString("P2")})");
+            log.AppendLine($"Block producers idle time : {TimeSpan.FromSeconds(this.network.ConsensusOptions.TargetSpacingSeconds * (maxDepth - hitCount)).ToString(@"hh\:mm\:ss")}");
+            log.AppendLine();
         }
 
         /// <inheritdoc/>
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.cancellation.Cancel();
             this.miningTask?.GetAwaiter().GetResult();

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using NBitcoin;
 using NBitcoin.Policy;
 using Xels.Bitcoin.Builder;
+using Xels.Bitcoin.Builder.Feature;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Connection;
@@ -20,7 +21,6 @@ using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Broadcasting;
 using Xels.Bitcoin.Features.Wallet.Controllers;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
-using Xels.Bitcoin.Features.Wallet.Notifications;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Utilities;
 
@@ -51,18 +51,6 @@ namespace Xels.Bitcoin.Features.ColdStaking
     {
         /// <summary>The synchronization manager for the wallet, tasked with keeping the wallet synced with the network.</summary>
         private readonly IWalletSyncManager walletSyncManager;
-
-        /// <summary>The signals responsible for receiving blocks and transactions from the network.</summary>
-        private readonly Signals.Signals signals;
-
-        /// <summary>Records disposable returned by <see cref="Signals.Signals.SubscribeForBlocksConnected"/> for <see cref="BlockObserver"/>.</summary>
-        private IDisposable blockSubscriberDisposable;
-
-        /// <summary>Records disposable returned by <see cref="Signals.Signals.SubscribeForBlocksConnected"/> for <see cref="TransactionObserver"/>.</summary>
-        private IDisposable transactionSubscriberDisposable;
-
-        /// <summary>The chain of blocks.</summary>
-        private ConcurrentChain chain;
 
         /// <summary>The connection manager.</summary>
         private readonly IConnectionManager connectionManager;
@@ -105,8 +93,6 @@ namespace Xels.Bitcoin.Features.ColdStaking
             IWalletSyncManager walletSyncManager,
             IWalletManager walletManager,
             IAddressBookManager addressBookManager,
-            Signals.Signals signals,
-            ConcurrentChain chain,
             IConnectionManager connectionManager,
             BroadcasterBehavior broadcasterBehavior,
             NodeSettings nodeSettings,
@@ -125,8 +111,6 @@ namespace Xels.Bitcoin.Features.ColdStaking
 
             this.walletSyncManager = walletSyncManager;
             this.addressBookManager = addressBookManager;
-            this.signals = signals;
-            this.chain = chain;
             this.connectionManager = connectionManager;
             this.broadcasterBehavior = broadcasterBehavior;
             this.nodeSettings = nodeSettings;
@@ -161,12 +145,11 @@ namespace Xels.Bitcoin.Features.ColdStaking
 
             if (walletManager != null)
             {
-                int height = walletManager.LastBlockHeight();
-                uint256 hash = walletManager.LastReceivedBlockHash();
+                HashHeightPair hashHeightPair = walletManager.LastReceivedBlockInfo();
 
                 benchLogs.AppendLine("Wallet.Height: ".PadRight(LoggingConfiguration.ColumnLength + 1) +
-                               (walletManager.ContainsWallets ? height.ToString().PadRight(8) : "No Wallet".PadRight(8)) +
-                               (walletManager.ContainsWallets ? (" Wallet.Hash: ".PadRight(LoggingConfiguration.ColumnLength - 1) + hash) : string.Empty));
+                               (walletManager.ContainsWallets ? hashHeightPair.Height.ToString().PadRight(8) : "No Wallet".PadRight(8)) +
+                               (walletManager.ContainsWallets ? (" Wallet.Hash: ".PadRight(LoggingConfiguration.ColumnLength - 1) + hashHeightPair.Hash) : string.Empty));
             }
         }
 
@@ -215,10 +198,6 @@ namespace Xels.Bitcoin.Features.ColdStaking
         /// <inheritdoc />
         public override Task InitializeAsync()
         {
-            // subscribe to receiving blocks and transactions
-            this.blockSubscriberDisposable = this.signals.SubscribeForBlocksConnected(new BlockObserver(this.walletSyncManager));
-            this.transactionSubscriberDisposable = this.signals.SubscribeForTransactions(new TransactionObserver(this.walletSyncManager));
-
             this.coldStakingManager.Start();
             this.walletSyncManager.Start();
             this.addressBookManager.Initialize();
@@ -231,9 +210,6 @@ namespace Xels.Bitcoin.Features.ColdStaking
         /// <inheritdoc />
         public override void Dispose()
         {
-            this.blockSubscriberDisposable.Dispose();
-            this.transactionSubscriberDisposable.Dispose();
-
             this.coldStakingManager.Stop();
             this.walletSyncManager.Stop();
         }
@@ -252,7 +228,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
                 throw new InvalidOperationException("Cold staking can only be used on a Xels network.");
 
             // Register the cold staking script template.
-            StandardScripts.RegisterStandardScriptTemplate(ColdStakingScriptTemplate.Instance);
+            fullNodeBuilder.Network.StandardScriptsRegistry.RegisterStandardScriptTemplate(ColdStakingScriptTemplate.Instance);
 
             LoggingConfiguration.RegisterFeatureNamespace<ColdStakingFeature>("wallet");
 

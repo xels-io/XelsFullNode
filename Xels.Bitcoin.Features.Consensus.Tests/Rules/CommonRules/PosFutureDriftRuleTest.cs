@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using NBitcoin;
+﻿using NBitcoin;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
 using Xunit;
@@ -19,7 +18,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_HeaderTimestampTooNew_WithoutReducedDrift_ThrowsBlockTimestampTooFarConsensusErrorAsync()
+        public void RunAsync_HeaderTimestampTooNew_WithoutReducedDrift_ThrowsBlockTimestampTooFarConsensusErrorAsync()
         {
             long futureDriftTimestamp = (XelsBugFixPosFutureDriftRule.DriftingBugFixTimestamp - 100);
             this.dateTimeProvider.Setup(d => d.GetAdjustedTimeAsUnixTimestamp())
@@ -32,7 +31,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_HeaderTimestampTooNew_WithReducedDrift_ThrowsBlockTimestampTooFarConsensusErrorAsync()
+        public void RunAsync_HeaderTimestampTooNew_WithReducedDrift_ThrowsBlockTimestampTooFarConsensusError()
         {
             long futureDriftTimestamp = (XelsBugFixPosFutureDriftRule.DriftingBugFixTimestamp + 100);
             this.dateTimeProvider.Setup(d => d.GetAdjustedTimeAsUnixTimestamp())
@@ -45,7 +44,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_HeaderTimestampSameAsFutureDriftLimit_WithoutReducedDrift_DoesNotThrowExceptionAsync()
+        public void RunAsync_HeaderTimestampSameAsFutureDriftLimit_WithoutReducedDrift_DoesNotThrowExceptionAsync()
         {
             long futureDriftTimestamp = (XelsBugFixPosFutureDriftRule.DriftingBugFixTimestamp - 100);
             this.dateTimeProvider.Setup(d => d.GetAdjustedTimeAsUnixTimestamp())
@@ -56,7 +55,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_HeaderTimestampSameAsFutureDriftLimit_WithReducedDrift_DoesNotThrowExceptionAsync()
+        public void RunAsync_HeaderTimestampSameAsFutureDriftLimit_WithReducedDrift_DoesNotThrowException()
         {
             long futureDriftTimestamp = (XelsBugFixPosFutureDriftRule.DriftingBugFixTimestamp + 100);
             this.dateTimeProvider.Setup(d => d.GetAdjustedTimeAsUnixTimestamp())
@@ -67,7 +66,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_HeaderTimestampBelowFutureDriftLimit_WithoutReducedDrift_DoesNotThrowExceptionAsync()
+        public void RunAsync_HeaderTimestampBelowFutureDriftLimit_WithoutReducedDrift_DoesNotThrowException()
         {
             long futureDriftTimestamp = (XelsBugFixPosFutureDriftRule.DriftingBugFixTimestamp - 100);
             this.dateTimeProvider.Setup(d => d.GetAdjustedTimeAsUnixTimestamp())
@@ -78,7 +77,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
         }
 
         [Fact]
-        public async Task RunAsync_HeaderTimestampBelowFutureDriftLimit_WithReducedDrift_DoesNotThrowExceptionAsync()
+        public void RunAsync_HeaderTimestampBelowFutureDriftLimit_WithReducedDrift_DoesNotThrowException()
         {
             long futureDriftTimestamp = (XelsBugFixPosFutureDriftRule.DriftingBugFixTimestamp + 100);
             this.dateTimeProvider.Setup(d => d.GetAdjustedTimeAsUnixTimestamp())

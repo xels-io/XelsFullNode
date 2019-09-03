@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ConcurrentCollections;
 using NBitcoin;
 using Xels.Bitcoin.Connection;
+using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
@@ -40,13 +41,13 @@ namespace Xels.Bitcoin.Features.Wallet.Broadcasting
             return txEntry ?? null;
         }
 
-        public void AddOrUpdate(Transaction transaction, State state, string errorMessage = "")
+        public void AddOrUpdate(Transaction transaction, State state, MempoolError mempoolError = null)
         {
             TransactionBroadcastEntry broadcastEntry = this.Broadcasts.FirstOrDefault(x => x.Transaction.GetHash() == transaction.GetHash());
 
             if (broadcastEntry == null)
             {
-                broadcastEntry = new TransactionBroadcastEntry(transaction, state, errorMessage);
+                broadcastEntry = new TransactionBroadcastEntry(transaction, state, mempoolError);
                 this.Broadcasts.Add(broadcastEntry);
                 this.OnTransactionStateChanged(broadcastEntry);
             }

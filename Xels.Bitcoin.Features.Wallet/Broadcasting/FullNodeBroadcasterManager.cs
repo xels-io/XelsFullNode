@@ -31,21 +31,12 @@ namespace Xels.Bitcoin.Features.Wallet.Broadcasting
 
             if (!await this.mempoolValidator.AcceptToMemoryPool(state, transaction).ConfigureAwait(false))
             {
-                string errorMessage = "Failed";
-
-                if (state.Error?.ConsensusError != null)
-                {
-                    errorMessage = state.Error.ConsensusError.Message;
-                }
-                else if (!string.IsNullOrEmpty(state.Error?.Code))
-                {
-                    errorMessage = state.Error.Code;
-                }
-
-                this.AddOrUpdate(transaction, State.CantBroadcast, errorMessage);
+                this.AddOrUpdate(transaction, State.CantBroadcast, state.Error);
             }
             else
+            {
                 await this.PropagateTransactionToPeersAsync(transaction, this.connectionManager.ConnectedPeers.ToList()).ConfigureAwait(false);
+            }
         }
     }
 }

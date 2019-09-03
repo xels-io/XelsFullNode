@@ -4,12 +4,14 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
 using Xels.Bitcoin.Utilities;
 using Xels.Bitcoin.Utilities.Extensions;
+using TracerAttributes;
 
 namespace Xels.Bitcoin.P2P
 {
@@ -18,9 +20,10 @@ namespace Xels.Bitcoin.P2P
     /// </summary>
     public sealed class PeerConnectorConnectNode : PeerConnector
     {
-        /// <summary>Constructor for dependency injection.</summary>
+        private readonly ILogger logger;
+
         public PeerConnectorConnectNode(
-            IAsyncLoopFactory asyncLoopFactory,
+            IAsyncProvider asyncProvider,
             IDateTimeProvider dateTimeProvider,
             ILoggerFactory loggerFactory,
             Network network,
@@ -30,25 +33,22 @@ namespace Xels.Bitcoin.P2P
             ConnectionManagerSettings connectionSettings,
             IPeerAddressManager peerAddressManager,
             ISelfEndpointTracker selfEndpointTracker) :
-            base(asyncLoopFactory, dateTimeProvider, loggerFactory, network, networkPeerFactory, nodeLifetime, nodeSettings, connectionSettings, peerAddressManager, selfEndpointTracker)
+            base(asyncProvider, dateTimeProvider, loggerFactory, network, networkPeerFactory, nodeLifetime, nodeSettings, connectionSettings, peerAddressManager, selfEndpointTracker)
         {
+            this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
+
             this.Requirements.RequiredServices = NetworkPeerServices.Nothing;
         }
 
         /// <inheritdoc/>
-        public override void OnInitialize()
+        protected override void OnInitialize()
         {
-            // For the -connect connector, effectively disable burst mode by preventing high frequency connection attempts.
-            // The initial -connect list will all have their connection attempts made in parallel regardless, so this
-            // does not slow down the startup.
-            this.burstConnectionInterval = TimeSpans.Second;
-
             this.MaxOutboundConnections = this.ConnectionSettings.Connect.Count;
 
             // Add the endpoints from the -connect arg to the address manager.
             foreach (IPEndPoint ipEndpoint in this.ConnectionSettings.Connect)
             {
-                this.peerAddressManager.AddPeer(ipEndpoint.MapToIpv6(), IPAddress.Loopback);
+                this.PeerAddressManager.AddPeer(ipEndpoint.MapToIpv6(), IPAddress.Loopback);
             }
         }
 
@@ -59,9 +59,17 @@ namespace Xels.Bitcoin.P2P
         }
 
         /// <inheritdoc/>
-        public override void OnStartConnect()
+        [NoTrace]
+        protected override void OnStartConnect()
         {
             this.CurrentParameters.PeerAddressManagerBehaviour().Mode = PeerAddressManagerBehaviourMode.None;
+        }
+
+        /// <inheritdoc/>
+        [NoTrace]
+        protected override TimeSpan CalculateConnectionInterval()
+        {
+            return TimeSpans.Second;
         }
 
         /// <summary>
@@ -69,15 +77,17 @@ namespace Xels.Bitcoin.P2P
         /// </summary>
         public override async Task OnConnectAsync()
         {
-            await this.ConnectionSettings.Connect.ForEachAsync(this.ConnectionSettings.MaxOutboundConnections, this.nodeLifetime.ApplicationStopping,
+            await this.ConnectionSettings.Connect.ForEachAsync(this.ConnectionSettings.MaxOutboundConnections, this.NodeLifetime.ApplicationStopping,
                 async (ipEndpoint, cancellation) =>
                 {
-                    if (this.nodeLifetime.ApplicationStopping.IsCancellationRequested)
+                    if (this.NodeLifetime.ApplicationStopping.IsCancellationRequested)
                         return;
 
-                    PeerAddress peerAddress = this.peerAddressManager.FindPeer(ipEndpoint);
-                    if (peerAddress != null && !this.IsPeerConnected(peerAddress.Endpoint))
+                    PeerAddress peerAddress = this.PeerAddressManager.FindPeer(ipEndpoint);
+                    if (peerAddress != null)
                     {
+                        this.logger.LogDebug("Attempting connection to {0}.", peerAddress.Endpoint);
+
                         await this.ConnectAsync(peerAddress).ConfigureAwait(false);
                     }
                 }).ConfigureAwait(false);

@@ -33,8 +33,8 @@ namespace Xels.Bitcoin.Api.Tests
             ApiSettings settings = FullNodeSetup(nodeSettings);
 
             // Assert.
-            Assert.Equal(ApiSettings.DefaultBitcoinApiPort, settings.ApiPort);
-            Assert.Equal(new Uri($"{ApiSettings.DefaultApiHost}:{ApiSettings.DefaultBitcoinApiPort}"), settings.ApiUri);
+            Assert.Equal(network.DefaultAPIPort, settings.ApiPort);
+            Assert.Equal(new Uri($"{ApiSettings.DefaultApiHost}:{network.DefaultAPIPort}"), settings.ApiUri);
         }
 
         /// <summary>
@@ -51,8 +51,8 @@ namespace Xels.Bitcoin.Api.Tests
             ApiSettings settings = FullNodeSetup(nodeSettings);
 
             // Assert.
-            Assert.Equal(ApiSettings.DefaultXelsApiPort, settings.ApiPort);
-            Assert.Equal(new Uri($"{ApiSettings.DefaultApiHost}:{ApiSettings.DefaultXelsApiPort}"), settings.ApiUri);
+            Assert.Equal(network.DefaultAPIPort, settings.ApiPort);
+            Assert.Equal(new Uri($"{ApiSettings.DefaultApiHost}:{network.DefaultAPIPort}"), settings.ApiUri);
 
             settings.HttpsCertificateFilePath.Should().BeNull();
             settings.UseHttps.Should().BeFalse();
@@ -92,8 +92,8 @@ namespace Xels.Bitcoin.Api.Tests
 
 
             // Assert.
-            Assert.Equal(ApiSettings.DefaultBitcoinApiPort, settings.ApiPort);
-            Assert.Equal(new Uri($"{customApiUri}:{ApiSettings.DefaultBitcoinApiPort}"), settings.ApiUri);
+            Assert.Equal(network.DefaultAPIPort, settings.ApiPort);
+            Assert.Equal(new Uri($"{customApiUri}:{network.DefaultAPIPort}"), settings.ApiUri);
         }
 
         /// <summary>
@@ -111,8 +111,8 @@ namespace Xels.Bitcoin.Api.Tests
             ApiSettings settings = FullNodeSetup(nodeSettings);
 
             // Assert.
-            Assert.Equal(ApiSettings.DefaultXelsApiPort, settings.ApiPort);
-            Assert.Equal(new Uri($"{customApiUri}:{ApiSettings.DefaultXelsApiPort}"), settings.ApiUri);
+            Assert.Equal(network.DefaultAPIPort, settings.ApiPort);
+            Assert.Equal(new Uri($"{customApiUri}:{network.DefaultAPIPort}"), settings.ApiUri);
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Xels.Bitcoin.Api.Tests
             ApiSettings settings = FullNodeSetup(nodeSettings);
 
             // Assert.
-            Assert.Equal(ApiSettings.DefaultBitcoinApiPort, settings.ApiPort);
+            Assert.Equal(KnownNetworks.Main.DefaultAPIPort, settings.ApiPort);
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Xels.Bitcoin.Api.Tests
             ApiSettings settings = FullNodeSetup(nodeSettings);
 
             // Assert.
-            Assert.Equal(ApiSettings.TestBitcoinApiPort, settings.ApiPort);
+            Assert.Equal(KnownNetworks.TestNet.DefaultAPIPort, settings.ApiPort);
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace Xels.Bitcoin.Api.Tests
             ApiSettings settings = FullNodeSetup(nodeSettings);
 
             // Assert.
-            Assert.Equal(ApiSettings.DefaultXelsApiPort, settings.ApiPort);
+            Assert.Equal(KnownNetworks.XelsMain.DefaultAPIPort, settings.ApiPort);
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace Xels.Bitcoin.Api.Tests
             ApiSettings settings = FullNodeSetup(nodeSettings);
 
             // Assert.
-            Assert.Equal(ApiSettings.TestXelsApiPort, settings.ApiPort);
+            Assert.Equal(KnownNetworks.XelsTest.DefaultAPIPort, settings.ApiPort);
         }
 
         [Theory]

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NBitcoin;
-using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin.Features.Consensus

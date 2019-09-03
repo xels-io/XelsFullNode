@@ -5,8 +5,14 @@ using NBitcoin;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Consensus.Rules;
+using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
 using Xels.Bitcoin.Utilities;
+using Xels.SmartContracts.CLR;
+using Xels.SmartContracts.Core;
+using Xels.SmartContracts.Core.Receipts;
+using Xels.SmartContracts.Core.State;
+using Xels.SmartContracts.Core.Util;
 
 namespace Xels.Bitcoin.Features.SmartContracts.Rules
 {
@@ -18,11 +24,39 @@ namespace Xels.Bitcoin.Features.SmartContracts.Rules
         protected uint refundCounter;
         private SmartContractCoinViewRuleLogic logic;
 
+        private readonly Network network;
+        private readonly IStateRepositoryRoot stateRepositoryRoot;
+        private readonly IContractExecutorFactory executorFactory;
+        private readonly ICallDataSerializer callDataSerializer;
+        private readonly ISenderRetriever senderRetriever;
+        private readonly IReceiptRepository receiptRepository;
+        private readonly ICoinView coinView;
+        private readonly IList<Receipt> receipts;
+        private IStateRepositoryRoot mutableStateRepository;
+
+        protected SmartContractCoinviewRule(Network network, 
+            IStateRepositoryRoot stateRepositoryRoot,
+            IContractExecutorFactory executorFactory,
+            ICallDataSerializer callDataSerializer,
+            ISenderRetriever senderRetriever,
+            IReceiptRepository receiptRepository,
+            ICoinView coinView)
+        {
+            this.network = network;
+            this.stateRepositoryRoot = stateRepositoryRoot;
+            this.executorFactory = executorFactory;
+            this.callDataSerializer = callDataSerializer;
+            this.senderRetriever = senderRetriever;
+            this.receiptRepository = receiptRepository;
+            this.coinView = coinView;
+        }
+
         /// <inheritdoc />
         public override void Initialize()
         {
             base.Initialize();
-            this.logic = new SmartContractCoinViewRuleLogic(this.Parent);
+
+            this.logic = new SmartContractCoinViewRuleLogic(this.stateRepositoryRoot, this.executorFactory, this.callDataSerializer, this.senderRetriever, this.receiptRepository, this.coinView);
         }
 
         /// <inheritdoc />
@@ -58,10 +92,10 @@ namespace Xels.Bitcoin.Features.SmartContracts.Rules
         /// <remarks>Should someone wish to use POW only we'll need to implement subsidy halving.</remarks>
         public override Money GetProofOfWorkReward(int height)
         {
-            if (height == this.Parent.Network.Consensus.PremineHeight)
-                return this.Parent.Network.Consensus.PremineReward;
+            if (height == this.network.Consensus.PremineHeight)
+                return this.network.Consensus.PremineReward;
 
-            return this.Parent.Network.Consensus.ProofOfWorkReward;
+            return this.network.Consensus.ProofOfWorkReward;
         }
 
         /// <summary>
@@ -97,12 +131,6 @@ namespace Xels.Bitcoin.Features.SmartContracts.Rules
         protected void ExecuteContractTransaction(RuleContext context, Transaction transaction)
         {
             this.logic.ExecuteContractTransaction(context, transaction);
-        }
-
-        /// <inheritdoc/>
-        protected override bool IsProtocolTransaction(Transaction transaction)
-        {
-            return this.logic.IsProtocolTransaction(transaction);
         }
     }
 }

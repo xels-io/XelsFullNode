@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Moq;
 using NBitcoin;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;

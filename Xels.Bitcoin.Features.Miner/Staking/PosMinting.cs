@@ -8,6 +8,7 @@ using NBitcoin;
 using NBitcoin.BuilderExtensions;
 using NBitcoin.Crypto;
 using NBitcoin.Protocol;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Features.Consensus;
@@ -21,7 +22,6 @@ using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Mining;
-using Xels.Bitcoin.Primitives;
 using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin.Features.Miner.Staking
@@ -100,11 +100,11 @@ namespace Xels.Bitcoin.Features.Miner.Staking
         /// but high enough to compensate for tasks' overhead.</remarks>
         private const int UtxoStakeDescriptionsPerCoinstakeWorker = 25;
 
-        /// <summary>Consumes manager class.</summary>
+        /// <summary>Consensus manager class.</summary>
         private readonly IConsensusManager consensusManager;
 
         /// <summary>Thread safe access to the best chain of block headers (that the node is aware of) from genesis.</summary>
-        private readonly ConcurrentChain chain;
+        private readonly ChainIndexer chainIndexer;
 
         /// <summary>Specification of the network the node runs on - regtest/testnet/mainnet.</summary>
         private readonly Network network;
@@ -125,7 +125,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
         private readonly IStakeValidator stakeValidator;
 
         /// <summary>Factory for creating background async loop tasks.</summary>
-        private readonly IAsyncLoopFactory asyncLoopFactory;
+        private readonly IAsyncProvider asyncProvider;
 
         /// <summary>A manager providing operations on wallets.</summary>
         private readonly IWalletManager walletManager;
@@ -214,13 +214,17 @@ namespace Xels.Bitcoin.Features.Miner.Staking
 
         /// <summary>State of time synchronization feature that stores collected data samples.</summary>
         private readonly ITimeSyncBehaviorState timeSyncBehaviorState;
-
+        
+        /// <summary>
+        /// Needed for Increament Nonce method of PoW Hybridization with PoS
+        /// </summary>
         private uint256 hashPrevBlock;
+
 
         public PosMinting(
             IBlockProvider blockProvider,
             IConsensusManager consensusManager,
-            ConcurrentChain chain,
+            ChainIndexer chainIndexer,
             Network network,
             IDateTimeProvider dateTimeProvider,
             IInitialBlockDownloadState initialBlockDownloadState,
@@ -231,14 +235,14 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             MempoolSchedulerLock mempoolLock,
             ITxMempool mempool,
             IWalletManager walletManager,
-            IAsyncLoopFactory asyncLoopFactory,
+            IAsyncProvider asyncProvider,
             ITimeSyncBehaviorState timeSyncBehaviorState,
             ILoggerFactory loggerFactory,
             MinerSettings minerSettings)
         {
             this.blockProvider = blockProvider;
             this.consensusManager = consensusManager;
-            this.chain = chain;
+            this.chainIndexer = chainIndexer;
             this.network = network;
             this.dateTimeProvider = dateTimeProvider;
             this.initialBlockDownloadState = initialBlockDownloadState;
@@ -248,7 +252,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             this.stakeValidator = stakeValidator;
             this.mempoolLock = mempoolLock;
             this.mempool = mempool;
-            this.asyncLoopFactory = asyncLoopFactory;
+            this.asyncProvider = asyncProvider;
             this.walletManager = walletManager;
             this.timeSyncBehaviorState = timeSyncBehaviorState;
             this.loggerFactory = loggerFactory;
@@ -283,11 +287,11 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             this.rpcGetStakingInfoModel.Enabled = true;
             this.stakeCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(new[] { this.nodeLifetime.ApplicationStopping });
 
-            this.stakingLoop = this.asyncLoopFactory.Run("PosMining.Stake", async token =>
+            this.stakingLoop = this.asyncProvider.CreateAndRunAsyncLoop("PosMining.Stake", async token =>
             {
                 try
                 {
-                    await this.GenerateBlocksAsync(walletSecret, this.stakeCancellationTokenSource.Token)
+                    await this.GenerateBlocksAsync(walletSecret, token)
                         .ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
@@ -370,7 +374,16 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                     continue;
                 }
 
-                // Prevent staking if not in initial block download.
+                // Don't stake if the wallet is not up-to-date with the current chain.
+                if (this.consensusManager.Tip.HashBlock != this.walletManager.WalletTipHash)
+                {
+                    this.logger.LogTrace("Waiting for wallet to catch up before mining can be started.");
+
+                    await Task.Delay(TimeSpan.FromMilliseconds(this.minerSleep), cancellationToken).ConfigureAwait(false);
+                    continue;
+                }
+
+                // Prevent staking if in initial block download.
                 if (this.initialBlockDownloadState.IsInitialBlockDownload())
                 {
                     this.logger.LogTrace("Waiting for synchronization before mining can be started.");
@@ -400,7 +413,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
 
                 while (!PoWFound)
                 {
-                    nExtraNonce = this.IncrementExtraNonce(pblock, this.chain.Tip, nExtraNonce);
+                    nExtraNonce = this.IncrementExtraNonce(pblock, this.chainIndexer, nExtraNonce);
                     while ((maxTries > 0) && (pblock.Header.Nonce < InnerLoopCount) && !pblock.CheckProofOfWork())
                     {
                         this.nodeLifetime.ApplicationStopping.ThrowIfCancellationRequested();
@@ -412,7 +425,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                         break;
                     if (pblock.Header.Nonce == InnerLoopCount)
                         continue;
-                    
+
                     PoWFound = true;
                 }
 
@@ -429,7 +442,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                 blockTemplate = blockTemplate ?? this.blockProvider.BuildPosBlock(chainTip, new Script());
                 var posBlock = (PosBlock)blockTemplate.Block;
 
-                this.networkWeight = ((long)this.GetNetworkWeight());// + (long) 1.0 ;
+                this.networkWeight = (long)this.GetNetworkWeight();
                 this.rpcGetStakingInfoModel.CurrentBlockSize = posBlock.GetSerializedSize();
                 this.rpcGetStakingInfoModel.CurrentBlockTx = posBlock.Transactions.Count();
                 this.rpcGetStakingInfoModel.PooledTx = await this.mempoolLock.ReadAsync(() => this.mempool.MapTx.Count).ConfigureAwait(false);
@@ -451,8 +464,14 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                 }
             }
         }
-
-        public int IncrementExtraNonce(Block block, ChainedHeader previousHeader, int extraNonce)
+        /// <summary>
+        /// This method is used in PoW mining loop.
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="previousHeader"></param>
+        /// <param name="extraNonce"></param>
+        /// <returns></returns>
+        public int IncrementExtraNonce(Block block, ChainIndexer previousHeader, int extraNonce)
         {
             if (this.hashPrevBlock != block.Header.HashPrevBlock)
             {
@@ -474,37 +493,42 @@ namespace Xels.Bitcoin.Features.Miner.Staking
         internal async Task<List<UtxoStakeDescription>> GetUtxoStakeDescriptionsAsync(WalletSecret walletSecret, CancellationToken cancellationToken)
         {
             var utxoStakeDescriptions = new List<UtxoStakeDescription>();
-            List<UnspentOutputReference> spendableTransactions = this.walletManager
-                .GetSpendableTransactionsInWalletForStaking(walletSecret.WalletName, 1).ToList();
+            List<UnspentOutputReference> stakableUtxos = this.walletManager
+                .GetSpendableTransactionsInWalletForStaking(walletSecret.WalletName, 1)
+                .Where(utxo => utxo.Transaction.Amount >= this.MinimumStakingCoinValue) // exclude dust from stake process
+                .ToList();
 
-            FetchCoinsResponse fetchedCoinSet = await this.coinView.FetchCoinsAsync(spendableTransactions.Select(t => t.Transaction.Id).Distinct().ToArray(), cancellationToken).ConfigureAwait(false);
+            FetchCoinsResponse fetchedCoinSet = this.coinView.FetchCoins(stakableUtxos.Select(t => t.Transaction.Id).Distinct().ToArray(), cancellationToken);
+            Dictionary<uint256, UnspentOutputs> utxoByTransaction = fetchedCoinSet.UnspentOutputs.Where(utxo => utxo != null).ToDictionary(utxo => utxo.TransactionId, utxo => utxo);
+            fetchedCoinSet = null; // allow GC to collect as soon as possible.
 
-            foreach (UnspentOutputReference outputReference in spendableTransactions)
+            for (int i = 0; i < stakableUtxos.Count; i++)
             {
+                UnspentOutputReference stakableUtxo = stakableUtxos[i];
+
                 if (cancellationToken.IsCancellationRequested)
                 {
                     this.logger.LogTrace("(-)[CANCELLATION]");
                     throw new OperationCanceledException(cancellationToken);
                 }
 
-                UnspentOutputs coinSet = fetchedCoinSet.UnspentOutputs
-                    .FirstOrDefault(f => f?.TransactionId == outputReference.Transaction.Id);
-                if ((coinSet == null) || (outputReference.Transaction.Index >= coinSet.Outputs.Length))
+                UnspentOutputs coinSet = utxoByTransaction.TryGet(stakableUtxo.Transaction.Id);
+                if ((coinSet == null) || (stakableUtxo.Transaction.Index >= coinSet.Outputs.Length))
                     continue;
 
-                TxOut utxo = coinSet.Outputs[outputReference.Transaction.Index];
-                if ((utxo == null) || (utxo.Value < MinimumStakingCoinValue))
+                TxOut utxo = coinSet.Outputs[stakableUtxo.Transaction.Index];
+                if ((utxo == null) || (utxo.Value < this.MinimumStakingCoinValue))
                     continue;
 
-                uint256 hashBlock = this.chain.GetBlock((int)coinSet.Height)?.HashBlock;
+                uint256 hashBlock = this.chainIndexer.GetHeader((int)coinSet.Height)?.HashBlock;
                 if (hashBlock == null)
                     continue;
 
                 var utxoStakeDescription = new UtxoStakeDescription
                 {
                     TxOut = utxo,
-                    OutPoint = new OutPoint(coinSet.TransactionId, outputReference.Transaction.Index),
-                    Address = outputReference.Address,
+                    OutPoint = new OutPoint(coinSet.TransactionId, stakableUtxo.Transaction.Index),
+                    Address = stakableUtxo.Address,
                     HashBlock = hashBlock,
                     UtxoSet = coinSet,
                     Secret = walletSecret // Temporary.
@@ -519,7 +543,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
         }
 
         /// <summary>
-        /// One a new block is staked, this method is used to verify that it
+        /// Once a new block is staked, this method is used to verify that it
         /// is a valid block and if so, it will add it to the chain.
         /// </summary>
         /// <param name="block">The new block.</param>
@@ -658,8 +682,8 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                 return false;
             }
 
-            long ourWeight = stakingUtxoDescriptions.Sum(s => s.TxOut.Value);// + (long) 1.0;
-            long expectedTime = ( StakeValidator.TargetSpacingSeconds * this.networkWeight / ourWeight ) + StakeValidator.TargetSpacingSeconds;
+            long ourWeight = stakingUtxoDescriptions.Sum(s => s.TxOut.Value);
+            long expectedTime = StakeValidator.TargetSpacingSeconds * this.networkWeight / ourWeight;
             decimal ourPercent = this.networkWeight != 0 ? 100.0m * (decimal)ourWeight / (decimal)this.networkWeight : 0;
 
             this.logger.LogInformation("Node staking with {0} ({1:0.00} % of the network weight {2}), est. time to find new block is {3}.", new Money(ourWeight), ourPercent, new Money(this.networkWeight), TimeSpan.FromSeconds(expectedTime));
@@ -700,11 +724,12 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                 cwc.utxoStakeDescriptions.AddRange(stakingUtxoDescriptions.GetRange(coinIndex, stakingUtxoCount));
                 coinIndex += stakingUtxoCount;
                 workerContexts[workerIndex] = cwc;
-
-                workers[workerIndex] = Task.Run(() => this.CoinstakeWorker(cwc, chainTip, block, minimalAllowedTime, searchInterval));
             }
 
-            await Task.WhenAll(workers).ConfigureAwait(false);
+            await Task.Run(() => Parallel.ForEach(workerContexts, cwc =>
+            {
+                this.CoinstakeWorker(cwc, chainTip, block, minimalAllowedTime, searchInterval);
+            }));
 
             if (workersResult.KernelFoundIndex == CoinstakeWorkerResult.KernelNotFound)
             {
@@ -833,7 +858,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                         break;
                     }
 
-                    if (chainTip != this.chain.Tip)
+                    if (chainTip != this.chainIndexer.Tip)
                     {
                         context.Logger.LogTrace("Chain advanced, stopping work.");
                         stopWork = true;
@@ -858,7 +883,12 @@ namespace Xels.Bitcoin.Features.Miner.Staking
 
                         var contextInformation = new PosRuleContext(BlockStake.Load(block));
 
-                        this.stakeValidator.CheckKernel(contextInformation, chainTip, block.Header.Bits, txTime, prevoutStake);
+                        var validKernel = this.stakeValidator.CheckKernel(contextInformation, chainTip, block.Header.Bits, txTime, prevoutStake);
+
+                        if (!validKernel)
+                        {
+                            continue;
+                        }
 
                         if (context.Result.SetKernelFoundIndex(context.Index))
                         {
@@ -901,9 +931,6 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                     catch (ConsensusErrorException cex)
                     {
                         context.Logger.LogTrace("Checking kernel failed with exception: {0}.", cex.Message);
-                        if (cex.ConsensusError == ConsensusErrors.StakeHashInvalidTarget)
-                            continue;
-
                         stopWork = true;
                     }
 
@@ -1045,12 +1072,12 @@ namespace Xels.Bitcoin.Features.Miner.Staking
         /// </returns>
         private async Task<int> GetDepthInMainChainAsync(UtxoStakeDescription utxoStakeDescription)
         {
-            ChainedHeader chainedBlock = this.chain.GetBlock(utxoStakeDescription.HashBlock);
+            ChainedHeader chainedBlock = this.chainIndexer.GetHeader(utxoStakeDescription.HashBlock);
 
             if (chainedBlock == null)
                 return await this.mempoolLock.ReadAsync(() => this.mempool.Exists(utxoStakeDescription.UtxoSet.TransactionId) ? 0 : -1).ConfigureAwait(false);
 
-            return this.chain.Tip.Height - chainedBlock.Height + 1;
+            return this.chainIndexer.Tip.Height - chainedBlock.Height + 1;
         }
 
         /// <inheritdoc/>

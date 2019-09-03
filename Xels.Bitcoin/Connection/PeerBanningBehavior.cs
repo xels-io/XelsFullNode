@@ -1,10 +1,6 @@
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Configuration;
-using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.P2P.Peer;
-using Xels.Bitcoin.P2P.Protocol;
 using Xels.Bitcoin.P2P.Protocol.Behaviors;
 using TracerAttributes;
 

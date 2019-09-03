@@ -2,8 +2,8 @@
 using NBitcoin;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Interfaces;
-using Xels.SmartContracts.Core;
 using Xels.SmartContracts.CLR;
+using Xels.SmartContracts.Core;
 
 namespace Xels.Bitcoin.Features.SmartContracts
 {

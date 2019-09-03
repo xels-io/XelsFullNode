@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util = "http://schemas.microsoft.com/wix/UtilExtension">
-  <Product Id="*" Name="XELS" Language="1033" Version="2.1.1.0" Manufacturer="Silicon Orchard" UpgradeCode="ad06b9ad-c74e-4d12-9b80-3aefd43d5d9f">
+  <Product Id="*" Name="XELS" Language="1033" Version="2.2.0.0" Manufacturer="Xels.io" UpgradeCode="ad06b9ad-c74e-4d12-9b80-3aefd43d5d9f">
     <Package InstallerVersion="200" Compressed="yes" Platform="x64" InstallScope="perMachine" />
     <!--Jeo: Upgrade code for newer version which automatically replace previous version -->
     <!--Start-->
@@ -13,18 +13,17 @@
       <RemoveExistingProducts After="InstallValidate" />
     </InstallExecuteSequence>
     <!--Finish-->
-   
-    <!--CommentOut below the AppDataFolder(1,2,3) commented part for closing "Deletion of XelsNode folder from AppDataFolder" -->
     
+    <!--CommentOut below the AppDataFolder(1,2,3) commented part for closing "Deletion of XelsNode folder from AppDataFolder" -->
     <!--AppDataFolder(1): Add Property to Remove XelsNode folder from AppDataFolder-->
     <!--Start-->
     <!--Neo: UnComment Next 2 lines to clean up cahin data.-->
-    <?define AppXelsFolder = "XelsNode" ?>
-    <SetProperty Id="XELSFOLDER" Value="[AppDataFolder]$(var.AppXelsFolder)" After="CostFinalize" /> 
+    <!--<?define AppXelsFolder = "XelsNode" ?>
+    <SetProperty Id="XELSFOLDER" Value="[AppDataFolder]$(var.AppXelsFolder)" After="CostFinalize" />--> 
     <!--Finish-->
     
-    <Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONROOTDIRECTORY" />
-    <UIRef Id="WixUI_InstallDir" />
+    <!--<Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONROOTDIRECTORY" />
+    <UIRef Id="WixUI_InstallDir" />-->
     
     <!--<MajorUpgrade DowngradeErrorMessage="A newer version of Xels is already installed." />-->
     <MediaTemplate EmbedCab="yes" />
@@ -32,15 +31,27 @@
     <Feature Id="ProductFeature" Title="XELS" Level="1">
       <ComponentGroupRef Id="Xels_Project" />
       <ComponentRef Id="ApplicationShortcutDesktop" />
+      <ComponentRef Id="ApplicationShortcutDesktopTest" />
       <ComponentRef Id="ApplicationShortcutStartMenu" />
+      <ComponentRef Id="ApplicationShortCutStartUp" />
 
       <!--AppDataFolder(2): Add ComponentRef to Remove XelsNode folder from AppDataFolder-->
       <!--Start-->
       <!--Neo: UnComment Next 1 line to clean up cahin data.-->
-      <ComponentRef Id="XelsFolderCleanup" />
+      <!--<ComponentRef Id="XelsFolderCleanup" />-->
       <!--Finish-->
       
     </Feature>
+    <UI>
+      <UIRef Id="WixUI_Minimal" />
+      <Publish Dialog="ExitDialog"
+               Control="Finish"
+               Event="DoAction"
+               Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+    </UI>
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch Xels Daemon" />
+    <Property Id="WixShellExecTarget" Value="[#filE0949A33ABC424E47D589039C62AFF47]" />
+    <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
   </Product>
 
   <Fragment>
@@ -52,16 +63,42 @@
         <Directory Id="ApplicationProgramsFolder" Name="XELS"/>
       </Directory>
       <Directory Id="DesktopFolder" SourceName="Desktop" />
+      <Directory Id="StartupFolder" Name="Xels"/>
 
       <!-- AppDataFolder(3): Remove XelsNode folder from AppDataFolder  -->
       <!--Start-->
       <!--Neo: UnComment Next 3 lines to clean up cahin data.-->
-      <Component Id="XelsFolderCleanup" Guid="63127A7D-42F9-4A61-B661-A8ABCC3A7FE1">
+      <!--<Component Id="XelsFolderCleanup" Guid="63127A7D-42F9-4A61-B661-A8ABCC3A7FE1">
         <util:RemoveFolderEx On="install" Property="XELSFOLDER"/>
-      </Component>
+      </Component>-->
       <!--Finish-->
       
     </Directory>
+
+    <DirectoryRef Id="StartupFolder">
+      <Component Id="ApplicationShortCutStartUp" Guid="{C6565BDC-963A-42DA-8736-57C3F68A970C}">
+        <Shortcut Id="StartupShortcut" Name="XELS"
+                  Description="XELS Decentralized Ecological Economy Platform"
+                  Target="[#filE0949A33ABC424E47D589039C62AFF47]"
+                  WorkingDirectory="APPLICATIONROOTDIRECTORY" />
+
+
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\XELS" Action="createAndRemoveOnUninstall">
+          <RegistryValue Name="ShortCutStartUp" Type="integer" Value="1" KeyPath="yes"  />
+        </RegistryKey>
+      </Component>
+
+    </DirectoryRef>
+
+    <!--<SetDirectory Id="UserStartupFolder" Value="Startup"/>-->
+    <!-- more wix stuff -->
+    <!--<DirectoryRef Id="StartupFolder">
+      <Component Id="StartupFolderShortcut" Guid="{DD3A8995-1FA2-4676-9037-C57D0E2D29D7}">
+        <Shortcut Id="StartupFolderShortcut" Name="XELS" Description="XELS Decentralized Ecological Economy Platform" Target="[#filE0949A33ABC424E47D589039C62AFF47]" WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\XELS" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>-->
+
 
     <DirectoryRef Id="DesktopFolder">
       <Component Id="ApplicationShortcutDesktop" Guid="{501069CB-F127-4087-9887-EC2FEED638A2}" Win64='yes'>
@@ -69,6 +106,15 @@
         <Shortcut Id="ApplicationDesktopShortcut" Name="XELS" Description="XELS Decentralized Ecological Economy Platform" Target="[#filE0949A33ABC424E47D589039C62AFF47]" WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
         <RemoveFolder Id="RemoveFolder" Directory="DesktopFolder" On="uninstall"/>
         <RegistryValue Root="HKCU" Key="Software\Microsoft\XELS" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="ApplicationShortcutDesktopTest" Guid="{749E55D7-2552-4A0B-A5AC-C5D05D477610}" Win64='yes'>
+        <!-- Neo: The Target attribute is important here.. This is the ID of the exe file. search for "filE0949A33ABC424E47D589039C62AFF47" in Xels.XelsD.wxs file -->
+        <Shortcut Id="ApplicationDesktopShortcutTest" Name="XELSTEST" Arguments="-testnet" Description="XELS Decentralized Ecological Economy Platform" Target="[#filE0949A33ABC424E47D589039C62AFF47]" WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+        <RemoveFolder Id="RemoveFolderTest" Directory="DesktopFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\XELSTEST" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
     </DirectoryRef>
     

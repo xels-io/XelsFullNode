@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using NBitcoin;
-using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.MemoryPool.Interfaces;
 using Xels.Bitcoin.Features.Miner;
-using Xels.Bitcoin.Features.PoA.ConsensusRules;
+using Xels.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules;
 using Xels.Bitcoin.Mining;
 using Xels.Bitcoin.Utilities;
 
@@ -19,8 +18,9 @@ namespace Xels.Bitcoin.Features.PoA
             ILoggerFactory loggerFactory,
             ITxMempool mempool,
             MempoolSchedulerLock mempoolLock,
-            Network network)
-            : base(consensusManager, dateTimeProvider, loggerFactory, mempool, mempoolLock, new MinerSettings(NodeSettings.Default(network)), network)
+            Network network,
+            MinerSettings minerSettings)
+            : base(consensusManager, dateTimeProvider, loggerFactory, mempool, mempoolLock, minerSettings, network)
         {
         }
 

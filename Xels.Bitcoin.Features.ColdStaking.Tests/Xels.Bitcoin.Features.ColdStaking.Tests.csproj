@@ -14,7 +14,6 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <CodeAnalysisRuleSet>..\None.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -35,7 +34,6 @@
   <ItemGroup>
     <ProjectReference Include="..\NBitcoin\NBitcoin.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.ColdStaking\Xels.Bitcoin.Features.ColdStaking.csproj" />
-    <ProjectReference Include="..\Xels.Bitcoin.Features.Wallet.Tests\Xels.Bitcoin.Features.Wallet.Tests.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.Wallet\Xels.Bitcoin.Features.Wallet.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Tests.Common\Xels.Bitcoin.Tests.Common.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Tests.Wallet.Common\Xels.Bitcoin.Tests.Wallet.Common.csproj" />

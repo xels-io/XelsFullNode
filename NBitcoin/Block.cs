@@ -40,17 +40,6 @@ namespace NBitcoin
             this.header = blockHeader;
         }
 
-        [Obsolete("Should use Block.Load outside of ConsensusFactories")]
-        public Block(byte[] bytes, ConsensusFactory consensusFactory)
-        {
-            var stream = new BitcoinStream(bytes)
-            {
-                ConsensusFactory = consensusFactory
-            };
-
-            this.ReadWrite(stream);
-        }
-
         public virtual void ReadWrite(BitcoinStream stream)
         {
             stream.ReadWrite(ref this.header);
@@ -101,22 +90,24 @@ namespace NBitcoin
                 return this;
 
             Block instance = consensusFactory.CreateBlock();
-            var ms = new MemoryStream();
-            var bms = new BitcoinStream(ms, true)
+            using (var ms = new MemoryStream())
             {
-                TransactionOptions = options,
-                ConsensusFactory = consensusFactory
-            };
+                var bms = new BitcoinStream(ms, true)
+                {
+                    TransactionOptions = options,
+                    ConsensusFactory = consensusFactory
+                };
 
-            this.ReadWrite(bms);
-            ms.Position = 0;
-            bms = new BitcoinStream(ms, false)
-            {
-                TransactionOptions = options,
-                ConsensusFactory = consensusFactory
-            };
+                this.ReadWrite(bms);
+                ms.Position = 0;
+                bms = new BitcoinStream(ms, false)
+                {
+                    TransactionOptions = options,
+                    ConsensusFactory = consensusFactory
+                };
 
-            instance.ReadWrite(bms);
+                instance.ReadWrite(bms);
+            }
             return instance;
         }
 
@@ -157,30 +148,30 @@ namespace NBitcoin
             return blk;
         }
 
-        public static Block Parse(string hex, Network network)
+        public static Block Parse(string hex, ConsensusFactory consensusFactory)
         {
             if (string.IsNullOrEmpty(hex))
                 throw new ArgumentNullException(nameof(hex));
 
-            if (network == null)
-                throw new ArgumentNullException(nameof(network));
+            if (consensusFactory == null)
+                throw new ArgumentNullException(nameof(consensusFactory));
 
-            Block block = network.Consensus.ConsensusFactory.CreateBlock();
-            block.ReadWrite(Encoders.Hex.DecodeData(hex), consensusFactory: network.Consensus.ConsensusFactory);
+            Block block = consensusFactory.CreateBlock();
+            block.ReadWrite(Encoders.Hex.DecodeData(hex), consensusFactory);
 
             return block;
         }
 
-        public static Block Load(byte[] bytes, Network network)
+        public static Block Load(byte[] bytes, ConsensusFactory consensusFactory)
         {
             if (bytes == null)
                 throw new ArgumentNullException(nameof(bytes));
 
-            if (network == null)
-                throw new ArgumentNullException(nameof(network));
+            if (consensusFactory == null)
+                throw new ArgumentNullException(nameof(consensusFactory));
 
-            Block block = network.Consensus.ConsensusFactory.CreateBlock();
-            block.ReadWrite(bytes, network.Consensus.ConsensusFactory);
+            Block block = consensusFactory.CreateBlock();
+            block.ReadWrite(bytes, consensusFactory);
 
             return block;
         }

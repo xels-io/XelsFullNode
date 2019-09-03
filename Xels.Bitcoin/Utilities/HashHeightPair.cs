@@ -81,5 +81,13 @@ namespace Xels.Bitcoin.Utilities
 
             return this == (HashHeightPair)value;
         }
+
+        /// <summary>Constructs <see cref="HashHeightPair"/> from a set bytes and the given network.</summary>
+        public static HashHeightPair Load(byte[] bytes, ConsensusFactory consensusFactory)
+        {
+            var hashHeight = new HashHeightPair();
+            hashHeight.ReadWrite(bytes, consensusFactory);
+            return hashHeight;
+        }
     }
 }

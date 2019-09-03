@@ -5,11 +5,12 @@ using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
+using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
-using Xels.SmartContracts.Core.State;
 using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.CLR.Compilation;
 using Xels.SmartContracts.CLR.Serialization;
+using Xels.SmartContracts.Core.State;
 using Xels.SmartContracts.Tests.Common;
 using Xunit;
 
@@ -41,7 +42,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
                 // Create a token contract
                 ulong gasPrice = 1;
                 int vmVersion = 1;
-                Gas gasLimit = (Gas)5000;
+                var gasLimit = (RuntimeObserver.Gas)5000;
                 ContractCompilationResult compilationResult = ContractCompiler.CompileFile("SmartContracts/TransferTestPos.cs");
                 Assert.True(compilationResult.Success);
 
@@ -65,7 +66,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
                 scSender.AddToXelsMempool(transferContractTransaction);
 
                 // Ensure the smart contract transaction is in the mempool.
-                TestHelper.WaitLoop(() => scSender.CreateRPCClient().GetRawMempool().Length > 0);
+                TestBase.WaitLoop(() => scSender.CreateRPCClient().GetRawMempool().Length > 0);
 
                 // Mine the token transaction and wait for it sync
                 TestHelper.MineBlocks(scSender, 1);
@@ -105,11 +106,11 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
                 scSender.AddToXelsMempool(transferContractTransaction);
 
                 // Wait for the token transaction to be picked up by the mempool
-                TestHelper.WaitLoop(() => scSender.CreateRPCClient().GetRawMempool().Length > 0);
+                TestBase.WaitLoop(() => scSender.CreateRPCClient().GetRawMempool().Length > 0);
                 TestHelper.MineBlocks(scSender, 1);
 
                 // Ensure both nodes are synced with each other
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(scReceiver, scSender));
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(scReceiver, scSender));
 
                 tokenContractAddress = addressGenerator.GenerateAddress(transferContractTransaction.GetHash(), 0); // nonce is 0 for user contract creation.
                 Assert.NotNull(senderState.GetCode(tokenContractAddress));
@@ -136,11 +137,11 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
                 scSender.AddToXelsMempool(callContractTransaction);
 
                 // Wait for the token transaction to be picked up by the mempool
-                TestHelper.WaitLoop(() => scSender.CreateRPCClient().GetRawMempool().Length > 0);
+                TestBase.WaitLoop(() => scSender.CreateRPCClient().GetRawMempool().Length > 0);
                 TestHelper.MineBlocks(scSender, 1);
 
                 // Ensure the nodes are synced
-                TestHelper.WaitLoop(() => TestHelper.AreNodesSynced(scReceiver, scSender));
+                TestBase.WaitLoop(() => TestHelper.AreNodesSynced(scReceiver, scSender));
 
                 // The balance should now reflect the transfer
                 Assert.Equal((ulong)900, senderState.GetCurrentBalance(tokenContractAddress));

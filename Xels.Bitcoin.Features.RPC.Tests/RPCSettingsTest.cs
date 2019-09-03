@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Xels.Bitcoin.Configuration;
-using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Tests.Common;
 using Xunit;
 

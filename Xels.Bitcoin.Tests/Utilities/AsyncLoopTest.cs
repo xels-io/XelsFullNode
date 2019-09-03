@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Tests.Common.Logging;
 using Xels.Bitcoin.Utilities;
 using Xunit;

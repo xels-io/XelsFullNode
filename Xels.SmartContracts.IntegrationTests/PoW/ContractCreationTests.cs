@@ -3,9 +3,9 @@ using System.Text;
 using NBitcoin;
 using Xels.Bitcoin.Features.SmartContracts;
 using Xels.Bitcoin.Features.SmartContracts.Models;
-using Xels.SmartContracts.Core;
 using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.CLR.Compilation;
+using Xels.SmartContracts.Core;
 using Xels.SmartContracts.Tests.Common.MockChain;
 using Xunit;
 
@@ -59,7 +59,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
                 Assert.False(scBlockHeader.LogsBloom.Test(Encoding.UTF8.GetBytes("RandomValue")));
 
                 // Do a create that should transfer all funds sent now.
-                const double amount = 20;
+                decimal amount = 20;
                 BuildCallContractTransactionResponse callResponse2 = sender.SendCallContractTransaction("CreateCatWithFunds", response.NewContractAddress, amount);
                 receiver.WaitMempoolCount(1);
                 receiver.MineBlocks(1);

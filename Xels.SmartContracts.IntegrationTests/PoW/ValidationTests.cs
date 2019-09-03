@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Xels.Bitcoin.Features.SmartContracts.Models;
-using Xels.SmartContracts.CLR;
+﻿using Xels.Bitcoin.Features.SmartContracts.Models;
 using Xels.SmartContracts.CLR.Compilation;
 using Xels.SmartContracts.Tests.Common.MockChain;
 using Xunit;

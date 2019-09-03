@@ -11,17 +11,18 @@ using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Consensus.PerformanceCounters.Rules;
 using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Utilities;
+using TracerAttributes;
 
 namespace Xels.Bitcoin.Consensus
 {
     /// <inheritdoc />
     public abstract class ConsensusRuleEngine : IConsensusRuleEngine
     {
-        /// <summary>A factory to creates logger instances for each rule.</summary>
-        private readonly ILoggerFactory loggerFactory;
-
         /// <summary>Instance logger.</summary>
-        protected readonly ILogger logger;
+        private readonly ILogger logger;
+
+        /// <summary>A factory to creates logger instances for each rule.</summary>
+        public ILoggerFactory LoggerFactory { get; }
 
         /// <summary>Specification of the network the node runs on - regtest/testnet/mainnet.</summary>
         public Network Network { get; }
@@ -30,7 +31,7 @@ namespace Xels.Bitcoin.Consensus
         public IDateTimeProvider DateTimeProvider { get; }
 
         /// <summary>A chain of the longest block headers all the way to genesis.</summary>
-        public ConcurrentChain Chain { get; }
+        public ChainIndexer ChainIndexer { get; }
 
         /// <summary>A deployment construction that tracks activation of features on the chain.</summary>
         public NodeDeployments NodeDeployments { get; }
@@ -69,7 +70,7 @@ namespace Xels.Bitcoin.Consensus
             Network network,
             ILoggerFactory loggerFactory,
             IDateTimeProvider dateTimeProvider,
-            ConcurrentChain chain,
+            ChainIndexer chainIndexer,
             NodeDeployments nodeDeployments,
             ConsensusSettings consensusSettings,
             ICheckpoints checkpoints,
@@ -80,7 +81,7 @@ namespace Xels.Bitcoin.Consensus
             Guard.NotNull(network, nameof(network));
             Guard.NotNull(loggerFactory, nameof(loggerFactory));
             Guard.NotNull(dateTimeProvider, nameof(dateTimeProvider));
-            Guard.NotNull(chain, nameof(chain));
+            Guard.NotNull(chainIndexer, nameof(chainIndexer));
             Guard.NotNull(nodeDeployments, nameof(nodeDeployments));
             Guard.NotNull(consensusSettings, nameof(consensusSettings));
             Guard.NotNull(checkpoints, nameof(checkpoints));
@@ -89,17 +90,17 @@ namespace Xels.Bitcoin.Consensus
             Guard.NotNull(nodeStats, nameof(nodeStats));
 
             this.Network = network;
-            this.Chain = chain;
+            this.ChainIndexer = chainIndexer;
             this.ChainState = chainState;
             this.NodeDeployments = nodeDeployments;
-            this.loggerFactory = loggerFactory;
+            this.LoggerFactory = loggerFactory;
             this.ConsensusSettings = consensusSettings;
             this.Checkpoints = checkpoints;
             this.ConsensusParams = this.Network.Consensus;
             this.ConsensusSettings = consensusSettings;
             this.DateTimeProvider = dateTimeProvider;
             this.invalidBlockHashStore = invalidBlockHashStore;
-            this.loggerFactory = loggerFactory;
+            this.LoggerFactory = loggerFactory;
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
             this.NodeDeployments = nodeDeployments;
 
@@ -112,9 +113,8 @@ namespace Xels.Bitcoin.Consensus
         }
 
         /// <inheritdoc />
-        public virtual Task InitializeAsync(ChainedHeader chainTip)
+        public virtual void Initialize(ChainedHeader chainTip)
         {
-            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -148,7 +148,7 @@ namespace Xels.Bitcoin.Consensus
             foreach (ConsensusRuleBase rule in rules)
             {
                 rule.Parent = this;
-                rule.Logger = this.loggerFactory.CreateLogger(rule.GetType().FullName);
+                rule.Logger = this.LoggerFactory.CreateLogger(rule.GetType().FullName);
                 rule.Initialize();
             }
         }
@@ -295,11 +295,12 @@ namespace Xels.Bitcoin.Consensus
         public abstract RuleContext CreateRuleContext(ValidationContext validationContext);
 
         /// <inheritdoc />
-        public abstract Task<uint256> GetBlockHashAsync();
+        public abstract uint256 GetBlockHash();
 
         /// <inheritdoc />
         public abstract Task<RewindState> RewindAsync();
 
+        [NoTrace]
         public T GetRule<T>() where T : ConsensusRuleBase
         {
             object rule = this.headerValidationRules.SingleOrDefault(r => r is T);

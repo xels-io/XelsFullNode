@@ -1,5 +1,4 @@
-﻿using NBitcoin;
-using Xels.Bitcoin.Utilities;
+﻿using Xels.Bitcoin.Utilities;
 using Xunit;
 
 namespace Xels.Bitcoin.Tests.Utilities
@@ -15,8 +14,7 @@ namespace Xels.Bitcoin.Tests.Utilities
 
             for (int i = 0; i < 10; i++)
             {
-                var item = RandomUtils.GetInt32().ToString();
-                cache.AddOrUpdate(i, item, item.Length);
+                cache.AddOrUpdate(i, "item", 20); // fixed size to exceed the limit
             }
 
             Assert.True(maxSize >= cache.TotalSize);
@@ -32,8 +30,7 @@ namespace Xels.Bitcoin.Tests.Utilities
 
             for (int i = 0; i < itemsCountToAdd; i++)
             {
-                var item = RandomUtils.GetInt32().ToString();
-                cache.AddOrUpdate(i, item, item.Length);
+                cache.AddOrUpdate(i, "item", 10); // fixed size
             }
 
             for (int i = itemsCountToAdd - maxItemsCount; i < itemsCountToAdd; i++)
@@ -78,7 +75,7 @@ namespace Xels.Bitcoin.Tests.Utilities
 
             for (int i = 0; i < 15; i++)
             {
-                cache.AddOrUpdate(i, RandomUtils.GetInt32().ToString(), 10);
+                cache.AddOrUpdate(i, "item", 10);
 
                 if (i == 8)
                 {

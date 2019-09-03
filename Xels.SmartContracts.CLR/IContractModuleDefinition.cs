@@ -1,8 +1,8 @@
 ﻿using System;
 using Mono.Cecil;
-using Xels.SmartContracts.CLR.Validation;
 using Xels.SmartContracts.CLR.ILRewrite;
 using Xels.SmartContracts.CLR.Loader;
+using Xels.SmartContracts.CLR.Validation;
 
 namespace Xels.SmartContracts.CLR
 {

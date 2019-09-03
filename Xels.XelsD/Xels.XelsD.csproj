@@ -9,7 +9,6 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-	<CodeAnalysisRuleSet>..\None.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -28,6 +27,7 @@
     <ProjectReference Include="..\Xels.Bitcoin.Features.BlockStore\Xels.Bitcoin.Features.BlockStore.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.ColdStaking\Xels.Bitcoin.Features.ColdStaking.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.Consensus\Xels.Bitcoin.Features.Consensus.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Dns\Xels.Bitcoin.Features.Dns.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.MemoryPool\Xels.Bitcoin.Features.MemoryPool.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.Miner\Xels.Bitcoin.Features.Miner.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.RPC\Xels.Bitcoin.Features.RPC.csproj" />

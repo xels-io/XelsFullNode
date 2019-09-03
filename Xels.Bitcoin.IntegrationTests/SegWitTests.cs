@@ -4,7 +4,6 @@ using NBitcoin;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Features.RPC;
-using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.Networks.Deployments;
 using Xels.Bitcoin.Tests.Common;
@@ -45,7 +44,7 @@ namespace Xels.Bitcoin.IntegrationTests
                     // generate 450 blocks, block 431 will be segwit activated.
                     coreRpc.Generate(450);
                     var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(2)).Token;
-                    TestHelper.WaitLoop(() => xelsNode.CreateRPCClient().GetBestBlockHash() == coreNode.CreateRPCClient().GetBestBlockHash(), cancellationToken: cancellationToken);
+                    TestBase.WaitLoop(() => xelsNode.CreateRPCClient().GetBestBlockHash() == coreNode.CreateRPCClient().GetBestBlockHash(), cancellationToken: cancellationToken);
 
                     // segwit activation on Bitcoin regtest.
                     // - On regtest deployment state changes every 144 block, the threshold for activating a rule is 108 blocks.
@@ -56,10 +55,10 @@ namespace Xels.Bitcoin.IntegrationTests
                     // - Active at block 431.
 
                     var consensusLoop = xelsNode.FullNode.NodeService<IConsensusRuleEngine>() as ConsensusRuleEngine;
-                    ThresholdState[] segwitDefinedState = consensusLoop.NodeDeployments.BIP9.GetStates(xelsNode.FullNode.Chain.GetBlock(142));
-                    ThresholdState[] segwitStartedState = consensusLoop.NodeDeployments.BIP9.GetStates(xelsNode.FullNode.Chain.GetBlock(143));
-                    ThresholdState[] segwitLockedInState = consensusLoop.NodeDeployments.BIP9.GetStates(xelsNode.FullNode.Chain.GetBlock(287));
-                    ThresholdState[] segwitActiveState = consensusLoop.NodeDeployments.BIP9.GetStates(xelsNode.FullNode.Chain.GetBlock(431));
+                    ThresholdState[] segwitDefinedState = consensusLoop.NodeDeployments.BIP9.GetStates(xelsNode.FullNode.ChainIndexer.GetHeader(142));
+                    ThresholdState[] segwitStartedState = consensusLoop.NodeDeployments.BIP9.GetStates(xelsNode.FullNode.ChainIndexer.GetHeader(143));
+                    ThresholdState[] segwitLockedInState = consensusLoop.NodeDeployments.BIP9.GetStates(xelsNode.FullNode.ChainIndexer.GetHeader(287));
+                    ThresholdState[] segwitActiveState = consensusLoop.NodeDeployments.BIP9.GetStates(xelsNode.FullNode.ChainIndexer.GetHeader(431));
 
                     // check that segwit is got activated at block 431
                     Assert.Equal(ThresholdState.Defined, segwitDefinedState.GetValue((int)BitcoinBIP9Deployments.Segwit));

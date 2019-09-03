@@ -9,7 +9,6 @@ using Xels.Bitcoin.Features.Consensus.Rules;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.SmartContracts.Core;
 using Xels.SmartContracts.Core.Util;
-using Block = NBitcoin.Block;
 
 namespace Xels.Bitcoin.Features.SmartContracts.Rules
 {
@@ -29,7 +28,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.Rules
 
             foreach (Transaction transaction in block.Transactions)
             {
-                CheckTransactionInsideBlock(transaction, this.PowParent.UtxoSet, processedTxs);
+                this.CheckTransactionInsideBlock(transaction, this.PowParent.UtxoSet, processedTxs);
                 processedTxs.Add(transaction);
             }
 

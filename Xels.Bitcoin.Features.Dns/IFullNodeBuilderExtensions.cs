@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Xels.Bitcoin.Builder;
 using Xels.Bitcoin.Configuration.Logging;
-using Xels.Bitcoin.Connection;
 
 namespace Xels.Bitcoin.Features.Dns
 {

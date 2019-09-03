@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NBitcoin;
 using NBitcoin.DataEncoders;
+using Xels.Bitcoin.Features.PoA.Policies;
 
 namespace Xels.Bitcoin.Features.PoA
 {
@@ -38,11 +39,13 @@ namespace Xels.Bitcoin.Features.PoA
             uint magic = BitConverter.ToUInt32(messageStart, 0);
 
             this.Name = "PoAMain";
+            this.NetworkType = NetworkType.Mainnet;
             this.Magic = magic;
             this.DefaultPort = 16438;
             this.DefaultMaxOutboundConnections = 16;
             this.DefaultMaxInboundConnections = 109;
-            this.RPCPort = 16474;
+            this.DefaultRPCPort = 16474;
+            this.DefaultAPIPort = 37221; // TODO: Confirm
             this.MaxTipAge = 2 * 60 * 60;
             this.MinTxFee = 10000;
             this.FallbackFee = 10000;
@@ -65,14 +68,14 @@ namespace Xels.Bitcoin.Features.PoA
 
             this.Genesis = genesisBlock;
 
-            // Configure federation public keys.
+            // Configure federation.
             // Keep in mind that order in which keys are added to this list is important
             // and should be the same for all nodes operating on this network.
-            var federationPublicKeys = new List<PubKey>()
+            var genesisFederationMembers = new List<IFederationMember>()
             {
-                new PubKey("02977737b49decf55ed8783dd51bba1a62f9421c1b0abcb1c2b1197c5309f82f63"),
-                new PubKey("030c5a0a9f7031339cd9761af083f8e7cf794a419c1ef73074f811a33d8d37c945"),
-                new PubKey("03deba53728d26be0fc321fddb48934e193e4396291dda2044c783b96525e50e15")
+                new FederationMember(new PubKey("02977737b49decf55ed8783dd51bba1a62f9421c1b0abcb1c2b1197c5309f82f63")),
+                new FederationMember(new PubKey("030c5a0a9f7031339cd9761af083f8e7cf794a419c1ef73074f811a33d8d37c945")),
+                new FederationMember(new PubKey("03deba53728d26be0fc321fddb48934e193e4396291dda2044c783b96525e50e15"))
             };
 
             var consensusOptions = new PoAConsensusOptions(
@@ -81,8 +84,10 @@ namespace Xels.Bitcoin.Features.PoA
                 maxStandardTxWeight: 100_000,
                 maxBlockSigopsCost: 20_000,
                 maxStandardTxSigopsCost: 20_000 / 5,
-                federationPublicKeys: federationPublicKeys,
-                targetSpacingSeconds: 16
+                genesisFederationMembers: genesisFederationMembers,
+                targetSpacingSeconds: 16,
+                votingEnabled: true,
+                autoKickIdleMembers: true
             );
 
             var buriedDeployments = new BuriedDeploymentsArray
@@ -108,7 +113,7 @@ namespace Xels.Bitcoin.Features.PoA
                 bip34Hash: new uint256("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8"),
                 ruleChangeActivationThreshold: 1916, // 95% of 2016
                 minerConfirmationWindow: 2016, // nPowTargetTimespan / nPowTargetSpacing
-                maxReorgLength: 0, // No max reorg limit on PoA networks.
+                maxReorgLength: 500,
                 defaultAssumeValid: null,
                 maxMoney: long.MaxValue,
                 coinbaseMaturity: 2,
@@ -118,6 +123,7 @@ namespace Xels.Bitcoin.Features.PoA
                 powTargetTimespan: TimeSpan.FromSeconds(14 * 24 * 60 * 60), // two weeks
                 powTargetSpacing: TimeSpan.FromSeconds(60),
                 powAllowMinDifficultyBlocks: false,
+                posNoRetargeting: true,
                 powNoRetargeting: true,
                 powLimit: null,
                 minimumChainWork: null,
@@ -160,12 +166,14 @@ namespace Xels.Bitcoin.Features.PoA
             string[] seedNodes = { };
             this.SeedNodes = this.ConvertToNetworkAddresses(seedNodes, this.DefaultPort).ToList();
 
+            this.StandardScriptsRegistry = new PoAStandardScriptsRegistry();
+
             Assert(this.Consensus.HashGenesisBlock == uint256.Parse("0x0621b88fb7a99c985d695be42e606cb913259bace2babe92970547fa033e4076"));
             Assert(this.Genesis.Header.HashMerkleRoot == uint256.Parse("0x9928b372fd9e4cf62a31638607344c03c48731ba06d24576342db9c8591e1432"));
 
-            if ((this.ConsensusOptions.FederationPublicKeys == null) || (this.ConsensusOptions.FederationPublicKeys.Count == 0))
+            if ((this.ConsensusOptions.GenesisFederationMembers == null) || (this.ConsensusOptions.GenesisFederationMembers.Count == 0))
             {
-                throw new Exception("No keys for federation members are configured!");
+                throw new Exception("No keys for initial federation are configured!");
             }
         }
 

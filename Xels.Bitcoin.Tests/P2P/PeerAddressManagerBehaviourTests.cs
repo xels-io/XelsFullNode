@@ -1,14 +1,17 @@
 ﻿using System.Net;
 using System.Threading;
 using Moq;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Logging;
+using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P;
 using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.P2P.Protocol;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common.Logging;
 using Xels.Bitcoin.Utilities;
 using Xunit;
@@ -19,19 +22,26 @@ namespace Xels.Bitcoin.Tests.P2P
     {
         private readonly ExtendedLoggerFactory extendedLoggerFactory;
         private readonly INetworkPeerFactory networkPeerFactory;
+        private readonly ConnectionManagerSettings connectionManagerSettings;
+        private readonly ISignals signals;
+        private readonly AsyncProvider asyncProvider;
 
         public PeerAddressManagerBehaviourTests()
         {
             this.extendedLoggerFactory = new ExtendedLoggerFactory();
             this.extendedLoggerFactory.AddConsoleWithFilters();
+            this.connectionManagerSettings = new ConnectionManagerSettings(NodeSettings.Default(this.Network));
+            this.signals = new Bitcoin.Signals.Signals(extendedLoggerFactory, null);
+            this.asyncProvider = new AsyncProvider(extendedLoggerFactory, this.signals, new NodeLifetime());
 
             this.networkPeerFactory = new NetworkPeerFactory(this.Network,
                 DateTimeProvider.Default,
                 this.extendedLoggerFactory,
                 new PayloadProvider().DiscoverPayloads(),
-                new SelfEndpointTracker(this.extendedLoggerFactory),
+                new SelfEndpointTracker(this.extendedLoggerFactory, this.connectionManagerSettings),
                 new Mock<IInitialBlockDownloadState>().Object,
-                new Configuration.Settings.ConnectionManagerSettings(NodeSettings.Default(this.Network)));
+                this.connectionManagerSettings,
+                this.asyncProvider);
         }
 
         [Fact]
@@ -41,7 +51,8 @@ namespace Xels.Bitcoin.Tests.P2P
             var endpoint = new IPEndPoint(ipAddress, 80);
 
             DataFolder peerFolder = CreateDataFolder(this);
-            var addressManager = new PeerAddressManager(DateTimeProvider.Default, peerFolder, this.LoggerFactory.Object, new SelfEndpointTracker(this.extendedLoggerFactory));
+            var addressManager = new PeerAddressManager(DateTimeProvider.Default, peerFolder, this.LoggerFactory.Object,
+                new SelfEndpointTracker(this.extendedLoggerFactory, this.connectionManagerSettings));
             addressManager.AddPeer(endpoint, IPAddress.Loopback);
 
             var networkPeer = new Mock<INetworkPeer>();
@@ -78,7 +89,8 @@ namespace Xels.Bitcoin.Tests.P2P
             var endpoint = new IPEndPoint(ipAddress, 80);
 
             DataFolder peerFolder = CreateDataFolder(this);
-            var addressManager = new PeerAddressManager(DateTimeProvider.Default, peerFolder, this.LoggerFactory.Object, new SelfEndpointTracker(this.extendedLoggerFactory));
+            var addressManager = new PeerAddressManager(DateTimeProvider.Default, peerFolder, this.LoggerFactory.Object,
+                new SelfEndpointTracker(this.extendedLoggerFactory, this.connectionManagerSettings));
             addressManager.AddPeer(endpoint, IPAddress.Loopback);
 
             var networkPeer = new Mock<INetworkPeer>();
@@ -115,7 +127,8 @@ namespace Xels.Bitcoin.Tests.P2P
             var endpoint = new IPEndPoint(ipAddress, 80);
 
             DataFolder peerFolder = CreateDataFolder(this);
-            var addressManager = new PeerAddressManager(DateTimeProvider.Default, peerFolder, this.LoggerFactory.Object, new SelfEndpointTracker(this.extendedLoggerFactory));
+            var addressManager = new PeerAddressManager(DateTimeProvider.Default, peerFolder, this.LoggerFactory.Object,
+                new SelfEndpointTracker(this.extendedLoggerFactory, this.connectionManagerSettings));
             addressManager.AddPeer(endpoint, IPAddress.Loopback);
 
             var networkPeer = new Mock<INetworkPeer>();
@@ -151,7 +164,8 @@ namespace Xels.Bitcoin.Tests.P2P
             var endpoint = new IPEndPoint(ipAddress, 80);
 
             DataFolder peerFolder = CreateDataFolder(this);
-            var addressManager = new PeerAddressManager(DateTimeProvider.Default, peerFolder, this.LoggerFactory.Object, new SelfEndpointTracker(this.extendedLoggerFactory));
+            var addressManager = new PeerAddressManager(DateTimeProvider.Default, peerFolder, this.LoggerFactory.Object,
+                new SelfEndpointTracker(this.extendedLoggerFactory, this.connectionManagerSettings));
             addressManager.AddPeer(endpoint, IPAddress.Loopback);
 
             var networkPeer = new Mock<INetworkPeer>();
@@ -193,7 +207,8 @@ namespace Xels.Bitcoin.Tests.P2P
             var peerEndPoint = new IPEndPoint(peerEndPointAddress, 80);
 
             DataFolder peerFolder = CreateDataFolder(this);
-            var addressManager = new PeerAddressManager(DateTimeProvider.Default, peerFolder, this.LoggerFactory.Object, new SelfEndpointTracker(this.extendedLoggerFactory));
+            var addressManager = new PeerAddressManager(DateTimeProvider.Default, peerFolder, this.LoggerFactory.Object,
+                new SelfEndpointTracker(this.extendedLoggerFactory, this.connectionManagerSettings));
 
             var networkPeer = new Mock<INetworkPeer>();
             networkPeer.SetupGet(n => n.Inbound).Returns(true);
@@ -229,7 +244,8 @@ namespace Xels.Bitcoin.Tests.P2P
             var peerEndPoint = new IPEndPoint(peerEndPointAddress, 80);
 
             DataFolder peerFolder = CreateDataFolder(this);
-            var addressManager = new PeerAddressManager(DateTimeProvider.Default, peerFolder, this.LoggerFactory.Object, new SelfEndpointTracker(this.extendedLoggerFactory));
+            var addressManager = new PeerAddressManager(DateTimeProvider.Default, peerFolder, this.LoggerFactory.Object,
+                new SelfEndpointTracker(this.extendedLoggerFactory, this.connectionManagerSettings));
 
             var networkPeer = new Mock<INetworkPeer>();
             networkPeer.SetupGet(n => n.Inbound).Returns(true);

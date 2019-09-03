@@ -55,11 +55,11 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         }
 
         [Fact]
-        public void GetAccountByNameWithNonMatchingNameThrowsException()
+        public void GetAccountByNameWithNonMatchingNameReturnsNull()
         {
             AccountRoot accountRoot = CreateAccountRootWithHdAccountHavingAddresses("Test", CoinType.Xels);
 
-            Assert.Throws<WalletException>(() => { accountRoot.GetAccountByName("test"); });
+            Assert.Null(accountRoot.GetAccountByName("test"));
         }
     }
 }

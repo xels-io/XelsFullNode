@@ -1,7 +1,7 @@
 ﻿using NBitcoin;
-using Xels.SmartContracts.Core.State;
 using Xels.SmartContracts.CLR.ContractLogging;
 using Xels.SmartContracts.CLR.Serialization;
+using Xels.SmartContracts.Core.State;
 
 namespace Xels.SmartContracts.CLR
 {
@@ -24,7 +24,7 @@ namespace Xels.SmartContracts.CLR
         /// <summary>
         /// Sets up a new <see cref="ISmartContractState"/> based on the current state.
         /// </summary>        
-        public ISmartContractState Create(IState state, IGasMeter gasMeter, uint160 address, BaseMessage message, IStateRepository repository)
+        public ISmartContractState Create(IState state, RuntimeObserver.IGasMeter gasMeter, uint160 address, BaseMessage message, IStateRepository repository)
         {
             IPersistenceStrategy persistenceStrategy = new MeteredPersistenceStrategy(repository, gasMeter, new BasicKeyEncodingStrategy());
 
@@ -41,9 +41,8 @@ namespace Xels.SmartContracts.CLR
                 ),
                 persistentState,
                 this.serializer,
-                gasMeter,
                 contractLogger,
-                this.InternalTransactionExecutorFactory.Create(state),
+                this.InternalTransactionExecutorFactory.Create(gasMeter, state),
                 new InternalHashHelper(),
                 () => state.GetBalance(address));
 

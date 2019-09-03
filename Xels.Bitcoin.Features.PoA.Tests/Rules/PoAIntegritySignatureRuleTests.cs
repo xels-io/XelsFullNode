@@ -1,25 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using NBitcoin;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Consensus.Rules;
-using Xels.Bitcoin.Features.PoA.ConsensusRules;
+using Xels.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules;
 using Xunit;
 
 namespace Xels.Bitcoin.Features.PoA.Tests.Rules
 {
-    public class PoAIntegritySignatureRuleTests : PoARulesTestsBase
+    public class PoAIntegritySignatureRuleTests : PoATestsBase
     {
         private readonly PoAIntegritySignatureRule integritySignatureRule;
 
         public PoAIntegritySignatureRuleTests()
         {
             this.integritySignatureRule = new PoAIntegritySignatureRule();
-            this.integritySignatureRule.Parent = this.rulesEngine;
-            this.integritySignatureRule.Logger = this.loggerFactory.CreateLogger(this.integritySignatureRule.GetType().FullName);
-            this.integritySignatureRule.Initialize();
+            this.InitRule(this.integritySignatureRule);
         }
 
         [Fact]

@@ -10,6 +10,7 @@ using Xels.Bitcoin.Features.Miner;
 using Xels.Bitcoin.Features.RPC;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
+using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P;
 
 namespace Xels.Bitcoin.IntegrationTests.Common.Runners
@@ -43,16 +44,18 @@ namespace Xels.Bitcoin.IntegrationTests.Common.Runners
                             .UseTestChainedHeaderTree()
                             .MockIBD();
 
-            if (this.InterceptorDisconnect != null)
-                builder = builder.InterceptBlockDisconnected(this.InterceptorDisconnect);
-
             if (this.ServiceToOverride != null)
                 builder.OverrideService<BaseFeature>(this.ServiceToOverride);
 
             if (!this.EnablePeerDiscovery)
             {
                 builder.RemoveImplementation<PeerConnectorDiscovery>();
-                builder.ReplaceService<IPeerDiscovery>(new PeerDiscoveryDisabled());
+                builder.ReplaceService<IPeerDiscovery, BaseFeature>(new PeerDiscoveryDisabled());
+            }
+
+            if (this.AlwaysFlushBlocks)
+            {
+                builder.ReplaceService<IBlockStoreQueueFlushCondition, BlockStoreFeature>(new BlockStoreAlwaysFlushCondition());
             }
 
             this.FullNode = (FullNode)builder.Build();

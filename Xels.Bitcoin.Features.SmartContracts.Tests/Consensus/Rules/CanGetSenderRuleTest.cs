@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NBitcoin;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Configuration;
@@ -15,12 +13,13 @@ using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.Rules;
 using Xels.Bitcoin.Features.MemoryPool;
-using Xels.Bitcoin.Features.SmartContracts.Networks;
 using Xels.Bitcoin.Features.SmartContracts.Rules;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
 using Xels.SmartContracts.Core;
 using Xels.SmartContracts.Core.Util;
+using Xels.SmartContracts.Networks;
 using Xunit;
 using Block = NBitcoin.Block;
 
@@ -41,11 +40,12 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Consensus.Rules
                 this.network,
                 new Mock<ILoggerFactory>().Object,
                 new Mock<IDateTimeProvider>().Object,
-                new ConcurrentChain(this.network),
-                new NodeDeployments(KnownNetworks.RegTest, new ConcurrentChain(this.network)),
+                new ChainIndexer(this.network),
+                new NodeDeployments(KnownNetworks.RegTest, new ChainIndexer(this.network)),
                 new ConsensusSettings(NodeSettings.Default(this.network)), new Mock<ICheckpoints>().Object, new Mock<ICoinView>().Object, new Mock<IChainState>().Object,
                 new InvalidBlockHashStore(null),
-                new NodeStats(null));
+                new NodeStats(null),
+                new AsyncProvider(new Mock<ILoggerFactory>().Object, new Mock<ISignals>().Object, new NodeLifetime()));
 
             this.rule.Initialize();
         }

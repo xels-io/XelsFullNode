@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net;
 using NBitcoin;
 using NBitcoin.BouncyCastle.Math;
 using NBitcoin.DataEncoders;
+using NBitcoin.Protocol;
 using Xels.Bitcoin.Networks.Deployments;
+using Xels.Bitcoin.Networks.Policies;
 
 namespace Xels.Bitcoin.Networks
 {
@@ -35,11 +37,13 @@ namespace Xels.Bitcoin.Networks
             uint magic = BitConverter.ToUInt32(messageStart, 0); //0x5223570;
 
             this.Name = "XelsMain";
+            this.NetworkType = NetworkType.Mainnet;
             this.Magic = magic;
             this.DefaultPort = 29776;
             this.DefaultMaxOutboundConnections = 16;
             this.DefaultMaxInboundConnections = 109;
-            this.RPCPort = 29775;
+            this.DefaultRPCPort = 29775;
+            this.DefaultAPIPort = 37221;
             this.MaxTipAge = 2 * 60 * 60;
             this.MinTxFee = 10000;
             this.FallbackFee = 10000;
@@ -47,7 +51,7 @@ namespace Xels.Bitcoin.Networks
             this.RootFolderName = XelsRootFolderName;
             this.DefaultConfigFilename = XelsDefaultConfigFilename;
             this.MaxTimeOffsetSeconds = 25 * 60;
-            this.CoinTicker = "XEL";
+            this.CoinTicker = "XELS";
 
             var consensusFactory = new PosConsensusFactory();
 
@@ -100,7 +104,7 @@ namespace Xels.Bitcoin.Networks
                 ruleChangeActivationThreshold: 1916, // 95% of 2016
                 minerConfirmationWindow: 2016, // nPowTargetTimespan / nPowTargetSpacing
                 maxReorgLength: 500,
-                defaultAssumeValid: new uint256("0x0000033ab02dbdf95788721b78fcbaac559fde8bdc0948ad2dbeeedf45c99c4e"), // 795970
+                defaultAssumeValid: new uint256("0x0000033ab02dbdf95788721b78fcbaac559fde8bdc0948ad2dbeeedf45c99c4e"), // 1213518
                 maxMoney: 2537175000 * Money.COIN, //long.MaxValue,
                 coinbaseMaturity: 1,
                 premineHeight: 10,
@@ -110,9 +114,10 @@ namespace Xels.Bitcoin.Networks
                 forthMiningPeriodHeight: 850000 + 500000 + 850000 + 500000,
                 premineReward: Money.Coins(187155000),
                 proofOfWorkReward: Money.Coins(375),
-                powTargetTimespan: TimeSpan.FromSeconds( 24 * 60 * 60), // One day // two weeks
-                powTargetSpacing: TimeSpan.FromSeconds( 150 ),
+                powTargetTimespan: TimeSpan.FromSeconds(24 * 60 * 60), // two weeks
+                powTargetSpacing: TimeSpan.FromSeconds(150),
                 powAllowMinDifficultyBlocks: false,
+                posNoRetargeting: false,
                 powNoRetargeting: false,
                 powLimit: new Target(new uint256("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")),
                 minimumChainWork: null,
@@ -142,18 +147,39 @@ namespace Xels.Bitcoin.Networks
                 { 0, new CheckpointInfo(new uint256("0x0000033ab02dbdf95788721b78fcbaac559fde8bdc0948ad2dbeeedf45c99c4e"), new uint256("0x0000000000000000000000000000000000000000000000000000000000000000")) }
             };
 
-            var encoder = new Bech32Encoder("xc");
             this.Bech32Encoders = new Bech32Encoder[2];
-            this.Bech32Encoders[(int)Bech32Type.WITNESS_PUBKEY_ADDRESS] = encoder;
-            this.Bech32Encoders[(int)Bech32Type.WITNESS_SCRIPT_ADDRESS] = encoder;
+            // Bech32 is currently unsupported on Xels - once supported uncomment lines below
+            //var encoder = new Bech32Encoder("bc");
+            //this.Bech32Encoders[(int)Bech32Type.WITNESS_PUBKEY_ADDRESS] = encoder;
+            //this.Bech32Encoders[(int)Bech32Type.WITNESS_SCRIPT_ADDRESS] = encoder;
+            this.Bech32Encoders[(int)Bech32Type.WITNESS_PUBKEY_ADDRESS] = null;
+            this.Bech32Encoders[(int)Bech32Type.WITNESS_SCRIPT_ADDRESS] = null;
 
+            this.DNSSeeds = new List<DNSSeedData>();
             this.DNSSeeds = new List<DNSSeedData>
             {
-                new DNSSeedData("", "")
+                new DNSSeedData("api.xels.io","api.xels.io")
+                //    new DNSSeedData("mainnet2.xelsnetwork.com", "mainnet2.xelsnetwork.com"),
+                //    new DNSSeedData("mainnet3.xelsplatform.com", "mainnet3.xelsplatform.com"),
+                //    new DNSSeedData("mainnet4.xelsnetwork.com", "mainnet4.xelsnetwork.com")
             };
 
-            string[] seedNodes = { /*"101.200.198.155", "103.24.76.21", "104.172.24.79", "13.78.39.87", "23.102.35.247" */};
-            this.SeedNodes = ConvertToNetworkAddresses(seedNodes, this.DefaultPort).ToList();
+            this.SeedNodes = new List<NetworkAddress>();
+            this.SeedNodes = new List<NetworkAddress>
+            {
+                new NetworkAddress(IPAddress.Parse("52.68.239.4"), 29776), // Redistribution node
+                new NetworkAddress(IPAddress.Parse("54.238.248.117"), 29776), // public node
+                new NetworkAddress(IPAddress.Parse("13.114.52.87"), 29776), // public node
+                new NetworkAddress(IPAddress.Parse("52.192.229.45"), 29776), // public node
+                new NetworkAddress(IPAddress.Parse("52.199.121.139"), 29776 ), // public node
+
+                //new NetworkAddress(IPAddress.Parse("137.116.46.151"), 37221), // public node
+                //new NetworkAddress(IPAddress.Parse("40.78.80.159"), 37221), // public node
+                //new NetworkAddress(IPAddress.Parse("52.151.86.242"), 37221), // public node
+                //new NetworkAddress(IPAddress.Parse("40.74.67.242"), 37221), // public node
+            };
+
+            this.StandardScriptsRegistry = new XelsStandardScriptsRegistry();
 
             Assert(this.Consensus.HashGenesisBlock == uint256.Parse("0x0000033ab02dbdf95788721b78fcbaac559fde8bdc0948ad2dbeeedf45c99c4e"));
             Assert(this.Genesis.Header.HashMerkleRoot == uint256.Parse("0xb89a84007e56441da69efe6177920a2359574f7944c73ae61871a9e2a0f8e4a5"));
@@ -187,6 +213,7 @@ namespace Xels.Bitcoin.Networks
             genesis.Transactions.Add(txNew);
             genesis.Header.HashPrevBlock = uint256.Zero;
             genesis.UpdateMerkleRoot();
+
             //var PoWFound = false;
             //while (!PoWFound)
             //{
@@ -226,8 +253,8 @@ namespace Xels.Bitcoin.Networks
             //    PoWFound = true;
             //}
 
+
             return genesis;
         }
-
     }
 }

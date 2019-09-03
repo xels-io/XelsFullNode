@@ -1,5 +1,4 @@
-﻿using System;
-using Xels.SmartContracts;
+﻿using Xels.SmartContracts;
 
 [Deploy]
 public class InterContract1 : SmartContract

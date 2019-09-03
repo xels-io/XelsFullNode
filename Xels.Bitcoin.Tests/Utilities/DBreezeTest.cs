@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using DBreeze;
@@ -25,7 +26,7 @@ namespace Xels.Bitcoin.Tests.Utilities
         /// </summary>
         public DBreezeTest() : base(KnownNetworks.XelsRegTest)
         {
-            this.dbreezeSerializer = new DBreezeSerializer(this.Network);
+            this.dbreezeSerializer = new DBreezeSerializer(this.Network.Consensus.ConsensusFactory);
         }
 
         [Fact]
@@ -203,6 +204,24 @@ namespace Xels.Bitcoin.Tests.Utilities
 
                 return data;
             }
+        }
+
+        [Fact]
+        public void IsAbleToSerializeCollections()
+        {
+            var data = new List<uint256>
+            {
+                new uint256(3),
+                new uint256(2),
+                new uint256(5),
+                new uint256(10),
+            };
+
+            byte[] bytes1 = this.dbreezeSerializer.Serialize(data);
+            byte[] bytes2 = this.dbreezeSerializer.Serialize(data.ToArray());
+            Assert.True(bytes1.SequenceEqual(bytes2));
+
+            this.dbreezeSerializer.Serialize(data.ToHashSet());
         }
     }
 }

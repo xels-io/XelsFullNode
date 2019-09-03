@@ -4,11 +4,11 @@ using NBitcoin;
 using Xels.Bitcoin.Features.SmartContracts;
 using Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Consensus.Rules;
 using Xels.Bitcoin.IntegrationTests.Common;
-using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
-using Xels.SmartContracts.Core;
-using Xels.SmartContracts.Core.State;
+using Xels.Bitcoin.Tests.Common;
 using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.CLR.Serialization;
+using Xels.SmartContracts.Core;
+using Xels.SmartContracts.Core.State;
 using Xels.SmartContracts.Tests.Common;
 using Xunit;
 
@@ -25,7 +25,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
 
                 TestHelper.MineBlocks(xelsNodeSync, 105); // coinbase maturity = 100
 
-                var block = xelsNodeSync.FullNode.BlockStore().GetBlockAsync(xelsNodeSync.FullNode.Chain.GetBlock(4).HashBlock).Result;
+                var block = xelsNodeSync.FullNode.BlockStore().GetBlock(xelsNodeSync.FullNode.ChainIndexer.GetHeader(4).HashBlock);
                 var prevTrx = block.Transactions.First();
                 var dest = new BitcoinSecret(new Key(), xelsNodeSync.FullNode.Network);
 
@@ -37,7 +37,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
 
                 xelsNodeSync.Broadcast(tx);
 
-                TestHelper.WaitLoop(() => xelsNodeSync.CreateRPCClient().GetRawMempool().Length == 1);
+                TestBase.WaitLoop(() => xelsNodeSync.CreateRPCClient().GetRawMempool().Length == 1);
             }
         }
 
@@ -52,14 +52,14 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
 
                 TestHelper.MineBlocks(xelsNodeSync, 105); // coinbase maturity = 100
 
-                var block = xelsNodeSync.FullNode.BlockStore().GetBlockAsync(xelsNodeSync.FullNode.Chain.GetBlock(4).HashBlock).Result;
+                var block = xelsNodeSync.FullNode.BlockStore().GetBlock(xelsNodeSync.FullNode.ChainIndexer.GetHeader(4).HashBlock);
                 var prevTrx = block.Transactions.First();
                 var dest = new BitcoinSecret(new Key(), xelsNodeSync.FullNode.Network);
 
                 // Gas higher than allowed limit
                 var tx = xelsNodeSync.FullNode.Network.CreateTransaction();
                 tx.AddInput(new TxIn(new OutPoint(prevTrx.GetHash(), 0), PayToPubkeyHashTemplate.Instance.GenerateScriptPubKey(xelsNodeSync.MinerSecret.PubKey)));
-                var contractTxData = new ContractTxData(1, 100, new Gas(10_000_000), new uint160(0), "Test");
+                var contractTxData = new ContractTxData(1, 100, new RuntimeObserver.Gas(10_000_000), new uint160(0), "Test");
                 tx.AddOutput(new TxOut(1, new Script(callDataSerializer.Serialize(contractTxData))));
                 tx.Sign(xelsNodeSync.FullNode.Network, xelsNodeSync.MinerSecret, false);
                 xelsNodeSync.Broadcast(tx);
@@ -92,7 +92,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
                 // Gas price lower than minimum
                 tx = xelsNodeSync.FullNode.Network.CreateTransaction();
                 tx.AddInput(new TxIn(new OutPoint(prevTrx.GetHash(), 0), PayToPubkeyHashTemplate.Instance.GenerateScriptPubKey(xelsNodeSync.MinerSecret.PubKey)));
-                var lowGasPriceContractTxData = new ContractTxData(1, SmartContractMempoolValidator.MinGasPrice - 1, new Gas(SmartContractFormatRule.GasLimitMaximum), new uint160(0), "Test");
+                var lowGasPriceContractTxData = new ContractTxData(1, SmartContractMempoolValidator.MinGasPrice - 1, new RuntimeObserver.Gas(SmartContractFormatLogic.GasLimitMaximum), new uint160(0), "Test");
                 tx.AddOutput(new TxOut(1, new Script(callDataSerializer.Serialize(lowGasPriceContractTxData))));
                 tx.Sign(xelsNodeSync.FullNode.Network, xelsNodeSync.MinerSecret, false);
                 xelsNodeSync.Broadcast(tx);
@@ -108,7 +108,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
                 tx.AddOutput(new TxOut("24", new Key().PubKey.Hash)); // 1 btc fee
                 tx.Sign(xelsNodeSync.FullNode.Network, xelsNodeSync.MinerSecret, false);
                 xelsNodeSync.Broadcast(tx);
-                TestHelper.WaitLoop(() => xelsNodeSync.CreateRPCClient().GetRawMempool().Length == 1);
+                TestBase.WaitLoop(() => xelsNodeSync.CreateRPCClient().GetRawMempool().Length == 1);
             }
         }
     }

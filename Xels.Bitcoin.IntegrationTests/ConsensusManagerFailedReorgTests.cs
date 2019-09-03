@@ -1,113 +1,236 @@
-﻿using NBitcoin;
+﻿using System.Threading.Tasks;
+using NBitcoin;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
+using Xels.Bitcoin.IntegrationTests.Common.ReadyData;
 using Xels.Bitcoin.IntegrationTests.Common.TestNetworks;
 using Xels.Bitcoin.Networks;
+using Xels.Bitcoin.Primitives;
+using Xels.Bitcoin.Tests.Common;
 using Xunit;
 
 namespace Xels.Bitcoin.IntegrationTests
 {
     public class ConsensusManagerFailedReorgTests
     {
-        private readonly Network posNetwork;
         private readonly Network powNetwork;
 
         public ConsensusManagerFailedReorgTests()
         {
-            this.posNetwork = new XelsRegTest();
             this.powNetwork = new BitcoinRegTest();
         }
 
         [Fact]
-        public void ReorgChain_FailsFullValidation_Reconnect_OldChain_Nodes_Connected()
+        public async Task ReorgChain_FailsFullValidation_Reconnect_OldChain_Nodes_ConnectedAsync()
         {
             using (var builder = NodeBuilder.Create(this))
             {
                 var bitcoinNoValidationRulesNetwork = new BitcoinRegTestNoValidationRules();
 
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var minerB = builder.CreateXelsPowNode(bitcoinNoValidationRulesNetwork).NoValidation().WithDummyWallet().Start();
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cmfr-1-minerA").WithDummyWallet().WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Miner);
+                var minerB = builder.CreateXelsPowNode(bitcoinNoValidationRulesNetwork, "cmfr-1-minerB").NoValidation().WithDummyWallet().Start();
 
-                // MinerA mines 5 blocks
-                TestHelper.MineBlocks(minerA, 5);
+                ChainedHeader minerBChainTip = null;
+                bool interceptorsEnabled = false;
+                bool minerA_Disconnected_ItsOwnChain_ToConnectTo_MinerBs_LongerChain = false;
+                bool minerA_IsConnecting_To_MinerBChain = false;
+                bool minerA_Disconnected_MinerBsChain = false;
+                bool minerA_Reconnected_Its_OwnChain = false;
 
-                // MinerB syncs with MinerA
+                // Configure the interceptor to intercept when Miner A connects Miner B's chain.
+                void interceptorConnect(ChainedHeaderBlock chainedHeaderBlock)
+                {
+                    if (!interceptorsEnabled)
+                        return;
+
+                    if (!minerA_IsConnecting_To_MinerBChain)
+                    {
+                        if (chainedHeaderBlock.ChainedHeader.Height == 12)
+                            minerA_IsConnecting_To_MinerBChain = minerA.FullNode.ConsensusManager().Tip.HashBlock == minerBChainTip.GetAncestor(12).HashBlock;
+
+                        return;
+                    }
+
+                    if (!minerA_Reconnected_Its_OwnChain)
+                    {
+                        if (chainedHeaderBlock.ChainedHeader.Height == 14)
+                            minerA_Reconnected_Its_OwnChain = true;
+
+                        return;
+                    }
+                }
+
+                // Configure the interceptor to intercept when Miner A disconnects Miner B's chain after the reorg.
+                void interceptorDisconnect(ChainedHeaderBlock chainedHeaderBlock)
+                {
+                    if (!interceptorsEnabled)
+                        return;
+
+                    if (!minerA_Disconnected_ItsOwnChain_ToConnectTo_MinerBs_LongerChain)
+                    {
+                        if (minerA.FullNode.ConsensusManager().Tip.Height == 10)
+                            minerA_Disconnected_ItsOwnChain_ToConnectTo_MinerBs_LongerChain = true;
+
+                        return;
+                    }
+
+                    if (!minerA_Disconnected_MinerBsChain)
+                    {
+                        if (minerA.FullNode.ConsensusManager().Tip.Height == 10)
+                            minerA_Disconnected_MinerBsChain = true;
+
+                        return;
+                    }
+                }
+
+                minerA.Start();
+                minerA.SetConnectInterceptor(interceptorConnect);
+                minerA.SetDisconnectInterceptor(interceptorDisconnect);
+
+                // Miner B syncs with Miner A
                 TestHelper.ConnectAndSync(minerB, minerA);
 
-                // Disable syncer from sending blocks to miner B
+                // Disable Miner A from sending blocks to Miner B
                 TestHelper.DisableBlockPropagation(minerA, minerB);
 
-                // Miner A continues to mine to height 9
+                // Miner A continues to mine to height 14
                 TestHelper.MineBlocks(minerA, 4);
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 9);
+                TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 14);
+                Assert.Equal(10, minerB.FullNode.ConsensusManager().Tip.Height);
 
-                // MinerB mines 5 more blocks:
+                // Enable the interceptors so that they are active during the reorg.
+                interceptorsEnabled = true;
+
+                // Miner B mines 5 more blocks:
                 // Block 6,7,9,10 = valid
                 // Block 8 = invalid
-                TestHelper.BuildBlocks.OnNode(minerB).Amount(5).Invalid(8, (coreNode, block) => BlockBuilder.InvalidCoinbaseReward(coreNode, block)).BuildAsync();
+                minerBChainTip = await TestHelper.BuildBlocks.OnNode(minerB).Amount(5).Invalid(13, (coreNode, block) => BlockBuilder.InvalidCoinbaseReward(coreNode, block)).BuildAsync();
+                Assert.Equal(15, minerBChainTip.Height);
+                Assert.Equal(15, minerB.FullNode.ConsensusManager().Tip.Height);
 
-                // On mining the following will happen: 
-                // Reorg from blocks 9 to 5.
-                // Connect blocks 5 to 10
-                // Block 8 fails.
-                // Reorg from 7 to 5
-                // Reconnect blocks 6 to 9
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 9);
-                TestHelper.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 10);
+                // Wait until Miner A disconnected its own chain so that it can connect to
+                // Miner B's longer chain.
+                TestBase.WaitLoop(() => minerA_Disconnected_ItsOwnChain_ToConnectTo_MinerBs_LongerChain);
+
+                // Wait until Miner A has connected Miner B's chain (but failed)
+                TestBase.WaitLoop(() => minerA_IsConnecting_To_MinerBChain);
+
+                // Wait until Miner A has disconnected Miner B's invalid chain.
+                TestBase.WaitLoop(() => minerA_Disconnected_MinerBsChain);
+
+                // Wait until Miner A has reconnected its own chain.
+                TestBase.WaitLoop(() => minerA_Reconnected_Its_OwnChain);
             }
         }
 
         [Fact]
-        public void ReorgChain_FailsFullValidation_Reconnect_OldChain_Nodes_Disconnected()
+        public async Task ReorgChain_FailsFullValidation_Reconnect_OldChain_Nodes_DisconnectedAsync()
         {
             using (var builder = NodeBuilder.Create(this))
             {
-                var noValidationRulesNetwork = new BitcoinRegTestNoValidationRules();
+                var bitcoinNoValidationRulesNetwork = new BitcoinRegTestNoValidationRules();
 
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var minerB = builder.CreateXelsPowNode(noValidationRulesNetwork).NoValidation().WithDummyWallet().Start();
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cmfr-2-minerA").WithDummyWallet().WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Miner).Start();
+                var minerB = builder.CreateXelsPowNode(bitcoinNoValidationRulesNetwork, "cmfr-2-minerB").NoValidation().WithDummyWallet().Start();
 
-                // MinerA mines 5 blocks
-                TestHelper.MineBlocks(minerA, 5);
-
-                // MinerB syncs with MinerA
+                // Miner B syncs with Miner A
                 TestHelper.ConnectAndSync(minerB, minerA);
 
-                // Disconnect miner B from minerA
-                TestHelper.Disconnect(minerB, minerA);
+                // Disable Miner A from sending blocks to Miner B
+                TestHelper.DisableBlockPropagation(minerA, minerB);
 
-                // Miner A continues to mine to height 9
+                // Miner A continues to mine to height 14
                 TestHelper.MineBlocks(minerA, 4);
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 9);
+                TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 14);
+                Assert.Equal(10, minerB.FullNode.ConsensusManager().Tip.Height);
 
-                // MinerB mines 5 more blocks:
-                // Block 6,7,9,10 = valid
-                // Block 8 = invalid
-                TestHelper.BuildBlocks.OnNode(minerB).Amount(5).Invalid(8, (coreNode, block) => BlockBuilder.InvalidCoinbaseReward(coreNode, block)).BuildAsync();
+                // Disable Miner B from sending blocks to miner A
+                TestHelper.DisableBlockPropagation(minerB, minerA);
 
-                // Reconnect minerA to minerB causing the following to happen: 
-                // Reorg from blocks 9 to 5.
-                // Connect blocks 5 to 10
-                // Block 8 fails.
-                // Reorg from 7 to 5
-                // Reconnect blocks 6 to 9
-                TestHelper.Connect(minerA, minerB);
+                // Miner B mines 5 more blocks [Block 6,7,9,10 = valid, Block 8 = invalid]
+                var minerBChainTip = await TestHelper.BuildBlocks.OnNode(minerB).Amount(5).Invalid(13, (coreNode, block) => BlockBuilder.InvalidCoinbaseReward(coreNode, block)).BuildAsync();
+                Assert.Equal(15, minerBChainTip.Height);
+                Assert.Equal(15, minerB.FullNode.ConsensusManager().Tip.Height);
 
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 9);
-                TestHelper.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 10);
+                TestHelper.EnableBlockPropagation(minerB, minerA);
+
+                bool minerA_Disconnected_ItsOwnChain_ToConnectTo_MinerBs_LongerChain = false;
+                bool minerA_IsConnecting_To_MinerBChain = false;
+                bool minerA_Disconnected_MinerBsChain = false;
+                bool minerA_Reconnected_Its_OwnChain = false;
+
+                // Configure the interceptor to intercept when Miner A connects Miner B's chain.
+                void interceptorConnect(ChainedHeaderBlock chainedHeaderBlock)
+                {
+                    if (!minerA_IsConnecting_To_MinerBChain)
+                    {
+                        if (chainedHeaderBlock.ChainedHeader.Height == 12)
+                            minerA_IsConnecting_To_MinerBChain = minerA.FullNode.ConsensusManager().Tip.HashBlock == minerBChainTip.GetAncestor(12).HashBlock;
+
+                        return;
+                    }
+
+                    if (!minerA_Reconnected_Its_OwnChain)
+                    {
+                        if (chainedHeaderBlock.ChainedHeader.Height == 14)
+                            minerA_Reconnected_Its_OwnChain = true;
+
+                        return;
+                    }
+                }
+
+                // Configure the interceptor to intercept when Miner A disconnects Miner B's chain after the reorg.
+                void interceptorDisconnect(ChainedHeaderBlock chainedHeaderBlock)
+                {
+                    if (!minerA_Disconnected_ItsOwnChain_ToConnectTo_MinerBs_LongerChain)
+                    {
+                        if (minerA.FullNode.ConsensusManager().Tip.Height == 10)
+                            minerA_Disconnected_ItsOwnChain_ToConnectTo_MinerBs_LongerChain = true;
+
+                        return;
+                    }
+                    else
+
+                    if (!minerA_Disconnected_MinerBsChain)
+                    {
+                        if (minerA.FullNode.ConsensusManager().Tip.Height == 10)
+                            minerA_Disconnected_MinerBsChain = true;
+
+                        return;
+                    }
+                }
+
+                minerA.Restart();
+                minerA.SetConnectInterceptor(interceptorConnect);
+                minerA.SetDisconnectInterceptor(interceptorDisconnect);
+
+                TestHelper.ConnectNoCheck(minerA, minerB);
+
+                // Wait until Miner A disconnected its own chain so that it can connect to
+                // Miner B's longer chain.
+                TestBase.WaitLoop(() => minerA_Disconnected_ItsOwnChain_ToConnectTo_MinerBs_LongerChain);
+
+                // Wait until Miner A has connected Miner B's chain (but failed)
+                TestBase.WaitLoop(() => minerA_IsConnecting_To_MinerBChain);
+
+                // Wait until Miner A has disconnected Miner B's invalid chain.
+                TestBase.WaitLoop(() => minerA_Disconnected_MinerBsChain);
+
+                // Wait until Miner A has reconnected its own chain.
+                TestBase.WaitLoop(() => minerA_Reconnected_Its_OwnChain);
             }
         }
 
         [Fact]
-        public void ReorgChain_FailsFullValidation_Reconnect_OldChain_FromSecondMiner_Disconnected()
+        public async Task ReorgChain_FailsFullValidation_Reconnect_OldChain_FromSecondMiner_DisconnectedAsync()
         {
             using (var builder = NodeBuilder.Create(this))
             {
                 var noValidationRulesNetwork = new BitcoinRegTestNoValidationRules();
 
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var syncer = builder.CreateXelsPowNode(this.powNetwork).Start();
-                var minerB = builder.CreateXelsPowNode(noValidationRulesNetwork).NoValidation().WithDummyWallet().Start();
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cmfr-3-minerA").WithDummyWallet().Start();
+                var syncer = builder.CreateXelsPowNode(this.powNetwork, "cmfr-3-syncer").Start();
+                var minerB = builder.CreateXelsPowNode(noValidationRulesNetwork, "cmfr-3-minerB").NoValidation().WithDummyWallet().Start();
 
                 // MinerA mines 5 blocks
                 TestHelper.MineBlocks(minerA, 5);
@@ -118,114 +241,118 @@ namespace Xels.Bitcoin.IntegrationTests
 
                 // Disconnect minerB from miner A
                 TestHelper.Disconnect(minerB, minerA);
-                TestHelper.WaitLoop(() => !TestHelper.IsNodeConnected(minerB));
+                TestBase.WaitLoop(() => !TestHelper.IsNodeConnected(minerB));
 
                 // Miner A continues to mine to height 9
                 TestHelper.MineBlocks(minerA, 4);
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 9);
-                TestHelper.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 5);
-                TestHelper.WaitLoop(() => syncer.FullNode.ConsensusManager().Tip.Height == 9);
+                TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 9);
+                TestBase.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 5);
+                TestBase.WaitLoop(() => syncer.FullNode.ConsensusManager().Tip.Height == 9);
 
                 // Disconnect syncer from minerA
                 TestHelper.Disconnect(syncer, minerA);
-                TestHelper.WaitLoop(() => !TestHelper.IsNodeConnected(minerA));
+                TestBase.WaitLoop(() => !TestHelper.IsNodeConnected(minerA));
 
                 // MinerB mines 5 more blocks:
                 // Block 6,7,9,10 = valid
                 // Block 8 = invalid
-                TestHelper.BuildBlocks.OnNode(minerB).Amount(5).Invalid(8, (coreNode, block) => BlockBuilder.InvalidCoinbaseReward(coreNode, block)).BuildAsync();
+                await TestHelper.BuildBlocks.OnNode(minerB).Amount(5).Invalid(8, (coreNode, block) => BlockBuilder.InvalidCoinbaseReward(coreNode, block)).BuildAsync();
 
-                // Reconnect syncer to minerB causing the following to happen: 
+                // Reconnect syncer to minerB causing the following to happen:
                 // Reorg from blocks 9 to 5.
                 // Connect blocks 5 to 10
                 // Block 8 fails.
                 // Reorg from 7 to 5
                 // Reconnect blocks 6 to 9
-                TestHelper.Connect(syncer, minerB);
+                TestHelper.ConnectNoCheck(syncer, minerB);
 
                 TestHelper.AreNodesSynced(minerA, syncer);
 
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 9);
-                TestHelper.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 10);
-                TestHelper.WaitLoop(() => syncer.FullNode.ConsensusManager().Tip.Height == 9);
+                TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 9);
+                TestBase.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 10);
+                TestBase.WaitLoop(() => syncer.FullNode.ConsensusManager().Tip.Height == 9);
             }
         }
 
         [Fact]
-        public void ReorgChain_FailsPartialValidation_Nodes_Connected()
+        public async Task ReorgChain_FailsPartialValidation_Nodes_ConnectedAsync()
         {
             using (var builder = NodeBuilder.Create(this))
             {
                 var noValidationRulesNetwork = new BitcoinRegTestNoValidationRules();
 
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var minerB = builder.CreateXelsPowNode(noValidationRulesNetwork).NoValidation().WithDummyWallet().Start();
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cmfr-4-minerA").WithDummyWallet().WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Miner).Start();
+                var minerB = builder.CreateXelsPowNode(noValidationRulesNetwork, "cmfr-4-minerB").NoValidation().WithDummyWallet().Start();
 
-                // MinerA mines 5 blocks
-                TestHelper.MineBlocks(minerA, 5);
-
-                // MinerB syncs with MinerA
+                // Miner B syncs with Miner A
                 TestHelper.ConnectAndSync(minerB, minerA);
 
-                // Disable syncer from sending blocks to miner B
+                // Disable Miner A from sending blocks to Miner B
                 TestHelper.DisableBlockPropagation(minerA, minerB);
 
-                // Miner A continues to mine to height 9
+                // Miner A continues to mine to height 14
                 TestHelper.MineBlocks(minerA, 4);
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 9);
+                TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 14);
 
-                // MinerB mines 5 more blocks:
+                // Miner B mines 5 more blocks:
                 // Block 6,7,9,10 = valid
                 // Block 8 = invalid
-                TestHelper.BuildBlocks.OnNode(minerB).Amount(5).Invalid(8, (coreNode, block) => BlockBuilder.InvalidDuplicateCoinbase(coreNode, block)).BuildAsync();
+                var minerBTip = await TestHelper.BuildBlocks.OnNode(minerB).Amount(5).Invalid(14, (coreNode, block) => BlockBuilder.InvalidDuplicateCoinbase(coreNode, block)).BuildAsync();
 
-                // Reconnect minerA to minerB.
-                // This will cause the reorg chain to fail at block 8 and roll back any changes.
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 9);
-                TestHelper.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 10);
+                // MinerA will disconnect MinerB
+                TestBase.WaitLoop(() => !TestHelper.IsNodeConnectedTo(minerA, minerB));
+
+                // Ensure Miner A and Miner B remains on their respective heights.
+                var badBlockOnMinerBChain = minerBTip.GetAncestor(14);
+                Assert.Null(minerA.FullNode.ConsensusManager().Tip.FindAncestorOrSelf(badBlockOnMinerBChain));
+                TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 14);
+                TestBase.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 15);
             }
         }
 
         [Fact]
-        public void ReorgChain_FailsPartialValidation_Nodes_Disconnected()
+        public async Task ReorgChain_FailsPartialValidation_Nodes_DisconnectedAsync()
         {
             using (var builder = NodeBuilder.Create(this))
             {
                 var noValidationRulesNetwork = new BitcoinRegTestNoValidationRules();
 
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var minerB = builder.CreateXelsPowNode(noValidationRulesNetwork).NoValidation().WithDummyWallet().Start();
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cmfr-5-minerA").WithDummyWallet().WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest10Miner).Start();
+                var minerB = builder.CreateXelsPowNode(noValidationRulesNetwork, "cmfr-5-minerB").NoValidation().WithDummyWallet().Start();
 
-                // MinerA mines 5 blocks
-                TestHelper.MineBlocks(minerA, 5);
-
-                // MinerB syncs with MinerA
+                // Miner B syncs with Miner A
                 TestHelper.ConnectAndSync(minerB, minerA);
 
-                // Disconnect minerA from miner B
+                // Disconnect Miner A from Miner B
                 TestHelper.Disconnect(minerB, minerA);
 
-                // Miner A continues to mine to height 9
+                // Miner A continues to mine to height 14
                 TestHelper.MineBlocks(minerA, 4);
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 9);
+                TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 14);
 
-                // MinerB mines 5 more blocks:
+                // Miner B mines 5 more blocks:
                 // Block 6,7,9,10 = valid
                 // Block 8 = invalid
-                TestHelper.BuildBlocks.OnNode(minerB).Amount(5).Invalid(8, (coreNode, block) => BlockBuilder.InvalidDuplicateCoinbase(coreNode, block)).BuildAsync();
+                var minerBTip = await TestHelper.BuildBlocks.OnNode(minerB).Amount(5).Invalid(14, (coreNode, block) => BlockBuilder.InvalidDuplicateCoinbase(coreNode, block)).BuildAsync();
 
-                // Reconnect minerA to minerB.
-                // This will cause the reorg chain to fail at block 8 and roll back any changes.
-                TestHelper.Connect(minerA, minerB);
+                // Reconnect Miner A to Miner B.
+                TestHelper.ConnectNoCheck(minerA, minerB);
 
-                TestHelper.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 9);
-                TestHelper.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 10);
+                // Miner A will disconnect Miner B
+                TestBase.WaitLoop(() => !TestHelper.IsNodeConnectedTo(minerA, minerB));
+
+                // Ensure Miner A and Miner B remains on their respective heights.
+                var badBlockOnMinerBChain = minerBTip.GetAncestor(14);
+                Assert.Null(minerA.FullNode.ConsensusManager().Tip.FindAncestorOrSelf(badBlockOnMinerBChain));
+                TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 14);
+                TestBase.WaitLoop(() => minerB.FullNode.ConsensusManager().Tip.Height == 15);
+
             }
         }
 
         /// <summary>
         /// The chain that will be reconnected to has 4 blocks and 4 headers from fork point:
-        /// 
+        ///
         /// 6 -> Full Block
         /// 7 -> Full Block
         /// 8 -> Full Block
@@ -236,18 +363,19 @@ namespace Xels.Bitcoin.IntegrationTests
         /// 13 -> Header Only
         /// </summary>
         [Fact]
-        public void ReorgChain_FailsFullValidation_ChainHasBlocksAndHeadersOnly_NodesDisconnected()
+        public async Task ReorgChain_FailsFullValidation_ChainHasBlocksAndHeadersOnly_NodesDisconnectedAsync()
         {
             using (var builder = NodeBuilder.Create(this))
             {
                 var noValidationRulesNetwork = new BitcoinRegTestNoValidationRules();
 
-                var minerA = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var minerB = builder.CreateXelsPowNode(this.powNetwork).WithDummyWallet().Start();
-                var minerC = builder.CreateXelsPowNode(noValidationRulesNetwork).NoValidation().WithDummyWallet().Start();
+                var minerA = builder.CreateXelsPowNode(this.powNetwork, "cmfr-6-minerA").WithDummyWallet().Start();
+                var minerB = builder.CreateXelsPowNode(this.powNetwork, "cmfr-6-minerB").WithDummyWallet().Start();
+                var minerC = builder.CreateXelsPowNode(noValidationRulesNetwork, "cmfr-6-minerC").NoValidation().WithDummyWallet().Start();
 
-                // MinerA mines 5 blocks
-                TestHelper.MineBlocks(minerA, 5);
+                // Mine 10 blocks with minerA. We cannot use a premade chain as it adversely affects the max tip age calculation, causing sporadic sync errors.
+                TestHelper.MineBlocks(minerA, 10);
+                TestBase.WaitLoop(() => minerA.FullNode.ConsensusManager().Tip.Height == 10);
 
                 // MinerB and MinerC syncs with MinerA
                 TestHelper.ConnectAndSync(minerA, minerB, minerC);
@@ -255,34 +383,34 @@ namespace Xels.Bitcoin.IntegrationTests
                 // Disconnect MinerC from MinerA
                 TestHelper.Disconnect(minerA, minerC);
 
-                // MinerA continues to mine to height 9
+                // MinerA continues to mine to height 14
                 TestHelper.MineBlocks(minerA, 4);
-                TestHelper.WaitLoopMessage(() => { return (minerA.FullNode.ConsensusManager().Tip.Height == 9, minerA.FullNode.ConsensusManager().Tip.Height.ToString()); });
-                TestHelper.WaitLoopMessage(() => { return (minerB.FullNode.ConsensusManager().Tip.Height == 9, minerB.FullNode.ConsensusManager().Tip.Height.ToString()); });
-                TestHelper.WaitLoopMessage(() => { return (minerC.FullNode.ConsensusManager().Tip.Height == 5, minerC.FullNode.ConsensusManager().Tip.Height.ToString()); });
+                TestBase.WaitLoopMessage(() => { return (minerA.FullNode.ConsensusManager().Tip.Height == 14, minerA.FullNode.ConsensusManager().Tip.Height.ToString()); });
+                TestBase.WaitLoopMessage(() => { return (minerB.FullNode.ConsensusManager().Tip.Height == 14, minerB.FullNode.ConsensusManager().Tip.Height.ToString()); });
+                TestBase.WaitLoopMessage(() => { return (minerC.FullNode.ConsensusManager().Tip.Height == 10, minerC.FullNode.ConsensusManager().Tip.Height.ToString()); });
 
                 // MinerB continues to mine to block 13 without block propogation
                 TestHelper.DisableBlockPropagation(minerB, minerA);
                 TestHelper.MineBlocks(minerB, 4);
-                TestHelper.WaitLoop(() => TestHelper.IsNodeSyncedAtHeight(minerA, 9));
-                TestHelper.WaitLoop(() => TestHelper.IsNodeSyncedAtHeight(minerB, 13));
-                TestHelper.WaitLoop(() => TestHelper.IsNodeSyncedAtHeight(minerC, 5));
+                TestBase.WaitLoop(() => TestHelper.IsNodeSyncedAtHeight(minerA, 14));
+                TestBase.WaitLoop(() => TestHelper.IsNodeSyncedAtHeight(minerB, 18));
+                TestBase.WaitLoop(() => TestHelper.IsNodeSyncedAtHeight(minerC, 10));
 
                 // MinerB mines 5 more blocks:
                 // Block 6,7,9,10 = valid
                 // Block 8 = invalid
-                TestHelper.BuildBlocks.OnNode(minerC).Amount(5).Invalid(8, (coreNode, block) => BlockBuilder.InvalidCoinbaseReward(coreNode, block)).BuildAsync();
+                await TestHelper.BuildBlocks.OnNode(minerC).Amount(5).Invalid(13, (coreNode, block) => BlockBuilder.InvalidCoinbaseReward(coreNode, block)).BuildAsync();
 
                 // Reconnect MinerA to MinerC.
-                TestHelper.Connect(minerA, minerC);
+                TestHelper.ConnectNoCheck(minerA, minerC);
 
                 // MinerC should be disconnected from MinerA
-                TestHelper.WaitLoop(() => !TestHelper.IsNodeConnectedTo(minerA, minerC));
+                TestBase.WaitLoop(() => !TestHelper.IsNodeConnectedTo(minerA, minerC));
 
                 // This will cause the reorg chain to fail at block 8 and roll back any changes.
-                TestHelper.WaitLoopMessage(() => { return (minerA.FullNode.ConsensusManager().Tip.Height == 9, minerA.FullNode.ConsensusManager().Tip.Height.ToString()); });
-                TestHelper.WaitLoopMessage(() => { return (minerB.FullNode.ConsensusManager().Tip.Height == 13, minerB.FullNode.ConsensusManager().Tip.Height.ToString()); });
-                TestHelper.WaitLoopMessage(() => { return (minerC.FullNode.ConsensusManager().Tip.Height == 10, minerC.FullNode.ConsensusManager().Tip.Height.ToString()); });
+                TestBase.WaitLoopMessage(() => { return (minerA.FullNode.ConsensusManager().Tip.Height == 14, minerA.FullNode.ConsensusManager().Tip.Height.ToString()); });
+                TestBase.WaitLoopMessage(() => { return (minerB.FullNode.ConsensusManager().Tip.Height == 18, minerB.FullNode.ConsensusManager().Tip.Height.ToString()); });
+                TestBase.WaitLoopMessage(() => { return (minerC.FullNode.ConsensusManager().Tip.Height == 15, minerC.FullNode.ConsensusManager().Tip.Height.ToString()); });
             }
         }
     }

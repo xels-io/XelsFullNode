@@ -509,6 +509,7 @@
       "path": "microsoft.netcore.targets/1.1.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
@@ -865,11 +866,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Apps.Browser\\Xels.Bitcoin.Apps.Browser.csproj",
+      "projectUniqueName": "F:\\XelCodeRepo\\XelsCore-master\\XelsBitcoinFullNode\\src\\Xels.Bitcoin.Apps.Browser\\Xels.Bitcoin.Apps.Browser.csproj",
       "projectName": "Xels.Bitcoin.Apps.Browser",
-      "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Apps.Browser\\Xels.Bitcoin.Apps.Browser.csproj",
+      "projectPath": "F:\\XelCodeRepo\\XelsCore-master\\XelsBitcoinFullNode\\src\\Xels.Bitcoin.Apps.Browser\\Xels.Bitcoin.Apps.Browser.csproj",
       "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-      "outputPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Apps.Browser\\obj\\",
+      "outputPath": "F:\\XelCodeRepo\\XelsCore-master\\XelsBitcoinFullNode\\src\\Xels.Bitcoin.Apps.Browser\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

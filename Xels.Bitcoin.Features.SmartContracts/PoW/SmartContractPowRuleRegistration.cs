@@ -2,23 +2,44 @@
 using NBitcoin;
 using NBitcoin.Rules;
 using Xels.Bitcoin.Consensus.Rules;
+using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
 using Xels.Bitcoin.Features.SmartContracts.PoW.Rules;
 using Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Consensus.Rules;
 using Xels.Bitcoin.Features.SmartContracts.Rules;
-using Xels.SmartContracts.Core.Util;
 using Xels.SmartContracts.CLR;
-using Xels.SmartContracts.CLR.Serialization;
+using Xels.SmartContracts.Core;
+using Xels.SmartContracts.Core.Receipts;
+using Xels.SmartContracts.Core.State;
+using Xels.SmartContracts.Core.Util;
 
 namespace Xels.Bitcoin.Features.SmartContracts.PoW
 {
     public sealed class SmartContractPowRuleRegistration : IRuleRegistration
     {
         private readonly Network network;
+        private readonly IStateRepositoryRoot stateRepositoryRoot;
+        private readonly IContractExecutorFactory executorFactory;
+        private readonly ICallDataSerializer callDataSerializer;
+        private readonly ISenderRetriever senderRetriever;
+        private readonly IReceiptRepository receiptRepository;
+        private readonly ICoinView coinView;
 
-        public SmartContractPowRuleRegistration(Network network)
+        public SmartContractPowRuleRegistration(Network network,
+            IStateRepositoryRoot stateRepositoryRoot,
+            IContractExecutorFactory executorFactory,
+            ICallDataSerializer callDataSerializer,
+            ISenderRetriever senderRetriever,
+            IReceiptRepository receiptRepository,
+            ICoinView coinView)
         {
             this.network = network;
+            this.stateRepositoryRoot = stateRepositoryRoot;
+            this.executorFactory = executorFactory;
+            this.callDataSerializer = callDataSerializer;
+            this.senderRetriever = senderRetriever;
+            this.receiptRepository = receiptRepository;
+            this.coinView = coinView;
         }
 
         public void RegisterRules(IConsensus consensus)
@@ -49,7 +70,11 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoW
                 new EnsureCoinbaseRule(),
                 new CheckPowTransactionRule(),
                 new CheckSigOpsRule(),
-                new AllowedScriptTypeRule()
+                new AllowedScriptTypeRule(this.network),
+                new ContractTransactionPartialValidationRule(this.callDataSerializer, new List<IContractTransactionPartialValidationRule>
+                {
+                    new SmartContractFormatLogic()
+                })
             };
 
             consensus.FullValidationRules = new List<IFullValidationConsensusRule>()
@@ -60,10 +85,9 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoW
                 new TransactionDuplicationActivationRule(), // implements BIP30
                 new TxOutSmartContractExecRule(),
                 new OpSpendRule(),
-                new CanGetSenderRule(new SenderRetriever()),
-                new SmartContractFormatRule(new CallDataSerializer(new ContractPrimitiveSerializer(this.network))), // Can we inject these serializers?
-                new P2PKHNotContractRule(),
-                new SmartContractPowCoinviewRule(), // implements BIP68, MaxSigOps and BlockReward 
+                new CanGetSenderRule(this.senderRetriever),
+                new P2PKHNotContractRule(this.stateRepositoryRoot),
+                new SmartContractPowCoinviewRule(this.network, this.stateRepositoryRoot, this.executorFactory, this.callDataSerializer, this.senderRetriever, this.receiptRepository, this.coinView), // implements BIP68, MaxSigOps and BlockReward 
                 new SaveCoinviewRule()
             };
         }

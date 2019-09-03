@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using NBitcoin;
+using Xels.SmartContracts.Core.Hashing;
 
 namespace Xels.SmartContracts.CLR
 {

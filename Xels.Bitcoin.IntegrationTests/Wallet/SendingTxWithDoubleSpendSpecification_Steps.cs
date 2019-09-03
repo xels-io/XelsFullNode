@@ -8,6 +8,8 @@ using Xels.Bitcoin.Features.Wallet.Controllers;
 using Xels.Bitcoin.Features.Wallet.Models;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
+using Xels.Bitcoin.IntegrationTests.Common.ReadyData;
+using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Tests.Common.TestFramework;
 using Xunit.Abstractions;
@@ -22,19 +24,24 @@ namespace Xels.Bitcoin.IntegrationTests.Wallet
         private const string AccountName = "account 0";
 
         private NodeBuilder builder;
+        private Network network;
         private CoreNode xelsSender;
         private CoreNode xelsReceiver;
         private Transaction transaction;
         private MempoolValidationState mempoolValidationState;
         private HdAddress receivingAddress;
 
-        public SendingTransactionWithDoubleSpend(ITestOutputHelper outputHelper) : base(outputHelper) { }
+        public SendingTransactionWithDoubleSpend(ITestOutputHelper outputHelper) : base(outputHelper)
+        {
+        }
 
         protected override void BeforeTest()
         {
             this.builder = NodeBuilder.Create(this);
-            this.xelsSender = this.builder.CreateXelsPowNode(KnownNetworks.RegTest).WithWallet().Start();
-            this.xelsReceiver = this.builder.CreateXelsPowNode(KnownNetworks.RegTest).WithWallet().Start();
+            this.network = new BitcoinRegTest();
+
+            this.xelsSender = this.builder.CreateXelsPowNode(this.network).WithReadyBlockchainData(ReadyBlockchain.BitcoinRegTest100Miner).Start();
+            this.xelsReceiver = this.builder.CreateXelsPowNode(this.network).WithWallet().Start();
             this.mempoolValidationState = new MempoolValidationState(true);
         }
 
@@ -46,7 +53,7 @@ namespace Xels.Bitcoin.IntegrationTests.Wallet
         private void wallets_with_coins()
         {
             var maturity = (int)this.xelsSender.FullNode.Network.Consensus.CoinbaseMaturity;
-            TestHelper.MineBlocks(this.xelsSender, maturity + 5);
+            TestHelper.MineBlocks(this.xelsSender, 5);
 
             var total = this.xelsSender.FullNode.WalletManager().GetSpendableTransactionsInWallet(Name).Sum(s => s.Transaction.Amount);
             total.Should().Equals(Money.COIN * 6 * 50);
@@ -63,8 +70,8 @@ namespace Xels.Bitcoin.IntegrationTests.Wallet
 
             this.xelsSender.FullNode.NodeService<WalletController>().SendTransaction(new SendTransactionRequest(this.transaction.ToHex()));
 
-            TestHelper.WaitLoop(() => this.xelsReceiver.CreateRPCClient().GetRawMempool().Length > 0);
-            TestHelper.WaitLoop(() => this.xelsReceiver.FullNode.WalletManager().GetSpendableTransactionsInWallet(Name).Any());
+            TestBase.WaitLoop(() => this.xelsReceiver.CreateRPCClient().GetRawMempool().Length > 0);
+            TestBase.WaitLoop(() => this.xelsReceiver.FullNode.WalletManager().GetSpendableTransactionsInWallet(Name).Any());
 
             var receivetotal = this.xelsReceiver.FullNode.WalletManager().GetSpendableTransactionsInWallet(Name).Sum(s => s.Transaction.Amount);
             receivetotal.Should().Equals(Money.COIN * 100);

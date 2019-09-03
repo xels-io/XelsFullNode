@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Moq;
 using NBitcoin;
 using Xels.Bitcoin.Configuration;
-using Xels.Bitcoin.Features.PoA.Tests.Rules;
+using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Tests.Common;
 using Xunit;
 
@@ -11,17 +10,18 @@ namespace Xels.Bitcoin.Features.PoA.Tests
 {
     public class SlotsManagerTests
     {
-        private SlotsManager slotsManager;
-        private PoANetwork network;
+        private ISlotsManager slotsManager;
+        private TestPoANetwork network;
         private PoAConsensusOptions consensusOptions;
+        private IFederationManager federationManager;
 
         public SlotsManagerTests()
         {
             this.network = new TestPoANetwork();
             this.consensusOptions = this.network.ConsensusOptions;
 
-            var fedManager = new FederationManager(NodeSettings.Default(this.network), this.network, new LoggerFactory());
-            this.slotsManager = new SlotsManager(this.network, fedManager, new LoggerFactory());
+            this.federationManager = PoATestsBase.CreateFederationManager(this);
+            this.slotsManager = new SlotsManager(this.network, this.federationManager, new LoggerFactory());
         }
 
         [Fact]
@@ -38,17 +38,19 @@ namespace Xels.Bitcoin.Features.PoA.Tests
         [Fact]
         public void ValidSlotAssigned()
         {
-            List<PubKey> fedKeys = this.network.ConsensusOptions.FederationPublicKeys;
-            uint roundStart = this.consensusOptions.TargetSpacingSeconds * (uint)fedKeys.Count * 5;
+            List<IFederationMember> federationMembers = this.federationManager.GetFederationMembers();
+            uint roundStart = this.consensusOptions.TargetSpacingSeconds * (uint)federationMembers.Count * 5;
 
-            Assert.Equal(fedKeys[0], this.slotsManager.GetPubKeyForTimestamp(roundStart));
-            Assert.Equal(fedKeys[1], this.slotsManager.GetPubKeyForTimestamp(roundStart + this.consensusOptions.TargetSpacingSeconds * 1));
-            Assert.Equal(fedKeys[2], this.slotsManager.GetPubKeyForTimestamp(roundStart + this.consensusOptions.TargetSpacingSeconds * 2));
-            Assert.Equal(fedKeys[3], this.slotsManager.GetPubKeyForTimestamp(roundStart + this.consensusOptions.TargetSpacingSeconds * 3));
-            Assert.Equal(fedKeys[4], this.slotsManager.GetPubKeyForTimestamp(roundStart + this.consensusOptions.TargetSpacingSeconds * 4));
-            Assert.Equal(fedKeys[5], this.slotsManager.GetPubKeyForTimestamp(roundStart + this.consensusOptions.TargetSpacingSeconds * 5));
-            Assert.Equal(fedKeys[0], this.slotsManager.GetPubKeyForTimestamp(roundStart + this.consensusOptions.TargetSpacingSeconds * 6));
-            Assert.Equal(fedKeys[1], this.slotsManager.GetPubKeyForTimestamp(roundStart + this.consensusOptions.TargetSpacingSeconds * 7));
+            int currentFedIndex = -1;
+
+            for (int i = 0; i < 20; i++)
+            {
+                currentFedIndex++;
+                if (currentFedIndex > federationMembers.Count - 1)
+                    currentFedIndex = 0;
+
+                Assert.Equal(federationMembers[currentFedIndex].PubKey, this.slotsManager.GetFederationMemberForTimestamp(roundStart + this.consensusOptions.TargetSpacingSeconds * (uint)i).PubKey);
+            }
         }
 
         [Fact]
@@ -56,21 +58,21 @@ namespace Xels.Bitcoin.Features.PoA.Tests
         {
             var tool = new KeyTool(new DataFolder(string.Empty));
             Key key = tool.GeneratePrivateKey();
-            this.network = new TestPoANetwork(new List<PubKey>() { tool.GeneratePrivateKey().PubKey, key.PubKey, tool.GeneratePrivateKey().PubKey});
+            this.network = new TestPoANetwork(new List<PubKey>() { tool.GeneratePrivateKey().PubKey, key.PubKey, tool.GeneratePrivateKey().PubKey });
 
-            var fedManager = new FederationManager(NodeSettings.Default(this.network), this.network, new LoggerFactory());
+            IFederationManager fedManager = PoATestsBase.CreateFederationManager(this, this.network, new ExtendedLoggerFactory(), new Signals.Signals(new LoggerFactory(), null));
             this.slotsManager = new SlotsManager(this.network, fedManager, new LoggerFactory());
 
-            List<PubKey> fedKeys = this.consensusOptions.FederationPublicKeys;
-            uint roundStart = this.consensusOptions.TargetSpacingSeconds * (uint)fedKeys.Count * 5;
+            List<IFederationMember> federationMembers = this.federationManager.GetFederationMembers();
+            uint roundStart = this.consensusOptions.TargetSpacingSeconds * (uint)federationMembers.Count * 5;
 
-            fedManager.SetPrivatePropertyValue(nameof(FederationManager.IsFederationMember), true);
-            fedManager.SetPrivatePropertyValue(nameof(FederationManager.FederationMemberKey), key);
+            fedManager.SetPrivatePropertyValue(typeof(FederationManagerBase), nameof(IFederationManager.CurrentFederationKey), key);
+            fedManager.SetPrivatePropertyValue(typeof(FederationManagerBase), nameof(this.federationManager.IsFederationMember), true);
 
             Assert.Equal(roundStart + this.consensusOptions.TargetSpacingSeconds, this.slotsManager.GetMiningTimestamp(roundStart));
             Assert.Equal(roundStart + this.consensusOptions.TargetSpacingSeconds, this.slotsManager.GetMiningTimestamp(roundStart + 4));
 
-            roundStart += this.consensusOptions.TargetSpacingSeconds * (uint) fedKeys.Count;
+            roundStart += this.consensusOptions.TargetSpacingSeconds * (uint)federationMembers.Count;
             Assert.Equal(roundStart + this.consensusOptions.TargetSpacingSeconds, this.slotsManager.GetMiningTimestamp(roundStart - 5));
             Assert.Equal(roundStart + this.consensusOptions.TargetSpacingSeconds, this.slotsManager.GetMiningTimestamp(roundStart - this.consensusOptions.TargetSpacingSeconds + 1));
 

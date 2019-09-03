@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "Xels.BitcoinD": {
+      "commandName": "Project"
+    },
+    "Xels.BitcoinD Test": {
+      "commandName": "Project",
+      "commandLineArgs": "-testnet"
+    },
+    "Xels.BitcoinD Test with RPC": {
+      "commandName": "Project",
+      "commandLineArgs": "-testnet -server -rpcpassword=rpcpassword -rpcuser=rpcuser"
+    }
+  }
+}

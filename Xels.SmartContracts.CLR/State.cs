@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using NBitcoin;
+using Xels.SmartContracts.CLR.ContractLogging;
+using Xels.SmartContracts.CLR.Serialization;
 using Xels.SmartContracts.Core.Receipts;
 using Xels.SmartContracts.Core.State;
 using Xels.SmartContracts.Core.State.AccountAbstractionLayer;
-using Xels.SmartContracts.CLR.ContractLogging;
-using Xels.SmartContracts.CLR.Serialization;
 
 namespace Xels.SmartContracts.CLR
 {
@@ -83,7 +83,7 @@ namespace Xels.SmartContracts.CLR
         /// <summary>
         /// Sets up a new <see cref="ISmartContractState"/> based on the current state.
         /// </summary>
-        public ISmartContractState CreateSmartContractState(IState state, IGasMeter gasMeter, uint160 address, BaseMessage message, IStateRepository repository) 
+        public ISmartContractState CreateSmartContractState(IState state, RuntimeObserver.IGasMeter gasMeter, uint160 address, BaseMessage message, IStateRepository repository) 
         {
             return this.smartContractStateFactory.Create(state, gasMeter, address, message, repository);
         }

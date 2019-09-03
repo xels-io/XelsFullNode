@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Xels.Bitcoin.Configuration.Logging;
+using TracerAttributes;
 
 namespace Xels.Bitcoin.Utilities
 {
@@ -13,6 +14,7 @@ namespace Xels.Bitcoin.Utilities
     /// the logging output will not go to the console even if the logging
     /// level is at or above the minimum logging level for the console.
     /// </remarks>
+    [NoTrace]
     public class PrefixLogger : ILogger
     {
         /// <summary>Internal NLog logger instance.</summary>

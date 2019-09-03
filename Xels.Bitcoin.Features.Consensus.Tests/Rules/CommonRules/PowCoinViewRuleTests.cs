@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NBitcoin;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Configuration;
@@ -13,6 +14,7 @@ using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
 using Xunit;
@@ -95,11 +97,12 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
                     KnownNetworks.RegTest,
                     new Mock<ILoggerFactory>().Object,
                     new Mock<IDateTimeProvider>().Object,
-                    new ConcurrentChain(this.network),
-                    new NodeDeployments(KnownNetworks.RegTest, new ConcurrentChain(this.network)),
+                    new ChainIndexer(this.network),
+                    new NodeDeployments(KnownNetworks.RegTest, new ChainIndexer(this.network)),
                     new ConsensusSettings(NodeSettings.Default(KnownNetworks.RegTest)), new Mock<ICheckpoints>().Object, new Mock<ICoinView>().Object, new Mock<IChainState>().Object,
                     new InvalidBlockHashStore(dateTimeProvider),
-                    new NodeStats(dateTimeProvider));
+                    new NodeStats(dateTimeProvider),
+                    new AsyncProvider(new LoggerFactory(), new Mock<ISignals>().Object, new Mock<NodeLifetime>().Object));
 
                 rule.Initialize();
 

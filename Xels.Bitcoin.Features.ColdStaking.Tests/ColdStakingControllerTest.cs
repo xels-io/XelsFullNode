@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NBitcoin;
 using NBitcoin.Policy;
 using NBitcoin.Protocol;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Configuration;
@@ -21,11 +21,11 @@ using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.Interfaces;
 using Xels.Bitcoin.Features.Consensus.ProvenBlockHeaders;
 using Xels.Bitcoin.Features.Consensus.Rules;
-using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.MemoryPool.Fee;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
+using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
 using Xels.Bitcoin.Utilities.JsonErrors;
@@ -52,10 +52,11 @@ namespace Xels.Bitcoin.Features.ColdStaking.Tests
 
         private ColdStakingManager coldStakingManager;
         private ColdStakingController coldStakingController;
+        private IAsyncProvider asyncProvider;
         private NodeSettings nodeSettings;
         private IDateTimeProvider dateTimeProvider;
         private ILoggerFactory loggerFactory;
-        private ConcurrentChain concurrentChain;
+        private ChainIndexer chainIndexer;
         private NodeDeployments nodeDeployments;
         private ConsensusSettings consensusSettings;
         private MempoolSettings mempoolSettings;
@@ -69,7 +70,7 @@ namespace Xels.Bitcoin.Features.ColdStaking.Tests
         public ColdStakingControllerTest() : base(KnownNetworks.XelsMain)
         {
             // Register the cold staking script template.
-            StandardScripts.RegisterStandardScriptTemplate(ColdStakingScriptTemplate.Instance);
+            this.Network.StandardScriptsRegistry.RegisterStandardScriptTemplate(ColdStakingScriptTemplate.Instance);
         }
 
         /// <summary>
@@ -96,7 +97,7 @@ namespace Xels.Bitcoin.Features.ColdStaking.Tests
             {
                 Flags = BlockFlag.BLOCK_PROOF_OF_STAKE,
                 StakeModifierV2 = 0,
-                StakeTime = (this.concurrentChain.Tip.Header.Time + 60) & ~PosConsensusOptions.StakeTimestampMask
+                StakeTime = (this.chainIndexer.Tip.Header.Time + 60) & ~PosConsensusOptions.StakeTimestampMask
             });
         }
 
@@ -109,22 +110,22 @@ namespace Xels.Bitcoin.Features.ColdStaking.Tests
             this.coinView = new Mock<ICoinView>();
 
             // Mock the coinviews "FetchCoinsAsync" method. We will use the "unspentOutputs" dictionary to track spendable outputs.
-            this.coinView.Setup(d => d.FetchCoinsAsync(It.IsAny<uint256[]>(), It.IsAny<CancellationToken>()))
-                .Returns((uint256[] txIds, CancellationToken cancel) => Task.Run(() =>
+            this.coinView.Setup(d => d.FetchCoins(It.IsAny<uint256[]>(), It.IsAny<CancellationToken>()))
+                .Returns((uint256[] txIds, CancellationToken cancel) =>
                 {
                     var result = new UnspentOutputs[txIds.Length];
 
                     for (int i = 0; i < txIds.Length; i++)
                         result[i] = this.unspentOutputs.TryGetValue(txIds[i], out UnspentOutputs unspent) ? unspent : null;
 
-                    return new FetchCoinsResponse(result, this.concurrentChain.Tip.HashBlock);
-                }));
+                    return new FetchCoinsResponse(result, this.chainIndexer.Tip.HashBlock);
+                });
 
             // Mock the coinviews "GetTipHashAsync" method.
-            this.coinView.Setup(d => d.GetTipHashAsync(It.IsAny<CancellationToken>())).Returns(() => Task.Run(() =>
-            {
-                return this.concurrentChain.Tip.HashBlock;
-            }));
+            this.coinView.Setup(d => d.GetTipHash(It.IsAny<CancellationToken>())).Returns(() =>
+                {
+                    return this.chainIndexer.Tip.HashBlock;
+                });
         }
 
         /// <summary>
@@ -136,8 +137,8 @@ namespace Xels.Bitcoin.Features.ColdStaking.Tests
             this.consensusSettings = new ConsensusSettings(this.nodeSettings);
             this.txMemPool = new TxMempool(this.dateTimeProvider, new BlockPolicyEstimator(
                 new MempoolSettings(this.nodeSettings), this.loggerFactory, this.nodeSettings), this.loggerFactory, this.nodeSettings);
-            this.concurrentChain = new ConcurrentChain(this.Network);
-            this.nodeDeployments = new NodeDeployments(this.Network, this.concurrentChain);
+            this.chainIndexer = new ChainIndexer(this.Network);
+            this.nodeDeployments = new NodeDeployments(this.Network, this.chainIndexer);
 
             this.MockCoinView();
             this.MockStakeChain();
@@ -148,13 +149,13 @@ namespace Xels.Bitcoin.Features.ColdStaking.Tests
             var chainState = new ChainState();
             new FullNodeBuilderConsensusExtension.PosConsensusRulesRegistration().RegisterRules(this.Network.Consensus);
             ConsensusRuleEngine consensusRuleEngine = new PosConsensusRuleEngine(this.Network, this.loggerFactory, this.dateTimeProvider,
-                this.concurrentChain, this.nodeDeployments, this.consensusSettings, checkpoints.Object, this.coinView.Object, this.stakeChain.Object,
-                this.stakeValidator.Object, chainState, new InvalidBlockHashStore(this.dateTimeProvider), new Mock<INodeStats>().Object, new Mock<IRewindDataIndexCache>().Object)
+                this.chainIndexer, this.nodeDeployments, this.consensusSettings, checkpoints.Object, this.coinView.Object, this.stakeChain.Object,
+                this.stakeValidator.Object, chainState, new InvalidBlockHashStore(this.dateTimeProvider), new Mock<INodeStats>().Object, new Mock<IRewindDataIndexCache>().Object, this.asyncProvider)
                 .Register();
 
             // Create mempool validator.
             var mempoolLock = new MempoolSchedulerLock();
-            var mempoolValidator = new MempoolValidator(this.txMemPool, mempoolLock, this.dateTimeProvider, this.mempoolSettings, this.concurrentChain,
+            var mempoolValidator = new MempoolValidator(this.txMemPool, mempoolLock, this.dateTimeProvider, this.mempoolSettings, this.chainIndexer,
                 this.coinView.Object, this.loggerFactory, this.nodeSettings, consensusRuleEngine);
 
             // Create mempool manager.
@@ -175,14 +176,16 @@ namespace Xels.Bitcoin.Features.ColdStaking.Tests
             var walletSettings = new WalletSettings(this.nodeSettings);
             this.loggerFactory = this.nodeSettings.LoggerFactory;
 
-            this.coldStakingManager = new ColdStakingManager(this.Network, new ConcurrentChain(this.Network), walletSettings, this.nodeSettings.DataFolder,
-                new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), new ScriptAddressReader(),
+            this.coldStakingManager = new ColdStakingManager(this.Network, new ChainIndexer(this.Network), walletSettings, this.nodeSettings.DataFolder,
+                new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncProvider>().Object, new NodeLifetime(), new ScriptAddressReader(),
                 this.loggerFactory, DateTimeProvider.Default);
 
             var walletTransactionHandler = new WalletTransactionHandler(this.loggerFactory, this.coldStakingManager,
                 new Mock<IWalletFeePolicy>().Object, this.Network, new StandardTransactionPolicy(this.Network));
 
             this.coldStakingController = new ColdStakingController(this.loggerFactory, this.coldStakingManager, walletTransactionHandler);
+
+            this.asyncProvider = new AsyncProvider(this.loggerFactory, new Mock<ISignals>().Object, new NodeLifetime());
         }
 
         /// <summary>
@@ -192,7 +195,7 @@ namespace Xels.Bitcoin.Features.ColdStaking.Tests
         /// <returns>The spendable transaction that was added to the wallet.</returns>
         private Transaction AddSpendableTransactionToWallet(Wallet.Wallet wallet)
         {
-            HdAddress address = wallet.GetAllAddressesByCoinType(CoinType.Xels).FirstOrDefault();
+            HdAddress address = wallet.GetAllAddresses().FirstOrDefault();
 
             Transaction transaction = this.Network.CreateTransaction();
 

@@ -7,6 +7,7 @@ using FluentAssertions;
 using Moq;
 using NBitcoin;
 using NBitcoin.Policy;
+using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
@@ -20,17 +21,19 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
 {
     public class WalletTransactionHandlerTest : LogsTestBase
     {
-        public readonly string CostlyOpReturnData;
-        private readonly StandardTransactionPolicy standardTransactionPolicy;
+        private readonly IBlockStore blockStore;
+        private readonly string costlyOpReturnData;
         private readonly IScriptAddressReader scriptAddressReader;
+        private readonly StandardTransactionPolicy standardTransactionPolicy;
 
         public WalletTransactionHandlerTest()
         {
             // adding this data to the transaction output should increase the fee
             // 83 is the max size for the OP_RETURN script => 80 is the max for the content of the script
             byte[] maxQuantityOfBytes = Enumerable.Range(0, 80).Select(Convert.ToByte).ToArray();
-            this.CostlyOpReturnData = Encoding.UTF8.GetString(maxQuantityOfBytes);
+            this.costlyOpReturnData = Encoding.UTF8.GetString(maxQuantityOfBytes);
 
+            this.blockStore = new Mock<IBlockStore>().Object;
             this.standardTransactionPolicy = new StandardTransactionPolicy(this.Network);
             this.scriptAddressReader = new ScriptAddressReader();
         }
@@ -61,12 +64,12 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
                     });
 
                 BlockHeader blockHeader = this.Network.Consensus.ConsensusFactory.CreateBlockHeader();
-                var chain = new ConcurrentChain(this.Network, new ChainedHeader(blockHeader, blockHeader.GetHash(), 1));
+                var chain = new ChainIndexer(this.Network, new ChainedHeader(blockHeader, blockHeader.GetHash(), 1));
 
                 string dataDir = "TestData/WalletTransactionHandlerTest/BuildTransactionNoSpendableTransactionsThrowsWalletException";
                 var nodeSettings = new NodeSettings(network: this.Network, args: new string[] { $"-datadir={dataDir}" });
                 var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, chain, new WalletSettings(nodeSettings),
-                    new DataFolder(nodeSettings.DataDir), new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), DateTimeProvider.Default, new ScriptAddressReader());
+                    new DataFolder(nodeSettings.DataDir), new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncProvider>().Object, new NodeLifetime(), DateTimeProvider.Default, new ScriptAddressReader());
                 var walletTransactionHandler = new WalletTransactionHandler(this.LoggerFactory.Object, walletManager, new Mock<IWalletFeePolicy>().Object, this.Network, new StandardTransactionPolicy(this.Network));
 
                 walletManager.Wallets.Add(wallet);
@@ -104,7 +107,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
                 Transactions = new List<TransactionData>()
             };
 
-            var chain = new ConcurrentChain(wallet.Network);
+            var chain = new ChainIndexer(wallet.Network);
             WalletTestsHelpers.AddBlocksWithCoinbaseToChain(wallet.Network, chain, address);
 
             wallet.AccountsRoot.ElementAt(0).Accounts.Add(new HdAccount
@@ -130,7 +133,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
             string dataDir = "TestData/WalletTransactionHandlerTest/BuildTransactionFeeTooLowThrowsWalletException";
             var nodeSettings = new NodeSettings(network: this.Network, args: new string[] { $"-datadir={dataDir}" });
             var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, chain, new WalletSettings(nodeSettings),
-                new DataFolder(nodeSettings.DataDir), walletFeePolicy.Object, new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
+                new DataFolder(nodeSettings.DataDir), walletFeePolicy.Object, new Mock<IAsyncProvider>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
             var walletTransactionHandler = new WalletTransactionHandler(this.LoggerFactory.Object, walletManager, walletFeePolicy.Object, this.Network, this.standardTransactionPolicy);
 
             walletManager.Wallets.Add(wallet);
@@ -252,7 +255,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         {
             WalletTransactionHandlerTestContext testContext = SetupWallet();
 
-            byte[] eightyOneBytes = Encoding.UTF8.GetBytes(this.CostlyOpReturnData).Concat(Convert.ToByte(1));
+            byte[] eightyOneBytes = Encoding.UTF8.GetBytes(this.costlyOpReturnData).Concat(Convert.ToByte(1));
             string tooLongOpReturnString = Encoding.UTF8.GetString(eightyOneBytes);
 
             TransactionBuildContext context = CreateContext(this.Network, testContext.WalletReference, "password", testContext.DestinationKeys.PubKey.ScriptPubKey, new Money(7500), FeeType.Low, 0, tooLongOpReturnString);
@@ -285,7 +288,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
             };
 
             // wallet with 4 coinbase outputs of 50 = 200 Bitcoin
-            var chain = new ConcurrentChain(wallet.Network);
+            var chain = new ChainIndexer(wallet.Network);
             WalletTestsHelpers.AddBlocksWithCoinbaseToChain(wallet.Network, chain, address, 4);
 
             wallet.AccountsRoot.ElementAt(0).Accounts.Add(new HdAccount
@@ -303,7 +306,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
             var overrideFeeRate = new FeeRate(20000);
 
             var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, chain, new WalletSettings(NodeSettings.Default(this.Network)),
-                dataFolder, walletFeePolicy.Object, new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
+                dataFolder, walletFeePolicy.Object, new Mock<IAsyncProvider>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
             var walletTransactionHandler = new WalletTransactionHandler(this.LoggerFactory.Object, walletManager, walletFeePolicy.Object, this.Network, this.standardTransactionPolicy);
 
             walletManager.Wallets.Add(wallet);
@@ -314,7 +317,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
                 WalletName = "myWallet1"
             };
 
-            // create a trx with 3 outputs 50 + 50 + 49 = 149 BTC
+            // create a trx with 3 outputs 50 + 50 + 50 = 150 BTC
             var context = new TransactionBuildContext(this.Network)
             {
                 AccountReference = walletReference,
@@ -325,7 +328,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
                 {
                     new Recipient { Amount = new Money(50, MoneyUnit.BTC), ScriptPubKey = destinationKeys1.PubKey.ScriptPubKey },
                     new Recipient { Amount = new Money(50, MoneyUnit.BTC), ScriptPubKey = destinationKeys2.PubKey.ScriptPubKey },
-                    new Recipient { Amount = new Money(49, MoneyUnit.BTC), ScriptPubKey = destinationKeys3.PubKey.ScriptPubKey }
+                    new Recipient { Amount = new Money(50, MoneyUnit.BTC), ScriptPubKey = destinationKeys3.PubKey.ScriptPubKey }
                 }.ToList()
             };
 
@@ -371,9 +374,9 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         {
             DataFolder dataFolder = CreateDataFolder(this);
 
-            var chain = new ConcurrentChain(this.Network);
+            var chain = new ChainIndexer(this.Network);
             var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, chain, new WalletSettings(NodeSettings.Default(this.Network)),
-                dataFolder, new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), DateTimeProvider.Default, new ScriptAddressReader());
+                dataFolder, new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncProvider>().Object, new NodeLifetime(), DateTimeProvider.Default, new ScriptAddressReader());
 
             var walletTransactionHandler = new WalletTransactionHandler(this.LoggerFactory.Object, walletManager, It.IsAny<WalletFeePolicy>(), this.Network, this.standardTransactionPolicy);
 
@@ -396,8 +399,8 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         {
             DataFolder dataFolder = CreateDataFolder(this);
 
-            var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, new ConcurrentChain(this.Network), new WalletSettings(NodeSettings.Default(this.Network)),
-                dataFolder, new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
+            var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, new ChainIndexer(this.Network), new WalletSettings(NodeSettings.Default(this.Network)),
+                dataFolder, new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncProvider>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
 
             var walletTransactionHandler = new WalletTransactionHandler(this.LoggerFactory.Object, walletManager, It.IsAny<WalletFeePolicy>(), this.Network, this.standardTransactionPolicy);
 
@@ -432,8 +435,8 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         {
             DataFolder dataFolder = CreateDataFolder(this);
 
-            var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, new ConcurrentChain(this.Network), new WalletSettings(NodeSettings.Default(this.Network)),
-                dataFolder, new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
+            var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, new ChainIndexer(this.Network), new WalletSettings(NodeSettings.Default(this.Network)),
+                dataFolder, new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncProvider>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
 
             var walletTransactionHandler = new WalletTransactionHandler(this.LoggerFactory.Object, walletManager, It.IsAny<WalletFeePolicy>(), this.Network, this.standardTransactionPolicy);
 
@@ -471,8 +474,8 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
             var walletFeePolicy = new Mock<IWalletFeePolicy>();
             walletFeePolicy.Setup(w => w.GetFeeRate(FeeType.Low.ToConfirmations())).Returns(new FeeRate(20000));
 
-            var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, new ConcurrentChain(this.Network), new WalletSettings(NodeSettings.Default(this.Network)),
-                dataFolder, new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
+            var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, new ChainIndexer(this.Network), new WalletSettings(NodeSettings.Default(this.Network)),
+                dataFolder, new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncProvider>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
 
             var walletTransactionHandler = new WalletTransactionHandler(this.LoggerFactory.Object, walletManager, walletFeePolicy.Object, this.Network, this.standardTransactionPolicy);
 
@@ -506,8 +509,8 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
         {
             DataFolder dataFolder = CreateDataFolder(this);
 
-            var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, new ConcurrentChain(this.Network), new WalletSettings(NodeSettings.Default(this.Network)),
-                dataFolder, new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
+            var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, new ChainIndexer(this.Network), new WalletSettings(NodeSettings.Default(this.Network)),
+                dataFolder, new Mock<IWalletFeePolicy>().Object, new Mock<IAsyncProvider>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
 
             var walletTransactionHandler = new WalletTransactionHandler(this.LoggerFactory.Object, walletManager, It.IsAny<WalletFeePolicy>(), this.Network, this.standardTransactionPolicy);
             HdAccount account = WalletTestsHelpers.CreateAccount("account 1");
@@ -561,11 +564,11 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
             WalletTransactionHandlerTestContext testContext = SetupWallet();
 
             // Context to build requires password in order to sign transaction.
-            TransactionBuildContext buildContext = CreateContext(this.Network, testContext.WalletReference, "password", testContext.DestinationKeys.PubKey.ScriptPubKey, new Money(7500), FeeType.Low, 0, this.CostlyOpReturnData);
+            TransactionBuildContext buildContext = CreateContext(this.Network, testContext.WalletReference, "password", testContext.DestinationKeys.PubKey.ScriptPubKey, new Money(7500), FeeType.Low, 0, this.costlyOpReturnData);
             testContext.WalletTransactionHandler.BuildTransaction(buildContext);
 
             // Context for estimate does not need password.
-            TransactionBuildContext estimateContext = CreateContext(this.Network, testContext.WalletReference, null, testContext.DestinationKeys.PubKey.ScriptPubKey, new Money(7500), FeeType.Low, 0, this.CostlyOpReturnData);
+            TransactionBuildContext estimateContext = CreateContext(this.Network, testContext.WalletReference, null, testContext.DestinationKeys.PubKey.ScriptPubKey, new Money(7500), FeeType.Low, 0, this.costlyOpReturnData);
             Money feeEstimate = testContext.WalletTransactionHandler.EstimateFee(estimateContext);
 
             feeEstimate.Should().Be(buildContext.TransactionFee);
@@ -580,7 +583,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
             WalletTransactionHandlerTestContext testContext = SetupWallet();
 
             // Context with OpReturnData
-            TransactionBuildContext estimateContextWithOpReturn = CreateContext(this.Network, testContext.WalletReference, null, testContext.DestinationKeys.PubKey.ScriptPubKey, new Money(7500), FeeType.Low, 0, this.CostlyOpReturnData);
+            TransactionBuildContext estimateContextWithOpReturn = CreateContext(this.Network, testContext.WalletReference, null, testContext.DestinationKeys.PubKey.ScriptPubKey, new Money(7500), FeeType.Low, 0, this.costlyOpReturnData);
             Money feeEstimateWithOpReturn = testContext.WalletTransactionHandler.EstimateFee(estimateContextWithOpReturn);
 
             // Context without OpReturnData
@@ -600,7 +603,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
             WalletTransactionHandlerTestContext testContext = SetupWallet();
 
             // Context with OpReturnData
-            TransactionBuildContext contextWithOpReturn = CreateContext(this.Network, testContext.WalletReference, "password", testContext.DestinationKeys.PubKey.ScriptPubKey, new Money(7500), FeeType.Low, 0, this.CostlyOpReturnData);
+            TransactionBuildContext contextWithOpReturn = CreateContext(this.Network, testContext.WalletReference, "password", testContext.DestinationKeys.PubKey.ScriptPubKey, new Money(7500), FeeType.Low, 0, this.costlyOpReturnData);
             testContext.WalletTransactionHandler.BuildTransaction(contextWithOpReturn);
 
             // Context without OpReturnData
@@ -610,7 +613,6 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
             contextWithoutOpReturn.TransactionFee.Should().NotBe(contextWithOpReturn.TransactionFee);
             contextWithoutOpReturn.TransactionFee.Satoshi.Should().BeLessThan(contextWithOpReturn.TransactionFee.Satoshi);
         }
-
 
         public static TransactionBuildContext CreateContext(Network network, WalletAccountReference accountReference, string password,
             Script destinationScript, Money amount, FeeType feeType, int minConfirmations, string opReturnData = null)
@@ -622,6 +624,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
                 FeeType = feeType,
                 OpReturnData = opReturnData,
                 WalletPassword = password,
+                Sign = !string.IsNullOrEmpty(password),
                 Recipients = new[] { new Recipient { Amount = amount, ScriptPubKey = destinationScript } }.ToList()
             };
         }
@@ -645,7 +648,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
                 Transactions = new List<TransactionData>()
             };
 
-            var chain = new ConcurrentChain(wallet.Network);
+            var chain = new ChainIndexer(wallet.Network);
             WalletTestsHelpers.AddBlocksWithCoinbaseToChain(wallet.Network, chain, address);
             TransactionData addressTransaction = address.Transactions.First();
 
@@ -665,7 +668,7 @@ namespace Xels.Bitcoin.Features.Wallet.Tests
 
             var walletManager = new WalletManager(this.LoggerFactory.Object, this.Network, chain,
                 new WalletSettings(NodeSettings.Default(this.Network)), dataFolder,
-                walletFeePolicy.Object, new Mock<IAsyncLoopFactory>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
+                walletFeePolicy.Object, new Mock<IAsyncProvider>().Object, new NodeLifetime(), DateTimeProvider.Default, this.scriptAddressReader);
             var walletTransactionHandler =
                 new WalletTransactionHandler(this.LoggerFactory.Object, walletManager, walletFeePolicy.Object, this.Network, this.standardTransactionPolicy);
 

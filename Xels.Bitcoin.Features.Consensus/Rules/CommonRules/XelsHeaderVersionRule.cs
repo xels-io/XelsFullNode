@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using NBitcoin;
-using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Utilities;

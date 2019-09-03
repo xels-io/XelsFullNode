@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using NBitcoin;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Consensus.Rules;
-using Xels.Bitcoin.Features.SmartContracts.Networks;
 using Xels.Bitcoin.Features.SmartContracts.Rules;
 using Xels.SmartContracts.Core;
+using Xels.SmartContracts.Networks;
 using Xunit;
 
 namespace Xels.Bitcoin.Features.SmartContracts.Tests.Consensus.Rules
@@ -28,7 +28,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Consensus.Rules
             var context = new RuleContext(new ValidationContext(), testContext.DateTimeProvider.GetTimeOffset());
 
             context.ValidationContext.BlockToValidate = testContext.Network.Consensus.ConsensusFactory.CreateBlock();
-            context.ValidationContext.BlockToValidate.Header.HashPrevBlock = testContext.Chain.Tip.HashBlock;
+            context.ValidationContext.BlockToValidate.Header.HashPrevBlock = testContext.ChainIndexer.Tip.HashBlock;
             context.ValidationContext.BlockToValidate.Transactions = new List<Transaction>
             {
                 new Transaction()
@@ -40,9 +40,9 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Consensus.Rules
                 },
                 new Transaction()
                 {
-                    Outputs =
+                    Inputs =
                     {
-                        new TxOut(new Money(1000), new Script(new [] { (byte) ScOpcodeType.OP_SPEND}))
+                        new TxIn(new Script(new [] { (byte) ScOpcodeType.OP_SPEND}))
                     }
                 }
             };
@@ -51,37 +51,37 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Consensus.Rules
         }
 
         [Fact]
-        public void OpSpend_PreviousTransactionNone_FailureAsync()
+        public async Task OpSpend_PreviousTransactionNone_FailureAsync()
         {
             TestRulesContext testContext = TestRulesContextFactory.CreateAsync(this.network);
             OpSpendRule rule = testContext.CreateRule<OpSpendRule>();
 
             var context = new RuleContext(new ValidationContext(), testContext.DateTimeProvider.GetTimeOffset());
             context.ValidationContext.BlockToValidate = testContext.Network.Consensus.ConsensusFactory.CreateBlock();
-            context.ValidationContext.BlockToValidate.Header.HashPrevBlock = testContext.Chain.Tip.HashBlock;
+            context.ValidationContext.BlockToValidate.Header.HashPrevBlock = testContext.ChainIndexer.Tip.HashBlock;
             context.ValidationContext.BlockToValidate.Transactions = new List<Transaction>
             {
                 new Transaction()
                 {
-                    Outputs =
+                    Inputs =
                     {
-                        new TxOut(new Money(1000), new Script(new [] { (byte) ScOpcodeType.OP_SPEND}))
+                        new TxIn(new Script(new [] { (byte) ScOpcodeType.OP_SPEND}))
                     }
                 }
             };
 
-            Task<ConsensusErrorException> error = Assert.ThrowsAsync<ConsensusErrorException>(async () => await rule.RunAsync(context));
+            await Assert.ThrowsAsync<ConsensusErrorException>(async () => await rule.RunAsync(context));
         }
 
         [Fact]
-        public void OpSpend_PreviousTransactionOther_FailureAsync()
+        public async Task OpSpend_PreviousTransactionOther_FailureAsync()
         {
             TestRulesContext testContext = TestRulesContextFactory.CreateAsync(this.network);
             OpSpendRule rule = testContext.CreateRule<OpSpendRule>();
 
             var context = new RuleContext(new ValidationContext(), testContext.DateTimeProvider.GetTimeOffset());
             context.ValidationContext.BlockToValidate = testContext.Network.Consensus.ConsensusFactory.CreateBlock();
-            context.ValidationContext.BlockToValidate.Header.HashPrevBlock = testContext.Chain.Tip.HashBlock;
+            context.ValidationContext.BlockToValidate.Header.HashPrevBlock = testContext.ChainIndexer.Tip.HashBlock;
             context.ValidationContext.BlockToValidate.Transactions = new List<Transaction>
             {
                 new Transaction()
@@ -107,14 +107,14 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Consensus.Rules
                 },
                 new Transaction()
                 {
-                    Outputs =
+                    Inputs =
                     {
-                        new TxOut(new Money(1000), new Script(new [] { (byte) ScOpcodeType.OP_SPEND}))
+                        new TxIn(new Script(new [] { (byte) ScOpcodeType.OP_SPEND}))
                     }
                 }
             };
 
-            Task<ConsensusErrorException> error = Assert.ThrowsAsync<ConsensusErrorException>(async () => await rule.RunAsync(context));
+            await Assert.ThrowsAsync<ConsensusErrorException>(async () => await rule.RunAsync(context));
         }
     }
 }

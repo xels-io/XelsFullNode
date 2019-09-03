@@ -1,6 +1,7 @@
 ﻿using NBitcoin;
 using Xels.Bitcoin.Features.PoA;
 using Xels.SmartContracts.Core;
+using uint256 = NBitcoin.uint256;
 
 namespace Xels.Bitcoin.Features.SmartContracts.PoA
 {
