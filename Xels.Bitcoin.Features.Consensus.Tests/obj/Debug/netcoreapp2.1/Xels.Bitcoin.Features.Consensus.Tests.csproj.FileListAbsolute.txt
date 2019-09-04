@@ -1,4 +1,0 @@
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Consensus.Tests\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Consensus.Tests.csprojAssemblyReference.cache
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Consensus.Tests\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Consensus.Tests.csproj.CoreCompileInputs.cache
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Consensus.Tests\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Consensus.Tests.AssemblyInfoInputs.cache
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Consensus.Tests\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Consensus.Tests.AssemblyInfo.cs

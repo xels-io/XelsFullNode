@@ -1,7 +1,0 @@
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Setup\bin\Debug\Xels-Backend-Setup.msi
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Setup\bin\Debug\Xels-Backend-Setup.wixpdb
-obj\Debug\Product.wixobj
-obj\Debug\Xels.XelsD.wixobj
-obj\Debug\Setup.wixproj.BindContentsFileListnull.txt
-obj\Debug\Setup.wixproj.BindOutputsFileListnull.txt
-obj\Debug\Setup.wixproj.BindBuiltOutputsFileListnull.txt

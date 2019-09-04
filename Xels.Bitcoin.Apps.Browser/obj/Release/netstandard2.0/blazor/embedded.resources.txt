@@ -1,7 +1,0 @@
-C:\Users\ASUS\.nuget\packages\microsoft.aspnetcore.blazor\0.4.0\lib\netstandard2.0\Microsoft.AspNetCore.Blazor.dll
-C:\Users\ASUS\.nuget\packages\microsoft.aspnetcore.blazor.browser\0.4.0\lib\netstandard2.0\Microsoft.AspNetCore.Blazor.Browser.dll
-C:\Users\ASUS\.nuget\packages\microsoft.extensions.dependencyinjection\2.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.dll
-C:\Users\ASUS\.nuget\packages\microsoft.extensions.dependencyinjection.abstractions\2.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
-C:\Users\ASUS\.nuget\packages\newtonsoft.json\11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll
-C:\Users\ASUS\.nuget\packages\system.reactive\4.0.0\lib\netstandard2.0\System.Reactive.dll
-C:\Users\ASUS\.nuget\packages\system.runtime.interopservices.windowsruntime\4.3.0\lib\netstandard1.3\System.Runtime.InteropServices.WindowsRuntime.dll

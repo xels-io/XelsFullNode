@@ -1,4 +1,0 @@
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Wallet.Tests\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Wallet.Tests.csprojAssemblyReference.cache
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Wallet.Tests\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Wallet.Tests.csproj.CoreCompileInputs.cache
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Wallet.Tests\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Wallet.Tests.AssemblyInfoInputs.cache
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Wallet.Tests\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Wallet.Tests.AssemblyInfo.cs
