@@ -3,7 +3,7 @@
 
 https://www.xels.io/
 
-Xels fullnode is a Hybrid PoW-PoS based system. It is developed on the [Stratis](https://stratisplatform.com/) platform. Stratis itself is a PoS based system. It also provides a PoW based implementation for Bitcoin Network.
+Xels fullnode is a Hybrid PoW-PoS based system. It is a hard fork of [Stratis](https://stratisplatform.com/) platform. Stratis itself is a PoS based system. It also provides a PoW based implementation for Bitcoin Network.
 We implemented a mix of PoW and PoS based system to garantee protect the network from 51% attack. For detail please check our website.  
 
 
