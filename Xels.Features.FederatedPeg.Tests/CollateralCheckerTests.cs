@@ -37,7 +37,7 @@ namespace Xels.Features.FederatedPeg.Tests
             var loggerFactory = new LoggerFactory();
             IHttpClientFactory clientFactory = new Bitcoin.Controllers.HttpClientFactory();
 
-            Network network = CirrusNetwork.NetworksSelector.Regtest();
+            Network network = XoyNetwork.NetworksSelector.Regtest();
 
             this.collateralFederationMembers = new List<CollateralFederationMember>()
             {

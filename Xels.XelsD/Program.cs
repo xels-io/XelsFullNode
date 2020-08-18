@@ -16,15 +16,15 @@ using Xels.Bitcoin.Features.ColdStaking;
 using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Utilities;
 using Xels.Bitcoin.Features.BlockExplorer;
-using Xels.Bitcoin.Features.Dns;
+//using Xels.Bitcoin.Features.Dns;
 
 
 namespace Xels.XelsD
 {
     public class Program
     {
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-        static extern bool FreeConsole();
+        //[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        //static extern bool FreeConsole();
 
         public static async Task Main(string[] args)
         {
@@ -46,7 +46,7 @@ namespace Xels.XelsD
                     .UseApi()
                     .UseApps()
                     .AddRPC()
-                    .UseDns()
+                    //.UseDns()
                     .UseBlockExplorer()
                     .Build();
 

@@ -50,6 +50,43 @@ namespace Xels.Bitcoin.Features.Miner.Controllers
             this.walletManager = walletManager;
         }
 
+        [Route("startmining")]
+        [HttpPost]
+        public IActionResult StartMining([FromBody]StartMiningRequest request)
+        {
+            try
+            {
+                Script powAddressScript = this.walletManager.GetNewAddress(new WalletAccountReference(request.WalletName, "account 0")).ScriptPubKey;
+                this.powMining.Mine(powAddressScript);
+                return this.Ok();
+            }
+            catch (Exception e)
+            {
+                this.logger.LogError(ExceptionOccurredMessage, e.ToString());
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, e.Message, e.ToString());
+            }
+            //IEnumerable<HdAddress> addresses = account.CreateAddresses(wallet.Network, 1, isChange: false);
+            //this.walletManager.UpdateKeysLookupLocked(addresses);
+
+            //this.fullNode.NodeFeature<MiningFeature>(true)
+        }
+
+        [Route("stopmining")]
+        [HttpPost]
+        public IActionResult StopMining()
+        {
+            try
+            {
+                this.StopMining();
+                return this.Ok();
+            }
+            catch (Exception e)
+            {
+                this.logger.LogError(ExceptionOccurredMessage, e.ToString());
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, e.Message, e.ToString());
+            }
+        }
+
         /// <summary>
         /// Tries to mine one or more blocks.
         /// </summary>

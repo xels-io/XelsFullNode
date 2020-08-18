@@ -108,12 +108,13 @@ namespace Xels.Bitcoin.Networks
                 maxMoney: 2537175000 * Money.COIN, //long.MaxValue,
                 coinbaseMaturity: 1,
                 premineHeight: 10,
-                firstMiningPeriodHeight: 850000,
-                secondMiningPeriodHeight: 850000 + 500000,
-                thirdMiningPeriodHeight: 850000 + 500000 + 850000,
-                forthMiningPeriodHeight: 850000 + 500000 + 850000 + 500000,
+                firstMiningPeriodHeight: 768000,
+                secondMiningPeriodHeight: 768000 + 768000,
+                thirdMiningPeriodHeight: 768000 + 768000 + 768000,
+                forthMiningPeriodHeight: 768000 + 768000 + 768000 + 768000,
+                fifthMiningPeriodHeight: 768000 + 768000 + 768000 + 768000 + 768000,
                 premineReward: Money.Coins(187155000),
-                proofOfWorkReward: Money.Coins(375),
+                proofOfWorkReward: Money.Coins(50),
                 powTargetTimespan: TimeSpan.FromSeconds(24 * 60 * 60), // two weeks
                 powTargetSpacing: TimeSpan.FromSeconds(150),
                 powAllowMinDifficultyBlocks: false,
@@ -122,10 +123,10 @@ namespace Xels.Bitcoin.Networks
                 powLimit: new Target(new uint256("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")),
                 minimumChainWork: null,
                 isProofOfStake: true,
-                lastPowBlock: 10,
+                lastPowBlock: int.MaxValue - 100,
                 proofOfStakeLimit: new BigInteger(uint256.Parse("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff").ToBytes(false)),
                 proofOfStakeLimitV2: new BigInteger(uint256.Parse("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff").ToBytes(false)),
-                proofOfStakeReward: Money.Coins(375)
+                proofOfStakeReward: Money.Coins(50)
             );
 
             this.Base58Prefixes = new byte[12][];
@@ -158,7 +159,8 @@ namespace Xels.Bitcoin.Networks
             this.DNSSeeds = new List<DNSSeedData>();
             this.DNSSeeds = new List<DNSSeedData>
             {
-                new DNSSeedData("api.xels.io","api.xels.io")
+                new DNSSeedData("api.xels.io","api.xels.io"),
+                new DNSSeedData("mainnet.xels.io","mainnet.xels.io")
                 //    new DNSSeedData("mainnet2.xelsnetwork.com", "mainnet2.xelsnetwork.com"),
                 //    new DNSSeedData("mainnet3.xelsplatform.com", "mainnet3.xelsplatform.com"),
                 //    new DNSSeedData("mainnet4.xelsnetwork.com", "mainnet4.xelsnetwork.com")
@@ -167,11 +169,12 @@ namespace Xels.Bitcoin.Networks
             this.SeedNodes = new List<NetworkAddress>();
             this.SeedNodes = new List<NetworkAddress>
             {
-                new NetworkAddress(IPAddress.Parse("52.68.239.4"), 29776), // Redistribution node
+                new NetworkAddress(IPAddress.Parse("52.68.239.4"), 29776), // Redistribution node with DNS Server Enabled
                 new NetworkAddress(IPAddress.Parse("54.238.248.117"), 29776), // public node
                 new NetworkAddress(IPAddress.Parse("13.114.52.87"), 29776), // public node
                 new NetworkAddress(IPAddress.Parse("52.192.229.45"), 29776), // public node
                 new NetworkAddress(IPAddress.Parse("52.199.121.139"), 29776 ), // public node
+                new NetworkAddress(IPAddress.Parse("54.64.43.45"), 29776 ), // public node with DNS Server Enabled
 
                 //new NetworkAddress(IPAddress.Parse("137.116.46.151"), 37221), // public node
                 //new NetworkAddress(IPAddress.Parse("40.78.80.159"), 37221), // public node

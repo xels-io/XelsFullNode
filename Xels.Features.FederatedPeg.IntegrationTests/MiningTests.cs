@@ -16,7 +16,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests
         [Fact(Skip = FederatedPegTestHelper.SkipTests)]
         public void NodeCanLoadFederationKey()
         {
-            var network = (CirrusRegTest)CirrusNetwork.NetworksSelector.Regtest();
+            var network = (XoyRegTest)XoyNetwork.NetworksSelector.Regtest();
 
             using (PoANodeBuilder builder = PoANodeBuilder.CreatePoANodeBuilder(this))
             {
@@ -40,7 +40,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests
         [Fact(Skip = FederatedPegTestHelper.SkipTests)]
         public void NodeCanMine()
         {
-            var network = (CirrusRegTest)CirrusNetwork.NetworksSelector.Regtest();
+            var network = (XoyRegTest)XoyNetwork.NetworksSelector.Regtest();
 
             using (PoANodeBuilder builder = PoANodeBuilder.CreatePoANodeBuilder(this))
             {
@@ -62,7 +62,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests
         [Fact(Skip = FederatedPegTestHelper.SkipTests)]
         public void PremineIsReceived()
         {
-            var network = (CirrusRegTest)CirrusNetwork.NetworksSelector.Regtest();
+            var network = (XoyRegTest)XoyNetwork.NetworksSelector.Regtest();
 
             using (PoANodeBuilder builder = PoANodeBuilder.CreatePoANodeBuilder(this))
             {

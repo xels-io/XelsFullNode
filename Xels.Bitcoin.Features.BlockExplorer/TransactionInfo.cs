@@ -200,7 +200,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
             this.prevout = prevout;
             this.scriptSig = scriptSig;
             this.witScript = witScript;
-            this.address = scriptSig.PaymentScript.GetDestinationAddress(NetworkRegistration.GetNetwork(networkType));  //scriptSig.GetScriptAddress(Network.XelsMain);witScript.ToScript().GetDestinationAddress(Network.XelsMain);//
+            this.address = scriptSig.GetDestinationAddress(NetworkRegistration.GetNetwork(networkType));//scriptSig.PaymentScript.GetDestinationAddress(NetworkRegistration.GetNetwork(networkType));  //scriptSig.GetScriptAddress(Network.XelsMain);witScript.ToScript().GetDestinationAddress(Network.XelsMain);//
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
             this.publicKey = scriptPubKey;
             this.ScriptPubKey = scriptPubKey.PaymentScript.Hash.ScriptPubKey ;
             this._Value = Value;
-            this.address = scriptPubKey.PaymentScript.GetDestinationAddress(NetworkRegistration.GetNetwork(networkType));
+            this.address = scriptPubKey.GetDestinationAddress(NetworkRegistration.GetNetwork(networkType));//scriptPubKey.PaymentScript.GetDestinationAddress(NetworkRegistration.GetNetwork(networkType));
             //this.address = scriptPubKey.GetDestinationAddress(Network.XelsMain);
         }
 

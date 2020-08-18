@@ -16,7 +16,7 @@ namespace Xels.Features.FederatedPeg.Interfaces
 
         /// <summary>
         /// The chain that we are connecting to from this node.
-        /// E.g. if this is a Cirrus sidechain gateway node, the counter-chain would be Xels and vice versa.
+        /// E.g. if this is a Xoy sidechain gateway node, the counter-chain would be Xels and vice versa.
         /// </summary>
         Network CounterChainNetwork { get; }
     }

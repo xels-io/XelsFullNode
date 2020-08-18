@@ -626,7 +626,7 @@ namespace Xels.Features.FederatedPeg.Tests
 
             var transaction = new PosTransaction(model.Hex);
 
-            var reader = new OpReturnDataReader(this.loggerFactory, new CounterChainNetworkWrapper(CirrusNetwork.NetworksSelector.Testnet()));
+            var reader = new OpReturnDataReader(this.loggerFactory, new CounterChainNetworkWrapper(XoyNetwork.NetworksSelector.Testnet()));
             var extractor = new DepositExtractor(this.loggerFactory, this.federatedPegSettings, reader);
             IDeposit deposit = extractor.ExtractDepositFromTransaction(transaction, 2, 1);
 

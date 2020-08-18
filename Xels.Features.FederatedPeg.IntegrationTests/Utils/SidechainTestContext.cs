@@ -42,7 +42,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests.Utils
 
         public Network MainChainNetwork { get; }
 
-        public CirrusRegTest SideChainNetwork { get; }
+        public XoyRegTest SideChainNetwork { get; }
 
         // TODO: HashSets / Readonly
         public IReadOnlyList<CoreNode> MainChainNodes { get; }
@@ -63,7 +63,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests.Utils
         public SidechainTestContext()
         {
             this.MainChainNetwork = Networks.Xels.Regtest();
-            this.SideChainNetwork = (CirrusRegTest)CirrusNetwork.NetworksSelector.Regtest();
+            this.SideChainNetwork = (XoyRegTest)XoyNetwork.NetworksSelector.Regtest();
 
             this.mnemonics = this.SideChainNetwork.FederationMnemonics;
             this.pubKeysByMnemonic = this.mnemonics.ToDictionary(m => m, m => m.DeriveExtKey().PrivateKey.PubKey);

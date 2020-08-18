@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="XEO" Language="1033" Version="1.0.0.0" Manufacturer="" UpgradeCode="09552b26-fffc-4346-8c67-d9c573f2edb0">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		
+    <Upgrade Id="ad06b9ad-c74e-4d12-9b80-3aefd43d5d9f">
+      <UpgradeVersion OnlyDetect="no" Property="PREVIOUSFOUND"
+        Minimum="1.0.0.0" IncludeMinimum="yes"
+        Maximum="99.0.0.0" IncludeMaximum="no" />
+    </Upgrade>
+    
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After="InstallValidate" />
+    </InstallExecuteSequence>
+
+    <!--<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />-->
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="XEO" Level="1">
+      <ComponentGroupRef Id="Xeo_Project" />
+      <ComponentRef Id="ApplicationShortcutDesktop" />
+      <ComponentRef Id="ApplicationShortcutDesktopTest" />
+      <ComponentRef Id="ApplicationShortcutStartMenu" />
+      <ComponentRef Id="ApplicationShortCutStartUp" />
+
+    </Feature>
+    <UI>
+      <UIRef Id="WixUI_Minimal" />
+      <Publish Dialog="ExitDialog"
+               Control="Finish"
+               Event="DoAction"
+               Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+    </UI>
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch Xeo Daemon" />
+    <Property Id="WixShellExecTarget" Value="[#filE0949A33ABC424E47D589039C62AFF47]" />
+    <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+  </Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFiles64Folder">
+				<Directory Id="APPLICATIONROOTDIRECTORY" Name="XEO" />
+			</Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="XEO"/>
+      </Directory>
+      <Directory Id="DesktopFolder" SourceName="Desktop" />
+      <Directory Id="StartupFolder" Name="Xeo"/>
+		</Directory>
+    <DirectoryRef Id="StartupFolder">
+      <Component Id="ApplicationShortCutStartUp" Guid="{D6B4899E-3D67-462E-9161-582CFD13E9FC}">
+        <Shortcut Id="StartupShortcut" Name="XEO"
+                  Description="XEO Decentralized Ecological Economy Platform"
+                  Target="[#filE0949A33ABC424E47D589039C62AFF47]"
+                  WorkingDirectory="APPLICATIONROOTDIRECTORY" />
+
+
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\XEO" Action="createAndRemoveOnUninstall">
+          <RegistryValue Name="ShortCutStartUp" Type="integer" Value="1" KeyPath="yes"  />
+        </RegistryKey>
+      </Component>
+
+    </DirectoryRef>
+
+    <!--<SetDirectory Id="UserStartupFolder" Value="Startup"/>-->
+    <!-- more wix stuff -->
+    <!--<DirectoryRef Id="StartupFolder">
+      <Component Id="StartupFolderShortcut" Guid="{DD3A8995-1FA2-4676-9037-C57D0E2D29D7}">
+        <Shortcut Id="StartupFolderShortcut" Name="XEO" Description="XEO Decentralized Ecological Economy Platform" Target="[#filE0949A33ABC424E47D589039C62AFF47]" WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\XEO" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>-->
+
+
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="ApplicationShortcutDesktop" Guid="{D0BFA8B9-5EBB-4F3B-9211-C3FECEA3B095}" Win64='yes'>
+        <!-- Neo: The Target attribute is important here.. This is the ID of the exe file. search for "filE0949A33ABC424E47D589039C62AFF47" in Xeo.XeoD.wxs file -->
+        <Shortcut Id="ApplicationDesktopShortcut" Name="XEO" Description="XEO Decentralized Ecological Economy Platform" Target="[#filE0949A33ABC424E47D589039C62AFF47]" WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+        <RemoveFolder Id="RemoveFolder" Directory="DesktopFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\XEO" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="ApplicationShortcutDesktopTest" Guid="{2BBC23B3-82F0-47E8-AD30-FA0D8A09DF19}" Win64='yes'>
+        <!-- Neo: The Target attribute is important here.. This is the ID of the exe file. search for "filE0949A33ABC424E47D589039C62AFF47" in XeoSideChainD.wxs file -->
+        <Shortcut Id="ApplicationDesktopShortcutTest" Name="XEOTEST" Arguments="-testnet" Description="XEO Decentralized Ecological Economy Platform" Target="[#filE0949A33ABC424E47D589039C62AFF47]" WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+        <RemoveFolder Id="RemoveFolderTest" Directory="DesktopFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\XEOTEST" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcutStartMenu" Guid="{F2B1D237-7D40-4DD4-95BD-95183857C3ED}" Win64='yes'>
+        <Shortcut Id="ApplicationStartMenuShortcut" Name="XEO" Description="XEO Decentralized Ecological Economy Platform" Target="[#filE0949A33ABC424E47D589039C62AFF47]" WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+        <RemoveFolder Id="ApplicationProgramsFolder" Directory="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\XEO" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="APPLICATIONROOTDIRECTORY">
+			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+			<!-- <Component Id="ProductComponent"> -->
+				<!-- TODO: Insert files, registry keys, and other resources here. -->
+			<!-- </Component> -->
+		</ComponentGroup>
+    
+    
+    
+	</Fragment>
+</Wix>

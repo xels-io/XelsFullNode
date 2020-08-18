@@ -47,4 +47,11 @@ namespace Xels.Bitcoin.Features.Miner.Models
         [Required(ErrorMessage = "The number of blocks to mine required.")]
         public int BlockCount { get; set; }
     }
+
+
+    public class StartMiningRequest : RequestModel
+    {
+        [Required(ErrorMessage = "The wallet name required.")]
+        public string WalletName { get; set; }
+    }
 }

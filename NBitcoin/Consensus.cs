@@ -20,6 +20,7 @@ namespace NBitcoin
         public long SecondMiningPeriodHeight { get; }
         public long ThirdMiningPeriodHeight { get; }
         public long ForthMiningPeriodHeight { get; }
+        public long FifthMiningPeriodHeight { get; }
 
         /// <inheritdoc />
         public Money ProofOfWorkReward { get; }
@@ -139,7 +140,8 @@ namespace NBitcoin
             long firstMiningPeriodHeight = 0,
             long secondMiningPeriodHeight = 0,
             long thirdMiningPeriodHeight = 0,
-            long forthMiningPeriodHeight = 0)
+            long forthMiningPeriodHeight = 0,
+            long fifthMiningPeriodHeight = 0)
         {
             this.IntegrityValidationRules = new List<IIntegrityValidationConsensusRule>();
             this.HeaderValidationRules = new List<IHeaderValidationConsensusRule>();
@@ -153,6 +155,7 @@ namespace NBitcoin
             this.SecondMiningPeriodHeight = secondMiningPeriodHeight;
             this.ThirdMiningPeriodHeight = thirdMiningPeriodHeight;
             this.ForthMiningPeriodHeight = forthMiningPeriodHeight;
+            this.FifthMiningPeriodHeight = fifthMiningPeriodHeight;
             this.ProofOfWorkReward = proofOfWorkReward;
             this.ProofOfStakeReward = proofOfStakeReward;
             this.MaxReorgLength = maxReorgLength;

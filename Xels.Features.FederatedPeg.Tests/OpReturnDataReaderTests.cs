@@ -28,7 +28,7 @@ namespace Xels.Features.FederatedPeg.Tests
         public OpReturnDataReaderTests()
         {
             this.loggerFactory = Substitute.For<ILoggerFactory>();
-            this.network = CirrusNetwork.NetworksSelector.Regtest();
+            this.network = XoyNetwork.NetworksSelector.Regtest();
             this.counterChainNetwork = Networks.Xels.Regtest();
             this.opReturnDataReader = new OpReturnDataReader(this.loggerFactory, new CounterChainNetworkWrapper(this.counterChainNetwork));
 

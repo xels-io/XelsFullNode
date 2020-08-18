@@ -152,8 +152,8 @@ namespace Xels.Bitcoin.Features.Wallet.Controllers
             {
                 return ModelStateErrors.BuildErrorResponse(this.ModelState);
             }
-            var regex = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
-            var match = Regex.Match(request.Password, regex);
+            var regex = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#$%&'()*+,-./:;<=>?@[\]^_`{|}~])[A-Za-z\d!#$%&'()*+,-./:;<=>?@[\]^_`{|}~]{8,}$";
+            var match = Regex.Match(request.Password, regex);//['!', '@', '#', '$', '%', '^', '*', '+', '_', '-', '=', ':', ';', '?']
             if (!match.Success)
             {
                 return ErrorHelpers.BuildErrorResponse(HttpStatusCode.Conflict, "Password doesn't meet criteria",
@@ -625,7 +625,7 @@ namespace Xels.Bitcoin.Features.Wallet.Controllers
                             // Add incoming fund transaction details.
                             var receivedItem = new TransactionItemModel
                             {
-                                Type = TransactionItemType.Received,
+                                Type = transaction.IsCoinBase != null ? TransactionItemType.Mined : TransactionItemType.Received,
                                 ToAddress = address.Address,
                                 Amount = transaction.Amount,
                                 Id = transaction.Id,
@@ -637,6 +637,7 @@ namespace Xels.Bitcoin.Features.Wallet.Controllers
                             transactionItems.Add(receivedItem);
                             itemsCount++;
                         }
+                        
                     }
 
                     transactionItems = transactionItems.Distinct(new SentTransactionItemModelComparer()).Select(e => e).ToList();
@@ -1013,8 +1014,8 @@ namespace Xels.Bitcoin.Features.Wallet.Controllers
         /// for a specific transaction.</param>
         /// <returns>The estimated fee for the transaction.</returns>
         [Route("estimate-txfee")]
-        [HttpPost]
-        public IActionResult GetTransactionFeeEstimate([FromBody]TxFeeEstimateRequest request)
+        [HttpGet]
+        public IActionResult GetTransactionFeeEstimate([FromQuery]TxFeeEstimateRequest request)
         {
             Guard.NotNull(request, nameof(request));
 

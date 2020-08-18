@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util = "http://schemas.microsoft.com/wix/UtilExtension">
-  <Product Id="*" Name="XELS" Language="1033" Version="2.2.0.0" Manufacturer="Xels.io" UpgradeCode="ad06b9ad-c74e-4d12-9b80-3aefd43d5d9f">
+  <Product Id="*" Name="XELS" Language="1033" Version="3.0.0.0" Manufacturer="Xels.io" UpgradeCode="ad06b9ad-c74e-4d12-9b80-3aefd43d5d9f">
     <Package InstallerVersion="200" Compressed="yes" Platform="x64" InstallScope="perMachine" />
     <!--Jeo: Upgrade code for newer version which automatically replace previous version -->
     <!--Start-->
@@ -14,13 +14,12 @@
     </InstallExecuteSequence>
     <!--Finish-->
     
-    <!--CommentOut below the AppDataFolder(1,2,3) commented part for closing "Deletion of XelsNode folder from AppDataFolder" -->
-    <!--AppDataFolder(1): Add Property to Remove XelsNode folder from AppDataFolder-->
-    <!--Start-->
+    
+    <!--Neo: Data-cleaning-code-1 : Add Property to Remove XelsNode\xels folder from AppDataFolder-->
     <!--Neo: UnComment Next 2 lines to clean up cahin data.-->
-    <!--<?define AppXelsFolder = "XelsNode" ?>
-    <SetProperty Id="XELSFOLDER" Value="[AppDataFolder]$(var.AppXelsFolder)" After="CostFinalize" />--> 
-    <!--Finish-->
+    <!--<?define AppXelsFolder = "XelsNode\xels" ?>
+    <SetProperty Id="XELSFOLDER" Value="[AppDataFolder]$(var.AppXelsFolder)" After="CostFinalize" />-->
+    <!--Neo: Data-cleaning-code-1 : ends here -->
     
     <!--<Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONROOTDIRECTORY" />
     <UIRef Id="WixUI_InstallDir" />-->
@@ -35,11 +34,10 @@
       <ComponentRef Id="ApplicationShortcutStartMenu" />
       <ComponentRef Id="ApplicationShortCutStartUp" />
 
-      <!--AppDataFolder(2): Add ComponentRef to Remove XelsNode folder from AppDataFolder-->
-      <!--Start-->
+      <!--Neo: Data-cleaning-code-2 : Add ComponentRef to Remove XelsNode\xels folder from AppDataFolder-->
       <!--Neo: UnComment Next 1 line to clean up cahin data.-->
       <!--<ComponentRef Id="XelsFolderCleanup" />-->
-      <!--Finish-->
+      <!--Neo: Data-cleaning-code-2 : ends here -->
       
     </Feature>
     <UI>
@@ -65,13 +63,13 @@
       <Directory Id="DesktopFolder" SourceName="Desktop" />
       <Directory Id="StartupFolder" Name="Xels"/>
 
-      <!-- AppDataFolder(3): Remove XelsNode folder from AppDataFolder  -->
-      <!--Start-->
+      <!--Neo: Data-cleaning-code-3 : Remove XelsNode\xels folder from AppDataFolder-->
       <!--Neo: UnComment Next 3 lines to clean up cahin data.-->
       <!--<Component Id="XelsFolderCleanup" Guid="63127A7D-42F9-4A61-B661-A8ABCC3A7FE1">
         <util:RemoveFolderEx On="install" Property="XELSFOLDER"/>
       </Component>-->
-      <!--Finish-->
+      <!--Neo: Data-cleaning-code-3 : ends here -->
+      
       
     </Directory>
 

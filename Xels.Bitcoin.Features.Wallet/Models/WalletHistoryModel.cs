@@ -108,6 +108,7 @@ namespace Xels.Bitcoin.Features.Wallet.Models
     {
         Received,
         Send,
-        Staked
+        Staked,
+        Mined
     }
 }

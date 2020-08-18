@@ -77,7 +77,7 @@ namespace Xels.Features.FederatedPeg.Tests
         /// <param name="network">The network to run the tests for.</param>
         public CrossChainTestBase(Network network = null, Network counterChainNetwork = null)
         {
-            this.network = network ?? CirrusNetwork.NetworksSelector.Regtest();
+            this.network = network ?? XoyNetwork.NetworksSelector.Regtest();
             this.counterChainNetwork = counterChainNetwork ?? Networks.Xels.Regtest();
             this.counterChainNetworkWrapper = new CounterChainNetworkWrapper(counterChainNetwork);
 

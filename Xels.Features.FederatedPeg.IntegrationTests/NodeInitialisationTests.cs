@@ -26,7 +26,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests
     {
         private const int DepositConfirmations = 5;
 
-        private readonly CirrusRegTest sidechainNetwork;
+        private readonly XoyRegTest sidechainNetwork;
         private readonly Network mainNetwork;
 
         private readonly (Script payToMultiSig, BitcoinAddress sidechainMultisigAddress, BitcoinAddress
@@ -35,7 +35,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests
 
         public NodeInitialisationTests()
         {
-            this.sidechainNetwork = (CirrusRegTest)CirrusNetwork.NetworksSelector.Regtest();
+            this.sidechainNetwork = (XoyRegTest)XoyNetwork.NetworksSelector.Regtest();
             this.mainNetwork = Networks.Xels.Regtest();
             var pubKeysByMnemonic = this.sidechainNetwork.FederationMnemonics.ToDictionary(m => m, m => m.DeriveExtKey().PrivateKey.PubKey);
             this.scriptAndAddresses = FederatedPegTestHelper.GenerateScriptAndAddresses(this.mainNetwork, this.sidechainNetwork, 2, pubKeysByMnemonic);
@@ -108,7 +108,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests
         [Fact]
         public void MinerPairStarts()
         {
-            CirrusRegTest collateralSidechainNetwork = new CirrusSingleCollateralRegTest();
+            XoyRegTest collateralSidechainNetwork = new XoySingleCollateralRegTest();
 
             using (SidechainNodeBuilder sideNodeBuilder = SidechainNodeBuilder.CreateSidechainNodeBuilder(this))
             using (NodeBuilder nodeBuilder = NodeBuilder.Create(this))
@@ -189,11 +189,11 @@ namespace Xels.Features.FederatedPeg.IntegrationTests
         }
     }
 
-    public class CirrusSingleCollateralRegTest : CirrusRegTest
+    public class XoySingleCollateralRegTest : XoyRegTest
     {
-        public CirrusSingleCollateralRegTest()
+        public XoySingleCollateralRegTest()
         {
-            this.Name = "CirrusSingleCollateralRegTest";
+            this.Name = "XoySingleCollateralRegTest";
             CollateralFederationMember firstMember = this.ConsensusOptions.GenesisFederationMembers[0] as CollateralFederationMember;
             firstMember.CollateralAmount = Money.Coins(100m);
             firstMember.CollateralMainchainAddress = new Key().ScriptPubKey.GetDestinationAddress(this).ToString();

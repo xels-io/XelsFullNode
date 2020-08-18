@@ -22,6 +22,7 @@ namespace NBitcoin
         long SecondMiningPeriodHeight { get; }
         long ThirdMiningPeriodHeight { get; }
         long ForthMiningPeriodHeight { get; }
+        long FifthMiningPeriodHeight { get; }
 
         /// <summary>
         /// The height of the block in which the pre-mined coins should be.

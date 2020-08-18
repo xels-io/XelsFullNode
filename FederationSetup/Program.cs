@@ -291,15 +291,15 @@ namespace FederationSetup
             {
                 case "mainnet":
                     mainchainNetwork = Networks.Xels.Mainnet();
-                    sideChainNetwork = CirrusNetwork.NetworksSelector.Mainnet();
+                    sideChainNetwork = XoyNetwork.NetworksSelector.Mainnet();
                     break;
                 case "testnet":
                     mainchainNetwork = Networks.Xels.Testnet();
-                    sideChainNetwork = CirrusNetwork.NetworksSelector.Testnet();
+                    sideChainNetwork = XoyNetwork.NetworksSelector.Testnet();
                     break;
                 case "regtest":
                     mainchainNetwork = Networks.Xels.Regtest();
-                    sideChainNetwork = CirrusNetwork.NetworksSelector.Regtest();
+                    sideChainNetwork = XoyNetwork.NetworksSelector.Regtest();
                     break;
                 default:
                     throw new ArgumentException("Please specify a network such as: mainnet, testnet or regtest.");

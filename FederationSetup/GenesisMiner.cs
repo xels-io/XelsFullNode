@@ -29,9 +29,9 @@ namespace FederationSetup
 
             var targets = new Dictionary<uint256, string>
             {
-                { new Target(CirrusNetwork.NetworksSelector.Mainnet().GenesisBits).ToUInt256(), "-- MainNet network --" },
-                { new Target(CirrusNetwork.NetworksSelector.Testnet().GenesisBits).ToUInt256(), "-- TestNet network --" },
-                { new Target(CirrusNetwork.NetworksSelector.Regtest().GenesisBits).ToUInt256(), "-- RegTest network --" },
+                { new Target(XoyNetwork.NetworksSelector.Mainnet().GenesisBits).ToUInt256(), "-- MainNet network --" },
+                { new Target(XoyNetwork.NetworksSelector.Testnet().GenesisBits).ToUInt256(), "-- TestNet network --" },
+                { new Target(XoyNetwork.NetworksSelector.Regtest().GenesisBits).ToUInt256(), "-- RegTest network --" },
             };
 
             foreach (KeyValuePair<uint256, string> target in targets)

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProductVersion>3.10</ProductVersion>
+    <ProjectGuid>{1022e620-9d0d-42ab-91b0-d510ac02e810}</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>Xeo-Backend-Setup</OutputName>
+    <OutputType>Package</OutputType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Release</DefineConstants>
+    <CompilerAdditionalOptions>
+    </CompilerAdditionalOptions>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <SuppressAllWarnings>True</SuppressAllWarnings>
+    <Pedantic>False</Pedantic>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Product.wxs" />
+    <Compile Include="XeoSideChainD.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\XeoSideChainD\XeoSideChainD.csproj">
+      <Name>Xeo</Name>
+      <Project>{7A9024DE-DDA5-41A3-B47B-84748C0EFDCB}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>APPLICATIONROOTDIRECTORY</RefTargetDir>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
+  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
+    <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
+  </Target>
+  <!--
+	To modify your build process, add your task inside one of the targets below and uncomment it.
+	Other similar extension points exist, see Wix.targets.
+	<Target Name="BeforeBuild">
+	</Target>
+	<Target Name="AfterBuild">
+	</Target>
+	-->
+  <Target Name="BeforeBuild">
+    <Exec Command="dotnet publish ..\..\src\XeoSideChainD\XeoSideChainD.csproj -c $(Configuration) -r win10-x64" />
+    <PropertyGroup>
+      <LinkerBaseInputPaths>..\..\src\XeoSideChainD\bin\$(Configuration)\netcoreapp2.1\win10-x64\publish</LinkerBaseInputPaths>
+      <DefineConstants>BasePath=..\..\src\XeoSideChainD\bin\$(Configuration)\netcoreapp2.1\win10-x64\publish</DefineConstants>
+    </PropertyGroup>
+    <HeatDirectory OutputFile="XeoSideChainD.wxs" DirectoryRefId="APPLICATIONROOTDIRECTORY" ComponentGroupName="Xeo_Project" SuppressCom="true" Directory="..\..\src\XeoSideChainD\bin\$(Configuration)\netcoreapp2.1\win10-x64\publish" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" Transforms="RemovePdbs.xslt" />
+  </Target>
+  <PropertyGroup>
+    <PostBuildEvent />
+  </PropertyGroup>
+</Project>

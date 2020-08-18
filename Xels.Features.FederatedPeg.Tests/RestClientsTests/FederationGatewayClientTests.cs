@@ -21,7 +21,7 @@ namespace Xels.Features.FederatedPeg.Tests.RestClientsTests
             string multisigPubKey = "03be943c3a31359cd8e67bedb7122a0898d2c204cf2d0119e923ded58c429ef97c";
             string[] args = new[] { "-sidechain", "-regtest", $"-federationips={federationIps}", $"-redeemscript={redeemScript}", $"-publickey={multisigPubKey}", "-mincoinmaturity=1", "-mindepositconfirmations=1" };
 
-            var nodeSettings = new NodeSettings(Sidechains.Networks.CirrusNetwork.NetworksSelector.Regtest(), NBitcoin.Protocol.ProtocolVersion.ALT_PROTOCOL_VERSION, args: args);
+            var nodeSettings = new NodeSettings(Sidechains.Networks.XoyNetwork.NetworksSelector.Regtest(), NBitcoin.Protocol.ProtocolVersion.ALT_PROTOCOL_VERSION, args: args);
 
             this.client = new FederationGatewayClient(new ExtendedLoggerFactory(), new CounterChainSettings(nodeSettings, Networks.Xels.Regtest()), new HttpClientFactory());
         }

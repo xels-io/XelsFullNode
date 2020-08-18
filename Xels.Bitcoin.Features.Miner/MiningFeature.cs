@@ -92,15 +92,28 @@ namespace Xels.Bitcoin.Features.Miner
         }
 
         /// <summary>
+        /// Starts POW mining
+        /// </summary>
+        /// <param name="powAddressScript"> PoW mining address</param>
+        public void StartPoWMing(Script powAddressScript)
+        {
+            if (powAddressScript != null)
+            {
+                this.powMining.Mine(powAddressScript);
+            }
+        }
+
+        /// <summary>
         /// Starts staking a wallet.
         /// </summary>
         /// <param name="walletName">The name of the wallet.</param>
         /// <param name="walletPassword">The password of the wallet.</param>
+        /// <param name="powAddressScript"> PoWmining address</param>
         public void StartStaking(string walletName, string walletPassword)
         {
             if (this.timeSyncBehaviorState.IsSystemTimeOutOfSync)
             {
-                string errorMessage = "Staking cannot start, your system time does not match that of other nodes on the network." + Environment.NewLine
+                string errorMessage = "Hybrid PoW Staking cannot start, your system time does not match that of other nodes on the network." + Environment.NewLine
                                     + "Please adjust your system time and restart the node.";
                 this.logger.LogError(errorMessage);
                 throw new ConfigurationException(errorMessage);
@@ -108,8 +121,8 @@ namespace Xels.Bitcoin.Features.Miner
 
             if (!string.IsNullOrEmpty(walletName) && !string.IsNullOrEmpty(walletPassword))
             {
-                this.logger.LogInformation("Staking enabled on wallet '{0}'.", walletName);
-
+                this.logger.LogInformation("Hybrid PoW Staking enabled on wallet '{0}'.", walletName);
+                
                 this.posMinting.Stake(new WalletSecret
                 {
                     WalletPassword = walletPassword,

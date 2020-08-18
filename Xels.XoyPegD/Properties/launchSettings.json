@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Xels.XoyPegD": {
+      "commandName": "Project",
+      "commandLineArgs": "-mainchain"
+    }
+  }
+}

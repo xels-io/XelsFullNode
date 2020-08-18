@@ -13,7 +13,7 @@ namespace Xels.Features.FederatedPeg.Tests
         public PremineCoinbaseSplitterTests()
         {
             this.premineSplitter = new PremineCoinbaseSplitter();
-            this.network = CirrusNetwork.NetworksSelector.Mainnet();
+            this.network = XoyNetwork.NetworksSelector.Mainnet();
         }
 
         //[Fact]
