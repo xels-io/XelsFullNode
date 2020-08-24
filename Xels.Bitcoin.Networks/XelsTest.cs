@@ -95,12 +95,13 @@ namespace Xels.Bitcoin.Networks
                 maxMoney: 2537175000 * Money.COIN,  //long.MaxValue,
                 coinbaseMaturity: 1, //10,
                 premineHeight: 13, //2,
-                firstMiningPeriodHeight: 850000,
-                secondMiningPeriodHeight: 850000 + 500000,
-                thirdMiningPeriodHeight: 850000 + 500000 + 850000,
-                forthMiningPeriodHeight: 850000 + 500000 + 850000 + 500000,
+                firstMiningPeriodHeight: 768000,
+                secondMiningPeriodHeight: 768000 + 768000,
+                thirdMiningPeriodHeight: 768000 + 768000 + 768000,
+                forthMiningPeriodHeight: 768000 + 768000 + 768000 + 768000,
+                fifthMiningPeriodHeight: 768000 + 768000 + 768000 + 768000 + 768000,
                 premineReward: Money.Coins(187155000),  //Money.Coins(98000000),
-                proofOfWorkReward: Money.Coins(375), //(4),
+                proofOfWorkReward: Money.Coins(50), //(4),
                 powTargetTimespan: TimeSpan.FromSeconds(24 * 60 * 60), //(14 * 24 * 60 * 60), // two weeks
                 powTargetSpacing: TimeSpan.FromSeconds(150), //(10 * 60),
                 powAllowMinDifficultyBlocks: false,
@@ -112,7 +113,7 @@ namespace Xels.Bitcoin.Networks
                 lastPowBlock: 3, //12500,
                 proofOfStakeLimit: new BigInteger(uint256.Parse("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff").ToBytes(false)),
                 proofOfStakeLimitV2: new BigInteger(uint256.Parse("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff").ToBytes(false)),
-                proofOfStakeReward: Money.Coins(375) //.COIN
+                proofOfStakeReward: Money.Coins(50) //.COIN
             );
 
             this.Base58Prefixes[(int)Base58Type.PUBKEY_ADDRESS] = new byte[] { (75) };      // 75 for capital X    { (65) };
@@ -125,22 +126,27 @@ namespace Xels.Bitcoin.Networks
                 { 0, new CheckpointInfo(new uint256("0x00000e246d7b73b88c9ab55f2e5e94d9e22d471def3df5ea448f5576b1d156b9"), new uint256("0x0000000000000000000000000000000000000000000000000000000000000000")) }
             };
 
-            this.DNSSeeds = new List<DNSSeedData>();
-            //this.DNSSeeds = new List<DNSSeedData>
-            //{
-            //    new DNSSeedData("testnet1.xelsplatform.com", "testnet1.xelsplatform.com"),
-            //    new DNSSeedData("testnet2.xelsplatform.com", "testnet2.xelsplatform.com"),
-            //    new DNSSeedData("testnet3.xelsplatform.com", "testnet3.xelsplatform.com"),
-            //    new DNSSeedData("testnet4.xelsplatform.com", "testnet4.xelsplatform.com")
-            //};
+            //this.DNSSeeds = new List<DNSSeedData>();
+            this.DNSSeeds = new List<DNSSeedData>
+            {
+                new DNSSeedData("api.xels.io","api.xels.io"),
+                new DNSSeedData("mainnet.xels.io","mainnet.xels.io")
+                //new DNSSeedData("testnet1.xelsplatform.com", "testnet1.xelsplatform.com"),
+                //new DNSSeedData("testnet2.xelsplatform.com", "testnet2.xelsplatform.com"),
+                //new DNSSeedData("testnet3.xelsplatform.com", "testnet3.xelsplatform.com"),
+                //new DNSSeedData("testnet4.xelsplatform.com", "testnet4.xelsplatform.com")
+            };
 
-            this.SeedNodes = new List<NetworkAddress>();
-            //this.SeedNodes = new List<NetworkAddress>
-            //{
-            //    new NetworkAddress(IPAddress.Parse("51.140.231.125"), 26178), // danger cloud node
-            //    new NetworkAddress(IPAddress.Parse("13.70.81.5"), 26178), // beard cloud node
-            //    new NetworkAddress(IPAddress.Parse("191.235.85.131"), 26178), // fassa cloud node
-            //};
+            //this.SeedNodes = new List<NetworkAddress>();
+            this.SeedNodes = new List<NetworkAddress>
+            {
+                new NetworkAddress(IPAddress.Parse("52.68.239.4"), this.DefaultPort ), // public node with DNS Server Enabled
+                new NetworkAddress(IPAddress.Parse("54.64.43.45"), this.DefaultPort ) // public node with DNS Server Enabled
+
+                //new NetworkAddress(IPAddress.Parse("51.140.231.125"), 26178), // danger cloud node
+                //new NetworkAddress(IPAddress.Parse("13.70.81.5"), 26178), // beard cloud node
+                //new NetworkAddress(IPAddress.Parse("191.235.85.131"), 26178), // fassa cloud node
+            };
 
             this.StandardScriptsRegistry = new XelsStandardScriptsRegistry();
 

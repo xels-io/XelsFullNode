@@ -60,12 +60,12 @@
 	</Target>
 	-->
   <Target Name="BeforeBuild">
-    <Exec Command="dotnet publish ..\..\src\Xels.XelsD\Xels.XelsD.csproj -c $(Configuration) -r win10-x64" />
+    <Exec Command="dotnet publish ..\..\src\Xels.XelsD\Xels.XelsD.csproj -c $(Configuration) -r win-x64" />
     <PropertyGroup>
-      <LinkerBaseInputPaths>..\..\src\Xels.XelsD\bin\$(Configuration)\netcoreapp2.1\win10-x64\publish</LinkerBaseInputPaths>
-      <DefineConstants>BasePath=..\..\src\Xels.XelsD\bin\$(Configuration)\netcoreapp2.1\win10-x64\publish</DefineConstants>
+      <LinkerBaseInputPaths>..\..\src\Xels.XelsD\bin\$(Configuration)\netcoreapp2.1\win-x64\publish</LinkerBaseInputPaths>
+      <DefineConstants>BasePath=..\..\src\Xels.XelsD\bin\$(Configuration)\netcoreapp2.1\win-x64\publish</DefineConstants>
     </PropertyGroup>
-    <HeatDirectory OutputFile="Xels.XelsD.wxs" DirectoryRefId="APPLICATIONROOTDIRECTORY" ComponentGroupName="Xels_Project" SuppressCom="true" Directory="..\..\src\Xels.XelsD\bin\$(Configuration)\netcoreapp2.1\win10-x64\publish" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" Transforms="RemovePdbs.xslt" />
+    <HeatDirectory OutputFile="Xels.XelsD.wxs" DirectoryRefId="APPLICATIONROOTDIRECTORY" ComponentGroupName="Xels_Project" SuppressCom="true" Directory="..\..\src\Xels.XelsD\bin\$(Configuration)\netcoreapp2.1\win-x64\publish" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" Transforms="RemovePdbs.xslt" />
   </Target>
   <PropertyGroup>
     <PostBuildEvent />

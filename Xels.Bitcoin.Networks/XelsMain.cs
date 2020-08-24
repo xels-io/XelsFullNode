@@ -39,10 +39,10 @@ namespace Xels.Bitcoin.Networks
             this.Name = "XelsMain";
             this.NetworkType = NetworkType.Mainnet;
             this.Magic = magic;
-            this.DefaultPort = 29776;
+            this.DefaultPort = 27976;
             this.DefaultMaxOutboundConnections = 16;
             this.DefaultMaxInboundConnections = 109;
-            this.DefaultRPCPort = 29775;
+            this.DefaultRPCPort = 27975;
             this.DefaultAPIPort = 37221;
             this.MaxTipAge = 2 * 60 * 60;
             this.MinTxFee = 10000;
@@ -161,7 +161,7 @@ namespace Xels.Bitcoin.Networks
             {
                 new DNSSeedData("api.xels.io","api.xels.io"),
                 new DNSSeedData("mainnet.xels.io","mainnet.xels.io")
-                //    new DNSSeedData("mainnet2.xelsnetwork.com", "mainnet2.xelsnetwork.com"),
+                //    new DNSSe                new NetworkAddress(IPAddress.Parse("52.68.239.4"), this.DefaultPort), // Redistribution node with DNS Server EnablededData("mainnet2.xelsnetwork.com", "mainnet2.xelsnetwork.com"),
                 //    new DNSSeedData("mainnet3.xelsplatform.com", "mainnet3.xelsplatform.com"),
                 //    new DNSSeedData("mainnet4.xelsnetwork.com", "mainnet4.xelsnetwork.com")
             };
@@ -169,12 +169,13 @@ namespace Xels.Bitcoin.Networks
             this.SeedNodes = new List<NetworkAddress>();
             this.SeedNodes = new List<NetworkAddress>
             {
-                new NetworkAddress(IPAddress.Parse("52.68.239.4"), 29776), // Redistribution node with DNS Server Enabled
-                new NetworkAddress(IPAddress.Parse("54.238.248.117"), 29776), // public node
-                new NetworkAddress(IPAddress.Parse("13.114.52.87"), 29776), // public node
-                new NetworkAddress(IPAddress.Parse("52.192.229.45"), 29776), // public node
-                new NetworkAddress(IPAddress.Parse("52.199.121.139"), 29776 ), // public node
-                new NetworkAddress(IPAddress.Parse("54.64.43.45"), 29776 ), // public node with DNS Server Enabled
+
+                new NetworkAddress(IPAddress.Parse("52.68.239.4"), this.DefaultPort ), // public node with DNS Server Enabled
+                new NetworkAddress(IPAddress.Parse("54.64.43.45"), this.DefaultPort ) // public node with DNS Server Enabled
+                //new NetworkAddress(IPAddress.Parse("54.238.248.117"), this.DefaultPort), // public node
+                //new NetworkAddress(IPAddress.Parse("13.114.52.87"), this.DefaultPort), // public node
+                //new NetworkAddress(IPAddress.Parse("52.192.229.45"), this.DefaultPort), // public node
+                //new NetworkAddress(IPAddress.Parse("52.199.121.139"), this.DefaultPort ), // public node
 
                 //new NetworkAddress(IPAddress.Parse("137.116.46.151"), 37221), // public node
                 //new NetworkAddress(IPAddress.Parse("40.78.80.159"), 37221), // public node

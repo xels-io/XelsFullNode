@@ -173,12 +173,34 @@ namespace Xels.Bitcoin.Configuration.Settings
             builder.AppendLine($"#port={network.DefaultPort}");
             builder.AppendLine($"#Accept connections from the outside.");
             builder.AppendLine($"#listen=<0 or 1>");
+
+            builder.AppendLine($"listen=1");
+
             builder.AppendLine($"#This can be used to accept incoming connections when -connect is specified.");
             builder.AppendLine($"#forcelisten=<0 or 1>");
+
+            builder.AppendLine($"forcelisten=1");
+
             builder.AppendLine($"#Specified node to connect to. Can be specified multiple times.");
             builder.AppendLine($"#connect=<ip:port>");
+
+            builder.AppendLine($"connect=52.68.239.4:{ network.DefaultPort }");
+            builder.AppendLine($"connect=54.64.43.45:{ network.DefaultPort }");
+            builder.AppendLine($"connect=54.238.248.117:{ network.DefaultPort }");
+            builder.AppendLine($"connect=13.114.52.87:{ network.DefaultPort }");
+            builder.AppendLine($"connect=52.192.229.45:{ network.DefaultPort }");
+            builder.AppendLine($"connect=52.199.121.139:{ network.DefaultPort }");
+
             builder.AppendLine($"#Add a node to connect to and attempt to keep the connection open. Can be specified multiple times.");
             builder.AppendLine($"#addnode=<ip:port>");
+
+            builder.AppendLine($"addnode=52.68.239.4:{ network.DefaultPort }");
+            builder.AppendLine($"addnode=54.64.43.45:{ network.DefaultPort }");
+            builder.AppendLine($"addnode=54.238.248.117:{ network.DefaultPort }");
+            builder.AppendLine($"addnode=13.114.52.87:{ network.DefaultPort }");
+            builder.AppendLine($"addnode=52.192.229.45:{ network.DefaultPort }");
+            builder.AppendLine($"addnode=52.199.121.139:{ network.DefaultPort }");
+
             builder.AppendLine($"#Bind to given address. Use [host]:port notation for IPv6. Can be specified multiple times.");
             builder.AppendLine($"#bind=<ip:port>");
             builder.AppendLine($"#Bind to given address and whitelist peers connecting to it. Use [host]:port notation for IPv6. Can be specified multiple times.");

@@ -23,14 +23,14 @@ namespace Xels.XelsD
 {
     public class Program
     {
-        //[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-        //static extern bool FreeConsole();
+        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        static extern bool FreeConsole();
 
         public static async Task Main(string[] args)
         {
             try
             {
-                //FreeConsole();
+                FreeConsole();
                 var nodeSettings = new NodeSettings(networksSelector: Networks.Xels, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
                 {
                     MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
