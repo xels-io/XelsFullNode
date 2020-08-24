@@ -1,0 +1,2 @@
+addnode=0.0.0.0
+addnode=0.0.0.1

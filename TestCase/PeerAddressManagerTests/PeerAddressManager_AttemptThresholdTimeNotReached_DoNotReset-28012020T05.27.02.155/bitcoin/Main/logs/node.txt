@@ -1,0 +1,216 @@
+[2020-01-28 05:27:02.9657 3] INFO: Xels.Bitcoin.FullNode.Initialize 
+
+                 
+ooooooo  ooooo oooooooooooo ooooo         .oooooo..o   
+ `8888    d8'  `888'     `8 `888'        d8P'    `Y8   
+   Y888..8P     888          888         Y88bo.        
+    `8888'      888oooo8     888          `"Y8888o.    
+   .8PY888.     888    "     888              `"Y88b   
+  d8'  `888b    888       o  888       o oo     .d8P   
+o888o  o88888o o888ooooood8 o888ooooood8 8""88888P'    
+                                                                                                                                                                                      
+
+ oooooooooo.                                                 .                      oooo   o8o                             .o8 
+ `888'   `Y8b                                              .o8                      `888   `"'                            "888 
+  888      888  .ooooo.   .ooooo.   .ooooo.  ooo. .oo.   .o888oo oooo d8b  .oooo.    888  oooo    oooooooo  .ooooo.   .oooo888 
+  888      888 d88' `88b d88' `"Y8 d88' `88b `888P"Y88b    888   `888""8P `P  )88b   888  `888   d'""7d8P  d88' `88b d88' `888 
+  888      888 888ooo888 888       888ooo888  888   888    888    888      .oP"888   888   888     .d8P'   888ooo888 888   888 
+  888     d88' 888    .o 888   .o8 888    .o  888   888    888 .  888     d8(  888   888   888   .d8P'  .P 888    .o 888   888 
+ o888bood8P'   `Y8bod8P' `Y8bod8P' `Y8bod8P' o888o o888o   "888" d888b    `Y888""8o o888o o888o d8888888P  `Y8bod8P' `Y8bod88P"
+
+                                                                                                                                                                                     
+oooooooooooo                     oooo                        o8o                      oooo    
+`888'     `8                     `888                        `"'                      `888    
+ 888          .ooooo.   .ooooo.   888   .ooooo.   .oooooooo oooo   .ooooo.   .oooo.    888    
+ 888oooo8    d88' `"Y8 d88' `88b  888  d88' `88b 888' `88b  `888  d88' `"Y8 `P  )88b   888    
+ 888    "    888       888   888  888  888   888 888   888   888  888        .oP"888   888    
+ 888       o 888   .o8 888   888  888  888   888 `88bod8P'   888  888   .o8 d8(  888   888    
+o888ooooood8 `Y8bod8P' `Y8bod8P' o888o `Y8bod8P' `8oooooo.  o888o `Y8bod8P' `Y888""8o o888o   
+                                                 d"     YD                                    
+                                                 "Y88888P'                                    
+
+ oooooooooooo                                                                           
+ `888'     `8                                                                           
+  888          .ooooo.   .ooooo.  ooo. .oo.    .ooooo.  ooo. .oo.  .oo.   oooo    ooo   
+  888oooo8    d88' `"Y8 d88' `88b `888P"Y88b  d88' `88b `888P"Y88bP"Y88b   `88.  .8'    
+  888    "    888       888   888  888   888  888   888  888   888   888    `88..8'     
+  888       o 888   .o8 888   888  888   888  888   888  888   888   888     `888'      
+ o888ooooood8 `Y8bod8P' `Y8bod8P' o888o o888o `Y8bod8P' o888o o888o o888o     .8'       
+                                                                          .o..P'        
+                                                                          `Y8P'         
+
+ooooooooo.   oooo                .    .o88o.                                                                                                                                          
+`888   `Y88. `888              .o8    888 `"                                                                                                                                          
+ 888   .d88'  888   .oooo.   .o888oo o888oo   .ooooo.  oooo d8b ooo. .oo.  .oo.                                                                                                       
+ 888ooo88P'   888  `P  )88b    888    888    d88' `88b `888""8P `888P"Y88bP"Y88b                                                                                                      
+ 888          888   .oP"888    888    888    888   888  888      888   888   888                                                                                                      
+ 888          888  d8(  888    888 .  888    888   888  888      888   888   888                                                                                                      
+o888o        o888o `Y888""8o   "888" o888o   `Y8bod8P' d888b    o888o o888o o888o                  
+                               
+     
+
+
+[2020-01-28 05:27:03.0569 3] INFO: Xels.Bitcoin.FullNode.Initialize Full node initialized on XelsRegTest.
+[2020-01-28 05:27:03.9143 3] INFO: Xels.Bitcoin.FullNode.Initialize 
+
+                 
+ooooooo  ooooo oooooooooooo ooooo         .oooooo..o   
+ `8888    d8'  `888'     `8 `888'        d8P'    `Y8   
+   Y888..8P     888          888         Y88bo.        
+    `8888'      888oooo8     888          `"Y8888o.    
+   .8PY888.     888    "     888              `"Y88b   
+  d8'  `888b    888       o  888       o oo     .d8P   
+o888o  o88888o o888ooooood8 o888ooooood8 8""88888P'    
+                                                                                                                                                                                      
+
+ oooooooooo.                                                 .                      oooo   o8o                             .o8 
+ `888'   `Y8b                                              .o8                      `888   `"'                            "888 
+  888      888  .ooooo.   .ooooo.   .ooooo.  ooo. .oo.   .o888oo oooo d8b  .oooo.    888  oooo    oooooooo  .ooooo.   .oooo888 
+  888      888 d88' `88b d88' `"Y8 d88' `88b `888P"Y88b    888   `888""8P `P  )88b   888  `888   d'""7d8P  d88' `88b d88' `888 
+  888      888 888ooo888 888       888ooo888  888   888    888    888      .oP"888   888   888     .d8P'   888ooo888 888   888 
+  888     d88' 888    .o 888   .o8 888    .o  888   888    888 .  888     d8(  888   888   888   .d8P'  .P 888    .o 888   888 
+ o888bood8P'   `Y8bod8P' `Y8bod8P' `Y8bod8P' o888o o888o   "888" d888b    `Y888""8o o888o o888o d8888888P  `Y8bod8P' `Y8bod88P"
+
+                                                                                                                                                                                     
+oooooooooooo                     oooo                        o8o                      oooo    
+`888'     `8                     `888                        `"'                      `888    
+ 888          .ooooo.   .ooooo.   888   .ooooo.   .oooooooo oooo   .ooooo.   .oooo.    888    
+ 888oooo8    d88' `"Y8 d88' `88b  888  d88' `88b 888' `88b  `888  d88' `"Y8 `P  )88b   888    
+ 888    "    888       888   888  888  888   888 888   888   888  888        .oP"888   888    
+ 888       o 888   .o8 888   888  888  888   888 `88bod8P'   888  888   .o8 d8(  888   888    
+o888ooooood8 `Y8bod8P' `Y8bod8P' o888o `Y8bod8P' `8oooooo.  o888o `Y8bod8P' `Y888""8o o888o   
+                                                 d"     YD                                    
+                                                 "Y88888P'                                    
+
+ oooooooooooo                                                                           
+ `888'     `8                                                                           
+  888          .ooooo.   .ooooo.  ooo. .oo.    .ooooo.  ooo. .oo.  .oo.   oooo    ooo   
+  888oooo8    d88' `"Y8 d88' `88b `888P"Y88b  d88' `88b `888P"Y88bP"Y88b   `88.  .8'    
+  888    "    888       888   888  888   888  888   888  888   888   888    `88..8'     
+  888       o 888   .o8 888   888  888   888  888   888  888   888   888     `888'      
+ o888ooooood8 `Y8bod8P' `Y8bod8P' o888o o888o `Y8bod8P' o888o o888o o888o     .8'       
+                                                                          .o..P'        
+                                                                          `Y8P'         
+
+ooooooooo.   oooo                .    .o88o.                                                                                                                                          
+`888   `Y88. `888              .o8    888 `"                                                                                                                                          
+ 888   .d88'  888   .oooo.   .o888oo o888oo   .ooooo.  oooo d8b ooo. .oo.  .oo.                                                                                                       
+ 888ooo88P'   888  `P  )88b    888    888    d88' `88b `888""8P `888P"Y88bP"Y88b                                                                                                      
+ 888          888   .oP"888    888    888    888   888  888      888   888   888                                                                                                      
+ 888          888  d8(  888    888 .  888    888   888  888      888   888   888                                                                                                      
+o888o        o888o `Y888""8o   "888" o888o   `Y8bod8P' d888b    o888o o888o o888o                  
+                               
+     
+
+
+[2020-01-28 05:27:04.1595 3] INFO: Xels.Bitcoin.FullNode.Initialize Full node initialized on XelsRegTest.
+[2020-01-28 05:27:04.2527 3] INFO: Xels.Bitcoin.FullNode.Initialize 
+
+                 
+ooooooo  ooooo oooooooooooo ooooo         .oooooo..o   
+ `8888    d8'  `888'     `8 `888'        d8P'    `Y8   
+   Y888..8P     888          888         Y88bo.        
+    `8888'      888oooo8     888          `"Y8888o.    
+   .8PY888.     888    "     888              `"Y88b   
+  d8'  `888b    888       o  888       o oo     .d8P   
+o888o  o88888o o888ooooood8 o888ooooood8 8""88888P'    
+                                                                                                                                                                                      
+
+ oooooooooo.                                                 .                      oooo   o8o                             .o8 
+ `888'   `Y8b                                              .o8                      `888   `"'                            "888 
+  888      888  .ooooo.   .ooooo.   .ooooo.  ooo. .oo.   .o888oo oooo d8b  .oooo.    888  oooo    oooooooo  .ooooo.   .oooo888 
+  888      888 d88' `88b d88' `"Y8 d88' `88b `888P"Y88b    888   `888""8P `P  )88b   888  `888   d'""7d8P  d88' `88b d88' `888 
+  888      888 888ooo888 888       888ooo888  888   888    888    888      .oP"888   888   888     .d8P'   888ooo888 888   888 
+  888     d88' 888    .o 888   .o8 888    .o  888   888    888 .  888     d8(  888   888   888   .d8P'  .P 888    .o 888   888 
+ o888bood8P'   `Y8bod8P' `Y8bod8P' `Y8bod8P' o888o o888o   "888" d888b    `Y888""8o o888o o888o d8888888P  `Y8bod8P' `Y8bod88P"
+
+                                                                                                                                                                                     
+oooooooooooo                     oooo                        o8o                      oooo    
+`888'     `8                     `888                        `"'                      `888    
+ 888          .ooooo.   .ooooo.   888   .ooooo.   .oooooooo oooo   .ooooo.   .oooo.    888    
+ 888oooo8    d88' `"Y8 d88' `88b  888  d88' `88b 888' `88b  `888  d88' `"Y8 `P  )88b   888    
+ 888    "    888       888   888  888  888   888 888   888   888  888        .oP"888   888    
+ 888       o 888   .o8 888   888  888  888   888 `88bod8P'   888  888   .o8 d8(  888   888    
+o888ooooood8 `Y8bod8P' `Y8bod8P' o888o `Y8bod8P' `8oooooo.  o888o `Y8bod8P' `Y888""8o o888o   
+                                                 d"     YD                                    
+                                                 "Y88888P'                                    
+
+ oooooooooooo                                                                           
+ `888'     `8                                                                           
+  888          .ooooo.   .ooooo.  ooo. .oo.    .ooooo.  ooo. .oo.  .oo.   oooo    ooo   
+  888oooo8    d88' `"Y8 d88' `88b `888P"Y88b  d88' `88b `888P"Y88bP"Y88b   `88.  .8'    
+  888    "    888       888   888  888   888  888   888  888   888   888    `88..8'     
+  888       o 888   .o8 888   888  888   888  888   888  888   888   888     `888'      
+ o888ooooood8 `Y8bod8P' `Y8bod8P' o888o o888o `Y8bod8P' o888o o888o o888o     .8'       
+                                                                          .o..P'        
+                                                                          `Y8P'         
+
+ooooooooo.   oooo                .    .o88o.                                                                                                                                          
+`888   `Y88. `888              .o8    888 `"                                                                                                                                          
+ 888   .d88'  888   .oooo.   .o888oo o888oo   .ooooo.  oooo d8b ooo. .oo.  .oo.                                                                                                       
+ 888ooo88P'   888  `P  )88b    888    888    d88' `88b `888""8P `888P"Y88bP"Y88b                                                                                                      
+ 888          888   .oP"888    888    888    888   888  888      888   888   888                                                                                                      
+ 888          888  d8(  888    888 .  888    888   888  888      888   888   888                                                                                                      
+o888o        o888o `Y888""8o   "888" o888o   `Y8bod8P' d888b    o888o o888o o888o                  
+                               
+     
+
+
+[2020-01-28 05:27:04.3450 3] INFO: Xels.Bitcoin.FullNode.Initialize Full node initialized on XelsRegTest.
+[2020-01-28 05:30:21.9160 58] FATAL: Xels.Bitcoin.Builder.FullNodeBuilder.BuildServices Feature FeatureA cannot be configured because it depends on other features that were not registered
+[2020-01-28 05:30:25.5237 58] INFO: Xels.Bitcoin.FullNode.Initialize 
+
+                 
+ooooooo  ooooo oooooooooooo ooooo         .oooooo..o   
+ `8888    d8'  `888'     `8 `888'        d8P'    `Y8   
+   Y888..8P     888          888         Y88bo.        
+    `8888'      888oooo8     888          `"Y8888o.    
+   .8PY888.     888    "     888              `"Y88b   
+  d8'  `888b    888       o  888       o oo     .d8P   
+o888o  o88888o o888ooooood8 o888ooooood8 8""88888P'    
+                                                                                                                                                                                      
+
+ oooooooooo.                                                 .                      oooo   o8o                             .o8 
+ `888'   `Y8b                                              .o8                      `888   `"'                            "888 
+  888      888  .ooooo.   .ooooo.   .ooooo.  ooo. .oo.   .o888oo oooo d8b  .oooo.    888  oooo    oooooooo  .ooooo.   .oooo888 
+  888      888 d88' `88b d88' `"Y8 d88' `88b `888P"Y88b    888   `888""8P `P  )88b   888  `888   d'""7d8P  d88' `88b d88' `888 
+  888      888 888ooo888 888       888ooo888  888   888    888    888      .oP"888   888   888     .d8P'   888ooo888 888   888 
+  888     d88' 888    .o 888   .o8 888    .o  888   888    888 .  888     d8(  888   888   888   .d8P'  .P 888    .o 888   888 
+ o888bood8P'   `Y8bod8P' `Y8bod8P' `Y8bod8P' o888o o888o   "888" d888b    `Y888""8o o888o o888o d8888888P  `Y8bod8P' `Y8bod88P"
+
+                                                                                                                                                                                     
+oooooooooooo                     oooo                        o8o                      oooo    
+`888'     `8                     `888                        `"'                      `888    
+ 888          .ooooo.   .ooooo.   888   .ooooo.   .oooooooo oooo   .ooooo.   .oooo.    888    
+ 888oooo8    d88' `"Y8 d88' `88b  888  d88' `88b 888' `88b  `888  d88' `"Y8 `P  )88b   888    
+ 888    "    888       888   888  888  888   888 888   888   888  888        .oP"888   888    
+ 888       o 888   .o8 888   888  888  888   888 `88bod8P'   888  888   .o8 d8(  888   888    
+o888ooooood8 `Y8bod8P' `Y8bod8P' o888o `Y8bod8P' `8oooooo.  o888o `Y8bod8P' `Y888""8o o888o   
+                                                 d"     YD                                    
+                                                 "Y88888P'                                    
+
+ oooooooooooo                                                                           
+ `888'     `8                                                                           
+  888          .ooooo.   .ooooo.  ooo. .oo.    .ooooo.  ooo. .oo.  .oo.   oooo    ooo   
+  888oooo8    d88' `"Y8 d88' `88b `888P"Y88b  d88' `88b `888P"Y88bP"Y88b   `88.  .8'    
+  888    "    888       888   888  888   888  888   888  888   888   888    `88..8'     
+  888       o 888   .o8 888   888  888   888  888   888  888   888   888     `888'      
+ o888ooooood8 `Y8bod8P' `Y8bod8P' o888o o888o `Y8bod8P' o888o o888o o888o     .8'       
+                                                                          .o..P'        
+                                                                          `Y8P'         
+
+ooooooooo.   oooo                .    .o88o.                                                                                                                                          
+`888   `Y88. `888              .o8    888 `"                                                                                                                                          
+ 888   .d88'  888   .oooo.   .o888oo o888oo   .ooooo.  oooo d8b ooo. .oo.  .oo.                                                                                                       
+ 888ooo88P'   888  `P  )88b    888    888    d88' `88b `888""8P `888P"Y88bP"Y88b                                                                                                      
+ 888          888   .oP"888    888    888    888   888  888      888   888   888                                                                                                      
+ 888          888  d8(  888    888 .  888    888   888  888      888   888   888                                                                                                      
+o888o        o888o `Y888""8o   "888" o888o   `Y8bod8P' d888b    o888o o888o o888o                  
+                               
+     
+
+
+[2020-01-28 05:30:27.0716 58] INFO: Xels.Bitcoin.FullNode.Initialize Full node initialized on XelsRegTest.
+[2020-01-28 05:30:53.6547 58] ERROR: Xels.Bitcoin.Consensus.ConsensusManager+<BlockMinedAsync>d__48.MoveNext Miner produced an invalid block, partial validation failed: bad block signature
+[2020-01-28 05:31:09.6917 58] ERROR: Xels.Bitcoin.Consensus.ConsensusManager.BlockDownloaded Unsolicited block '00000000000000000000000000000000000000000000000000000006f26a8aad'.
+[2020-01-28 05:31:11.7929 58] ERROR: Xels.Bitcoin.Consensus.ConsensusManager.BlockDownloaded Unsolicited block 'e471ad2a366288694bde436a05a0167261f08315fc3a8b0dc5a6b7e588e00801'.

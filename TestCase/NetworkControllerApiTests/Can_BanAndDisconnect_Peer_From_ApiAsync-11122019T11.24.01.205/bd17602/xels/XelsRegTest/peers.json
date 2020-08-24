@@ -1,0 +1,1 @@
+[{"loopback":"::ffff:127.0.0.1","endpoint":"::ffff:127.0.0.2|12545","connectionAttempts":0,"bantimestamp":"2019-12-11T11:24:14.504865Z","banuntil":"2019-12-11T11:25:54.5048651Z","banreason":"Banned via the API."},{"loopback":"::ffff:127.0.0.1","endpoint":"::ffff:127.0.0.1|12973","connectionAttempts":0}]

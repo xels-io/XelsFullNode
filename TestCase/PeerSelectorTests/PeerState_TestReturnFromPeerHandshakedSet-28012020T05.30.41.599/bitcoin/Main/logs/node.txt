@@ -1,0 +1,3 @@
+[2020-01-28 05:30:53.6547 58] ERROR: Xels.Bitcoin.Consensus.ConsensusManager+<BlockMinedAsync>d__48.MoveNext Miner produced an invalid block, partial validation failed: bad block signature
+[2020-01-28 05:31:09.6917 58] ERROR: Xels.Bitcoin.Consensus.ConsensusManager.BlockDownloaded Unsolicited block '00000000000000000000000000000000000000000000000000000006f26a8aad'.
+[2020-01-28 05:31:11.7929 58] ERROR: Xels.Bitcoin.Consensus.ConsensusManager.BlockDownloaded Unsolicited block 'e471ad2a366288694bde436a05a0167261f08315fc3a8b0dc5a6b7e588e00801'.
