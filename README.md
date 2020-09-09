@@ -85,7 +85,7 @@ Unit test preparations
 2. Create an interface for each class. This helps out a lot with testability. These can be inside the same file as the initial class or in a separate file in the same folder.
 3. Try to use dependencies by their interface instead of by their concrete type as much as possible.
 4. Move dependencies to the constructor so they can be moved into the dependency injection(DI) framework later. Again try to use their interface and not their concrete type.
-   For backward compatibility an overload can be created until the DI registration is done.
+   For backward compatibility, an overload can be created until the DI registration is done.
   
   ```csharp
   public RepositoryUser()
