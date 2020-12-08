@@ -1,7 +1,8 @@
-﻿using NBitcoin;
-using Xels.Bitcoin.Consensus;
+﻿using Microsoft.Extensions.Logging;
+using NBitcoin;
 using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
+using Xels.Bitcoin.Features.SmartContracts.Caching;
 using Xels.Bitcoin.Features.SmartContracts.Rules;
 using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.Core;
@@ -15,8 +16,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoW.Rules
     {
         public SmartContractPowCoinviewRule(Network network, IStateRepositoryRoot stateRepositoryRoot,
             IContractExecutorFactory executorFactory, ICallDataSerializer callDataSerializer,
-            ISenderRetriever senderRetriever, IReceiptRepository receiptRepository, ICoinView coinView) 
-            : base(network, stateRepositoryRoot, executorFactory, callDataSerializer, senderRetriever, receiptRepository, coinView)
+            ISenderRetriever senderRetriever, IReceiptRepository receiptRepository, ICoinView coinView, IBlockExecutionResultCache executionCache, ILoggerFactory loggerFactory) 
+            : base(network, stateRepositoryRoot, executorFactory, callDataSerializer, senderRetriever, receiptRepository, coinView, executionCache, loggerFactory)
         {
         }
 

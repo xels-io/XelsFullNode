@@ -9,6 +9,7 @@ using Xels.Bitcoin.Utilities.ModelStateErrors;
 
 namespace Xels.Bitcoin.Features.PoA.Voting
 {
+    [ApiVersion("1")]
     [Route("api/[controller]")]
     public class FederationVotingController : Controller
     {

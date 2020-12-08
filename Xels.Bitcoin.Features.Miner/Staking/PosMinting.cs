@@ -80,7 +80,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
         /// <summary>The maximum allowed size for a serialized block, in bytes (network rule).</summary>
         public const int MaxBlockSize = 1000000;
 
-        ///<summary>The maximum size for mined blocks.</summary>
+        /// <summary>The maximum size for mined blocks.</summary>
         public const int MaxBlockSizeGen = MaxBlockSize / 2;
 
         /// <summary>Builder that creates a proof-of-stake block template.</summary>
@@ -214,12 +214,11 @@ namespace Xels.Bitcoin.Features.Miner.Staking
 
         /// <summary>State of time synchronization feature that stores collected data samples.</summary>
         private readonly ITimeSyncBehaviorState timeSyncBehaviorState;
-        
+
         /// <summary>
         /// Needed for Increament Nonce method of PoW Hybridization with PoS
         /// </summary>
         private uint256 hashPrevBlock;
-
 
         public PosMinting(
             IBlockProvider blockProvider,
@@ -346,7 +345,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             }
 
             this.stakeCancellationTokenSource?.Cancel();
-            this.logger.LogTrace("Disposing staking loop.");
+            this.logger.LogDebug("Disposing staking loop.");
             this.stakingLoop?.Dispose();
             this.stakingLoop = null;
             this.stakeCancellationTokenSource?.Dispose();
@@ -377,7 +376,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                 // Don't stake if the wallet is not up-to-date with the current chain.
                 if (this.consensusManager.Tip.HashBlock != this.walletManager.WalletTipHash)
                 {
-                    this.logger.LogTrace("Waiting for wallet to catch up before mining can be started.");
+                    this.logger.LogDebug("Waiting for wallet to catch up before mining can be started.");
 
                     await Task.Delay(TimeSpan.FromMilliseconds(this.minerSleep), cancellationToken).ConfigureAwait(false);
                     continue;
@@ -386,7 +385,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                 // Prevent staking if in initial block download.
                 if (this.initialBlockDownloadState.IsInitialBlockDownload())
                 {
-                    this.logger.LogTrace("Waiting for synchronization before mining can be started.");
+                    this.logger.LogDebug("Waiting for synchronization before mining can be started.");
 
                     await Task.Delay(TimeSpan.FromMilliseconds(this.minerSleep), cancellationToken).ConfigureAwait(false);
                     continue;
@@ -398,7 +397,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                 {
                     this.lastCoinStakeSearchPrevBlockHash = chainTip.HashBlock;
                     this.lastCoinStakeSearchTime = chainTip.Header.Time;
-                    this.logger.LogTrace("New block '{0}' detected, setting last search time to its timestamp {1}.", chainTip, chainTip.Header.Time);
+                    this.logger.LogDebug("New block '{0}' detected, setting last search time to its timestamp {1}.", chainTip, chainTip.Header.Time);
 
                     // Reset the template as the chain advanced.
                     blockTemplate = null;
@@ -429,15 +428,16 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                     PoWFound = true;
                 }
 
+
                 uint coinstakeTimestamp = (uint)this.dateTimeProvider.GetAdjustedTimeAsUnixTimestamp() & ~PosConsensusOptions.StakeTimestampMask;
                 if (coinstakeTimestamp <= this.lastCoinStakeSearchTime)
                 {
-                    this.logger.LogTrace("Current coinstake time {0} is not greater than last search timestamp {1}.", coinstakeTimestamp, this.lastCoinStakeSearchTime);
+                    this.logger.LogDebug("Current coinstake time {0} is not greater than last search timestamp {1}.", coinstakeTimestamp, this.lastCoinStakeSearchTime);
                     this.logger.LogTrace("(-)[NOTHING_TO_DO]");
                     return;
                 }
 
-                List<UtxoStakeDescription> utxoStakeDescriptions = await this.GetUtxoStakeDescriptionsAsync(walletSecret, cancellationToken).ConfigureAwait(false);
+                List<UtxoStakeDescription> utxoStakeDescriptions = this.GetUtxoStakeDescriptions(walletSecret, cancellationToken);
 
                 blockTemplate = blockTemplate ?? this.blockProvider.BuildPosBlock(chainTip, new Script());
                 var posBlock = (PosBlock)blockTemplate.Block;
@@ -450,20 +450,21 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                 this.rpcGetStakingInfoModel.NetStakeWeight = this.networkWeight;
 
                 // Trying to create coinstake that satisfies the difficulty target, put it into a block and sign the block.
-                if (await this.StakeAndSignBlockAsync(utxoStakeDescriptions, posBlock, chainTip, blockTemplate.TotalFee, coinstakeTimestamp).ConfigureAwait(false))
+                if (await this.StakeAndSignBlockAsync(utxoStakeDescriptions, blockTemplate, chainTip, blockTemplate.TotalFee, coinstakeTimestamp).ConfigureAwait(false))
                 {
-                    this.logger.LogTrace("New POS block created and signed successfully.");
+                    this.logger.LogDebug("New POS block created and signed successfully.");
                     await this.CheckStakeAsync(posBlock, chainTip).ConfigureAwait(false);
 
                     blockTemplate = null;
                 }
                 else
                 {
-                    this.logger.LogTrace("{0} failed to create POS block, waiting {1} ms for next round.", nameof(this.StakeAndSignBlockAsync), this.minerSleep);
+                    this.logger.LogDebug("{0} failed to create POS block, waiting {1} ms for next round.", nameof(this.StakeAndSignBlockAsync), this.minerSleep);
                     await Task.Delay(TimeSpan.FromMilliseconds(this.minerSleep), cancellationToken).ConfigureAwait(false);
                 }
             }
         }
+
         /// <summary>
         /// This method is used in PoW mining loop.
         /// </summary>
@@ -490,9 +491,10 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             return extraNonce;
         }
 
-        internal async Task<List<UtxoStakeDescription>> GetUtxoStakeDescriptionsAsync(WalletSecret walletSecret, CancellationToken cancellationToken)
+        internal List<UtxoStakeDescription> GetUtxoStakeDescriptions(WalletSecret walletSecret, CancellationToken cancellationToken)
         {
             var utxoStakeDescriptions = new List<UtxoStakeDescription>();
+
             List<UnspentOutputReference> stakableUtxos = this.walletManager
                 .GetSpendableTransactionsInWalletForStaking(walletSecret.WalletName, 1)
                 .Where(utxo => utxo.Transaction.Amount >= this.MinimumStakingCoinValue) // exclude dust from stake process
@@ -535,10 +537,10 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                 };
                 utxoStakeDescriptions.Add(utxoStakeDescription);
 
-                this.logger.LogTrace("UTXO '{0}' with value {1} might be available for staking.", utxoStakeDescription.OutPoint, utxo.Value);
+                this.logger.LogDebug("UTXO '{0}' with value {1} might be available for staking.", utxoStakeDescription.OutPoint, utxo.Value);
             }
 
-            this.logger.LogTrace("Wallet total staking balance is {0}.", new Money(utxoStakeDescriptions.Sum(d => d.TxOut.Value)));
+            this.logger.LogDebug("Wallet total staking balance is {0}.", new Money(utxoStakeDescriptions.Sum(d => d.TxOut.Value)));
             return utxoStakeDescriptions;
         }
 
@@ -583,13 +585,15 @@ namespace Xels.Bitcoin.Features.Miner.Staking
         /// to be mined and signes it.
         /// </summary>
         /// <param name="utxoStakeDescriptions">List of UTXOs that are available in the wallet for staking.</param>
-        /// <param name="block">Template of the block that we are trying to mine.</param>
+        /// <param name="blockTemplate">Template of the block that we are trying to mine.</param>
         /// <param name="chainTip">Tip of the best chain.</param>
         /// <param name="fees">Transaction fees from the transactions included in the block if we mine it.</param>
         /// <param name="coinstakeTimestamp">Maximal timestamp of the coinstake transaction. The actual timestamp can be lower, but not higher.</param>
         /// <returns><c>true</c> if the function succeeds, <c>false</c> otherwise.</returns>
-        private async Task<bool> StakeAndSignBlockAsync(List<UtxoStakeDescription> utxoStakeDescriptions, PosBlock block, ChainedHeader chainTip, long fees, uint coinstakeTimestamp)
+        private async Task<bool> StakeAndSignBlockAsync(List<UtxoStakeDescription> utxoStakeDescriptions, BlockTemplate blockTemplate, ChainedHeader chainTip, long fees, uint coinstakeTimestamp)
         {
+            var block = blockTemplate.Block as PosBlock;
+
             // If we are trying to sign something except proof-of-stake block template.
             if (!block.Transactions[0].Outputs[0].IsEmpty)
             {
@@ -604,8 +608,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                 return true;
             }
 
-            var coinstakeContext = new CoinstakeContext();
-            coinstakeContext.CoinstakeTx = this.network.CreateTransaction();
+            var coinstakeContext = new CoinstakeContext { CoinstakeTx = this.network.CreateTransaction() };
             coinstakeContext.CoinstakeTx.Time = coinstakeTimestamp;
 
             // Search to current coinstake time.
@@ -615,27 +618,15 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             this.rpcGetStakingInfoModel.SearchInterval = (int)searchInterval;
 
             this.lastCoinStakeSearchTime = searchTime;
-            this.logger.LogTrace("Search interval set to {0}, last coinstake search timestamp set to {1}.", searchInterval, this.lastCoinStakeSearchTime);
+            this.logger.LogDebug("Search interval set to {0}, last coinstake search timestamp set to {1}.", searchInterval, this.lastCoinStakeSearchTime);
 
-            if (await this.CreateCoinstakeAsync(utxoStakeDescriptions, block, chainTip, searchInterval, fees, coinstakeContext).ConfigureAwait(false))
+            if (await this.CreateCoinstakeAsync(utxoStakeDescriptions, blockTemplate, chainTip, searchInterval, fees, coinstakeContext).ConfigureAwait(false))
             {
                 uint minTimestamp = chainTip.Header.Time + 1;
                 if (coinstakeContext.CoinstakeTx.Time >= minTimestamp)
                 {
-                    // Make sure coinstake would meet timestamp protocol
-                    // as it would be the same as the block timestamp.
+                    // Make sure coinstake would meet timestamp protocol as it would be the same as the block timestamp.
                     block.Transactions[0].Time = block.Header.Time = coinstakeContext.CoinstakeTx.Time;
-
-                    // We have to make sure that we have no future timestamps in
-                    // our transactions set.
-                    for (int i = block.Transactions.Count - 1; i >= 0; i--)
-                    {
-                        if (block.Transactions[i].Time > block.Header.Time)
-                        {
-                            this.logger.LogDebug("Removing transaction with timestamp {0} as it is greater than coinstake transaction timestamp {1}.", block.Transactions[i].Time, block.Header.Time);
-                            block.Transactions.Remove(block.Transactions[i]);
-                        }
-                    }
 
                     block.Transactions.Insert(1, coinstakeContext.CoinstakeTx);
                     block.UpdateMerkleRoot();
@@ -646,15 +637,15 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                     block.BlockSignature = new BlockSignature { Signature = signature.ToDER() };
                     return true;
                 }
-                else this.logger.LogTrace("Coinstake transaction created with too early timestamp {0}, minimal timestamp is {1}.", coinstakeContext.CoinstakeTx.Time, minTimestamp);
+                else this.logger.LogDebug("Coinstake transaction created with too early timestamp {0}, minimal timestamp is {1}.", coinstakeContext.CoinstakeTx.Time, minTimestamp);
             }
-            else this.logger.LogTrace("Unable to create coinstake transaction.");
+            else this.logger.LogDebug("Unable to create coinstake transaction.");
 
             return false;
         }
 
         /// <inheritdoc/>
-        public async Task<bool> CreateCoinstakeAsync(List<UtxoStakeDescription> utxoStakeDescriptions, Block block, ChainedHeader chainTip, long searchInterval, long fees, CoinstakeContext coinstakeContext)
+        public async Task<bool> CreateCoinstakeAsync(List<UtxoStakeDescription> utxoStakeDescriptions, BlockTemplate blockTemplate, ChainedHeader chainTip, long searchInterval, long fees, CoinstakeContext coinstakeContext)
         {
             coinstakeContext.CoinstakeTx.Inputs.Clear();
             coinstakeContext.CoinstakeTx.Outputs.Clear();
@@ -662,12 +653,14 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             // Mark coinstake transaction.
             coinstakeContext.CoinstakeTx.Outputs.Add(new TxOut(Money.Zero, new Script()));
 
-            long balance = (await this.GetMatureBalanceAsync(utxoStakeDescriptions).ConfigureAwait(false)).Satoshi;
+            (Money balance, Money immature) = await this.GetMatureBalanceAsync(utxoStakeDescriptions).ConfigureAwait(false);
+            this.rpcGetStakingInfoModel.Immature = immature.Satoshi;
+
             if (balance <= this.targetReserveBalance)
             {
                 this.rpcGetStakingInfoModel.PauseStaking();
 
-                this.logger.LogTrace("Total balance of available UTXOs is {0}, which is less than or equal to reserve balance {1}.", balance, this.targetReserveBalance);
+                this.logger.LogDebug("Total balance of available UTXOs is {0}, which is less than or equal to reserve balance {1}.", balance, this.targetReserveBalance);
                 this.logger.LogTrace("(-)[BELOW_RESERVE]:false");
                 return false;
             }
@@ -691,7 +684,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             this.rpcGetStakingInfoModel.ResumeStaking(ourWeight, expectedTime);
 
             long minimalAllowedTime = chainTip.Header.Time + 1;
-            this.logger.LogTrace("Trying to find staking solution among {0} transactions, minimal allowed time is {1}, coinstake time is {2}.", stakingUtxoDescriptions.Count, minimalAllowedTime, coinstakeContext.CoinstakeTx.Time);
+            this.logger.LogDebug("Trying to find staking solution among {0} transactions, minimal allowed time is {1}, coinstake time is {2}.", stakingUtxoDescriptions.Count, minimalAllowedTime, coinstakeContext.CoinstakeTx.Time);
 
             // If the time after applying the mask is lower than minimal allowed time,
             // it is simply too early for us to mine, there can't be any valid solution.
@@ -728,7 +721,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
 
             await Task.Run(() => Parallel.ForEach(workerContexts, cwc =>
             {
-                this.CoinstakeWorker(cwc, chainTip, block, minimalAllowedTime, searchInterval);
+                this.CoinstakeWorker(cwc, chainTip, blockTemplate.Block, minimalAllowedTime, searchInterval);
             }));
 
             if (workersResult.KernelFoundIndex == CoinstakeWorkerResult.KernelNotFound)
@@ -737,7 +730,22 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                 return false;
             }
 
-            this.logger.LogTrace("Worker #{0} found the kernel.", workersResult.KernelFoundIndex);
+            this.logger.LogDebug("Worker #{0} found the kernel.", workersResult.KernelFoundIndex);
+
+            // We have to make sure that we have no future timestamps in our transactions set.
+            // We ignore the coinbase (it gets its timestamp reset after the coinstake is created).
+            for (int i = blockTemplate.Block.Transactions.Count - 1; i >= 1; i--)
+            {
+                // We have not yet updated the header timestamp, so we use the coinstake timestamp directly here.
+                if (blockTemplate.Block.Transactions[i].Time <= coinstakeContext.CoinstakeTx.Time)
+                    continue;
+
+                // Update the total fees, with the to-be-removed transaction taken into account.
+                fees -= blockTemplate.FeeDetails[blockTemplate.Block.Transactions[i].GetHash()].Satoshi;
+
+                this.logger.LogDebug("Removing transaction with timestamp {0} as it is greater than coinstake transaction timestamp {1}. New fee amount {2}.", blockTemplate.Block.Transactions[i].Time, coinstakeContext.CoinstakeTx.Time, fees);
+                blockTemplate.Block.Transactions.Remove(blockTemplate.Block.Transactions[i]);
+            }
 
             // Get reward for newly created block.
             long reward = fees + this.consensusManager.ConsensusRules.GetRule<PosCoinviewRule>().GetProofOfStakeReward(chainTip.Height + 1);
@@ -770,7 +778,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             int serializedSize = coinstakeContext.CoinstakeTx.GetSerializedSize(ProtocolVersion.ALT_PROTOCOL_VERSION, SerializationType.Network);
             if (serializedSize >= (MaxBlockSizeGen / 5))
             {
-                this.logger.LogTrace("Coinstake size {0} bytes exceeded limit {1} bytes.", serializedSize, MaxBlockSizeGen / 5);
+                this.logger.LogDebug("Coinstake size {0} bytes exceeded limit {1} bytes.", serializedSize, MaxBlockSizeGen / 5);
                 this.logger.LogTrace("(-)[SIZE_EXCEEDED]:false");
                 return false;
             }
@@ -789,7 +797,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             if (!shouldSplitStake)
             {
                 coinstakeContext.CoinstakeTx.Outputs[lastOutputIndex].Value = coinstakeOutputValue;
-                this.logger.LogTrace("Coinstake output value is {0}.", coinstakeContext.CoinstakeTx.Outputs[lastOutputIndex].Value);
+                this.logger.LogDebug("Coinstake output value is {0}.", coinstakeContext.CoinstakeTx.Outputs[lastOutputIndex].Value);
                 this.logger.LogTrace("(-)[NO_SPLIT]:{0}", coinstakeContext.CoinstakeTx);
                 return coinstakeContext.CoinstakeTx;
             }
@@ -823,7 +831,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
         /// <param name="searchInterval">Length of an unexplored block time space in seconds. It only makes sense to look for a solution within this interval.</param>
         private void CoinstakeWorker(CoinstakeWorkerContext context, ChainedHeader chainTip, Block block, long minimalAllowedTime, long searchInterval)
         {
-            context.Logger.LogTrace("Going to process {0} UTXOs.", context.utxoStakeDescriptions.Count);
+            context.Logger.LogDebug("Going to process {0} UTXOs.", context.utxoStakeDescriptions.Count);
 
             // Sort staking UTXOs by amount, so that highest amounts are tried first
             // because they have greater chance to succeed and thus saving some work.
@@ -832,13 +840,13 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             bool stopWork = false;
             foreach (UtxoStakeDescription utxoStakeInfo in orderedUtxoStakeDescriptions)
             {
-                context.Logger.LogTrace("Trying UTXO from address '{0}', output amount {1}.", utxoStakeInfo.Address.Address, utxoStakeInfo.TxOut.Value);
+                context.Logger.LogDebug("Trying UTXO from address '{0}', output amount {1}.", utxoStakeInfo.Address.Address, utxoStakeInfo.TxOut.Value);
 
                 // Script of the first coinstake input.
                 Script scriptPubKeyKernel = utxoStakeInfo.TxOut.ScriptPubKey;
                 if (!this.ValidStakingTemplates.Any(a => a.Value.CheckScriptPubKey(scriptPubKeyKernel)))
                 {
-                    context.Logger.LogTrace("Kernel type must be {0}, kernel rejected.", string.Join(" or ", this.ValidStakingTemplates.Keys));
+                    context.Logger.LogDebug("Kernel type must be {0}, kernel rejected.", string.Join(" or ", this.ValidStakingTemplates.Keys));
                     continue;
                 }
 
@@ -846,21 +854,21 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                 {
                     if (context.Result.KernelFoundIndex != CoinstakeWorkerResult.KernelNotFound)
                     {
-                        context.Logger.LogTrace("Different worker #{0} already found kernel, stopping work.", context.Result.KernelFoundIndex);
+                        context.Logger.LogDebug("Different worker #{0} already found kernel, stopping work.", context.Result.KernelFoundIndex);
                         stopWork = true;
                         break;
                     }
 
                     if (this.stakeCancellationTokenSource.Token.IsCancellationRequested)
                     {
-                        context.Logger.LogTrace("Application shutdown detected, stopping work.");
+                        context.Logger.LogDebug("Application shutdown detected, stopping work.");
                         stopWork = true;
                         break;
                     }
 
                     if (chainTip != this.chainIndexer.Tip)
                     {
-                        context.Logger.LogTrace("Chain advanced, stopping work.");
+                        context.Logger.LogDebug("Chain advanced, stopping work.");
                         stopWork = true;
                         break;
                     }
@@ -875,7 +883,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                     if ((txTime & PosConsensusOptions.StakeTimestampMask) != 0)
                         continue;
 
-                    context.Logger.LogTrace("Trying with transaction time {0}.", txTime);
+                    context.Logger.LogDebug("Trying with transaction time {0}.", txTime);
 
                     try
                     {
@@ -892,9 +900,9 @@ namespace Xels.Bitcoin.Features.Miner.Staking
 
                         if (context.Result.SetKernelFoundIndex(context.Index))
                         {
-                            context.Logger.LogTrace("Kernel found with solution hash '{0}'.", contextInformation.HashProofOfStake);
+                            context.Logger.LogDebug("Kernel found with solution hash '{0}'.", contextInformation.HashProofOfStake);
 
-                            Wallet.Wallet wallet = this.walletManager.GetWalletByName(utxoStakeInfo.Secret.WalletName);
+                            Wallet.Wallet wallet = this.walletManager.GetWallet(utxoStakeInfo.Secret.WalletName);
                             context.CoinstakeContext.Key = wallet.GetExtendedPrivateKeyForAddress(utxoStakeInfo.Secret.WalletPassword, utxoStakeInfo.Address).PrivateKey;
                             utxoStakeInfo.Key = context.CoinstakeContext.Key;
 
@@ -922,15 +930,15 @@ namespace Xels.Bitcoin.Features.Miner.Staking
                             context.CoinstakeContext.CoinstakeTx.Outputs.Add(new TxOut(0, scriptPubKeyOut));
                             context.Result.KernelCoin = utxoStakeInfo;
 
-                            context.Logger.LogTrace("Kernel accepted, coinstake input is '{0}', stopping work.", prevoutStake);
+                            context.Logger.LogDebug("Kernel accepted, coinstake input is '{0}', stopping work.", prevoutStake);
                         }
-                        else context.Logger.LogTrace("Kernel found, but worker #{0} announced its kernel earlier, stopping work.", context.Result.KernelFoundIndex);
+                        else context.Logger.LogDebug("Kernel found, but worker #{0} announced its kernel earlier, stopping work.", context.Result.KernelFoundIndex);
 
                         stopWork = true;
                     }
                     catch (ConsensusErrorException cex)
                     {
-                        context.Logger.LogTrace("Checking kernel failed with exception: {0}.", cex.Message);
+                        context.Logger.LogDebug("Checking kernel failed with exception: {0}.", cex.Message);
                         stopWork = true;
                     }
 
@@ -973,19 +981,24 @@ namespace Xels.Bitcoin.Features.Miner.Staking
         }
 
         /// <inheritdoc/>
-        public async Task<Money> GetMatureBalanceAsync(List<UtxoStakeDescription> utxoStakeDescriptions)
+        public async Task<(Money balance, Money immature)> GetMatureBalanceAsync(List<UtxoStakeDescription> utxoStakeDescriptions)
         {
             var money = new Money(0);
+            var immature = new Money(0);
+
             foreach (UtxoStakeDescription utxoStakeDescription in utxoStakeDescriptions)
             {
                 // Must wait until coinbase is safely deep enough in the chain before valuing it.
                 if ((utxoStakeDescription.UtxoSet.IsCoinbase || utxoStakeDescription.UtxoSet.IsCoinstake) && (await this.GetBlocksCountToMaturityAsync(utxoStakeDescription).ConfigureAwait(false) > 0))
+                {
+                    immature += utxoStakeDescription.TxOut.Value;
                     continue;
+                }
 
                 money += utxoStakeDescription.TxOut.Value;
             }
 
-            return money;
+            return (money, immature);
         }
 
         /// <summary>
@@ -1005,40 +1018,50 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             var res = new List<UtxoStakeDescription>();
 
             long currentValue = 0;
+            // Add 1 to chainTip because this is being called in the context of trying to create a new block, which will have height (chainTip + 1).
+            // Subtract 1 from the required depth, because if a UTXO is in a block with height == requiredDepth it already has 1 confirmation.
+            // e.g. consider a hypothetical chain with the coinstake age requirement = 5, a prospective UTXO at height 3 and a chainTip of 10.
+            // Taking (chainTip + 1) into account, the UTXO has ((10 + 1) - 3 + 1) = 9 confirmations, meaning it easily has sufficient depth.
+            // Now consider a different UTXO at height 7. This has (10 + 1) - 7 + 1) = 5 confirmations, meaning it just barely qualifies.
             long requiredDepth = ((PosConsensusOptions)this.network.Consensus.Options).GetStakeMinConfirmations(chainTip.Height + 1, this.network) - 1;
             foreach (UtxoStakeDescription utxoStakeDescription in utxoStakeDescriptions.OrderByDescending(x => x.TxOut.Value))
             {
+                // Internally GetDepthInMainChainAsync uses chainTip instead of (chainTip + 1). That is why there is a later comparison to
+                // (depth < requiredDepth) instead of (depth <= requiredDepth).
                 int depth = await this.GetDepthInMainChainAsync(utxoStakeDescription).ConfigureAwait(false);
-                this.logger.LogTrace("Checking if UTXO '{0}' value {1} can be added, its depth is {2}.", utxoStakeDescription.OutPoint, utxoStakeDescription.TxOut.Value, depth);
+                this.logger.LogDebug("Checking if UTXO '{0}' value {1} can be added, its depth is {2}.", utxoStakeDescription.OutPoint, utxoStakeDescription.TxOut.Value, depth);
 
                 if (depth < 1)
                 {
-                    this.logger.LogTrace("UTXO '{0}' is new or reorg happened.", utxoStakeDescription.OutPoint);
+                    this.logger.LogDebug("UTXO '{0}' is new or reorg happened.", utxoStakeDescription.OutPoint);
                     continue;
                 }
 
                 if (depth < requiredDepth)
                 {
-                    this.logger.LogTrace("UTXO '{0}' depth {1} is lower than required minimum depth {2}.", utxoStakeDescription.OutPoint, depth, requiredDepth);
+                    this.logger.LogDebug("UTXO '{0}' depth {1} is lower than required minimum depth {2}.", utxoStakeDescription.OutPoint, depth, requiredDepth); this.logger.LogDebug("UTXO '{0}' depth {1} is lower than required minimum depth {2}.", utxoStakeDescription.OutPoint, depth, requiredDepth);
                     continue;
                 }
 
                 if (utxoStakeDescription.UtxoSet.Time > spendTime)
                 {
-                    this.logger.LogTrace("UTXO '{0}' can't be added because its time {1} is greater than coinstake time {2}.", utxoStakeDescription.OutPoint, utxoStakeDescription.UtxoSet.Time, spendTime);
+                    this.logger.LogDebug("UTXO '{0}' can't be added because its time {1} is greater than coinstake time {2}.", utxoStakeDescription.OutPoint, utxoStakeDescription.UtxoSet.Time, spendTime);
                     continue;
                 }
 
+                // Under normal circumstances this maturity check will not trigger, as the requiredDepth calculation will have already filtered out
+                // a coinbase/coinstake with insufficient confirmations. However, see the comments within the GetBlocksCountToMaturityAsync method
+                // for the rationale of why we perform this check anyway.
                 int toMaturity = await this.GetBlocksCountToMaturityAsync(utxoStakeDescription).ConfigureAwait(false);
                 if (toMaturity > 0)
                 {
-                    this.logger.LogTrace("UTXO '{0}' can't be added because it is not mature, {1} blocks to maturity left.", utxoStakeDescription.OutPoint, toMaturity);
+                    this.logger.LogDebug("UTXO '{0}' can't be added because it is not mature, {1} blocks to maturity left.", utxoStakeDescription.OutPoint, toMaturity);
                     continue;
                 }
 
                 currentValue += utxoStakeDescription.TxOut.Value;
 
-                this.logger.LogTrace("UTXO '{0}' accepted.", utxoStakeDescription.OutPoint);
+                this.logger.LogDebug("UTXO '{0}' accepted.", utxoStakeDescription.OutPoint);
                 res.Add(utxoStakeDescription);
 
                 if (currentValue >= targetValue)
@@ -1049,16 +1072,27 @@ namespace Xels.Bitcoin.Features.Miner.Staking
         }
 
         /// <summary>
-        /// Calculates blocks count till UTXO is considered mature for staking.
+        /// Calculates the number of blocks until a coinbase or coinstake UTXO is considered mature for staking.
         /// </summary>
         /// <param name="utxoStakeDescription">The UTXO stake description.</param>
         /// <returns>How many blocks are left till UTXO is considered mature for staking.</returns>
+        /// <remarks>Do NOT use this for general-purpose maturity calculations outside of <see cref="PosMinting"/> as it will give off-by-one errors.
+        /// This method is making the assumption that we are adding a new block to the chain, and thus reduces the maturity threshold by 1.</remarks>
         private async Task<int> GetBlocksCountToMaturityAsync(UtxoStakeDescription utxoStakeDescription)
         {
+            // The concept of maturity only applies to coinbase and coinstake outputs, so normal outputs do not have this restriction.
             if (!(utxoStakeDescription.UtxoSet.IsCoinbase || utxoStakeDescription.UtxoSet.IsCoinstake))
                 return 0;
 
-            return Math.Max(0, (int)this.network.Consensus.CoinbaseMaturity + 1 - await this.GetDepthInMainChainAsync(utxoStakeDescription).ConfigureAwait(false));
+            // Using CoinbaseMaturity here is not strictly correct. Due to the ProvenHeaderCoinstakeRule enforcing a unilateral prevOut depth equivalent
+            // to maxReorg, a mature UTXO is not necessarily old enough for staking. However, the minter also separately filters out UTXOs younger than
+            // the minimum required depth in the GetUtxoStakeDescriptionsSuitableForStakingAsync method. So this method retains the CoinbaseMaturity
+            // constant so that it returns an intuitive result, in case there are alternate network definitions where the coinstake age requirement is
+            // less than the maturity.
+            int minConf = (int)this.network.Consensus.CoinbaseMaturity;
+
+            // The reason why we subtract 1 here is because any newly staked block will be at (chainTip + 1), effectively giving an extra confirmation over and above the depth calculation.
+            return Math.Max(0, minConf - 1 - await this.GetDepthInMainChainAsync(utxoStakeDescription).ConfigureAwait(false));
         }
 
         /// <summary>
@@ -1077,6 +1111,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             if (chainedBlock == null)
                 return await this.mempoolLock.ReadAsync(() => this.mempool.Exists(utxoStakeDescription.UtxoSet.TransactionId) ? 0 : -1).ConfigureAwait(false);
 
+            // Add 1 because a transaction is considered to have 1 confirmation when it is in a block.
             return this.chainIndexer.Tip.Height - chainedBlock.Height + 1;
         }
 
@@ -1193,7 +1228,7 @@ namespace Xels.Bitcoin.Features.Miner.Staking
             long coinAgeLimit = ((PosConsensusOptions)this.network.Consensus.Options).GetStakeMinConfirmations(chainHeight + 1, this.network);
             long coinMaturityLimit = this.network.Consensus.CoinbaseMaturity;
             long requiredCoinAgeForStaking = Math.Max(coinMaturityLimit, coinAgeLimit);
-            this.logger.LogTrace("Required coin age for staking is {0}.", requiredCoinAgeForStaking);
+            this.logger.LogDebug("Required coin age for staking is {0}.", requiredCoinAgeForStaking);
 
             long targetCoinDistributionSize = (requiredCoinAgeForStaking + 1) * CoinstakeSplitLimitMultiplier;
 

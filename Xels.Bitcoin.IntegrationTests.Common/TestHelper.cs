@@ -10,6 +10,8 @@ using Xels.Bitcoin.Features.BlockStore;
 using Xels.Bitcoin.Features.Miner;
 using Xels.Bitcoin.Features.Miner.Interfaces;
 using Xels.Bitcoin.Features.Wallet;
+using Xels.Bitcoin.Features.Wallet.Controllers;
+using Xels.Bitcoin.Features.Wallet.Models;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.IntegrationTests.Common.Runners;
 using Xels.Bitcoin.P2P.Peer;
@@ -131,7 +133,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common
         /// <returns>Returns <c>true</c> if the node is synced at a given height.</returns>
         public static bool IsNodeSyncedAtHeight(CoreNode node, int height)
         {
-            TestBase.WaitLoop(() => node.FullNode.ConsensusManager().Tip.Height == height);
+            TestBase.WaitLoopMessage(() => { return (node.FullNode.ConsensusManager().Tip.Height == height, $"Node height: {node.FullNode.ConsensusManager().Tip.Height}; Expected height: {height}"); });
             return true;
         }
 
@@ -195,19 +197,21 @@ namespace Xels.Bitcoin.IntegrationTests.Common
         {
             if (coreNode.MinerSecret == null)
             {
+                Wallet wallet = coreNode.FullNode.WalletManager().GetWallet(walletName);
+                HdAccount account = wallet.GetAccount(accountName);
+
                 HdAddress address;
                 if (!string.IsNullOrEmpty(miningAddress))
                 {
-                    address = coreNode.FullNode.WalletManager().GetAccounts(walletName).Single(a => a.Name == accountName).GetCombinedAddresses().Single(add => add.Address == miningAddress);
+                    address = account.ExternalAddresses.Concat(account.InternalAddresses).Single(add => add.Address == miningAddress);
                 }
                 else
                 {
-                    address = coreNode.FullNode.WalletManager().GetUnusedAddress(new WalletAccountReference(walletName, accountName));
+                    address = account.GetFirstUnusedReceivingAddress();
                 }
 
                 coreNode.MinerHDAddress = address;
 
-                Wallet wallet = coreNode.FullNode.WalletManager().GetWalletByName(walletName);
                 Key extendedPrivateKey = wallet.GetExtendedPrivateKeyForAddress(walletPassword, address).PrivateKey;
                 coreNode.SetMinerSecret(new BitcoinSecret(extendedPrivateKey, coreNode.FullNode.Network));
             }
@@ -490,5 +494,43 @@ namespace Xels.Bitcoin.IntegrationTests.Common
         /// A helper that constructs valid and various types of invalid blocks manually.
         /// </summary>
         public static BlockBuilder BuildBlocks { get { return new BlockBuilder(); } }
+
+        private const string Password = "password";
+        private const string Name = "mywallet";
+        private const string AccountName = "account 0";
+
+        public static bool CheckWalletBalance(CoreNode node, Money amount)
+        {
+            var total = node.FullNode.WalletManager().GetSpendableTransactionsInWallet(Name).Sum(s => s.Transaction.Amount);
+            return total == amount;
+        }
+
+        public static void SendCoins(CoreNode sender, CoreNode receiver, Money amount, int? confirmations = null)
+        {
+            var receivingAddress = receiver.FullNode.WalletManager().GetUnusedAddress(new WalletAccountReference(Name, AccountName));
+
+            var context = CreateContext(sender.FullNode.Network, new WalletAccountReference(Name, AccountName), Password, receivingAddress.ScriptPubKey, amount, FeeType.Medium, (int)sender.FullNode.Network.Consensus.CoinbaseMaturity);
+
+            var transaction = sender.FullNode.WalletTransactionHandler().BuildTransaction(context);
+
+            sender.FullNode.NodeController<WalletController>().SendTransaction(new SendTransactionRequest(transaction.ToHex()));
+
+            TestBase.WaitLoop(() => receiver.CreateRPCClient().GetRawMempool().Length > 0);
+            TestBase.WaitLoop(() => receiver.FullNode.WalletManager().GetSpendableTransactionsInWallet(Name).Any());
+
+            TestBase.WaitLoop(() => CheckWalletBalance(receiver, amount));
+        }
+
+        private static TransactionBuildContext CreateContext(Network network, WalletAccountReference accountReference, string password, Script destinationScript, Money amount, FeeType feeType, int minConfirmations)
+        {
+            return new TransactionBuildContext(network)
+            {
+                AccountReference = accountReference,
+                MinConfirmations = minConfirmations,
+                FeeType = feeType,
+                WalletPassword = password,
+                Recipients = new[] { new Recipient { Amount = amount, ScriptPubKey = destinationScript } }.ToList()
+            };
+        }
     }
 }

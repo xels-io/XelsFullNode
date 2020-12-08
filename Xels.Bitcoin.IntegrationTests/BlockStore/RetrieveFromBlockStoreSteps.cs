@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using NBitcoin;
 using Xels.Bitcoin.Features.Wallet;
@@ -100,7 +101,7 @@ namespace Xels.Bitcoin.IntegrationTests.BlockStore
             TestHelper.WaitForNodeToSync(this.node, this.transactionNode);
         }
 
-        private void a_real_transaction()
+        private async Task a_real_transaction()
         {
             var transactionBuildContext = new TransactionBuildContext(this.node.FullNode.Network)
             {
@@ -112,7 +113,7 @@ namespace Xels.Bitcoin.IntegrationTests.BlockStore
 
             this.transaction = this.node.FullNode.WalletTransactionHandler().BuildTransaction(transactionBuildContext);
 
-            this.node.FullNode.NodeService<WalletController>()
+            await this.node.FullNode.NodeController<WalletController>()
                 .SendTransaction(new SendTransactionRequest(this.transaction.ToHex()));
         }
 

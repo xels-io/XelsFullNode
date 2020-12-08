@@ -4,13 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Xels.Bitcoin.AsyncWork;
-using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Interfaces;
-using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.Utilities;
 using Xels.Features.FederatedPeg.InputConsolidation;
 using Xels.Features.FederatedPeg.Interfaces;
-using Xels.Features.FederatedPeg.NetworkHelpers;
 using Xels.Features.FederatedPeg.Payloads;
 
 namespace Xels.Features.FederatedPeg.TargetChain
@@ -80,7 +77,7 @@ namespace Xels.Features.FederatedPeg.TargetChain
 
         public async Task BroadcastPartialTransactionsAsync() {
             if (this.ibdState.IsInitialBlockDownload() || !this.federationWalletManager.IsFederationWalletActive()) {
-                this.logger.LogTrace("Federation wallet isn't active or in IBD. Not attempting to request transaction signatures.");
+                this.logger.LogDebug("Federation wallet isn't active or in IBD. Not attempting to request transaction signatures.");
                 return;
             }
 

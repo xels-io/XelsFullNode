@@ -1,7 +1,7 @@
 {
   "profiles": {
     "Xels.XelsD": {
-      "commandName": "Project",
+      "commandName": "Project"
     },
     "Xels.XelsD Test": {
       "commandName": "Project",

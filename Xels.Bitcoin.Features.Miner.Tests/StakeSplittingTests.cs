@@ -35,21 +35,21 @@ namespace Xels.Bitcoin.Features.Miner.Tests
             shouldStakeSplitForThe100000Coin.Should().BeTrue("coin is bigger than target average value");
         }
 
-        //[Fact]
-        //public void Given_A_Wallet_With_A_Few_Balanced_Coins_Then_Big_Coins_Below_Target_Should_Get_Split()
-        //{
-        //    var amounts = Enumerable.Repeat(900, 40)
-        //        .Select(a => new Money(a, MoneyUnit.BTC))
-        //        .ToArray();
+        [Fact]
+        public void Given_A_Wallet_With_A_Few_Balanced_Coins_Then_Big_Coins_Below_Target_Should_Get_Split()
+        {
+            var amounts = Enumerable.Repeat(900, 40)
+                .Select(a => new Money(a, MoneyUnit.BTC))
+                .ToArray();
 
-        //    var shouldStakeSplit = this.posMinting.ShouldSplitStake(
-        //        stakedUtxosCount: amounts.Length,
-        //        amountStaked: amounts.Sum(u => u.Satoshi),
-        //        coinValue: amounts.Last(),
-        //        chainHeight: ChainHeight);
+            var shouldStakeSplit = this.posMinting.ShouldSplitStake(
+                stakedUtxosCount: amounts.Length,
+                amountStaked: amounts.Sum(u => u.Satoshi),
+                coinValue: amounts.Last(),
+                chainHeight: ChainHeight);
 
-        //    shouldStakeSplit.Should().BeTrue("coin is bigger than target average value");
-        //}
+            shouldStakeSplit.Should().BeTrue("coin is bigger than target average value");
+        }
 
         [Fact]
         public void Given_A_Wallet_With_Big_And_Small_Coins_Then_Coins_Below_Target_Should_Get_Split()
@@ -142,42 +142,42 @@ namespace Xels.Bitcoin.Features.Miner.Tests
             return (coinstakeInputValue, transaction);
         }
 
-        //[Fact]
-        //public void Given_A_Wallet_With_Big_Coins_Then_Splitting_Should_End_When_Target_Reached()
-        //{
-        //    var amounts = Enumerable.Repeat(100_000, 3)
-        //        .Select(a => new Money(a, MoneyUnit.BTC))
-        //        .ToList();
-        //    var chainHeight = ChainHeight;
+        [Fact]
+        public void Given_A_Wallet_With_Big_Coins_Then_Splitting_Should_End_When_Target_Reached()
+        {
+            var amounts = Enumerable.Repeat(100_000, 3)
+                .Select(a => new Money(a, MoneyUnit.BTC))
+                .ToList();
+            var chainHeight = ChainHeight;
 
-        //    //only a rough calculation to prevent infinite loop later in the test
-        //    var targetSplitCoinValue = amounts.Sum(u => u.Satoshi) / (500 + 1) * 3;
-        //    var maxIterations = Math.Ceiling((Math.Log(amounts.Last().Satoshi, PosMinting.SplitFactor) 
-        //                               - Math.Log(targetSplitCoinValue, PosMinting.SplitFactor))) + 1;
+            //only a rough calculation to prevent infinite loop later in the test
+            var targetSplitCoinValue = amounts.Sum(u => u.Satoshi) / (500 + 1) * 3;
+            var maxIterations = Math.Ceiling((Math.Log(amounts.Last().Satoshi, PosMinting.SplitFactor) 
+                                       - Math.Log(targetSplitCoinValue, PosMinting.SplitFactor))) + 1;
 
-        //    var iterations = 0;
-        //    while (this.posMinting.ShouldSplitStake(
-        //        stakedUtxosCount: amounts.Count,
-        //        amountStaked: amounts.Sum(u => u.Satoshi),
-        //        coinValue: amounts.Last(),
-        //        chainHeight: ChainHeight) && iterations < maxIterations)
-        //    {
-        //        iterations++;
-        //        chainHeight++;
+            var iterations = 0;
+            while (this.posMinting.ShouldSplitStake(
+                stakedUtxosCount: amounts.Count,
+                amountStaked: amounts.Sum(u => u.Satoshi),
+                coinValue: amounts.Last(),
+                chainHeight: ChainHeight) && iterations < maxIterations)
+            {
+                iterations++;
+                chainHeight++;
 
-        //        var transaction = GetCoinstakeTransaction(amounts);
+                var transaction = GetCoinstakeTransaction(amounts);
 
-        //        //replace coins in 'amounts' with the new split ones
-        //        amounts.RemoveAt(amounts.Count - 1);
-        //        amounts.AddRange(transaction.Outputs
-        //            .Select(a => a.Value).Where(a => a > 0).ToList());
-        //    }
+                //replace coins in 'amounts' with the new split ones
+                amounts.RemoveAt(amounts.Count - 1);
+                amounts.AddRange(transaction.Outputs
+                    .Select(a => a.Value).Where(a => a > 0).ToList());
+            }
 
-        //    iterations.Should().BeLessThan((int)maxIterations, "the loop should end when we don't need to split anymore");
-        //    amounts.Reverse();
-        //    amounts.Take(PosMinting.SplitFactor).All(a => a.Satoshi < targetSplitCoinValue)
-        //        .Should().BeTrue();
-        //}
+            iterations.Should().BeLessThan((int)maxIterations, "the loop should end when we don't need to split anymore");
+            amounts.Reverse();
+            amounts.Take(PosMinting.SplitFactor).All(a => a.Satoshi < targetSplitCoinValue)
+                .Should().BeTrue();
+        }
 
         private Transaction GetCoinstakeTransaction(List<Money> amounts)
         {

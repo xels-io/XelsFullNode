@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Xels.Bitcoin.Configuration;
+﻿using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Features.RPC.Controllers;
 using Xels.Bitcoin.Features.RPC.Models;
+using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.Interfaces;
 using Xunit;
 
@@ -14,7 +14,7 @@ namespace Xels.Bitcoin.IntegrationTests.RPC
         {
             string dir = CreateTestDir(this);
             IFullNode fullNode = this.BuildServicedNode(dir);
-            var controller = fullNode.Services.ServiceProvider.GetService<FullNodeController>();
+            var controller = fullNode.NodeController<FullNodeController>();
 
             Assert.NotNull(fullNode.NodeService<INetworkDifficulty>(true));
 

@@ -38,5 +38,8 @@ namespace Xels.Bitcoin.IntegrationTests.Common.ReadyData
         public static string BitcoinRegTest150Miner = @"ReadyData/RegTest150Miner.zip";
         public static string BitcoinRegTest150Listener = @"ReadyData/RegTest150Listener.zip";
         public static string BitcoinRegTest150NoWallet = @"ReadyData/RegTest150NoWallet.zip";
+
+        public static string XelsXMainnet15K = @"ReadyData/XelsXOver15K.zip";
+        public static string XelsMainnet9500 = @"ReadyData/XelsMain9500.zip";
     }
 }

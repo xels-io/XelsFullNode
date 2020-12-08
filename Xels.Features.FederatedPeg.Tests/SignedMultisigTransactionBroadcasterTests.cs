@@ -8,6 +8,7 @@ using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.MemoryPool.Fee;
+using Xels.Bitcoin.Features.MemoryPool.Interfaces;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Signals;
@@ -98,85 +99,85 @@ namespace Xels.Features.FederatedPeg.Tests
                 this.nodeSettings.Network);
         }
 
-        //[Fact]
-        //public async Task Call_GetSignedTransactionsAsync_Signed_Transactions_Broadcasts()
-        //{
-        //    this.federatedPegSettings.PublicKey.Returns(PublicKey);
+        [Fact]
+        public async Task Call_GetSignedTransactionsAsync_Signed_Transactions_Broadcasts()
+        {
+            this.federatedPegSettings.PublicKey.Returns(PublicKey);
 
-        //    using (var signedMultisigTransactionBroadcaster = new SignedMultisigTransactionBroadcaster(
-        //       this.loggerFactory,
-        //       this.mempoolManager,
-        //       this.broadcasterManager,
-        //       this.ibdState,
-        //       this.federationWalletManager,
-        //       this.signals))
-        //    {
-        //        signedMultisigTransactionBroadcaster.Start();
+            using (var signedMultisigTransactionBroadcaster = new SignedMultisigTransactionBroadcaster(
+               this.loggerFactory,
+               this.mempoolManager,
+               this.broadcasterManager,
+               this.ibdState,
+               this.federationWalletManager,
+               this.signals))
+            {
+                signedMultisigTransactionBroadcaster.Start();
 
-        //        var partial = new Transaction();
-        //        var xfer = new CrossChainTransfer();
-        //        xfer.SetPartialTransaction(partial);
+                var partial = new Transaction();
+                var xfer = new CrossChainTransfer();
+                xfer.SetPartialTransaction(partial);
 
-        //        this.signals.Publish(new CrossChainTransferTransactionFullySigned(xfer));
-        //        await Task.Delay(100); //the event subscriber handles the event asynchronously so let's wait a bit to give it the time to complete.
+                this.signals.Publish(new CrossChainTransferTransactionFullySigned(xfer));
+                await Task.Delay(100); //the event subscriber handles the event asynchronously so let's wait a bit to give it the time to complete.
 
-        //        await this.broadcasterManager.Received(1).BroadcastTransactionAsync(Arg.Any<Transaction>());
-        //    }
-        //}
+                await this.broadcasterManager.Received(1).BroadcastTransactionAsync(Arg.Any<Transaction>());
+            }
+        }
 
-        //[Fact]
-        //public async Task Dont_Do_Work_In_IBD()
-        //{
-        //    this.ibdState.IsInitialBlockDownload().Returns(true);
+        [Fact]
+        public async Task Dont_Do_Work_In_IBD()
+        {
+            this.ibdState.IsInitialBlockDownload().Returns(true);
 
-        //    using (var signedMultisigTransactionBroadcaster = new SignedMultisigTransactionBroadcaster(
-        //       this.loggerFactory,
-        //       this.mempoolManager,
-        //       this.broadcasterManager,
-        //       this.ibdState,
-        //       this.federationWalletManager,
-        //       this.signals))
-        //    {
-        //        signedMultisigTransactionBroadcaster.Start();
+            using (var signedMultisigTransactionBroadcaster = new SignedMultisigTransactionBroadcaster(
+               this.loggerFactory,
+               this.mempoolManager,
+               this.broadcasterManager,
+               this.ibdState,
+               this.federationWalletManager,
+               this.signals))
+            {
+                signedMultisigTransactionBroadcaster.Start();
 
-        //        var partial = new Transaction();
-        //        var xfer = new CrossChainTransfer();
-        //        xfer.SetPartialTransaction(partial);
+                var partial = new Transaction();
+                var xfer = new CrossChainTransfer();
+                xfer.SetPartialTransaction(partial);
 
-        //        this.signals.Publish(new CrossChainTransferTransactionFullySigned(xfer));
-        //        await Task.Delay(100); //the event subscriber handles the event asynchronously so let's wait a bit to give it the time to complete.
+                this.signals.Publish(new CrossChainTransferTransactionFullySigned(xfer));
+                await Task.Delay(100); //the event subscriber handles the event asynchronously so let's wait a bit to give it the time to complete.
 
-        //        await this.broadcasterManager.Received(0).BroadcastTransactionAsync(Arg.Any<Transaction>());
-        //    }
-        //}
+                await this.broadcasterManager.Received(0).BroadcastTransactionAsync(Arg.Any<Transaction>());
+            }
+        }
 
-        //[Fact]
-        //public async Task Dont_Do_Work_Inactive_Federation()
-        //{
-        //    this.federationWalletManager.IsFederationWalletActive().Returns(false);
+        [Fact]
+        public async Task Dont_Do_Work_Inactive_Federation()
+        {
+            this.federationWalletManager.IsFederationWalletActive().Returns(false);
 
-        //    this.ibdState.IsInitialBlockDownload().Returns(true);
+            this.ibdState.IsInitialBlockDownload().Returns(true);
 
-        //    using (var signedMultisigTransactionBroadcaster = new SignedMultisigTransactionBroadcaster(
-        //       this.loggerFactory,
-        //       this.mempoolManager,
-        //       this.broadcasterManager,
-        //       this.ibdState,
-        //       this.federationWalletManager,
-        //       this.signals))
-        //    {
-        //        signedMultisigTransactionBroadcaster.Start();
+            using (var signedMultisigTransactionBroadcaster = new SignedMultisigTransactionBroadcaster(
+               this.loggerFactory,
+               this.mempoolManager,
+               this.broadcasterManager,
+               this.ibdState,
+               this.federationWalletManager,
+               this.signals))
+            {
+                signedMultisigTransactionBroadcaster.Start();
 
-        //        var partial = new Transaction();
-        //        var xfer = new CrossChainTransfer();
-        //        xfer.SetPartialTransaction(partial);
+                var partial = new Transaction();
+                var xfer = new CrossChainTransfer();
+                xfer.SetPartialTransaction(partial);
 
-        //        this.signals.Publish(new CrossChainTransferTransactionFullySigned(xfer));
-        //        await Task.Delay(100); //the event subscriber handles the event asynchronously so let's wait a bit to give it the time to complete.
+                this.signals.Publish(new CrossChainTransferTransactionFullySigned(xfer));
+                await Task.Delay(100); //the event subscriber handles the event asynchronously so let's wait a bit to give it the time to complete.
 
-        //        await this.broadcasterManager.Received(0).BroadcastTransactionAsync(Arg.Any<Transaction>());
-        //    }
-        //}
+                await this.broadcasterManager.Received(0).BroadcastTransactionAsync(Arg.Any<Transaction>());
+            }
+        }
 
         public void Dispose()
         {

@@ -14,6 +14,7 @@ using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.Networks;
+using Xels.Features.SQLiteWalletRepository;
 using Xunit;
 
 namespace Xels.Bitcoin.IntegrationTests
@@ -27,64 +28,66 @@ namespace Xels.Bitcoin.IntegrationTests
             this.network = new BitcoinRegTest();
         }
 
-        //[Fact(Skip = "Investigate PeerConnector shutdown timeout issue")]
-        //public void CanUnderstandUnknownParams()
-        //{
-        //    var extraParams = new NodeConfigParameters
-        //    {
-        //        { "some_new_unknown_param", "with a value" },
-        //    };
+        [Fact(Skip = "Investigate PeerConnector shutdown timeout issue")]
+        public void CanUnderstandUnknownParams()
+        {
+            var extraParams = new NodeConfigParameters
+            {
+                { "some_new_unknown_param", "with a value" },
+            };
 
-        //    using (var nodeBuilder = NodeBuilder.Create(this))
-        //    {
-        //        var buildAction = new Action<IFullNodeBuilder>(builder =>
-        //            builder.UseBlockStore()
-        //                .UsePowConsensus()
-        //                .UseMempool()
-        //                .AddMining()
-        //                .UseWallet()
-        //                .AddRPC()
-        //                .UseApi()
-        //                .MockIBD());
+            using (var nodeBuilder = NodeBuilder.Create(this))
+            {
+                var buildAction = new Action<IFullNodeBuilder>(builder =>
+                    builder.UseBlockStore()
+                        .UsePowConsensus()
+                        .UseMempool()
+                        .AddMining()
+                        .UseWallet()
+                        .AddSQLiteWalletRepository()
+                        .AddRPC()
+                        .UseApi()
+                        .MockIBD());
 
-        //        var coreNode = nodeBuilder.CreateCustomNode(buildAction, this.network,
-        //            ProtocolVersion.PROTOCOL_VERSION, configParameters: extraParams);
+                var coreNode = nodeBuilder.CreateCustomNode(buildAction, this.network,
+                    ProtocolVersion.PROTOCOL_VERSION, configParameters: extraParams);
 
-        //        coreNode.Start();
+                coreNode.Start();
 
-        //        coreNode.ConfigParameters["some_new_unknown_param"].Should().Be("with a value");
-        //    }
-        //}
+                coreNode.ConfigParameters["some_new_unknown_param"].Should().Be("with a value");
+            }
+        }
 
-        //[Fact(Skip = "Investigate PeerConnector shutdown timeout issue")]
-        //public void CanUseCustomConfigFileFromParams()
-        //{
-        //    var specialConf = "special.conf";
+        [Fact(Skip = "Investigate PeerConnector shutdown timeout issue")]
+        public void CanUseCustomConfigFileFromParams()
+        {
+            var specialConf = "special.conf";
 
-        //    var extraParams = new NodeConfigParameters
-        //    {
-        //        { "conf", specialConf },
-        //    };
+            var extraParams = new NodeConfigParameters
+            {
+                { "conf", specialConf },
+            };
 
-        //    using (var nodeBuilder = NodeBuilder.Create(this))
-        //    {
-        //        var buildAction = new Action<IFullNodeBuilder>(builder =>
-        //            builder.UseBlockStore()
-        //                .UsePowConsensus()
-        //                .UseMempool()
-        //                .AddMining()
-        //                .UseWallet()
-        //                .AddRPC()
-        //                .UseApi()
-        //                .MockIBD());
+            using (var nodeBuilder = NodeBuilder.Create(this))
+            {
+                var buildAction = new Action<IFullNodeBuilder>(builder =>
+                    builder.UseBlockStore()
+                        .UsePowConsensus()
+                        .UseMempool()
+                        .AddMining()
+                        .UseWallet()
+                        .AddSQLiteWalletRepository()
+                        .AddRPC()
+                        .UseApi()
+                        .MockIBD());
 
-        //        var coreNode = nodeBuilder.CreateCustomNode(buildAction, this.network, ProtocolVersion.PROTOCOL_VERSION, configParameters: extraParams);
+                var coreNode = nodeBuilder.CreateCustomNode(buildAction, this.network, ProtocolVersion.PROTOCOL_VERSION, configParameters: extraParams);
 
-        //        coreNode.Start();
+                coreNode.Start();
 
-        //        coreNode.ConfigParameters["conf"].Should().Be(specialConf);
-        //        File.Exists(Path.Combine(coreNode.DataFolder, specialConf)).Should().BeTrue();
-        //    }
-        //}
+                coreNode.ConfigParameters["conf"].Should().Be(specialConf);
+                File.Exists(Path.Combine(coreNode.DataFolder, specialConf)).Should().BeTrue();
+            }
+        }
     }
 }

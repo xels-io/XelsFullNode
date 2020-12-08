@@ -22,6 +22,7 @@ using Xels.Bitcoin.EventBus.CoreEvents;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.RPC;
 using Xels.Bitcoin.Features.Wallet;
+using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.IntegrationTests.Common.Runners;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P;
@@ -84,8 +85,9 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
             this.runner = runner;
 
             this.State = CoreNodeState.Stopped;
+            string user = Encoders.Hex.EncodeData(RandomUtils.GetBytes(20));
             string pass = Encoders.Hex.EncodeData(RandomUtils.GetBytes(20));
-            this.creds = new NetworkCredential(pass, pass);
+            this.creds = new NetworkCredential(user, pass);
             this.Config = Path.Combine(this.runner.DataFolder, configfile);
             this.CookieAuth = useCookieAuth;
 
@@ -223,6 +225,14 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
             // Extract the zipped blockchain data to the node's DataFolder.
             ZipFile.ExtractToDirectory(Path.GetFullPath(readyDataName), this.DataFolder, true);
 
+            // Import whole wallets to DB.
+            this.startActions.Add(() =>
+            {
+                var walletManager = ((WalletManager)this.FullNode?.NodeService<IWalletManager>(true));
+                if (walletManager != null)
+                    walletManager.ExcludeTransactionsFromWalletImports = false;
+            });
+
             return this;
         }
 
@@ -253,6 +263,8 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
             var ibdState = new Mock<IInitialBlockDownloadState>();
             ibdState.Setup(x => x.IsInitialBlockDownload()).Returns(() => true);
 
+            var peerAddressManager = new Mock<IPeerAddressManager>().Object;
+
             var networkPeerFactory = new NetworkPeerFactory(this.runner.Network,
                 DateTimeProvider.Default,
                 this.loggerFactory,
@@ -260,7 +272,8 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
                 selfEndPointTracker,
                 ibdState.Object,
                 connectionManagerSettings,
-                this.GetOrCreateAsyncProvider()
+                this.GetOrCreateAsyncProvider(),
+                peerAddressManager
                 );
 
             return networkPeerFactory.CreateConnectedNetworkPeerAsync("127.0.0.1:" + this.ProtocolPort).ConfigureAwait(false).GetAwaiter().GetResult();
@@ -274,7 +287,10 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
                 return this.runner.FullNode.NodeService<IAsyncProvider>();
         }
 
-        public CoreNode Start()
+        List<Action> startActions = new List<Action>();
+        List<Action> runActions = new List<Action>();
+
+        public CoreNode Start(Action startAction = null)
         {
             lock (this.lockObject)
             {
@@ -282,7 +298,15 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
                 this.runner.EnablePeerDiscovery = this.builderEnablePeerDiscovery;
                 this.runner.OverrideDateTimeProvider = this.builderOverrideDateTimeProvider;
 
+                if (this.builderNoValidation)
+                    this.DisableValidation();
+
                 this.runner.BuildNode();
+
+                startAction?.Invoke();
+                foreach (Action action in this.startActions)
+                    action.Invoke();
+
                 this.runner.Start();
                 this.State = CoreNodeState.Starting;
             }
@@ -293,6 +317,9 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
                 StartXelsRunner();
 
             this.State = CoreNodeState.Running;
+
+            foreach (Action runAction in this.runActions)
+                runAction.Invoke();
 
             return this;
         }
@@ -306,6 +333,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
             configParameters.SetDefaultValueIfUndefined("rest", "1");
             configParameters.SetDefaultValueIfUndefined("server", "1");
             configParameters.SetDefaultValueIfUndefined("txindex", "1");
+
             if (!this.CookieAuth)
             {
                 configParameters.SetDefaultValueIfUndefined("rpcuser", this.creds.UserName);
@@ -327,6 +355,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
             configParameters.SetDefaultValueIfUndefined("keypool", "10");
             configParameters.SetDefaultValueIfUndefined("agentprefix", "node" + this.ProtocolPort);
             configParameters.Import(this.ConfigParameters);
+
             File.WriteAllText(this.Config, configParameters.ToString());
         }
 
@@ -378,15 +407,12 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
 
             if (this.builderWithWallet)
             {
-                this.Mnemonic = this.FullNode.WalletManager().CreateWallet(
+                (_, this.Mnemonic) = this.FullNode.WalletManager().CreateWallet(
                     this.builderWalletPassword,
                     this.builderWalletName,
                     this.builderWalletPassphrase,
                     string.IsNullOrEmpty(this.builderWalletMnemonic) ? null : new Mnemonic(this.builderWalletMnemonic));
             }
-
-            if (this.builderNoValidation)
-                DisableValidation();
         }
 
         /// <summary>
@@ -394,12 +420,10 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         /// </summary>
         public void DisableValidation()
         {
-            this.FullNode.Network.Consensus.FullValidationRules.Clear();
-            this.FullNode.Network.Consensus.HeaderValidationRules.Clear();
-            this.FullNode.Network.Consensus.IntegrityValidationRules.Clear();
-            this.FullNode.Network.Consensus.PartialValidationRules.Clear();
-
-            this.FullNode.NodeService<IConsensusRuleEngine>().Register();
+            this.runner.Network.Consensus.ConsensusRules.FullValidationRules.Clear();
+            this.runner.Network.Consensus.ConsensusRules.HeaderValidationRules.Clear();
+            this.runner.Network.Consensus.ConsensusRules.IntegrityValidationRules.Clear();
+            this.runner.Network.Consensus.ConsensusRules.PartialValidationRules.Clear();
         }
 
         public void Broadcast(Transaction transaction)

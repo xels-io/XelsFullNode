@@ -12,6 +12,7 @@ using NLog.Targets;
 using NLog.Targets.Wrappers;
 using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Utilities;
+using TracerAttributes;
 
 namespace Xels.Bitcoin.Configuration.Logging
 {
@@ -306,6 +307,7 @@ namespace Xels.Bitcoin.Configuration.Logging
         /// </summary>
         /// <param name="loggerFactory">Logger factory interface being extended.</param>
         /// <returns>Console logger provider.</returns>
+        [NoTrace]
         public static ConsoleLoggerProvider GetConsoleLoggerProvider(this ILoggerFactory loggerFactory)
         {
             var extendedLoggerFactory = loggerFactory as ExtendedLoggerFactory;

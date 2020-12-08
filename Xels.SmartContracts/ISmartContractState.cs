@@ -7,7 +7,6 @@ namespace Xels.SmartContracts
         IBlock Block { get; }
         IMessage Message { get; }
         IPersistentState PersistentState { get; }
-        IGasMeter GasMeter { get; }
         IContractLogger ContractLogger { get; }
         IInternalTransactionExecutor InternalTransactionExecutor { get; }
         IInternalHashHelper InternalHashHelper { get; }

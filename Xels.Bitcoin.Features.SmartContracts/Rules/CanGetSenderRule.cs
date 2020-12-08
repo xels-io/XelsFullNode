@@ -6,13 +6,12 @@ using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.Rules;
-using Xels.Bitcoin.Features.MemoryPool;
 using Xels.SmartContracts.Core;
 using Xels.SmartContracts.Core.Util;
 
 namespace Xels.Bitcoin.Features.SmartContracts.Rules
 {
-    public class CanGetSenderRule : UtxoStoreConsensusRule, ISmartContractMempoolRule
+    public class CanGetSenderRule : UtxoStoreConsensusRule
     {
         private readonly ISenderRetriever senderRetriever;
 
@@ -21,6 +20,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.Rules
             this.senderRetriever = senderRetriever;
         }
 
+        /// <inheritdoc />
         public override Task RunAsync(RuleContext context)
         {
             Block block = context.ValidationContext.BlockToValidate;
@@ -45,19 +45,5 @@ namespace Xels.Bitcoin.Features.SmartContracts.Rules
                     new ConsensusError("cant-get-sender", "smart contract output without a P2PKH as the first input to the tx.").Throw();
             }
         }
-
-        public void CheckTransaction(MempoolValidationContext context)
-        {
-            // If wanting to execute a contract, we must be able to get the sender.
-            if (context.Transaction.Outputs.Any(x => x.ScriptPubKey.IsSmartContractExec()))
-            {
-                GetSenderResult result = this.senderRetriever.GetSender(context.Transaction, context.View);
-                if (!result.Success)
-                    new ConsensusError("cant-get-sender", "smart contract output without a P2PKH as the first input to the tx.").Throw();
-            }
-        }
-
     }
 }
-
-

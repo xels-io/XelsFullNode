@@ -13,6 +13,7 @@ using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Interfaces;
+using Xels.Bitcoin.P2P;
 using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.P2P.Protocol;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
@@ -223,6 +224,11 @@ namespace Xels.Bitcoin.Tests.Base
             }
 
             public void ClearBannedPeers()
+            {
+                throw new NotImplementedException();
+            }
+
+            public List<PeerAddress> GetAllBanned()
             {
                 throw new NotImplementedException();
             }

@@ -14,8 +14,9 @@ using Xels.Bitcoin.Features.SmartContracts.Wallet;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.Runners;
 using Xels.Bitcoin.Utilities;
-using Xels.Features.FederatedPeg.Collateral;
-using Xels.Features.FederatedPeg.CounterChain;
+using Xels.Features.Collateral;
+using Xels.Features.Collateral.CounterChain;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.Features.FederatedPeg.IntegrationTests.Utils
 {
@@ -45,7 +46,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests.Utils
                 .SetCounterChainNetwork(this.counterChainNetwork)
                 .UseSmartContractPoAConsensus()
                 .UseSmartContractCollateralPoAMining()
-                .CheckForPoAMembersCollateral()
+                .CheckForPoAMembersCollateral(true) // This is a mining node so we will check the commitment height data as well as the full set of collateral checks.
                 .UseTransactionNotification()
                 .UseBlockNotification()
                 .UseApi()
@@ -57,6 +58,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests.Utils
                     options.UsePoAWhitelistedContracts();
                 })
                 .UseSmartContractWallet()
+                .AddSQLiteWalletRepository()
                 .MockIBD()
                 .ReplaceTimeProvider(this.timeProvider)
                 .AddFastMiningCapability();

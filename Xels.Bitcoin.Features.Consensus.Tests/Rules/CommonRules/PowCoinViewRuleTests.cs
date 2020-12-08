@@ -8,6 +8,7 @@ using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Configuration;
+using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Consensus.Rules;
@@ -91,6 +92,9 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
                 this.logger = new Mock<ILogger>();
                 rule.Logger = this.logger.Object;
 
+                var loggerFactory = new ExtendedLoggerFactory();
+                loggerFactory.AddConsoleWithFilters();
+
                 var dateTimeProvider = new DateTimeProvider();
 
                 rule.Parent = new PowConsensusRuleEngine(
@@ -101,8 +105,9 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.Rules.CommonRules
                     new NodeDeployments(KnownNetworks.RegTest, new ChainIndexer(this.network)),
                     new ConsensusSettings(NodeSettings.Default(KnownNetworks.RegTest)), new Mock<ICheckpoints>().Object, new Mock<ICoinView>().Object, new Mock<IChainState>().Object,
                     new InvalidBlockHashStore(dateTimeProvider),
-                    new NodeStats(dateTimeProvider),
-                    new AsyncProvider(new LoggerFactory(), new Mock<ISignals>().Object, new Mock<NodeLifetime>().Object));
+                    new NodeStats(dateTimeProvider, loggerFactory),
+                    new AsyncProvider(loggerFactory, new Mock<ISignals>().Object, new Mock<NodeLifetime>().Object),
+                    new ConsensusRulesContainer());
 
                 rule.Initialize();
 

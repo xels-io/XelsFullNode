@@ -45,9 +45,11 @@ namespace Xels.Bitcoin.Features.BlockExplorer
                     //}
                     blockInfo.Transactions.Add(new TransactionInfo(tx.GetHash(), tx.Version, tx.IsCoinStake, tx.Time, tx.Inputs, tx.Outputs, tx.LockTime, this.network));
                     blockInfo.TotalAmount += tx.TotalOut;
-                    blockInfo.BlockReward = block.Transactions[0].TotalOut;
                // }
             }
+            blockInfo.blockSize = block.BlockSize;
+            //blockInfo.BlockReward = block.Transactions[0].TotalOut + block.Transactions[1].TotalOut;
+            blockInfo.BlockReward = Money.Coins( 50 ); //block.Transactions[0].TotalOut == 0 ? block.Transactions[1].TotalOut : block.Transactions[0].TotalOut;
             blockInfo.TransactionCount = block.Transactions.Count;
             blockInfo.BlockData = block;
             blockInfo.BlockId = chainedBlock.HashBlock;
@@ -74,7 +76,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
                     {
                         blockInfo.Transactions.Add(new TransactionInfo( tx.GetHash(), tx.Version, tx.IsCoinStake, tx.Time, tx.Inputs, tx.Outputs, tx.LockTime, this.network));
                         blockInfo.TotalAmount += tx.TotalOut;
-                        blockInfo.BlockReward = block.Transactions[0].TotalOut;
+                        blockInfo.BlockReward = Money.Coins(50); //block.Transactions[0].TotalOut;
                       
                     }
                     blockInfo.TransactionCount = block.Transactions.Count;
@@ -106,10 +108,9 @@ namespace Xels.Bitcoin.Features.BlockExplorer
                     {
                         blockInfo.Transactions.Add(new TransactionInfo(tx.GetHash(), tx.Version, tx.IsCoinStake, tx.Time, tx.Inputs, tx.Outputs, tx.LockTime, this.network));
                         blockInfo.TotalAmount += tx.TotalOut;
-                        blockInfo.BlockReward = block.Transactions[0].TotalOut;
-                        blockInfo.blockSize = block.BlockSize;
-                        
                     }
+                    blockInfo.blockSize = block.BlockSize;
+                    blockInfo.BlockReward = Money.Coins(50); //block.Transactions[0].TotalOut;  // == 0 ? block.Transactions[1].TotalOut : block.Transactions[0].TotalOut;
                     blockInfo.TransactionCount = block.Transactions.Count;
                     blockInfo.BlockData = block;
                 }
@@ -147,7 +148,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
                       
                         blockInfo.Transactions.Add(new TransactionInfo(tx.GetHash(), tx.Version, tx.IsCoinStake, tx.Time, tx.Inputs, tx.Outputs, tx.LockTime, this.network));
                         blockInfo.TotalAmount += tx.TotalOut;
-                        blockInfo.BlockReward = block.Transactions[0].TotalOut;
+                        blockInfo.BlockReward = Money.Coins(50); //block.Transactions[0].TotalOut;
                         //}
                     }
                   //  blockInfo.Previous = chainedBlock.Previous;

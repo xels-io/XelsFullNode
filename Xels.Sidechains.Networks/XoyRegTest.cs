@@ -4,8 +4,16 @@ using System.Linq;
 using NBitcoin;
 using NBitcoin.DataEncoders;
 using NBitcoin.Protocol;
+using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
+using Xels.Bitcoin.Features.MemoryPool.Rules;
 using Xels.Bitcoin.Features.PoA;
+using Xels.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules;
+using Xels.Bitcoin.Features.PoA.Voting.ConsensusRules;
+using Xels.Bitcoin.Features.SmartContracts.MempoolRules;
 using Xels.Bitcoin.Features.SmartContracts.PoA;
+using Xels.Bitcoin.Features.SmartContracts.PoA.MempoolRules;
+using Xels.Bitcoin.Features.SmartContracts.PoA.Rules;
+using Xels.Bitcoin.Features.SmartContracts.Rules;
 using Xels.SmartContracts.Networks.Policies;
 
 namespace Xels.Sidechains.Networks
@@ -37,13 +45,14 @@ namespace Xels.Sidechains.Networks
             this.DefaultMaxInboundConnections = 109;
             this.DefaultRPCPort = 26175;
             this.DefaultAPIPort = 38223;
-            this.MaxTipAge = 2 * 60 * 60;
+            this.MaxTipAge = 768; // 20% of the fastest time it takes for one MaxReorgLength of blocks to be mined.
             this.MinTxFee = 10000;
             this.FallbackFee = 10000;
             this.MinRelayTxFee = 10000;
             this.RootFolderName = NetworkRootFolderName;
             this.DefaultConfigFilename = NetworkDefaultConfigFilename;
             this.MaxTimeOffsetSeconds = 25 * 60;
+            this.DefaultBanTimeSeconds = 1920; // 240 (MaxReorg) * 16 (TargetSpacing) / 2 = 32 Minutes
 
             var consensusFactory = new SmartContractCollateralPoAConsensusFactory();
 
@@ -107,7 +116,6 @@ namespace Xels.Sidechains.Networks
                 buriedDeployments: buriedDeployments,
                 bip9Deployments: bip9Deployments,
                 bip34Hash: new uint256("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8"),
-                ruleChangeActivationThreshold: 1916, // 95% of 2016
                 minerConfirmationWindow: 2016, // nPowTargetTimespan / nPowTargetSpacing
                 maxReorgLength: 240, // Heuristic. Roughly 2 * mining members
                 defaultAssumeValid: null,
@@ -157,7 +165,99 @@ namespace Xels.Sidechains.Networks
 
             this.StandardScriptsRegistry = new SmartContractsStandardScriptsRegistry();
 
+            // 16 below should be changed to TargetSpacingSeconds when we move that field.
+            Assert(this.DefaultBanTimeSeconds <= this.Consensus.MaxReorgLength * 16 / 2);
+
             // TODO: Do we need Asserts for block hash
+
+            this.RegisterRules(this.Consensus);
+            this.RegisterMempoolRules(this.Consensus);
+        }
+
+        // This should be abstract or virtual
+        protected override void RegisterRules(IConsensus consensus)
+        {
+            // IHeaderValidationConsensusRule -----------------------
+            consensus.ConsensusRules
+                .Register<HeaderTimeChecksPoARule>()
+                .Register<XelsHeaderVersionRule>()
+                .Register<PoAHeaderDifficultyRule>()
+                .Register<PoAHeaderSignatureRule>();
+            // ------------------------------------------------------
+
+            // IIntegrityValidationConsensusRule
+            consensus.ConsensusRules
+                .Register<BlockMerkleRootRule>()
+                .Register<PoAIntegritySignatureRule>();
+            // ------------------------------------------------------
+
+            // IPartialValidationConsensusRule
+            consensus.ConsensusRules
+                .Register<SetActivationDeploymentsPartialValidationRule>()
+
+                // Rules that are inside the method ContextualCheckBlock
+                .Register<TransactionLocktimeActivationRule>()
+                .Register<CoinbaseHeightActivationRule>()
+                .Register<BlockSizeRule>()
+
+                // Rules that are inside the method CheckBlock
+                .Register<EnsureCoinbaseRule>()
+                .Register<CheckPowTransactionRule>()
+                .Register<CheckSigOpsRule>()
+
+                .Register<PoAVotingCoinbaseOutputFormatRule>()
+                .Register<AllowedScriptTypeRule>()
+                .Register<ContractTransactionPartialValidationRule>();
+            // ------------------------------------------------------
+
+            // IFullValidationConsensusRule
+            consensus.ConsensusRules
+                .Register<SetActivationDeploymentsFullValidationRule>()
+
+                // Rules that require the store to be loaded (coinview)
+                .Register<LoadCoinviewRule>()
+                .Register<TransactionDuplicationActivationRule>() // implements BIP30
+
+                // Smart contract specific
+                .Register<ContractTransactionFullValidationRule>()
+                .Register<TxOutSmartContractExecRule>()
+                .Register<OpSpendRule>()
+                .Register<CanGetSenderRule>()
+                .Register<P2PKHNotContractRule>()
+                .Register<SmartContractPoACoinviewRule>()
+                .Register<SaveCoinviewRule>();
+            // ------------------------------------------------------
+        }
+
+        private void RegisterMempoolRules(IConsensus consensus)
+        {
+            consensus.MempoolRules = new List<Type>()
+            {
+                typeof(OpSpendMempoolRule),
+                typeof(TxOutSmartContractExecMempoolRule),
+                typeof(AllowedScriptTypeMempoolRule),
+                typeof(P2PKHNotContractMempoolRule),
+
+                // The non- smart contract mempool rules
+                typeof(CheckConflictsMempoolRule),
+                typeof(CheckCoinViewMempoolRule),
+                typeof(CreateMempoolEntryMempoolRule),
+                typeof(CheckSigOpsMempoolRule),
+                typeof(CheckFeeMempoolRule),
+
+                // The smart contract mempool needs to do more fee checks than its counterpart, so include extra rules.
+                // These rules occur directly after the fee check rule in the non- smart contract mempool.
+                typeof(SmartContractFormatLogicMempoolRule),
+                typeof(CanGetSenderMempoolRule),
+                typeof(AllowedCodeHashLogicMempoolRule), // PoA-specific
+                typeof(CheckMinGasLimitSmartContractMempoolRule),
+
+                // Remaining non-SC rules.
+                typeof(CheckRateLimitMempoolRule),
+                typeof(CheckAncestorsMempoolRule),
+                typeof(CheckReplacementMempoolRule),
+                typeof(CheckAllInputsMempoolRule)
+            };
         }
     }
 }

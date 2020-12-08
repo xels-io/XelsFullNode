@@ -8,6 +8,7 @@ using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.Runners;
 using Xels.Bitcoin.Utilities;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.Bitcoin.Features.PoA.IntegrationTests.Common
 {
@@ -32,6 +33,7 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests.Common
                 .UsePoAConsensus()
                 .UseMempool()
                 .UseWallet()
+                .AddSQLiteWalletRepository()
                 .UseApi()
                 .AddRPC()
                 .MockIBD()

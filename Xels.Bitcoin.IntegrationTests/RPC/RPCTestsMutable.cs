@@ -13,6 +13,7 @@ using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.IntegrationTests.Common.ReadyData;
 using Xels.Bitcoin.Networks;
+using Xels.Bitcoin.Tests.Common;
 using Xunit;
 
 namespace Xels.Bitcoin.IntegrationTests.RPC
@@ -47,11 +48,14 @@ namespace Xels.Bitcoin.IntegrationTests.RPC
         {
             using (NodeBuilder builder = NodeBuilder.Create(this))
             {
-                CoreNode node = builder.CreateXelsPowNode(new BitcoinRegTest()).WithWallet().Start();
+                CoreNode node = builder.CreateXelsPowNode(new BitcoinRegTest()).AlwaysFlushBlocks().WithWallet().Start();
 
                 RPCClient rpc = node.CreateRPCClient();
                 uint256 blockHash = rpc.Generate(1)[0];
                 Block block = rpc.GetBlock(blockHash);
+
+                TestBase.WaitLoop(() => TestHelper.IsNodeSynced(node));
+
                 RPCResponse walletTx = rpc.SendCommand(RPCOperations.gettransaction, block.Transactions[0].GetHash().ToString());
                 walletTx.ThrowIfError();
             }
@@ -373,25 +377,25 @@ namespace Xels.Bitcoin.IntegrationTests.RPC
             }
         }
 
-        //[Fact]
-        //public async Task TestScanRPCCapabilitiesOnXelsNetworkAsync()
-        //{
-        //    using (NodeBuilder builder = NodeBuilder.Create(this))
-        //    {
-        //        Network network = new XelsRegTest();
-        //        var node = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
-        //        RPCClient rpcClient = node.CreateRPCClient();
+        [Fact]
+        public async Task TestScanRPCCapabilitiesOnXelsNetworkAsync()
+        {
+            using (NodeBuilder builder = NodeBuilder.Create(this))
+            {
+                Network network = new XelsRegTest();
+                var node = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
+                RPCClient rpcClient = node.CreateRPCClient();
 
-        //        RPCCapabilities capabilities = await rpcClient.ScanRPCCapabilitiesAsync();
+                RPCCapabilities capabilities = await rpcClient.ScanRPCCapabilitiesAsync();
 
-        //        capabilities.SupportEstimateSmartFee.Should().BeFalse();
-        //        capabilities.SupportGetNetworkInfo.Should().BeTrue();
-        //        capabilities.SupportScanUTXOSet.Should().BeFalse();
-        //        capabilities.SupportSignRawTransactionWith.Should().BeFalse();
-        //        capabilities.SupportSegwit.Should().BeFalse();
-        //        capabilities.SupportGenerateToAddress.Should().BeFalse();
-        //    }
-        //}
+                capabilities.SupportEstimateSmartFee.Should().BeFalse();
+                capabilities.SupportGetNetworkInfo.Should().BeTrue();
+                capabilities.SupportScanUTXOSet.Should().BeFalse();
+                capabilities.SupportSignRawTransactionWith.Should().BeFalse();
+                capabilities.SupportSegwit.Should().BeFalse();
+                capabilities.SupportGenerateToAddress.Should().BeFalse();
+            }
+        }
 
         [Fact]
         public async Task TestScanRPCCapabilitiesOnBitcoinNetworkAsync()

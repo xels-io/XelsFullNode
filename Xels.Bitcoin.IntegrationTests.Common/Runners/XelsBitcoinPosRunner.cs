@@ -12,20 +12,27 @@ using Xels.Bitcoin.Features.RPC;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.P2P;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.Bitcoin.IntegrationTests.Common.Runners
 {
     public sealed class XelsBitcoinPosRunner : NodeRunner
     {
-        public XelsBitcoinPosRunner(string dataDir, Network network, string agent = "XelsBitcoin")
+        private readonly bool isGateway;
+
+        public XelsBitcoinPosRunner(string dataDir, Network network, string agent = "XelsBitcoin", bool isGateway = false)
             : base(dataDir, agent)
         {
             this.Network = network;
+            this.isGateway = isGateway;
         }
 
         public override void BuildNode()
         {
             var settings = new NodeSettings(this.Network, ProtocolVersion.PROVEN_HEADER_VERSION, this.Agent, args: new string[] { "-conf=xels.conf", "-datadir=" + this.DataFolder });
+
+            if (this.isGateway)
+                settings.MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION;
 
             var builder = new FullNodeBuilder()
                 .UseNodeSettings(settings)
@@ -33,6 +40,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.Runners
                 .UsePosConsensus()
                 .UseMempool()
                 .UseWallet()
+                .AddSQLiteWalletRepository()
                 .AddPowPosMining()
                 .AddRPC()
                 .UseApi()
@@ -68,6 +76,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.Runners
                                 .UsePosConsensus()
                                 .UseMempool()
                                 .UseWallet()
+                                .AddSQLiteWalletRepository()
                                 .AddPowPosMining()
                                 .AddRPC()
                                 .MockIBD()

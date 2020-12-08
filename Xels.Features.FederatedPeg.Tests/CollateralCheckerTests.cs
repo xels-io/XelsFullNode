@@ -16,8 +16,8 @@ using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
-using Xels.Features.FederatedPeg.Collateral;
-using Xels.Features.FederatedPeg.CounterChain;
+using Xels.Features.Collateral;
+using Xels.Features.Collateral.CounterChain;
 using Xels.Features.FederatedPeg.Tests.Utils;
 using Xels.Sidechains.Networks;
 using Xunit;
@@ -61,7 +61,7 @@ namespace Xels.Features.FederatedPeg.Tests
 
             fedManager.Initialize();
 
-            this.collateralChecker = new CollateralChecker(loggerFactory, clientFactory, settings, fedManager, signals, network, asyncMock.Object);
+            this.collateralChecker = new CollateralChecker(loggerFactory, clientFactory, settings, fedManager, signals, network, asyncMock.Object, (new Mock<INodeLifetime>()).Object);
         }
 
         [Fact]
@@ -80,9 +80,8 @@ namespace Xels.Features.FederatedPeg.Tests
         {
             var blockStoreClientMock = new Mock<IBlockStoreClient>();
 
-            var collateralData = new VerboseAddressBalancesResult()
+            var collateralData = new VerboseAddressBalancesResult(this.collateralCheckHeight + 1000)
             {
-                ConsensusTipHeight = this.collateralCheckHeight + 1000,
                 BalancesData = new List<AddressIndexerData>()
                 {
                     new AddressIndexerData()

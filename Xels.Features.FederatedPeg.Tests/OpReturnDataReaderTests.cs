@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using NBitcoin;
 using NSubstitute;
 using Xels.Bitcoin.Networks;
-using Xels.Features.FederatedPeg.CounterChain;
+using Xels.Features.Collateral.CounterChain;
 using Xels.Features.FederatedPeg.Tests.Utils;
 using Xels.Sidechains.Networks;
 using Xunit;

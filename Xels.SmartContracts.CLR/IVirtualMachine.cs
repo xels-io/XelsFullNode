@@ -1,19 +1,21 @@
 ﻿using Xels.SmartContracts.Core.State;
+using Xels.SmartContracts.RuntimeObserver;
 
 namespace Xels.SmartContracts.CLR
 {
     public interface IVirtualMachine
     {
-        VmExecutionResult Create(IStateRepository repository, 
+        VmExecutionResult Create(IStateRepository repository,
             ISmartContractState contractState,
-            RuntimeObserver.IGasMeter gasMeter,
+            ExecutionContext executionContext,
             byte[] contractCode,
             object[] parameters,
             string typeName = null);
 
-        VmExecutionResult ExecuteMethod(ISmartContractState contractState, 
-            RuntimeObserver.IGasMeter gasMeter,
+        VmExecutionResult ExecuteMethod(ISmartContractState contractState,
+            ExecutionContext executionContext,
             MethodCall methodCall,
-            byte[] contractCode, string typeName);
+            byte[] contractCode,
+            string typeName);
     }
 }

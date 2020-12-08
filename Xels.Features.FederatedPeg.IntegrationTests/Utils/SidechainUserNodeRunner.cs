@@ -13,6 +13,7 @@ using Xels.Bitcoin.Features.SmartContracts.Wallet;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.Runners;
 using Xels.Bitcoin.Utilities;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.Features.FederatedPeg.IntegrationTests.Utils
 {
@@ -43,6 +44,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests.Utils
                 .UseSmartContractPoAConsensus()
                 .UseSmartContractPoAMining()
                 .UseSmartContractWallet()
+                .AddSQLiteWalletRepository()
                 .UseMempool()
                 .UseApi()
                 .MockIBD()

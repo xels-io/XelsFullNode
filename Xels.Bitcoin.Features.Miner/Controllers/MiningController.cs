@@ -20,6 +20,7 @@ namespace Xels.Bitcoin.Features.Miner.Controllers
     /// <summary>
     /// API controller for calls related to PoW mining and PoS minting.
     /// </summary>
+    [ApiVersion("1")]
     [Route("api/[controller]")]
     public class MiningController : Controller
     {
@@ -49,14 +50,13 @@ namespace Xels.Bitcoin.Features.Miner.Controllers
             this.powMining = powMining;
             this.walletManager = walletManager;
         }
-
         [Route("startmining")]
         [HttpPost]
         public IActionResult StartMining([FromBody]StartMiningRequest request)
         {
             try
             {
-                Script powAddressScript = this.walletManager.GetNewAddress(new WalletAccountReference(request.WalletName, "account 0")).ScriptPubKey;
+                Script powAddressScript = this.walletManager.GetUnusedAddresses(new WalletAccountReference(request.WalletName, "account 0"),1).FirstOrDefault().ScriptPubKey;
                 this.powMining.Mine(powAddressScript);
                 return this.Ok();
             }
@@ -71,22 +71,21 @@ namespace Xels.Bitcoin.Features.Miner.Controllers
             //this.fullNode.NodeFeature<MiningFeature>(true)
         }
 
-        [Route("stopmining")]
-        [HttpPost]
-        public IActionResult StopMining()
-        {
-            try
-            {
-                this.StopMining();
-                return this.Ok();
-            }
-            catch (Exception e)
-            {
-                this.logger.LogError(ExceptionOccurredMessage, e.ToString());
-                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, e.Message, e.ToString());
-            }
-        }
-
+        //[Route("stopmining")]
+        //[HttpPost]
+        //public IActionResult StopMining()
+        //{
+        //    try
+        //    {
+        //        this.StopMining();
+        //        return this.Ok();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        this.logger.LogError(ExceptionOccurredMessage, e.ToString());
+        //        return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, e.Message, e.ToString());
+        //    }
+        //}
         /// <summary>
         /// Tries to mine one or more blocks.
         /// </summary>
@@ -116,7 +115,7 @@ namespace Xels.Bitcoin.Features.Miner.Controllers
                 if (blockCount <= 0)
                     return ErrorHelpers.BuildErrorResponse(HttpStatusCode.Forbidden, "Invalid request", "The number of blocks to mine must be higher than zero.");
 
-                this.logger.LogTrace("({0}:{1})", nameof(request.BlockCount), blockCount);
+                this.logger.LogDebug("({0}:{1})", nameof(request.BlockCount), blockCount);
 
                 WalletAccountReference accountReference = this.GetAccount();
                 HdAddress address = this.walletManager.GetUnusedAddress(accountReference);

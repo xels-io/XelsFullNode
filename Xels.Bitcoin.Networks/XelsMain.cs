@@ -5,6 +5,9 @@ using NBitcoin;
 using NBitcoin.BouncyCastle.Math;
 using NBitcoin.DataEncoders;
 using NBitcoin.Protocol;
+using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
+using Xels.Bitcoin.Features.Consensus.Rules.ProvenHeaderRules;
+using Xels.Bitcoin.Features.MemoryPool.Rules;
 using Xels.Bitcoin.Networks.Deployments;
 using Xels.Bitcoin.Networks.Policies;
 
@@ -34,7 +37,7 @@ namespace Xels.Bitcoin.Networks
             messageStart[1] = 0x35;
             messageStart[2] = 0x22;
             messageStart[3] = 0x05;
-            uint magic = BitConverter.ToUInt32(messageStart, 0); //0x5223570;
+            uint magic = BitConverter.ToUInt32(messageStart, 0); //0x5223570;; 
 
             this.Name = "XelsMain";
             this.NetworkType = NetworkType.Mainnet;
@@ -44,6 +47,7 @@ namespace Xels.Bitcoin.Networks
             this.DefaultMaxInboundConnections = 109;
             this.DefaultRPCPort = 27975;
             this.DefaultAPIPort = 37221;
+            this.DefaultSignalRPort = 38824;
             this.MaxTipAge = 2 * 60 * 60;
             this.MinTxFee = 10000;
             this.FallbackFee = 10000;
@@ -52,6 +56,7 @@ namespace Xels.Bitcoin.Networks
             this.DefaultConfigFilename = XelsDefaultConfigFilename;
             this.MaxTimeOffsetSeconds = 25 * 60;
             this.CoinTicker = "XELS";
+            this.DefaultBanTimeSeconds = 16000; // 500 (MaxReorg) * 64 (TargetSpacing) / 2 = 4 hours, 26 minutes and 40 seconds
 
             var consensusFactory = new PosConsensusFactory();
 
@@ -84,9 +89,10 @@ namespace Xels.Bitcoin.Networks
 
             var bip9Deployments = new XelsBIP9Deployments()
             {
-                [XelsBIP9Deployments.ColdStaking] = new BIP9DeploymentsParameters(2,
-                    new DateTime(2018, 12, 1, 0, 0, 0, DateTimeKind.Utc),
-                    new DateTime(2019, 12, 1, 0, 0, 0, DateTimeKind.Utc))
+                [XelsBIP9Deployments.ColdStaking] = new BIP9DeploymentsParameters("ColdStaking", 2,
+                    new DateTime(2019, 12, 2, 0, 0, 0, DateTimeKind.Utc),
+                    new DateTime(2020, 12, 2, 0, 0, 0, DateTimeKind.Utc),
+                    BIP9DeploymentsParameters.DefaultMainnetThreshold)
             };
 
             this.Consensus = new NBitcoin.Consensus(
@@ -94,26 +100,25 @@ namespace Xels.Bitcoin.Networks
                 consensusOptions: consensusOptions,
                 coinType: 105,
                 hashGenesisBlock: genesisBlock.GetHash(),
-                subsidyHalvingInterval: 1014286,
+                subsidyHalvingInterval: 768000,
                 majorityEnforceBlockUpgrade: 750,
                 majorityRejectBlockOutdated: 950,
                 majorityWindow: 1000,
                 buriedDeployments: buriedDeployments,
                 bip9Deployments: bip9Deployments,
                 bip34Hash: new uint256("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8"),
-                ruleChangeActivationThreshold: 1916, // 95% of 2016
                 minerConfirmationWindow: 2016, // nPowTargetTimespan / nPowTargetSpacing
                 maxReorgLength: 500,
                 defaultAssumeValid: new uint256("0x0000033ab02dbdf95788721b78fcbaac559fde8bdc0948ad2dbeeedf45c99c4e"), // 1213518
-                maxMoney: 2537175000 * Money.COIN, //long.MaxValue,
+                maxMoney: long.MaxValue,
                 coinbaseMaturity: 1,
-                premineHeight: 10,
+                premineHeight: 1,
                 firstMiningPeriodHeight: 768000,
                 secondMiningPeriodHeight: 768000 + 768000,
                 thirdMiningPeriodHeight: 768000 + 768000 + 768000,
                 forthMiningPeriodHeight: 768000 + 768000 + 768000 + 768000,
                 fifthMiningPeriodHeight: 768000 + 768000 + 768000 + 768000 + 768000,
-                premineReward: Money.Coins(187155000),
+                premineReward: Money.Coins(21000000),
                 proofOfWorkReward: Money.Coins(50),
                 powTargetTimespan: TimeSpan.FromSeconds(24 * 60 * 60), // two weeks
                 powTargetSpacing: TimeSpan.FromSeconds(150),
@@ -159,8 +164,9 @@ namespace Xels.Bitcoin.Networks
             this.DNSSeeds = new List<DNSSeedData>();
             this.DNSSeeds = new List<DNSSeedData>
             {
-                new DNSSeedData("api.xels.io","api.xels.io"),
+                //new DNSSeedData("api.xels.io","api.xels.io"),
                 new DNSSeedData("mainnet.xels.io","mainnet.xels.io")
+                //new DNSSeedData("testnet.xels.io","testnet.xels.io")
                 //    new DNSSe                new NetworkAddress(IPAddress.Parse("52.68.239.4"), this.DefaultPort), // Redistribution node with DNS Server EnablededData("mainnet2.xelsnetwork.com", "mainnet2.xelsnetwork.com"),
                 //    new DNSSeedData("mainnet3.xelsplatform.com", "mainnet3.xelsplatform.com"),
                 //    new DNSSeedData("mainnet4.xelsnetwork.com", "mainnet4.xelsnetwork.com")
@@ -170,12 +176,13 @@ namespace Xels.Bitcoin.Networks
             this.SeedNodes = new List<NetworkAddress>
             {
 
-                new NetworkAddress(IPAddress.Parse("52.68.239.4"), this.DefaultPort ), // public node with DNS Server Enabled
+                //new NetworkAddress(IPAddress.Parse("52.68.239.4"), this.DefaultPort ), // public node with DNS Server Enabled
                 new NetworkAddress(IPAddress.Parse("54.64.43.45"), this.DefaultPort ) // public node with DNS Server Enabled
                 //new NetworkAddress(IPAddress.Parse("54.238.248.117"), this.DefaultPort), // public node
                 //new NetworkAddress(IPAddress.Parse("13.114.52.87"), this.DefaultPort), // public node
                 //new NetworkAddress(IPAddress.Parse("52.192.229.45"), this.DefaultPort), // public node
-                //new NetworkAddress(IPAddress.Parse("52.199.121.139"), this.DefaultPort ), // public node
+                //new NetworkAddress(IPAddress.Parse("52.199.121.139"), this.DefaultPort ) // public node
+                //new NetworkAddress(IPAddress.Parse("54.250.146.43"), this.DefaultPort ) // public node
 
                 //new NetworkAddress(IPAddress.Parse("137.116.46.151"), 37221), // public node
                 //new NetworkAddress(IPAddress.Parse("40.78.80.159"), 37221), // public node
@@ -185,8 +192,79 @@ namespace Xels.Bitcoin.Networks
 
             this.StandardScriptsRegistry = new XelsStandardScriptsRegistry();
 
+            // 64 below should be changed to TargetSpacingSeconds when we move that field.
+            Assert(this.DefaultBanTimeSeconds <= this.Consensus.MaxReorgLength * 64 / 2);
             Assert(this.Consensus.HashGenesisBlock == uint256.Parse("0x0000033ab02dbdf95788721b78fcbaac559fde8bdc0948ad2dbeeedf45c99c4e"));
             Assert(this.Genesis.Header.HashMerkleRoot == uint256.Parse("0xb89a84007e56441da69efe6177920a2359574f7944c73ae61871a9e2a0f8e4a5"));
+
+
+            this.RegisterRules(this.Consensus);
+            this.RegisterMempoolRules(this.Consensus);
+        }
+
+        protected void RegisterRules(IConsensus consensus)
+        {
+            consensus.ConsensusRules
+                .Register<HeaderTimeChecksRule>()
+                .Register<HeaderTimeChecksPosRule>()
+                .Register<XelsBugFixPosFutureDriftRule>()
+                .Register<CheckDifficultyPosRule>()
+                .Register<XelsHeaderVersionRule>()
+                .Register<ProvenHeaderSizeRule>()
+                .Register<ProvenHeaderCoinstakeRule>();
+
+            consensus.ConsensusRules
+                .Register<BlockMerkleRootRule>()
+                .Register<PosBlockSignatureRepresentationRule>()
+                .Register<PosBlockSignatureRule>();
+
+            consensus.ConsensusRules
+                .Register<SetActivationDeploymentsPartialValidationRule>()
+                .Register<PosTimeMaskRule>()
+
+                // rules that are inside the method ContextualCheckBlock
+                .Register<TransactionLocktimeActivationRule>()
+                .Register<CoinbaseHeightActivationRule>()
+                .Register<WitnessCommitmentsRule>()
+                .Register<BlockSizeRule>()
+
+                // rules that are inside the method CheckBlock
+                .Register<EnsureCoinbaseRule>()
+                .Register<CheckPowTransactionRule>()
+                .Register<CheckPosTransactionRule>()
+                .Register<CheckSigOpsRule>()
+                .Register<PosCoinstakeRule>();
+
+            consensus.ConsensusRules
+                .Register<SetActivationDeploymentsFullValidationRule>()
+
+                .Register<CheckDifficultyHybridRule>()
+
+                // rules that require the store to be loaded (coinview)
+                .Register<LoadCoinviewRule>()
+                .Register<TransactionDuplicationActivationRule>()
+                .Register<PosCoinviewRule>() // implements BIP68, MaxSigOps and BlockReward calculation
+                                             // Place the PosColdStakingRule after the PosCoinviewRule to ensure that all input scripts have been evaluated
+                                             // and that the "IsColdCoinStake" flag would have been set by the OP_CHECKCOLDSTAKEVERIFY opcode if applicable.
+                .Register<PosColdStakingRule>()
+                .Register<SaveCoinviewRule>();
+        }
+
+        protected void RegisterMempoolRules(IConsensus consensus)
+        {
+            consensus.MempoolRules = new List<Type>()
+            {
+                typeof(CheckConflictsMempoolRule),
+                typeof(CheckCoinViewMempoolRule),
+                typeof(CreateMempoolEntryMempoolRule),
+                typeof(CheckSigOpsMempoolRule),
+                typeof(CheckFeeMempoolRule),
+                typeof(CheckRateLimitMempoolRule),
+                typeof(CheckAncestorsMempoolRule),
+                typeof(CheckReplacementMempoolRule),
+                typeof(CheckAllInputsMempoolRule),
+                typeof(CheckTxOutDustRule)
+            };
         }
 
         protected static Block CreateXelsGenesisBlock(ConsensusFactory consensusFactory, uint nTime, uint nNonce, uint nBits, int nVersion, Money genesisReward)

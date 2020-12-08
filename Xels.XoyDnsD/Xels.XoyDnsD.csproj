@@ -23,6 +23,8 @@
       <ProjectReference Include="..\Xels.Bitcoin.Features.Api\Xels.Bitcoin.Features.Api.csproj" />
       <ProjectReference Include="..\Xels.Bitcoin.Features.Dns\Xels.Bitcoin.Features.Dns.csproj" />
       <ProjectReference Include="..\Xels.Bitcoin\Xels.Bitcoin.csproj" />
+      <ProjectReference Include="..\Xels.Features.Collateral\Xels.Features.Collateral.csproj" />
+      <ProjectReference Include="..\Xels.Features.SQLiteWalletRepository\Xels.Features.SQLiteWalletRepository.csproj" />
       <ProjectReference Include="..\Xels.Sidechains.Networks\Xels.Sidechains.Networks.csproj" />
     </ItemGroup>
 

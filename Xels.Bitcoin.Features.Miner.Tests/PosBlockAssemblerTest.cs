@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NBitcoin;
@@ -38,7 +39,7 @@ namespace Xels.Bitcoin.Features.Miner.Tests
         private readonly Mock<IStakeChain> stakeChain;
         private readonly Mock<IStakeValidator> stakeValidator;
 
-        public PosBlockAssemblerTest()
+        public PosBlockAssemblerTest() : base(KnownNetworks.XelsTest)
         {
             this.consensusManager = new Mock<IConsensusManager>();
             this.mempool = new Mock<ITxMempool>();
@@ -46,7 +47,6 @@ namespace Xels.Bitcoin.Features.Miner.Tests
             this.stakeValidator = new Mock<IStakeValidator>();
             this.stakeChain = new Mock<IStakeChain>();
             this.xelsTest = KnownNetworks.XelsTest;
-            new FullNodeBuilderConsensusExtension.PosConsensusRulesRegistration().RegisterRules(this.xelsTest.Consensus);
             this.key = new Key();
             this.minerSettings = new MinerSettings(NodeSettings.Default(this.Network));
             SetupConsensusManager();
@@ -184,17 +184,17 @@ namespace Xels.Bitcoin.Features.Miner.Tests
         {
             ConsensusOptions options = this.xelsTest.Consensus.Options;
             int minerConfirmationWindow = this.xelsTest.Consensus.MinerConfirmationWindow;
-            int ruleChangeActivationThreshold = this.xelsTest.Consensus.RuleChangeActivationThreshold;
+
             try
             {
                 var newOptions = new PosConsensusOptions();
                 this.xelsTest.Consensus.Options = newOptions;
-                this.xelsTest.Consensus.BIP9Deployments[0] = new BIP9DeploymentsParameters(19,
+                this.xelsTest.Consensus.BIP9Deployments[0] = new BIP9DeploymentsParameters("Test",19,
                     new DateTimeOffset(new DateTime(2016, 1, 1, 0, 0, 0, DateTimeKind.Utc)),
-                    new DateTimeOffset(new DateTime(2018, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
+                    new DateTimeOffset(new DateTime(2018, 1, 1, 0, 0, 0, DateTimeKind.Utc)),
+                    2);
 
                 this.xelsTest.Consensus.MinerConfirmationWindow = 2;
-                this.xelsTest.Consensus.RuleChangeActivationThreshold = 2;
 
                 ChainIndexer chainIndexer = GenerateChainWithHeightAndActivatedBip9(5, this.xelsTest, new Key(), this.xelsTest.Consensus.BIP9Deployments[0]);
                 this.SetupRulesEngine(chainIndexer);
@@ -214,7 +214,6 @@ namespace Xels.Bitcoin.Features.Miner.Tests
                 this.xelsTest.Consensus.Options = options;
                 this.xelsTest.Consensus.BIP9Deployments[0] = null;
                 this.xelsTest.Consensus.MinerConfirmationWindow = minerConfirmationWindow;
-                this.xelsTest.Consensus.RuleChangeActivationThreshold = ruleChangeActivationThreshold;
             }
         }
 
@@ -442,6 +441,15 @@ namespace Xels.Bitcoin.Features.Miner.Tests
         {
             var dateTimeProvider = new DateTimeProvider();
 
+            var consensusRulesContainer = new ConsensusRulesContainer();
+
+            foreach (var ruleType in this.Network.Consensus.ConsensusRules.HeaderValidationRules)
+                consensusRulesContainer.HeaderValidationRules.Add(Activator.CreateInstance(ruleType) as HeaderValidationConsensusRule);
+            foreach (var ruleType in this.Network.Consensus.ConsensusRules.PartialValidationRules)
+                consensusRulesContainer.PartialValidationRules.Add(Activator.CreateInstance(ruleType) as PartialValidationConsensusRule);
+            foreach (var ruleType in this.Network.Consensus.ConsensusRules.FullValidationRules)
+                consensusRulesContainer.FullValidationRules.Add(Activator.CreateInstance(ruleType) as FullValidationConsensusRule);
+
             var posConsensusRules = new PosConsensusRuleEngine(
                 this.xelsTest,
                 this.LoggerFactory.Object,
@@ -455,11 +463,12 @@ namespace Xels.Bitcoin.Features.Miner.Tests
                 new Mock<IStakeValidator>().Object,
                 new Mock<IChainState>().Object,
                 new InvalidBlockHashStore(dateTimeProvider),
-                new NodeStats(dateTimeProvider),
+                new NodeStats(dateTimeProvider, this.LoggerFactory.Object),
                 new Mock<IRewindDataIndexCache>().Object,
-                this.CreateAsyncProvider());
+                this.CreateAsyncProvider(),
+                consensusRulesContainer);
 
-            posConsensusRules.Register();
+            posConsensusRules.SetupRulesEngineParent();
 
             this.consensusManager.SetupGet(x => x.ConsensusRules)
                 .Returns(posConsensusRules);

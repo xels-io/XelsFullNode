@@ -20,9 +20,9 @@ using Xels.Bitcoin.Features.SmartContracts.Wallet;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Utilities;
-using Xels.Features.FederatedPeg;
-using Xels.Features.FederatedPeg.Collateral;
-using Xels.Features.FederatedPeg.CounterChain;
+using Xels.Features.Collateral;
+using Xels.Features.Collateral.CounterChain;
+using Xels.Features.SQLiteWalletRepository;
 using Xels.Sidechains.Networks;
 
 namespace Xels.XoyMinerD
@@ -69,7 +69,7 @@ namespace Xels.XoyMinerD
 
         private static IFullNode GetXoyMiningNode(string[] args)
         {
-            var nodeSettings = new NodeSettings(networksSelector: XoyNetwork.NetworksSelector, protocolVersion: ProtocolVersion.ALT_PROTOCOL_VERSION, args: args)
+            var nodeSettings = new NodeSettings(networksSelector: XoyNetwork.NetworksSelector, protocolVersion: ProtocolVersion.CIRRUS_VERSION, args: args)
             {
                 MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
             };
@@ -80,7 +80,7 @@ namespace Xels.XoyMinerD
                 .SetCounterChainNetwork(MainChainNetworks[nodeSettings.Network.NetworkType]())
                 .UseSmartContractPoAConsensus()
                 .UseSmartContractCollateralPoAMining()
-                .CheckForPoAMembersCollateral()
+                .CheckForPoAMembersCollateral(true) // This is a mining node so we will check the commitment height data as well as the full set of collateral checks.
                 .UseTransactionNotification()
                 .UseBlockNotification()
                 .UseApi()
@@ -92,6 +92,7 @@ namespace Xels.XoyMinerD
                     options.UsePoAWhitelistedContracts();
                 })
                 .UseSmartContractWallet()
+                .AddSQLiteWalletRepository()
                 .Build();
 
             return node;
@@ -119,6 +120,7 @@ namespace Xels.XoyMinerD
                 .AddRPC()
                 .UsePosConsensus()
                 .UseWallet()
+                .AddSQLiteWalletRepository()
                 .AddPowPosMining()
                 .Build();
 

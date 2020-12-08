@@ -20,9 +20,10 @@ using Xels.Bitcoin.Features.SmartContracts.Wallet;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Utilities;
+using Xels.Features.Collateral;
+using Xels.Features.Collateral.CounterChain;
 using Xels.Features.FederatedPeg;
-using Xels.Features.FederatedPeg.Collateral;
-using Xels.Features.FederatedPeg.CounterChain;
+using Xels.Features.SQLiteWalletRepository;
 using Xels.Sidechains.Networks;
 
 namespace Xels.XoyPegD
@@ -83,11 +84,17 @@ namespace Xels.XoyPegD
                 MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
             };
 
+            NetworkType networkType = nodeSettings.Network.NetworkType;
+
+            var fedPegOptions = new FederatedPegOptions(
+                walletSyncFromHeight: new int[] { FederatedPegSettings.XelsMainDepositStartBlock, 1, 1 }[(int)networkType]
+            );
+
             IFullNode node = new FullNodeBuilder()
                 .UseNodeSettings(nodeSettings)
                 .UseBlockStore()
                 .SetCounterChainNetwork(SidechainNetworks[nodeSettings.Network.NetworkType]())
-                .AddFederatedPeg()
+                .AddFederatedPeg(fedPegOptions)
                 .UseTransactionNotification()
                 .UseBlockNotification()
                 .UseApi()
@@ -95,6 +102,7 @@ namespace Xels.XoyPegD
                 .AddRPC()
                 .UsePosConsensus()
                 .UseWallet()
+                .AddSQLiteWalletRepository()
                 .AddPowPosMining()
                 .Build();
 
@@ -103,18 +111,22 @@ namespace Xels.XoyPegD
 
         private static IFullNode GetSidechainFullNode(string[] args)
         {
-            var nodeSettings = new NodeSettings(networksSelector: XoyNetwork.NetworksSelector, protocolVersion: ProtocolVersion.ALT_PROTOCOL_VERSION, args: args)
+            var nodeSettings = new NodeSettings(networksSelector: XoyNetwork.NetworksSelector, protocolVersion: ProtocolVersion.CIRRUS_VERSION, args: args)
             {
                 MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
             };
+
+            var fedPegOptions = new FederatedPegOptions(
+                walletSyncFromHeight: new int[] { 1, 1, 1 }[(int)nodeSettings.Network.NetworkType]
+            );
 
             IFullNode node = new FullNodeBuilder()
                 .UseNodeSettings(nodeSettings)
                 .UseBlockStore()
                 .SetCounterChainNetwork(MainChainNetworks[nodeSettings.Network.NetworkType]())
                 .UseFederatedPegPoAMining()
-                .AddFederatedPeg()
-                .CheckForPoAMembersCollateral()
+                .AddFederatedPeg(fedPegOptions)
+                .CheckForPoAMembersCollateral(true) // This is a mining node so we will check the commitment height data as well as the full set of collateral checks.
                 .UseTransactionNotification()
                 .UseBlockNotification()
                 .UseApi()
@@ -126,6 +138,7 @@ namespace Xels.XoyPegD
                     options.UsePoAWhitelistedContracts();
                 })
                 .UseSmartContractWallet()
+                .AddSQLiteWalletRepository()
                 .Build();
 
             return node;

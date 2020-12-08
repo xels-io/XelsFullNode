@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+      <TargetFramework>netcoreapp2.1</TargetFramework>
+      <RuntimeFrameworkVersion>2.1.1</RuntimeFrameworkVersion>
+      <Version>3.0.8.0</Version>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="CSharpFunctionalExtensions" Version="1.10.0" />
+        <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.12" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\Xels.Bitcoin.Features.Miner\Xels.Bitcoin.Features.Miner.csproj" />
+      <ProjectReference Include="..\Xels.Bitcoin.Features.Wallet\Xels.Bitcoin.Features.Wallet.csproj" />
+      <ProjectReference Include="..\Xels.Bitcoin\Xels.Bitcoin.csproj" />
+    </ItemGroup>
+
+</Project>

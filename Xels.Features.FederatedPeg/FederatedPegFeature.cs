@@ -14,6 +14,7 @@ using Xels.Bitcoin.Builder.Feature;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Connection;
+using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Features.Api;
 using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
@@ -22,14 +23,15 @@ using Xels.Bitcoin.Features.Notifications;
 using Xels.Bitcoin.Features.PoA;
 using Xels.Bitcoin.Features.PoA.Voting;
 using Xels.Bitcoin.Features.SmartContracts;
-using Xels.Bitcoin.Features.SmartContracts.PoA;
+using Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Consensus.Rules;
+using Xels.Bitcoin.Features.SmartContracts.Rules;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
 using Xels.Bitcoin.Utilities;
-using Xels.Features.FederatedPeg.Collateral;
+using Xels.Features.Collateral;
+using Xels.Features.Collateral.CounterChain;
 using Xels.Features.FederatedPeg.Controllers;
-using Xels.Features.FederatedPeg.CounterChain;
 using Xels.Features.FederatedPeg.InputConsolidation;
 using Xels.Features.FederatedPeg.Interfaces;
 using Xels.Features.FederatedPeg.Models;
@@ -79,6 +81,8 @@ namespace Xels.Features.FederatedPeg
 
         private readonly IPartialTransactionRequester partialTransactionRequester;
 
+        private readonly MempoolCleaner mempoolCleaner;
+
         private readonly ISignedMultisigTransactionBroadcaster signedBroadcaster;
 
         private readonly IMaturedBlocksSyncManager maturedBlocksSyncManager;
@@ -101,6 +105,7 @@ namespace Xels.Features.FederatedPeg
             INodeStats nodeStats,
             ICrossChainTransferStore crossChainTransferStore,
             IPartialTransactionRequester partialTransactionRequester,
+            MempoolCleaner mempoolCleaner,
             ISignedMultisigTransactionBroadcaster signedBroadcaster,
             IMaturedBlocksSyncManager maturedBlocksSyncManager,
             IWithdrawalHistoryProvider withdrawalHistoryProvider,
@@ -117,6 +122,7 @@ namespace Xels.Features.FederatedPeg
             this.network = network;
             this.crossChainTransferStore = crossChainTransferStore;
             this.partialTransactionRequester = partialTransactionRequester;
+            this.mempoolCleaner = mempoolCleaner;
             this.maturedBlocksSyncManager = maturedBlocksSyncManager;
             this.withdrawalHistoryProvider = withdrawalHistoryProvider;
             this.signedBroadcaster = signedBroadcaster;
@@ -128,8 +134,8 @@ namespace Xels.Features.FederatedPeg
             var payloadProvider = (PayloadProvider)this.fullNode.Services.ServiceProvider.GetService(typeof(PayloadProvider));
             payloadProvider.AddPayload(typeof(RequestPartialTransactionPayload));
 
-            nodeStats.RegisterStats(this.AddComponentStats, StatsType.Component);
-            nodeStats.RegisterStats(this.AddInlineStats, StatsType.Inline, 800);
+            nodeStats.RegisterStats(this.AddComponentStats, StatsType.Component, this.GetType().Name);
+            nodeStats.RegisterStats(this.AddInlineStats, StatsType.Inline, this.GetType().Name, 800);
         }
 
         public override async Task InitializeAsync()
@@ -152,6 +158,9 @@ namespace Xels.Features.FederatedPeg
             // Query our database for partially-signed transactions and send them around to be signed every N seconds.
             this.partialTransactionRequester.Start();
 
+            // Cleans the mempool periodically.
+            this.mempoolCleaner.Start();
+
             // Query our database for fully-signed transactions and broadcast them every N seconds.
             this.signedBroadcaster.Start();
 
@@ -173,7 +182,7 @@ namespace Xels.Features.FederatedPeg
         /// </summary>
         private void CheckConfiguration()
         {
-            var wallet = this.federationWalletManager.GetWallet();
+            FederationWallet wallet = this.federationWalletManager.GetWallet();
 
             if (wallet.MultiSigAddress.RedeemScript != this.federatedPegSettings.MultiSigRedeemScript)
             {
@@ -195,12 +204,13 @@ namespace Xels.Features.FederatedPeg
             this.crossChainTransferStore.Dispose();
         }
 
+        [NoTrace]
         private void AddInlineStats(StringBuilder benchLogs)
         {
             if (this.federationWalletManager == null)
                 return;
 
-            int height = this.federationWalletManager.LastBlockHeight();
+            int height = this.federationWalletManager.LastBlockSyncedHashHeight().Height;
             ChainedHeader block = this.chainIndexer.GetHeader(height);
             uint256 hashBlock = block == null ? 0 : block.HashBlock;
 
@@ -210,6 +220,7 @@ namespace Xels.Features.FederatedPeg
                                  (federationWallet != null ? (" Fed.Wallet.Hash: ".PadRight(LoggingConfiguration.ColumnLength - 1) + hashBlock) : string.Empty));
         }
 
+        [NoTrace]
         private void AddComponentStats(StringBuilder benchLog)
         {
             try
@@ -328,22 +339,24 @@ namespace Xels.Features.FederatedPeg
             return benchLog.ToString();
         }
 
+        [NoTrace]
         private void AddBenchmarkLine(StringBuilder benchLog, (string Value, int ValuePadding)[] items, int maxItemsPerLine = int.MaxValue)
         {
-            if (items != null)
+            if (items == null)
+                return;
+
+            int itemsAdded = 0;
+            foreach ((string Value, int ValuePadding) in items)
             {
-                int itemsAdded = 0;
-                foreach (var item in items)
+                if (itemsAdded++ >= maxItemsPerLine)
                 {
-                    if (itemsAdded++ >= maxItemsPerLine)
-                    {
-                        benchLog.AppendLine();
-                        itemsAdded = 1;
-                    }
-                    benchLog.Append(item.Value.PadRight(item.ValuePadding));
+                    benchLog.AppendLine();
+                    itemsAdded = 1;
                 }
-                benchLog.AppendLine();
+                benchLog.Append(Value.PadRight(ValuePadding));
             }
+
+            benchLog.AppendLine();
         }
     }
 
@@ -352,7 +365,8 @@ namespace Xels.Features.FederatedPeg
     /// </summary>
     public static class FullNodeBuilderSidechainRuntimeFeatureExtension
     {
-        public static IFullNodeBuilder AddFederatedPeg(this IFullNodeBuilder fullNodeBuilder)
+        [NoTrace]
+        public static IFullNodeBuilder AddFederatedPeg(this IFullNodeBuilder fullNodeBuilder, IFederatedPegOptions federatedPegOptions = null)
         {
             LoggingConfiguration.RegisterFeatureNamespace<FederatedPegFeature>(
                 FederatedPegFeature.FederationGatewayFeatureNamespace);
@@ -365,21 +379,21 @@ namespace Xels.Features.FederatedPeg
                     .FeatureServices(services =>
                     {
                         services.AddSingleton<IMaturedBlocksProvider, MaturedBlocksProvider>();
+                        services.AddSingleton(federatedPegOptions ?? new FederatedPegOptions());
                         services.AddSingleton<IFederatedPegSettings, FederatedPegSettings>();
                         services.AddSingleton<IOpReturnDataReader, OpReturnDataReader>();
                         services.AddSingleton<IDepositExtractor, DepositExtractor>();
                         services.AddSingleton<IWithdrawalExtractor, WithdrawalExtractor>();
-                        services.AddSingleton<FederationGatewayController>();
                         services.AddSingleton<IFederationWalletSyncManager, FederationWalletSyncManager>();
                         services.AddSingleton<IFederationWalletTransactionHandler, FederationWalletTransactionHandler>();
                         services.AddSingleton<IFederationWalletManager, FederationWalletManager>();
                         services.AddSingleton<IMultisigCoinSelector, MultisigCoinSelector>();
                         services.AddSingleton<FedMultiSigManualWithdrawalTransactionBuilder>();
                         services.AddSingleton<IWithdrawalTransactionBuilder, WithdrawalTransactionBuilder>();
-                        services.AddSingleton<FederationWalletController>();
                         services.AddSingleton<ICrossChainTransferStore, CrossChainTransferStore>();
                         services.AddSingleton<ISignedMultisigTransactionBroadcaster, SignedMultisigTransactionBroadcaster>();
                         services.AddSingleton<IPartialTransactionRequester, PartialTransactionRequester>();
+                        services.AddSingleton<MempoolCleaner>();
                         services.AddSingleton<IFederationGatewayClient, FederationGatewayClient>();
                         services.AddSingleton<IMaturedBlocksSyncManager, MaturedBlocksSyncManager>();
                         services.AddSingleton<IWithdrawalHistoryProvider, WithdrawalHistoryProvider>();
@@ -401,15 +415,20 @@ namespace Xels.Features.FederatedPeg
         {
             fullNodeBuilder.ConfigureFeature(features =>
             {
-                features.AddFeature<PoAFeature>().DependOn<FederatedPegFeature>().FeatureServices(services =>
-                    {
-                        services.AddSingleton<PoABlockHeaderValidator>();
-                        services.AddSingleton<IPoAMiner, CollateralPoAMiner>();
-                        services.AddSingleton<ISlotsManager, SlotsManager>();
-                        services.AddSingleton<BlockDefinition, FederatedPegBlockDefinition>();
-                        services.AddSingleton<ICoinbaseSplitter, PremineCoinbaseSplitter>();
-                        services.AddSingleton<IBlockBufferGenerator, BlockBufferGenerator>();
-                    });
+                features
+                .AddFeature<PoAFeature>()
+                .DependOn<FederatedPegFeature>()
+                .FeatureServices(services =>
+                {
+                    services.AddSingleton<PoABlockHeaderValidator>();
+                    services.AddSingleton<IPoAMiner, CollateralPoAMiner>();
+                    services.AddSingleton<ISlotsManager, SlotsManager>();
+                    services.AddSingleton<BlockDefinition, FederatedPegBlockDefinition>();
+                    services.AddSingleton<ICoinbaseSplitter, PremineCoinbaseSplitter>();
+                    services.AddSingleton<IBlockBufferGenerator, BlockBufferGenerator>();
+
+                    services.AddSingleton(typeof(IContractTransactionPartialValidationRule), typeof(SmartContractFormatLogic));
+                });
             });
 
             // TODO: Consensus and Mining should be separated. Sidechain nodes don't need any of the Federation code but do need Consensus.
@@ -419,11 +438,12 @@ namespace Xels.Features.FederatedPeg
             LoggingConfiguration.RegisterFeatureNamespace<ConsensusFeature>("consensus");
             fullNodeBuilder.ConfigureFeature(features =>
             {
-                features.AddFeature<ConsensusFeature>().FeatureServices(services =>
+                features
+                .AddFeature<ConsensusFeature>()
+                .FeatureServices(services =>
                 {
                     services.AddSingleton<DBreezeCoinView>();
                     services.AddSingleton<ICoinView, CachedCoinView>();
-                    services.AddSingleton<ConsensusController>();
                     services.AddSingleton<IChainState, ChainState>();
                     services.AddSingleton<ConsensusQuery>()
                         .AddSingleton<INetworkDifficulty, ConsensusQuery>(provider => provider.GetService<ConsensusQuery>())
@@ -437,34 +457,8 @@ namespace Xels.Features.FederatedPeg
                     services.AddSingleton<MinerSettings>();
 
                     // Consensus Rules
-                    services.AddSingleton<PoAConsensusRuleEngine>();
-                    services.AddSingleton<DefaultVotingController>();
+                    services.AddSingleton<IConsensusRuleEngine, PoAConsensusRuleEngine>();
                 });
-            });
-
-            return fullNodeBuilder;
-        }
-
-        /// <summary>
-        /// Adds mining to the smart contract node when on a proof-of-authority network with collateral enabled.
-        /// </summary>
-        public static IFullNodeBuilder UseSmartContractCollateralPoAMining(this IFullNodeBuilder fullNodeBuilder)
-        {
-            fullNodeBuilder.ConfigureFeature(features =>
-            {
-                features
-                    .AddFeature<PoAFeature>()
-                    .FeatureServices(services =>
-                    {
-                        services.AddSingleton<IFederationManager, FederationManager>();
-                        services.AddSingleton<PoABlockHeaderValidator>();
-                        services.AddSingleton<IPoAMiner, CollateralPoAMiner>();
-                        services.AddSingleton<PoAMinerSettings>();
-                        services.AddSingleton<MinerSettings>();
-                        services.AddSingleton<ISlotsManager, SlotsManager>();
-                        services.AddSingleton<BlockDefinition, SmartContractPoABlockDefinition>();
-                        services.AddSingleton<IBlockBufferGenerator, BlockBufferGenerator>();
-                    });
             });
 
             return fullNodeBuilder;

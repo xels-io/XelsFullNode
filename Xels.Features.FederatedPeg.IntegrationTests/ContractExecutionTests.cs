@@ -14,6 +14,7 @@ using Xels.Bitcoin.Features.SmartContracts.Wallet;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.Features.Wallet.Models;
+using Xels.Bitcoin.IntegrationTests;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.Networks;
@@ -137,7 +138,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests
 
             // Broadcast to the other node.
 
-            IActionResult result = coreNode.FullNode.NodeService<SmartContractWalletController>().SendTransaction(new SendTransactionRequest(trx.ToHex()));
+            IActionResult result = coreNode.FullNode.NodeController<SmartContractWalletController>().SendTransaction(new SendTransactionRequest(trx.ToHex()));
             if (result is ErrorResult errorResult)
             {
                 var errorResponse = (ErrorResponse)errorResult.Value;

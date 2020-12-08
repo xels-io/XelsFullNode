@@ -11,6 +11,7 @@ using Xels.Bitcoin.Utilities.ModelStateErrors;
 
 namespace Xels.Features.FederatedPeg.Controllers
 {
+    [ApiVersion("1")]
     [Route("api/[controller]")]
     public class CollateralVotingController : Controller
     {

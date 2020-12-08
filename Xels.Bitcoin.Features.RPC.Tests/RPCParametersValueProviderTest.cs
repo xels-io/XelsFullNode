@@ -1,10 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json.Linq;
+using Xels.Bitcoin.Features.RPC.Controllers;
+using Xels.Bitcoin.Features.Wallet;
 using Xunit;
 
 namespace Xels.Bitcoin.Features.RPC.Tests
@@ -131,6 +137,25 @@ namespace Xels.Bitcoin.Features.RPC.Tests
             bool result = this.provider.ContainsPrefix("rpc_");
 
             Assert.False(result);
+        }
+
+        [Fact]
+        public void WhenNoParametersPassedAttemptToUseDefaultValueFromAction()
+        {
+            this.actionContext.RouteData = new RouteData();
+
+            string obj = "{}";
+            this.actionContext.RouteData.Values.Add("req", JObject.Parse(obj));
+            this.actionContext.ActionDescriptor = new ActionDescriptor();
+            this.actionContext.ActionDescriptor.Parameters = new List<ParameterDescriptor>();
+            foreach (var parameterInfo in typeof(WalletRPCController).GetMethod("ListUnspent")?.GetParameters() ?? Array.Empty<ParameterInfo>())
+            {
+                this.actionContext.ActionDescriptor.Parameters.Add(new ControllerParameterDescriptor { Name = parameterInfo.Name, ParameterInfo = parameterInfo });
+            }
+
+            var result = this.provider.GetValue("minConfirmations");
+
+            result.FirstValue.Should().Be("1");
         }
 
         [Fact]

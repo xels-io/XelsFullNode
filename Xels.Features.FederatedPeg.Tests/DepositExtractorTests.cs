@@ -32,8 +32,6 @@ namespace Xels.Features.FederatedPeg.Tests
 
         private readonly TestTransactionBuilder transactionBuilder;
 
-        private readonly ChainIndexer chainIndexer;
-
         public DepositExtractorTests()
         {
             this.network = XoyNetwork.NetworksSelector.Regtest();

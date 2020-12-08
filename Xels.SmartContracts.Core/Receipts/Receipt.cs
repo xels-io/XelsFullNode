@@ -60,6 +60,11 @@ namespace Xels.SmartContracts.Core.Receipts
         public uint256 BlockHash { get; set; }
 
         /// <summary>
+        /// The height of the block. Nullable for backwards-compatibility with receipt data saved before this field was introduced.
+        /// </summary>
+        public ulong? BlockNumber { get; }
+
+        /// <summary>
         /// Address of the sender of the transaction.
         /// </summary>
         public uint160 From { get; }
@@ -68,6 +73,11 @@ namespace Xels.SmartContracts.Core.Receipts
         /// Contract address sent to in the CALL. Null if CREATE.
         /// </summary>
         public uint160 To { get; }
+
+        /// <summary>
+        /// Method name sent in the CALL. Null if CREATE.
+        /// </summary>
+        public string MethodName { get; }
 
         /// <summary>
         /// Contract address created in this CREATE. Null if CALL.
@@ -106,8 +116,10 @@ namespace Xels.SmartContracts.Core.Receipts
             string result,
             string errorMessage,
             ulong gasPrice,
-            ulong amount) 
-            : this(postState, gasUsed, logs, BuildBloom(logs), transactionHash, null, @from, to, newContractAddress, success, result, errorMessage, gasPrice, amount)
+            ulong amount,
+            string methodName = null,
+            ulong? blockNumber = null) 
+            : this(postState, gasUsed, logs, BuildBloom(logs), transactionHash, null, @from, to, newContractAddress, success, result, errorMessage, gasPrice, amount, methodName, blockNumber)
         { }
 
         /// <summary>
@@ -116,7 +128,7 @@ namespace Xels.SmartContracts.Core.Receipts
         public Receipt(uint256 postState,
             ulong gasUsed,
             Log[] logs)
-            : this(postState, gasUsed, logs, BuildBloom(logs), null, null, null, null, null, false, null, null, 0, 0)
+            : this(postState, gasUsed, logs, BuildBloom(logs), null, null, null, null, null, false, null, null, 0, 0, null, null)
         { }
 
         /// <summary>
@@ -127,7 +139,7 @@ namespace Xels.SmartContracts.Core.Receipts
             ulong gasUsed,
             Log[] logs,
             Bloom bloom) 
-            : this(postState, gasUsed, logs, bloom, null, null, null, null, null, false, null, null, 0, 0)
+            : this(postState, gasUsed, logs, bloom, null, null, null, null, null, false, null, null, 0, 0, null, null)
         { }
 
         private Receipt(uint256 postState,
@@ -136,14 +148,16 @@ namespace Xels.SmartContracts.Core.Receipts
             Bloom bloom,
             uint256 transactionHash,
             uint256 blockHash,
-            uint160 from,
+            uint160 @from,
             uint160 to,
             uint160 newContractAddress,
             bool success,
             string result,
             string errorMessage,
             ulong gasPrice,
-            ulong amount)
+            ulong amount,
+            string methodName,
+            ulong? blockNumber)
         {
             this.PostState = postState;
             this.GasPrice = gasPrice;
@@ -159,6 +173,8 @@ namespace Xels.SmartContracts.Core.Receipts
             this.Result = result;
             this.ErrorMessage = errorMessage;
             this.Amount = amount;
+            this.MethodName = methodName;
+            this.BlockNumber = blockNumber;
         }
 
         /// <summary>
@@ -235,6 +251,12 @@ namespace Xels.SmartContracts.Core.Receipts
             RLPCollection innerLogList = (RLPCollection)logList[0];
             Log[] logs = innerLogList.Select(x => Log.FromBytesRlp(x.RLPData)).ToArray();
 
+            // Method name is the 15th item to be added. Existing receipts without this data will throw exceptions without this check.
+            var hasMethodName = innerList.Count > 14;
+
+            // Block number is the 16th item to be added.
+            var hasBlockNumber = innerList.Count > 15;
+
             var receipt = new Receipt(
                 new uint256(innerList[0].RLPData),
                 BitConverter.ToUInt64(innerList[1].RLPData),
@@ -249,7 +271,9 @@ namespace Xels.SmartContracts.Core.Receipts
                 innerList[10].RLPData != null ? Encoding.UTF8.GetString(innerList[10].RLPData) : null,
                 innerList[11].RLPData != null ? Encoding.UTF8.GetString(innerList[11].RLPData) : null,
                 BitConverter.ToUInt64(innerList[12].RLPData),
-                BitConverter.ToUInt64(innerList[13].RLPData));
+                BitConverter.ToUInt64(innerList[13].RLPData),
+                hasMethodName && innerList[14].RLPData != null ? Encoding.UTF8.GetString(innerList[14].RLPData) : null,
+                hasBlockNumber && innerList[15].RLPData != null ? BitConverter.ToUInt64(innerList[15].RLPData) : (ulong?) null);
 
             return receipt;
         }
@@ -275,7 +299,9 @@ namespace Xels.SmartContracts.Core.Receipts
                 RLP.EncodeElement(Encoding.UTF8.GetBytes(this.Result ?? "")),
                 RLP.EncodeElement(Encoding.UTF8.GetBytes(this.ErrorMessage ?? "")),
                 RLP.EncodeElement(BitConverter.GetBytes(this.GasPrice)),
-                RLP.EncodeElement(BitConverter.GetBytes(this.Amount))
+                RLP.EncodeElement(BitConverter.GetBytes(this.Amount)),
+                RLP.EncodeElement(Encoding.UTF8.GetBytes(this.MethodName ?? "")),
+                RLP.EncodeElement(this.BlockNumber.HasValue ? BitConverter.GetBytes(this.BlockNumber.Value) : null)
             );
         }
 

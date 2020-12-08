@@ -1,6 +1,8 @@
 ﻿using NBitcoin;
 using Xels.Bitcoin.Features.PoA;
 using Xels.SmartContracts.Core;
+using Xels.SmartContracts.Core.Interfaces;
+using TracerAttributes;
 using uint256 = NBitcoin.uint256;
 
 namespace Xels.Bitcoin.Features.SmartContracts.PoA
@@ -32,6 +34,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoA
             this.logsBloom = new Bloom();
         }
 
+        [NoTrace]
         public override void ReadWrite(BitcoinStream stream)
         {
             base.ReadWrite(stream);
@@ -40,7 +43,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoA
             stream.ReadWrite(ref this.logsBloom);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc />  
+        [NoTrace]
         protected override void ReadWriteHashingStream(BitcoinStream stream)
         {
             base.ReadWriteHashingStream(stream);

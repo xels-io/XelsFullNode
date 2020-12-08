@@ -13,7 +13,8 @@ using Xels.Bitcoin.Features.RPC;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.Runners;
-using Xels.Features.FederatedPeg.CounterChain;
+using Xels.Features.Collateral.CounterChain;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.Features.FederatedPeg.IntegrationTests.Utils
 {
@@ -47,6 +48,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests.Utils
                 .AddRPC()
                 .UsePosConsensus()
                 .UseWallet()
+                .AddSQLiteWalletRepository()
                 .AddPowPosMining()
                 .MockIBD()
                 .Build();

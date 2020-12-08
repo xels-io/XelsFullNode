@@ -15,6 +15,7 @@ using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.IntegrationTests.Common.Runners;
 using Xels.Bitcoin.P2P;
 using Xels.Bitcoin.Utilities;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.SmartContracts.Tests.Common
 {
@@ -45,6 +46,7 @@ namespace Xels.SmartContracts.Tests.Common
                             .UseSmartContractPoAConsensus()
                             .UseSmartContractPoAMining()
                             .UseSmartContractWallet()
+                            .AddSQLiteWalletRepository()
                             .ReplaceTimeProvider(this.timeProvider)
                             .MockIBD()
                             .AddFastMiningCapability();

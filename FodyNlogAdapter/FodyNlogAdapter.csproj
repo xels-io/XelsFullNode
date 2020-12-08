@@ -2,9 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>Xels.FodyNlogAdapter</PackageId>
-    <Version>3.0.0.4-beta</Version>
+    <AssemblyName>FodyNlogAdapter</AssemblyName>
+    <Version>3.0.8.0</Version>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <Authors>Xels Group Ltd.</Authors>
+    <PackageId>Xels.FodyNlogAdapter</PackageId>
+    <Product>Xels.FodyNlogAdapter</Product>
   </PropertyGroup>
 
   <ItemGroup>

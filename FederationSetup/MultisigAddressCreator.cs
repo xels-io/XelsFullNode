@@ -1,9 +1,5 @@
 ﻿using System.Text;
 using NBitcoin;
-using NBitcoin.DataEncoders;
-using Xels.Bitcoin.Networks;
-using Xels.Sidechains.Networks;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace FederationSetup

@@ -19,7 +19,7 @@ using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
-using Xels.Features.FederatedPeg.CounterChain;
+using Xels.Features.Collateral.CounterChain;
 using Xels.Features.FederatedPeg.Interfaces;
 using Xels.Features.FederatedPeg.TargetChain;
 using Xels.Features.FederatedPeg.Wallet;
@@ -244,7 +244,7 @@ namespace Xels.Features.FederatedPeg.Tests
         protected ICrossChainTransferStore CreateStore()
         {
             return new CrossChainTransferStore(this.network, this.dataFolder, this.ChainIndexer, this.federatedPegSettings, this.dateTimeProvider,
-                this.loggerFactory, this.withdrawalExtractor, this.fullNode, this.blockRepository, this.federationWalletManager, this.withdrawalTransactionBuilder, this.dBreezeSerializer, this.signals, this.stateRepositoryRoot);
+                this.loggerFactory, this.withdrawalExtractor, this.blockRepository, this.federationWalletManager, this.withdrawalTransactionBuilder, this.dBreezeSerializer, this.signals, this.stateRepositoryRoot);
         }
 
         /// <summary>

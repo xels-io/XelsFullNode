@@ -108,6 +108,11 @@ namespace Xels.Bitcoin.Configuration
         /// is met. For this reason, the minimum relay transaction fee is usually lower than the minimum fee.
         /// </summary>
         public FeeRate MinRelayTxFeeRate { get; private set; }
+        
+        /// <summary>
+        /// If true then the node will add and start the SignalR feature.
+        /// </summary>
+        public bool EnableSignalR { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the object.
@@ -225,6 +230,8 @@ namespace Xels.Bitcoin.Configuration
                 if (File.Exists(this.ConfigurationFile))
                     this.ReadConfigurationFile();
             }
+
+            this.EnableSignalR = this.ConfigReader.GetOrDefault<bool>("enableSignalR",  false, this.Logger);
 
             // Create the custom logger factory.
             this.Log = new LogSettings();
@@ -401,18 +408,19 @@ namespace Xels.Bitcoin.Configuration
         /// <param name="network">The network to base the defaults off.</param>
         public static void BuildDefaultConfigurationFile(StringBuilder builder, Network network)
         {
-            //builder.AppendLine("connect=52.68.239.4");
-            //builder.AppendLine("connect=54.238.248.117");
-            //builder.AppendLine("connect=13.114.52.87");
-            //builder.AppendLine("connect=52.192.229.45");
-            //builder.AppendLine("connect=52.199.121.139");
+            builder.AppendLine("connect=52.68.239.4");
+            builder.AppendLine("connect=54.64.43.45");
+            builder.AppendLine("connect=54.238.248.117");
+            builder.AppendLine("connect=13.114.52.87");
+            builder.AppendLine("connect=52.192.229.45");
+            builder.AppendLine("connect=52.199.121.139");
 
-            //builder.AppendLine("whitelist=52.68.239.4");
-            //builder.AppendLine("whitelist=54.238.248.117");
-            //builder.AppendLine("whitelist=13.114.52.87");
-            //builder.AppendLine("whitelist=52.192.229.45");
-            //builder.AppendLine("whitelist=52.199.121.139");
-
+            builder.AppendLine("whitelist=52.68.239.4");
+            builder.AppendLine("whitelist=54.64.43.45");
+            builder.AppendLine("whitelist=54.238.248.117");
+            builder.AppendLine("whitelist=13.114.52.87");
+            builder.AppendLine("whitelist=52.192.229.45");
+            builder.AppendLine("whitelist=52.199.121.139");
 
             builder.AppendLine("####Node Settings####");
             builder.AppendLine($"#Test network. Defaults to 0.");

@@ -47,7 +47,7 @@ namespace Xels.Bitcoin.Features.Miner.Tests
             this.dateTimeProvider = new Mock<IDateTimeProvider>();
             this.powReward = Money.Coins(50);
             this.testNet = KnownNetworks.TestNet;
-            new FullNodeBuilderConsensusExtension.PowConsensusRulesRegistration().RegisterRules(this.testNet.Consensus);
+            //new FullNodeBuilderConsensusExtension.PowConsensusRulesRegistration().RegisterRules(this.testNet.Consensus);
             this.minerSettings = new MinerSettings(NodeSettings.Default(this.Network));
             this.key = new Key();
 
@@ -128,21 +128,21 @@ namespace Xels.Bitcoin.Features.Miner.Tests
         {
             ConsensusOptions options = this.testNet.Consensus.Options;
             int minerConfirmationWindow = this.testNet.Consensus.MinerConfirmationWindow;
-            int ruleChangeActivationThreshold = this.testNet.Consensus.RuleChangeActivationThreshold;
+
             try
             {
                 var newOptions = new ConsensusOptions();
                 this.testNet.Consensus.Options = newOptions;
-                this.testNet.Consensus.BIP9Deployments[0] = new BIP9DeploymentsParameters(19,
-                    new DateTimeOffset(new DateTime(2016, 1, 1, 0, 0, 0, DateTimeKind.Utc)),
-                    new DateTimeOffset(new DateTime(2018, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
+                this.testNet.Consensus.BIP9Deployments[0] = new BIP9DeploymentsParameters("Test", 
+                    19, new DateTimeOffset(new DateTime(2016, 1, 1, 0, 0, 0, DateTimeKind.Utc)),
+                    new DateTimeOffset(new DateTime(2018, 1, 1, 0, 0, 0, DateTimeKind.Utc)),
+                    2);
 
                 // As we are effectively using TestNet the other deployments need to be disabled
                 this.testNet.Consensus.BIP9Deployments[BitcoinBIP9Deployments.CSV] = null;
                 this.testNet.Consensus.BIP9Deployments[BitcoinBIP9Deployments.Segwit] = null;
 
                 this.testNet.Consensus.MinerConfirmationWindow = 2;
-                this.testNet.Consensus.RuleChangeActivationThreshold = 2;
 
                 ChainIndexer chainIndexer = GenerateChainWithHeightAndActivatedBip9(5, this.testNet, new Key(), this.testNet.Consensus.BIP9Deployments[0]);
                 this.SetupRulesEngine(chainIndexer);
@@ -162,7 +162,6 @@ namespace Xels.Bitcoin.Features.Miner.Tests
                 this.testNet.Consensus.Options = options;
                 this.testNet.Consensus.BIP9Deployments[0] = null;
                 this.testNet.Consensus.MinerConfirmationWindow = minerConfirmationWindow;
-                this.testNet.Consensus.RuleChangeActivationThreshold = ruleChangeActivationThreshold;
             }
         }
 
@@ -378,15 +377,23 @@ namespace Xels.Bitcoin.Features.Miner.Tests
         private void SetupRulesEngine(ChainIndexer chainIndexer)
         {
             var dateTimeProvider = new DateTimeProvider();
+            var consensusRulesContainer = new ConsensusRulesContainer();
+
+            foreach (var ruleType in this.Network.Consensus.ConsensusRules.HeaderValidationRules)
+                consensusRulesContainer.HeaderValidationRules.Add(Activator.CreateInstance(ruleType) as HeaderValidationConsensusRule);
+            foreach (var ruleType in this.Network.Consensus.ConsensusRules.PartialValidationRules)
+                consensusRulesContainer.PartialValidationRules.Add(Activator.CreateInstance(ruleType) as PartialValidationConsensusRule);
+            foreach (var ruleType in this.Network.Consensus.ConsensusRules.FullValidationRules)
+                consensusRulesContainer.FullValidationRules.Add(Activator.CreateInstance(ruleType) as FullValidationConsensusRule);
 
             var asyncProvider = new AsyncProvider(this.LoggerFactory.Object, new Mock<ISignals>().Object, new NodeLifetime());
 
             var powConsensusRules = new PowConsensusRuleEngine(this.testNet,
                     this.LoggerFactory.Object, this.dateTimeProvider.Object, chainIndexer,
                     new NodeDeployments(this.testNet, chainIndexer), new ConsensusSettings(new NodeSettings(this.testNet)), new Checkpoints(),
-                    new Mock<ICoinView>().Object, new Mock<IChainState>().Object, new InvalidBlockHashStore(dateTimeProvider), new NodeStats(dateTimeProvider), asyncProvider);
+                    new Mock<ICoinView>().Object, new Mock<IChainState>().Object, new InvalidBlockHashStore(dateTimeProvider), new NodeStats(dateTimeProvider, LoggerFactory.Object), asyncProvider, consensusRulesContainer);
 
-            powConsensusRules.Register();
+            powConsensusRules.SetupRulesEngineParent();
             this.consensusManager.SetupGet(x => x.ConsensusRules).Returns(powConsensusRules);
         }
 
@@ -408,7 +415,6 @@ namespace Xels.Bitcoin.Features.Miner.Tests
                 indexedTransactionSet.Add(txPoolEntry);
                 resultingTransactionEntries.Add(txPoolEntry);
             }
-
 
             this.txMempool.Setup(t => t.MapTx)
                 .Returns(indexedTransactionSet);

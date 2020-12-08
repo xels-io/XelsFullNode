@@ -15,14 +15,20 @@ using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Consensus;
+using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.Rules;
+using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.MemoryPool.Fee;
+using Xels.Bitcoin.Features.MemoryPool.Rules;
 using Xels.Bitcoin.Features.Miner;
 using Xels.Bitcoin.Features.SmartContracts;
+using Xels.Bitcoin.Features.SmartContracts.Caching;
 using Xels.Bitcoin.Features.SmartContracts.PoW;
+using Xels.Bitcoin.Features.SmartContracts.PoW.Rules;
 using Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Consensus.Rules;
+using Xels.Bitcoin.Features.SmartContracts.Rules;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.Mining;
 using Xels.Bitcoin.Signals;
@@ -30,6 +36,7 @@ using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
 using Stratis.Patricia;
 using Xels.SmartContracts.CLR;
+using Xels.SmartContracts.CLR.Caching;
 using Xels.SmartContracts.CLR.Compilation;
 using Xels.SmartContracts.CLR.Loader;
 using Xels.SmartContracts.CLR.ResultProcessors;
@@ -64,7 +71,9 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
                 new MinerSettings(testContext.NodeSettings),
                 testContext.network,
                 new SenderRetriever(),
-                testContext.StateRoot);
+                testContext.StateRoot,
+                testContext.executionCache, 
+                testContext.callDataSerializer);
         }
 
         public class Blockinfo
@@ -114,7 +123,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
 
             testContext.mempoolLock.ReadAsync(() => context.View.LoadViewLocked(tx)).GetAwaiter().GetResult();
 
-            return MempoolValidator.CheckSequenceLocks(testContext.network, chainedBlock, context, flags, uselock, false);
+            return CreateMempoolEntryMempoolRule.CheckSequenceLocks(testContext.network, chainedBlock, context, flags, uselock, false);
         }
 
         public class TestContext
@@ -146,9 +155,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
             #region Smart Contract Components
 
             internal AddressGenerator AddressGenerator { get; private set; }
-            private bool useCheckpoints = true;
             public Key privateKey;
-            private ReflectionVirtualMachine vm;
             private ISerializer serializer;
             private ContractAssemblyLoader assemblyLoader;
             public ICallDataSerializer callDataSerializer;
@@ -160,6 +167,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
             private StateFactory stateFactory;
             private IContractPrimitiveSerializer primitiveSerializer;
             internal Key PrivateKey { get; private set; }
+            private IContractAssemblyCache contractCache;
             private ReflectionVirtualMachine reflectionVirtualMachine;
             private IContractRefundProcessor refundProcessor;
             internal StateRepositoryRoot StateRoot { get; private set; }
@@ -168,6 +176,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
             private SmartContractValidator validator;
             private StateProcessor stateProcessor;
             private SmartContractStateFactory smartContractStateFactory;
+            public IBlockExecutionResultCache executionCache;
             public SmartContractPowConsensusFactory ConsensusFactory { get; private set; }
 
             #endregion
@@ -189,15 +198,16 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
                 this.ChainIndexer = new ChainIndexer(this.network);
                 this.network.Consensus.Options = new ConsensusOptions();
 
-                IDateTimeProvider dateTimeProvider = DateTimeProvider.Default;
-                var inMemoryCoinView = new InMemoryCoinView(this.ChainIndexer.Tip.HashBlock);
-                this.cachedCoinView = new CachedCoinView(inMemoryCoinView, dateTimeProvider, new LoggerFactory(), new NodeStats(new DateTimeProvider()));
-
                 this.loggerFactory = new ExtendedLoggerFactory();
                 this.loggerFactory.AddConsoleWithFilters();
 
+                IDateTimeProvider dateTimeProvider = DateTimeProvider.Default;
+                var inMemoryCoinView = new InMemoryCoinView(this.ChainIndexer.Tip.HashBlock);
+
                 this.NodeSettings = new NodeSettings(this.network, args: new string[] { "-checkpoints" });
                 var consensusSettings = new ConsensusSettings(this.NodeSettings);
+
+                this.cachedCoinView = new CachedCoinView(inMemoryCoinView, dateTimeProvider, this.loggerFactory, new NodeStats(dateTimeProvider, this.loggerFactory), consensusSettings);
 
                 var nodeDeployments = new NodeDeployments(this.network, this.ChainIndexer);
 
@@ -210,12 +220,28 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
                     BlockStoreTip = new ChainedHeader(genesis.Header, genesis.GetHash(), 0)
                 };
 
-                InitializeSmartContractComponents(callingMethod);
+                this.InitializeSmartContractComponents(callingMethod);
 
                 var receiptRepository = new PersistentReceiptRepository(new DataFolder(this.Folder));
 
-                var signals = new Signals(loggerFactory, null);
-                var asyncProvider = new AsyncProvider(loggerFactory, signals, new NodeLifetime());
+                var signals = new Signals(this.loggerFactory, null);
+                var asyncProvider = new AsyncProvider(this.loggerFactory, signals, new NodeLifetime());
+
+                var consensusRulesContainer = new ConsensusRulesContainer();
+
+                this.executionCache = new BlockExecutionResultCache();
+
+                consensusRulesContainer.HeaderValidationRules.Add(Activator.CreateInstance(typeof(BitcoinHeaderVersionRule)) as HeaderValidationConsensusRule);
+                consensusRulesContainer.FullValidationRules.Add(new SetActivationDeploymentsFullValidationRule() as FullValidationConsensusRule);
+                consensusRulesContainer.FullValidationRules.Add(new LoadCoinviewRule() as FullValidationConsensusRule);
+
+                consensusRulesContainer.FullValidationRules.Add(new TxOutSmartContractExecRule() as FullValidationConsensusRule);
+                consensusRulesContainer.FullValidationRules.Add(new OpSpendRule() as FullValidationConsensusRule);
+                consensusRulesContainer.FullValidationRules.Add(new CanGetSenderRule(senderRetriever) as FullValidationConsensusRule);
+                consensusRulesContainer.FullValidationRules.Add(new P2PKHNotContractRule(this.StateRoot) as FullValidationConsensusRule);
+                consensusRulesContainer.FullValidationRules.Add(new CanGetSenderRule(senderRetriever) as FullValidationConsensusRule);
+                consensusRulesContainer.FullValidationRules.Add(new SmartContractPowCoinviewRule(this.network, this.StateRoot, this.ExecutorFactory, this.callDataSerializer, senderRetriever, receiptRepository, this.cachedCoinView, this.executionCache, new LoggerFactory()) as FullValidationConsensusRule);
+                consensusRulesContainer.FullValidationRules.Add(new SaveCoinviewRule() as FullValidationConsensusRule);
 
                 this.consensusRules = new PowConsensusRuleEngine(
                         this.network,
@@ -227,14 +253,13 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
                         new Checkpoints(),
                         this.cachedCoinView,
                         chainState,
-                        new InvalidBlockHashStore(DateTimeProvider.Default),
-                        new NodeStats(new DateTimeProvider()),
-                        asyncProvider)
-                    .Register();
+                        new InvalidBlockHashStore(dateTimeProvider),
+                        new NodeStats(dateTimeProvider, this.loggerFactory),
+                        asyncProvider,
+                        consensusRulesContainer)
+                    .SetupRulesEngineParent();
 
-                var ruleRegistration = new SmartContractPowRuleRegistration(this.network, this.StateRoot,
-                    this.ExecutorFactory, this.callDataSerializer, senderRetriever, receiptRepository, this.cachedCoinView);
-                this.consensusManager = ConsensusManagerHelper.CreateConsensusManager(this.network, chainState: chainState, inMemoryCoinView: inMemoryCoinView, chainIndexer: this.ChainIndexer, ruleRegistration: ruleRegistration, consensusRules: this.consensusRules);
+                this.consensusManager = ConsensusManagerHelper.CreateConsensusManager(this.network, chainState: chainState, inMemoryCoinView: inMemoryCoinView, chainIndexer: this.ChainIndexer, consensusRules: this.consensusRules);
 
                 await this.consensusManager.InitializeAsync(chainState.BlockStoreTip);
 
@@ -315,7 +340,8 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
                 this.assemblyLoader = new ContractAssemblyLoader();
                 this.callDataSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(this.network));
                 this.moduleDefinitionReader = new ContractModuleDefinitionReader();
-                this.reflectionVirtualMachine = new ReflectionVirtualMachine(this.validator, this.loggerFactory, this.assemblyLoader, this.moduleDefinitionReader);
+                this.contractCache = new ContractAssemblyCache();
+                this.reflectionVirtualMachine = new ReflectionVirtualMachine(this.validator, this.loggerFactory, this.assemblyLoader, this.moduleDefinitionReader, this.contractCache);
                 this.stateProcessor = new StateProcessor(this.reflectionVirtualMachine, this.AddressGenerator);
                 this.internalTxExecutorFactory = new InternalExecutorFactory(this.loggerFactory, this.stateProcessor);
                 this.primitiveSerializer = new ContractPrimitiveSerializer(this.network);
@@ -336,7 +362,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
             await context.InitializeAsync();
 
             ulong gasPrice = 1;
-            var gasLimit = (RuntimeObserver.Gas) SmartContractFormatLogic.GasLimitMaximum;
+            var gasLimit = (RuntimeObserver.Gas)SmartContractFormatLogic.GasLimitMaximum;
             var gasBudget = gasPrice * gasLimit;
 
             ContractCompilationResult compilationResult = ContractCompiler.CompileFile("SmartContracts/Token.cs");
@@ -477,7 +503,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
             await context.InitializeAsync();
 
             ulong gasPrice = 1;
-            var gasLimit = (RuntimeObserver.Gas) SmartContractFormatLogic.GasLimitMaximum;
+            var gasLimit = (RuntimeObserver.Gas)SmartContractFormatLogic.GasLimitMaximum;
             var gasBudget = gasPrice * gasLimit;
 
             ContractCompilationResult compilationResult = ContractCompiler.CompileFile("SmartContracts/StorageDemo.cs");
@@ -557,7 +583,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
             await context.InitializeAsync();
 
             ulong gasPrice = 1;
-            var gasLimit = (RuntimeObserver.Gas) SmartContractFormatLogic.GasLimitMaximum;
+            var gasLimit = (RuntimeObserver.Gas)SmartContractFormatLogic.GasLimitMaximum;
             var gasBudget = gasPrice * gasLimit;
 
             ContractCompilationResult compilationResult = ContractCompiler.CompileFile("SmartContracts/TransferTest.cs");
@@ -694,7 +720,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
             context.mempool.Clear();
 
             ulong fundsToSend = 1000;
-            object[] testMethodParameters =  { newContractAddress.ToAddress() };
+            object[] testMethodParameters = { newContractAddress.ToAddress() };
 
             var transferContractCall = new ContractTxData(1, gasPrice, gasLimit, newContractAddress2, "ContractTransfer", testMethodParameters);
             blockTemplate = await this.AddTransactionToMemPoolAndBuildBlockAsync(context, transferContractCall, context.txFirst[2].GetHash(), fundsToSend, gasBudget);
@@ -725,7 +751,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
 
             ulong gasPrice = 1;
             // This uses a lot of gas
-            var gasLimit = (RuntimeObserver.Gas) SmartContractFormatLogic.GasLimitMaximum;
+            var gasLimit = (RuntimeObserver.Gas)SmartContractFormatLogic.GasLimitMaximum;
             var gasBudget = gasPrice * gasLimit;
 
             var compilationResult = ContractCompiler.CompileFile("SmartContracts/CountContract.cs");
@@ -748,7 +774,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
             context.mempool.Clear();
 
             ulong fundsToSend = 1000;
-            object[] testMethodParameters =  { newContractAddress.ToAddress() };
+            object[] testMethodParameters = { newContractAddress.ToAddress() };
 
             var transferContractCallData = new ContractTxData(1, gasPrice, gasLimit, newContractAddress2, "Tester", testMethodParameters);
             blockTemplate = await this.AddTransactionToMemPoolAndBuildBlockAsync(context, transferContractCallData, context.txFirst[2].GetHash(), fundsToSend, gasBudget);
@@ -830,7 +856,7 @@ namespace Xels.SmartContracts.IntegrationTests.PoW
 
             // Add the smart contract transaction to the mempool and mine as normal.
             ulong gasPrice = 1;
-            var gasLimit = (RuntimeObserver.Gas) SmartContractFormatLogic.GasLimitMaximum;
+            var gasLimit = (RuntimeObserver.Gas)SmartContractFormatLogic.GasLimitMaximum;
             var gasBudget = gasPrice * gasLimit;
             ContractCompilationResult compilationResult = ContractCompiler.CompileFile("SmartContracts/InterContract1.cs");
             Assert.True(compilationResult.Success);

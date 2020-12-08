@@ -9,15 +9,16 @@ using Xels.Bitcoin.Builder;
 using Xels.Bitcoin.Builder.Feature;
 using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Consensus;
-using Xels.Bitcoin.Features.MemoryPool;
+using Xels.Bitcoin.Features.MemoryPool.Interfaces;
+using Xels.Bitcoin.Features.SmartContracts.Caching;
 using Xels.Bitcoin.Features.SmartContracts.PoA;
 using Xels.Bitcoin.Features.SmartContracts.PoS;
 using Xels.Bitcoin.Features.SmartContracts.PoW;
-using Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Utilities;
 using Xels.SmartContracts;
 using Xels.SmartContracts.CLR;
+using Xels.SmartContracts.CLR.Caching;
 using Xels.SmartContracts.CLR.Compilation;
 using Xels.SmartContracts.CLR.Decompilation;
 using Xels.SmartContracts.CLR.Loader;
@@ -26,6 +27,7 @@ using Xels.SmartContracts.CLR.ResultProcessors;
 using Xels.SmartContracts.CLR.Serialization;
 using Xels.SmartContracts.CLR.Validation;
 using Xels.SmartContracts.Core;
+using Xels.SmartContracts.Core.Interfaces;
 using Xels.SmartContracts.Core.Receipts;
 using Xels.SmartContracts.Core.State;
 using Xels.SmartContracts.Core.Util;
@@ -81,7 +83,7 @@ namespace Xels.Bitcoin.Features.SmartContracts
         /// <summary>
         /// Adds the smart contract feature to the node.
         /// </summary>
-        public static IFullNodeBuilder AddSmartContracts(this IFullNodeBuilder fullNodeBuilder, Action<SmartContractOptions> options = null)
+        public static IFullNodeBuilder AddSmartContracts(this IFullNodeBuilder fullNodeBuilder, Action<SmartContractOptions> options = null, Action<SmartContractOptions> preOptions = null)
         {
             LoggingConfiguration.RegisterFeatureNamespace<SmartContractFeature>("smartcontracts");
 
@@ -91,17 +93,21 @@ namespace Xels.Bitcoin.Features.SmartContracts
                     .AddFeature<SmartContractFeature>()
                     .FeatureServices(services =>
                     {
+                        // Before setting up, invoke any additional options.
+                        preOptions?.Invoke(new SmartContractOptions(services, fullNodeBuilder.Network));
+
                         // STATE ----------------------------------------------------------------------------
                         services.AddSingleton<DBreezeContractStateStore>();
                         services.AddSingleton<NoDeleteContractStateSource>();
                         services.AddSingleton<IStateRepositoryRoot, StateRepositoryRoot>();
 
                         // CONSENSUS ------------------------------------------------------------------------
-                        services.AddSingleton<IMempoolValidator, SmartContractMempoolValidator>();
+                        services.Replace(ServiceDescriptor.Singleton<IMempoolValidator, SmartContractMempoolValidator>());
                         services.AddSingleton<StandardTransactionPolicy, SmartContractTransactionPolicy>();
 
                         // CONTRACT EXECUTION ---------------------------------------------------------------
                         services.AddSingleton<IInternalExecutorFactory, InternalExecutorFactory>();
+                        services.AddSingleton<IContractAssemblyCache, ContractAssemblyCache>();
                         services.AddSingleton<IVirtualMachine, ReflectionVirtualMachine>();
                         services.AddSingleton<IAddressGenerator, AddressGenerator>();
                         services.AddSingleton<ILoader, ContractAssemblyLoader>();
@@ -111,6 +117,7 @@ namespace Xels.Bitcoin.Features.SmartContracts
                         services.AddSingleton<IStateProcessor, StateProcessor>();
                         services.AddSingleton<ISmartContractStateFactory, SmartContractStateFactory>();
                         services.AddSingleton<ILocalExecutor, LocalExecutor>();
+                        services.AddSingleton<IBlockExecutionResultCache, BlockExecutionResultCache>();
 
                         // RECEIPTS -------------------------------------------------------------------------
                         services.AddSingleton<IReceiptRepository, PersistentReceiptRepository>();
@@ -160,7 +167,6 @@ namespace Xels.Bitcoin.Features.SmartContracts
 
             // Controllers + utils
             services.AddSingleton<CSharpContractDecompiler>();
-            services.AddSingleton<SmartContractsController>();
 
             return options;
         }

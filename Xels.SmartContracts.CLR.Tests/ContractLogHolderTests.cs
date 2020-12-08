@@ -4,6 +4,7 @@ using System.Text;
 using NBitcoin;
 using Xels.SmartContracts.CLR.ContractLogging;
 using Xels.SmartContracts.CLR.Serialization;
+using Xels.SmartContracts.Core;
 using Xels.SmartContracts.Core.Receipts;
 using Xels.SmartContracts.Networks;
 using Xunit;

@@ -52,44 +52,44 @@ namespace Xels.Bitcoin.IntegrationTests.RPC
         public void CanAddNodeToConnectionManager()
         {
             var connectionManager = this.rpcTestFixture.Node.FullNode.NodeService<IConnectionManager>();
-            Assert.Empty(connectionManager.ConnectionSettings.AddNode);
+            Assert.Empty(connectionManager.ConnectionSettings.RetrieveAddNodes());
 
             IPAddress ipAddress = IPAddress.Parse("::ffff:192.168.0.1");
             var endpoint = new IPEndPoint(ipAddress, 80);
             this.rpcTestFixture.RpcClient.AddNode(endpoint);
 
-            Assert.Single(connectionManager.ConnectionSettings.AddNode);
+            Assert.Single(connectionManager.ConnectionSettings.RetrieveAddNodes());
         }
 
-        //[Fact]
-        //public void CheckRPCFailures()
-        //{
-        //    uint256 hash = this.rpcTestFixture.RpcClient.GetBestBlockHash();
+        [Fact]
+        public void CheckRPCFailures()
+        {
+            uint256 hash = this.rpcTestFixture.RpcClient.GetBestBlockHash();
 
-        //    Assert.Equal(hash, KnownNetworks.RegTest.GetGenesis().GetHash());
-        //    RPCClient oldClient = this.rpcTestFixture.RpcClient;
-        //    var client = new RPCClient("abc:def", this.rpcTestFixture.RpcClient.Address, this.rpcTestFixture.RpcClient.Network);
-        //    try
-        //    {
-        //        client.GetBestBlockHash();
-        //        Assert.True(false, "should throw");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Assert.Contains("401", ex.Message);
-        //    }
-        //    client = oldClient;
+            Assert.Equal(hash, KnownNetworks.RegTest.GetGenesis().GetHash());
+            RPCClient oldClient = this.rpcTestFixture.RpcClient;
+            var client = new RPCClient("abc:def", this.rpcTestFixture.RpcClient.Address, this.rpcTestFixture.RpcClient.Network);
+            try
+            {
+                client.GetBestBlockHash();
+                Assert.True(false, "should throw");
+            }
+            catch (Exception ex)
+            {
+                Assert.Contains("401", ex.Message);
+            }
+            client = oldClient;
 
-        //    try
-        //    {
-        //        client.SendCommand("addnode", "regreg", "addr");
-        //        Assert.True(false, "should throw");
-        //    }
-        //    catch (RPCException ex)
-        //    {
-        //        Assert.Equal(RPCErrorCode.RPC_INTERNAL_ERROR, ex.RPCCode);
-        //    }
-        //}
+            try
+            {
+                client.SendCommand("addnode", "regreg", "addr");
+                Assert.True(false, "should throw");
+            }
+            catch (RPCException ex)
+            {
+                Assert.Equal(RPCErrorCode.RPC_INTERNAL_ERROR, ex.RPCCode);
+            }
+        }
 
         [Fact]
         public void InvalidCommandSendRPCException()
@@ -112,12 +112,12 @@ namespace Xels.Bitcoin.IntegrationTests.RPC
             Assert.NotNull(ids);
         }
 
-        //[Fact]
-        //public void CanGetBlockCount()
-        //{
-        //    int blockCount = this.rpcTestFixture.RpcClient.GetBlockCountAsync().Result;
-        //    Assert.Equal(0, blockCount);
-        //}
+        [Fact]
+        public void CanGetBlockCount()
+        {
+            int blockCount = this.rpcTestFixture.RpcClient.GetBlockCountAsync().Result;
+            Assert.Equal(0, blockCount);
+        }
 
         [Fact]
         public void CanGetXelsPeersInfo()

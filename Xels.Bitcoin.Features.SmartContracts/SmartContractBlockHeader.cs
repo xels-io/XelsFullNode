@@ -1,5 +1,6 @@
 ﻿using NBitcoin;
 using Xels.SmartContracts.Core;
+using Xels.SmartContracts.Core.Interfaces;
 
 namespace Xels.Bitcoin.Features.SmartContracts
 {

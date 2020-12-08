@@ -79,6 +79,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
             IScriptAddressReader scriptAddressReader,
             ILoggerFactory loggerFactory,
             IDateTimeProvider dateTimeProvider,
+            IWalletRepository walletRepository,
             IBroadcasterManager broadcasterManager = null) : base(
                 loggerFactory,
                 network,
@@ -90,6 +91,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
                 nodeLifeTime,
                 dateTimeProvider,
                 scriptAddressReader,
+                walletRepository,
                 broadcasterManager
                 )
         {
@@ -124,14 +126,14 @@ namespace Xels.Bitcoin.Features.ColdStaking
         }
 
         /// <summary>
-        /// Gets all the spendable transactions in a wallet from the accounts participating in staking.
+        /// Gets all the unspent transactions in a wallet from the accounts participating in staking.
         /// </summary>
         /// <param name="walletName">Name of the wallet to get the transactions from.</param>
         /// <param name="confirmations">Number of confirmation required.</param>
         /// <returns>An enumeration of <see cref="UnspentOutputReference"/> objects.</returns>
         public override IEnumerable<UnspentOutputReference> GetSpendableTransactionsInWalletForStaking(string walletName, int confirmations = 0)
         {
-            return this.GetSpendableTransactionsInWallet(walletName, confirmations,
+            return this.GetUnspentTransactionsInWallet(walletName, confirmations,
                 a => (a.Index < Wallet.Wallet.SpecialPurposeAccountIndexesStart) || (a.Index == ColdStakingManager.HotWalletAccountIndex));
         }
 
@@ -142,9 +144,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
         /// <returns>A <see cref="Models.GetColdStakingInfoResponse"/> object containing the information.</returns>
         internal Models.GetColdStakingInfoResponse GetColdStakingInfo(string walletName)
         {
-            this.logger.LogTrace("({0}:'{1}')", nameof(walletName), walletName);
-
-            Wallet.Wallet wallet = this.GetWalletByName(walletName);
+            Wallet.Wallet wallet = this.GetWallet(walletName);
 
             var response = new Models.GetColdStakingInfoResponse()
             {
@@ -172,8 +172,6 @@ namespace Xels.Bitcoin.Features.ColdStaking
         /// <returns>The cold staking account or <c>null</c> if the account does not exist.</returns>
         internal HdAccount GetColdStakingAccount(Wallet.Wallet wallet, bool isColdWalletAccount)
         {
-            this.logger.LogTrace("({0}:'{1}',{2}:{3})", nameof(wallet), wallet.Name, nameof(isColdWalletAccount), isColdWalletAccount);
-
             var coinType = (CoinType)wallet.Network.Consensus.CoinType;
             HdAccount account = wallet.GetAccount(isColdWalletAccount ? ColdWalletAccountName : HotWalletAccountName);
             if (account == null)
@@ -204,9 +202,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
         /// <returns>The new or existing cold staking account.</returns>
         internal HdAccount GetOrCreateColdStakingAccount(string walletName, bool isColdWalletAccount, string walletPassword)
         {
-            this.logger.LogTrace("({0}:'{1}',{2}:{3})", nameof(walletName), walletName, nameof(isColdWalletAccount), isColdWalletAccount);
-
-            Wallet.Wallet wallet = this.GetWalletByName(walletName);
+            Wallet.Wallet wallet = this.GetWallet(walletName);
 
             HdAccount account = this.GetColdStakingAccount(wallet, isColdWalletAccount);
             if (account != null)
@@ -215,7 +211,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
                 return account;
             }
 
-            this.logger.LogTrace("The {0} wallet account for '{1}' does not exist and will now be created.", isColdWalletAccount ? "cold" : "hot", wallet.Name);
+            this.logger.LogDebug("The {0} wallet account for '{1}' does not exist and will now be created.", isColdWalletAccount ? "cold" : "hot", wallet.Name);
 
             int accountIndex;
             string accountName;
@@ -231,14 +227,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
                 accountName = HotWalletAccountName;
             }
 
-            account = wallet.AddNewAccount(walletPassword, this.dateTimeProvider.GetTimeOffset(), accountIndex, accountName);
-
-            // Maintain at least one unused address at all times. This will ensure that wallet recovery will also work.
-            IEnumerable<HdAddress> newAddresses = account.CreateAddresses(wallet.Network, 1, false);
-            this.UpdateKeysLookupLocked(newAddresses);
-
-            // Save the changes to the file.
-            this.SaveWallet(wallet);
+            account = wallet.AddNewAccount(walletPassword,  accountIndex, accountName, this.dateTimeProvider.GetTimeOffset());
 
             this.logger.LogTrace("(-):'{0}'", account.Name);
             return account;
@@ -254,9 +243,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
         {
             Guard.NotNull(walletName, nameof(walletName));
 
-            this.logger.LogTrace("({0}:'{1}',{2}:{3})", nameof(walletName), walletName, nameof(isColdWalletAddress), isColdWalletAddress);
-
-            Wallet.Wallet wallet = this.GetWalletByName(walletName);
+            Wallet.Wallet wallet = this.GetWallet(walletName);
             HdAccount account = this.GetColdStakingAccount(wallet, isColdWalletAddress);
             if (account == null)
             {
@@ -267,10 +254,13 @@ namespace Xels.Bitcoin.Features.ColdStaking
             HdAddress address = account.GetFirstUnusedReceivingAddress();
             if (address == null)
             {
-                this.logger.LogTrace("No unused address exists on account '{0}'. Adding new address.", account.Name);
+                this.logger.LogDebug("No unused address exists on account '{0}'. Adding new address.", account.Name);
+                // TODO:
+                /*
                 IEnumerable<HdAddress> newAddresses = account.CreateAddresses(wallet.Network, 1);
                 this.UpdateKeysLookupLocked(newAddresses);
                 address = newAddresses.First();
+                */
             }
 
             this.logger.LogTrace("(-):'{0}'", address.Address);
@@ -313,16 +303,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
             Guard.NotNull(amount, nameof(amount));
             Guard.NotNull(feeAmount, nameof(feeAmount));
 
-            this.logger.LogTrace("({0}:'{1}',{2}:'{3}',{4}:'{5}',{6}:'{7}',{8}:{9},{10}:{11})",
-                nameof(coldWalletAddress), coldWalletAddress,
-                nameof(hotWalletAddress), hotWalletAddress,
-                nameof(walletName), walletName,
-                nameof(walletAccount), walletAccount,
-                nameof(amount), amount,
-                nameof(feeAmount), feeAmount
-                );
-
-            Wallet.Wallet wallet = this.GetWalletByName(walletName);
+            Wallet.Wallet wallet = this.GetWallet(walletName);
 
             // Get/create the cold staking accounts.
             HdAccount coldAccount = this.GetOrCreateColdStakingAccount(walletName, true, walletPassword);
@@ -331,7 +312,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
             bool thisIsColdWallet = coldAccount?.ExternalAddresses.Select(a => a.Address).Contains(coldWalletAddress) ?? false;
             bool thisIsHotWallet = hotAccount?.ExternalAddresses.Select(a => a.Address).Contains(hotWalletAddress) ?? false;
 
-            this.logger.LogTrace("Local wallet '{0}' does{1} contain cold wallet address '{2}' and does{3} contain hot wallet address '{4}'.",
+            this.logger.LogDebug("Local wallet '{0}' does{1} contain cold wallet address '{2}' and does{3} contain hot wallet address '{4}'.",
                 walletName, thisIsColdWallet ? "" : " NOT", coldWalletAddress, thisIsHotWallet ? "" : " NOT", hotWalletAddress);
 
             if (thisIsColdWallet && thisIsHotWallet)
@@ -400,14 +381,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
             Guard.NotNull(amount, nameof(amount));
             Guard.NotNull(feeAmount, nameof(feeAmount));
 
-            this.logger.LogTrace("({0}:'{1}',{2}:'{3}',{4}:'{5}',{6}:'{7}'",
-                nameof(receivingAddress), receivingAddress,
-                nameof(walletName), walletName,
-                nameof(amount), amount,
-                nameof(feeAmount), feeAmount
-                );
-
-            Wallet.Wallet wallet = this.GetWalletByName(walletName);
+            Wallet.Wallet wallet = this.GetWallet(walletName);
 
             // Get the cold staking account.
             HdAccount coldAccount = this.GetColdStakingAccount(wallet, true);
@@ -496,9 +470,8 @@ namespace Xels.Bitcoin.Features.ColdStaking
         public IEnumerable<UnspentOutputReference> GetSpendableTransactionsInColdWallet(string walletName, bool isColdWalletAccount, int confirmations = 0)
         {
             Guard.NotEmpty(walletName, nameof(walletName));
-            this.logger.LogTrace("({0}:'{1}',{2}:{3})", nameof(walletName), walletName, nameof(confirmations), confirmations);
 
-            Wallet.Wallet wallet = this.GetWalletByName(walletName);
+            Wallet.Wallet wallet = this.GetWallet(walletName);
             UnspentOutputReference[] res = null;
             lock (this.lockObject)
             {
@@ -508,24 +481,6 @@ namespace Xels.Bitcoin.Features.ColdStaking
 
             this.logger.LogTrace("(-):*.Count={0}", res.Count());
             return res;
-        }
-
-        /// <summary>
-        /// Checks if the script contains a cold staking address and if so maintains the buffer.
-        /// </summary>
-        /// <param name="script">The script (possibly a cold staking script) to check.</param>
-        /// <param name="accountFilter">The account filter.</param>
-        public override void TransactionFoundInternal(Script script, Func<HdAccount, bool> accountFilter = null)
-        {
-            if (ColdStakingScriptTemplate.Instance.ExtractScriptPubKeyParameters(script, out KeyId hotPubKeyHash, out KeyId coldPubKeyHash))
-            {
-                base.TransactionFoundInternal(hotPubKeyHash.ScriptPubKey, a => a.Index == HotWalletAccountIndex);
-                base.TransactionFoundInternal(coldPubKeyHash.ScriptPubKey, a => a.Index == ColdWalletAccountIndex);
-            }
-            else
-            {
-                base.TransactionFoundInternal(script, accountFilter);
-            }
         }
     }
 }

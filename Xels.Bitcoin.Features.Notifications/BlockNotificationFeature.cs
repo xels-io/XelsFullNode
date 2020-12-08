@@ -83,7 +83,6 @@ namespace Xels.Bitcoin.Features.Notifications
                 .FeatureServices(services =>
                 {
                     services.AddSingleton<IBlockNotification, BlockNotification>();
-                    services.AddSingleton<NotificationsController>();
                 });
             });
 

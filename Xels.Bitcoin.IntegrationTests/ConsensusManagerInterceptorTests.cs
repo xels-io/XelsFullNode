@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
+using Xels.Bitcoin.IntegrationTests.Common.TestNetworks;
 using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Primitives;
 using Xels.Bitcoin.Tests.Common;
@@ -15,15 +16,13 @@ namespace Xels.Bitcoin.IntegrationTests
         /// tries to connect to another chain with longer chain work but containing an invalid block.
         /// </summary>
         [Fact]
-        public async Task ReorgChain_AfterInitialRewind_ChainA_Extension_MinerC_DisconnectsAsync()
+        public async Task ReorgChain_Scenario1_Async()
         {
             using (var builder = NodeBuilder.Create(this))
             {
-                var network = new BitcoinRegTest();
-
-                var minerA = builder.CreateXelsPowNode(network, "cmi-1-minerA").WithDummyWallet();
-                var minerB = builder.CreateXelsPowNode(network, "cmi-1-minerB").NoValidation().WithDummyWallet();
-                var syncer = builder.CreateXelsPowNode(network, "cmi-1-syncer").WithDummyWallet();
+                var minerA = builder.CreateXelsPowNode(new BitcoinRegTest(), "cmi-1-minerA").WithDummyWallet();
+                var minerB = builder.CreateXelsPowNode(new BitcoinRegTestNoValidationRules(), "cmi-1-minerB").NoValidation().WithDummyWallet();
+                var syncer = builder.CreateXelsPowNode(new BitcoinRegTest(), "cmi-1-syncer").WithDummyWallet();
 
                 bool minerADisconnectedFromSyncer = false;
 
@@ -94,15 +93,13 @@ namespace Xels.Bitcoin.IntegrationTests
         /// tries to connect to another chain with longer chain work.
         /// </summary>
         [Fact]
-        public void ReorgChain_AfterInitialRewind_ChainB_MinerB_Disconnects()
+        public void ReorgChain_Scenario2()
         {
             using (var builder = NodeBuilder.Create(this))
             {
-                var network = new BitcoinRegTest();
-
-                var minerA = builder.CreateXelsPowNode(network, "cmi-2-minerA").WithDummyWallet();
-                var minerB = builder.CreateXelsPowNode(network, "cmi-2-minerB").WithDummyWallet();
-                var syncer = builder.CreateXelsPowNode(network, "cmi-2-syncer").WithDummyWallet();
+                var minerA = builder.CreateXelsPowNode(new BitcoinRegTest(), "cmi-2-minerA").WithDummyWallet();
+                var minerB = builder.CreateXelsPowNode(new BitcoinRegTest(), "cmi-2-minerB").WithDummyWallet();
+                var syncer = builder.CreateXelsPowNode(new BitcoinRegTest(), "cmi-2-syncer").WithDummyWallet();
 
                 bool minerADisconnectedFromMinerB = false;
 

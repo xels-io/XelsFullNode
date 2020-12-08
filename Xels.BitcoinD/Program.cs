@@ -9,10 +9,10 @@ using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.RPC;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Api;
-using Xels.Bitcoin.Features.Apps;
 using Xels.Bitcoin.Features.Miner;
 using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Utilities;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.BitcoinD
 {
@@ -32,8 +32,8 @@ namespace Xels.BitcoinD
                     .AddMining()
                     .AddRPC()
                     .UseWallet()
+                    .AddSQLiteWalletRepository()
                     .UseApi()
-                    .UseApps()                    
                     .Build();
 
                 if (node != null)

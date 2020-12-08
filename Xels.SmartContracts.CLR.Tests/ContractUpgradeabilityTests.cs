@@ -21,123 +21,123 @@ namespace Xels.SmartContracts.CLR.Tests
             }
         }
 
-//        [Fact]
-//        public void Load_Contract_Compiled_Against_V1_With_V2_SmartContracts_Succeeds()
-//        {
-//            var source = @"
-//using Xels.SmartContracts;
+        [Fact]
+        public void Load_Contract_Compiled_Against_V1_With_V2_SmartContracts_Succeeds()
+        {
+            var source = @"
+using Xels.SmartContracts;
 
-//public class TestContract : SmartContract
-//{
-//    public bool AMethod(){ return true; }
-//}
-//";
+public class TestContract : SmartContract
+{
+    public bool AMethod(){ return true; }
+}
+";
 
-//            var loader = @"
-//using Xels.SmartContracts;
-//using System.Reflection;
-//using System;
+            var loader = @"
+using Xels.SmartContracts;
+using System.Reflection;
+using System;
 
-//public class TestLoader
-//{
-//    public static bool Load(Assembly assembly)
-//    {
-//        var contractType = assembly.GetType(""TestContract"");
+public class TestLoader
+{
+    public static bool Load(Assembly assembly)
+    {
+        var contractType = assembly.GetType(""TestContract"");
 
-//        if (contractType == null)
-//            return false;
+        if (contractType == null)
+            return false;
 
-//        var method = contractType.GetMethod(""TestMethod"");
+        var method = contractType.GetMethod(""TestMethod"");
 
-//        if (method == null)
-//            return false;
+        if (method == null)
+            return false;
 
-//        var instance = (SmartContract) Activator.CreateInstance(contractType);
+        var instance = (SmartContract) Activator.CreateInstance(contractType);
 
-//        var result = (string)method.Invoke(instance, null);
+        var result = (string)method.Invoke(instance, null);
 
-//        return !string.IsNullOrWhiteSpace(result);
-//    }
-//}
-//";
-//            var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        return !string.IsNullOrWhiteSpace(result);
+    }
+}
+";
+            var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-//            var references = new List<MetadataReference>
-//            {
-//                MetadataReference.CreateFromFile(Path.Combine(basePath, "Packages", "netcoreapp2.1", "System.Runtime.dll")),
-//            };
+            var references = new List<MetadataReference>
+            {
+                MetadataReference.CreateFromFile(Path.Combine(basePath, "Packages", "netcoreapp2.1", "System.Runtime.dll")),
+            };
 
-//            // Xels.SmartContracts.SmartContract with the constructor removed
-//            var version1DllPath = Path.Combine(basePath, "Packages", "1.0.0-TEST", "Xels.SmartContracts.dll");
+            // Xels.SmartContracts.SmartContract with the constructor removed
+            var version1DllPath = Path.Combine(basePath, "Packages", "1.0.0-TEST", "Xels.SmartContracts.dll");
 
-//            // Version 2.0.0-TEST adds string TestMethod() to Xels.SmartContracts.SmartContract
-//            // and GetString() to Xels.SmartContracts.ISmartContractState
-//            var version2DllPath = Path.Combine(basePath, "Packages", "4.0.0-TEST", "Xels.SmartContracts.dll");
+            // Version 2.0.0-TEST adds string TestMethod() to Xels.SmartContracts.SmartContract
+            // and GetString() to Xels.SmartContracts.ISmartContractState
+            var version2DllPath = Path.Combine(basePath, "Packages", "4.0.0-TEST", "Xels.SmartContracts.dll");
             
-//            references.Add(MetadataReference.CreateFromFile(version1DllPath));
+            references.Add(MetadataReference.CreateFromFile(version1DllPath));
 
-//            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
+            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
 
-//            CSharpCompilation compilation = CSharpCompilation.Create(
-//                "smartContract",
-//                new[] { syntaxTree },
-//                references,
-//                new CSharpCompilationOptions(
-//                    OutputKind.DynamicallyLinkedLibrary,
-//                    checkOverflow: true));
+            CSharpCompilation compilation = CSharpCompilation.Create(
+                "smartContract",
+                new[] { syntaxTree },
+                references,
+                new CSharpCompilationOptions(
+                    OutputKind.DynamicallyLinkedLibrary,
+                    checkOverflow: true));
 
-//            byte[] version1CompiledContract;
+            byte[] version1CompiledContract;
 
-//            using (var dllStream = new MemoryStream())
-//            {
-//                EmitResult emitResult = compilation.Emit(dllStream);
+            using (var dllStream = new MemoryStream())
+            {
+                EmitResult emitResult = compilation.Emit(dllStream);
                 
-//                Assert.True(emitResult.Success);
+                Assert.True(emitResult.Success);
 
-//                version1CompiledContract = dllStream.ToArray();
-//            }
+                version1CompiledContract = dllStream.ToArray();
+            }
 
-//            SyntaxTree syntaxTreeLoader = CSharpSyntaxTree.ParseText(loader);
+            SyntaxTree syntaxTreeLoader = CSharpSyntaxTree.ParseText(loader);
 
-//            CSharpCompilation loaderCompilation = CSharpCompilation.Create(
-//                "loader",
-//                new[] { syntaxTreeLoader },
-//                references,
-//                new CSharpCompilationOptions(
-//                    OutputKind.DynamicallyLinkedLibrary,
-//                    checkOverflow: true));
+            CSharpCompilation loaderCompilation = CSharpCompilation.Create(
+                "loader",
+                new[] { syntaxTreeLoader },
+                references,
+                new CSharpCompilationOptions(
+                    OutputKind.DynamicallyLinkedLibrary,
+                    checkOverflow: true));
 
-//            var alc = new TestAssemblyLoadContext();
+            var alc = new TestAssemblyLoadContext();
 
-//            var version2Assembly = alc.LoadFromAssemblyPath(version2DllPath);
+            var version2Assembly = alc.LoadFromAssemblyPath(version2DllPath);
 
-//            Assert.Equal(Version.Parse("4.0.0.0"), version2Assembly.GetName().Version);
+            Assert.Equal(Version.Parse("4.0.0.0"), version2Assembly.GetName().Version);
             
-//            Assembly loaderAssembly;
+            Assembly loaderAssembly;
             
-//            using (var dllStream = new MemoryStream())
-//            {
-//                EmitResult emitResult = loaderCompilation.Emit(dllStream);
+            using (var dllStream = new MemoryStream())
+            {
+                EmitResult emitResult = loaderCompilation.Emit(dllStream);
 
-//                Assert.True(emitResult.Success);
+                Assert.True(emitResult.Success);
 
-//                dllStream.Seek(0, SeekOrigin.Begin);
-//                loaderAssembly = alc.LoadFromStream(dllStream);
-//            }
+                dllStream.Seek(0, SeekOrigin.Begin);
+                loaderAssembly = alc.LoadFromStream(dllStream);
+            }
 
-//            var version1ContractMemoryStream = new MemoryStream(version1CompiledContract);     
-//            var version1ContractAssembly = alc.LoadFromStream(version1ContractMemoryStream);
-//            version1ContractMemoryStream.Dispose();
+            var version1ContractMemoryStream = new MemoryStream(version1CompiledContract);     
+            var version1ContractAssembly = alc.LoadFromStream(version1ContractMemoryStream);
+            version1ContractMemoryStream.Dispose();
 
-//            var loaderType = loaderAssembly.ExportedTypes.First(t => t.Name == "TestLoader");
+            var loaderType = loaderAssembly.ExportedTypes.First(t => t.Name == "TestLoader");
 
-//            var loaderMethod = loaderType.GetMethod("Load");
+            var loaderMethod = loaderType.GetMethod("Load");
 
-//            var version2MethodInvocationResult = (bool) loaderMethod.Invoke(null, new [] { version1ContractAssembly });
+            var version2MethodInvocationResult = (bool) loaderMethod.Invoke(null, new [] { version1ContractAssembly });
 
-//            // If this condition is not null, we have a v1 contract referencing a v2 assembly and a successful
-//            // invocation of a method that only exists on v2
-//            Assert.True(version2MethodInvocationResult);
-//        }
+            // If this condition is not null, we have a v1 contract referencing a v2 assembly and a successful
+            // invocation of a method that only exists on v2
+            Assert.True(version2MethodInvocationResult);
+        }
     }
 }

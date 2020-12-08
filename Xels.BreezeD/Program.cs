@@ -12,6 +12,7 @@ using Xels.Bitcoin.Features.LightWallet;
 using Xels.Bitcoin.Features.Notifications;
 using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Utilities;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.BreezeD
 {
@@ -43,6 +44,7 @@ namespace Xels.BreezeD
                                     .UseBlockStore()
                                     .UsePosConsensus()
                                     .UseLightWallet()
+                                    .AddSQLiteWalletRepository()
                                     .UseBlockNotification()
                                     .UseTransactionNotification();
                 }
@@ -56,6 +58,7 @@ namespace Xels.BreezeD
                                     .UseBlockStore()
                                     .UsePowConsensus()
                                     .UseLightWallet()
+                                    .AddSQLiteWalletRepository()
                                     .UseBlockNotification()
                                     .UseTransactionNotification();
                 }

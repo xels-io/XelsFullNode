@@ -14,6 +14,7 @@ using Xels.Bitcoin.Features.RPC;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Utilities;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.XelsDnsD
 {
@@ -52,6 +53,7 @@ namespace Xels.XelsDnsD
                         .UsePosConsensus()
                         .UseMempool()
                         .UseWallet()
+                        .AddSQLiteWalletRepository()
                         .AddPowPosMining()
                         .UseApi()
                         .AddRPC()

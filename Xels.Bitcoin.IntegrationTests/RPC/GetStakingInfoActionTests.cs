@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Xels.Bitcoin.Features.Miner.Controllers;
 using Xels.Bitcoin.Features.Miner.Interfaces;
 using Xels.Bitcoin.Features.Miner.Models;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
+using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.Runners;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
@@ -28,7 +28,7 @@ namespace Xels.Bitcoin.IntegrationTests.RPC
 
             var nodeLifetime = fullNode.NodeService<INodeLifetime>();
             nodeLifetime.ApplicationStarted.WaitHandle.WaitOne();
-            var controller = fullNode.Services.ServiceProvider.GetService<StakingRpcController>();
+            var controller = fullNode.NodeController<StakingRpcController>();
 
             Assert.NotNull(fullNode.NodeService<IPosMinting>(true));
 
@@ -58,7 +58,7 @@ namespace Xels.Bitcoin.IntegrationTests.RPC
 
             var nodeLifetime = fullNode.NodeService<INodeLifetime>();
             nodeLifetime.ApplicationStarted.WaitHandle.WaitOne();
-            var controller = fullNode.Services.ServiceProvider.GetService<StakingRpcController>();
+            var controller = fullNode.NodeController<StakingRpcController>();
 
             var walletManager = node.NodeService<IWalletManager>() as WalletManager;
 

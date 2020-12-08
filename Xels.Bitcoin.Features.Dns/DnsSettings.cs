@@ -12,7 +12,7 @@ namespace Xels.Bitcoin.Features.Dns
     public class DnsSettings
     {
         /// <summary>The default value for the DNS listen port.</summary>
-        public int DefaultDnsListenPort = 53;
+        public const int DefaultDnsListenPort = 53;
 
         /// <summary>The default value which a peer should have last have been connected before being blacklisted in DNS nodes.</summary>
         public const int DefaultDnsPeerBlacklistThresholdInSeconds = 1800;
@@ -42,7 +42,7 @@ namespace Xels.Bitcoin.Features.Dns
         /// Initializes an instance of the object from the node configuration.
         /// </summary>
         /// <param name="nodeSettings">The node configuration.</param>
-        public DnsSettings(NodeSettings nodeSettings)
+        public DnsSettings(NodeSettings nodeSettings)  
         {
             Guard.NotNull(nodeSettings, nameof(nodeSettings));
 
@@ -50,14 +50,12 @@ namespace Xels.Bitcoin.Features.Dns
 
             TextFileConfiguration config = nodeSettings.ConfigReader;
 
-            this.DefaultDnsListenPort = nodeSettings.Network.DefaultPort;
-
-            this.DnsListenPort = config.GetOrDefault<int>("dnslistenport", this.DefaultDnsListenPort, this.logger);
-            this.DnsFullNode = config.GetOrDefault<bool>("dnsfullnode", true, this.logger);
+            this.DnsListenPort = config.GetOrDefault<int>("dnslistenport", DefaultDnsListenPort, this.logger);
+            this.DnsFullNode = config.GetOrDefault<bool>("dnsfullnode", false, this.logger);
             this.DnsPeerBlacklistThresholdInSeconds = config.GetOrDefault("dnspeerblacklistthresholdinseconds", DefaultDnsPeerBlacklistThresholdInSeconds, this.logger);
-            this.DnsHostName = config.GetOrDefault<string>("dnshostname", "api.xels.io", this.logger);
-            this.DnsNameServer = config.GetOrDefault<string>("dnsnameserver", "api.xels.io", this.logger);
-            this.DnsMailBox = config.GetOrDefault<string>("dnsmailbox", "host19.server.ae", this.logger);
+            this.DnsHostName = config.GetOrDefault<string>("dnshostname", "mainnet.xels.io", this.logger);
+            this.DnsNameServer = config.GetOrDefault<string>("dnsnameserver", "mainnet.xels.io", this.logger);
+            this.DnsMailBox = config.GetOrDefault<string>("dnsmailbox", "mail.xels.io", this.logger);
         }
 
         /// <summary>Prints the help information on how to configure the DNS settings to the logger.</summary>
@@ -66,7 +64,7 @@ namespace Xels.Bitcoin.Features.Dns
         {
             var builder = new StringBuilder();
 
-            builder.AppendLine($"-dnslistenport=<0-65535>  The DNS listen port. Defaults to {network.DefaultPort}.");
+            builder.AppendLine($"-dnslistenport=<0-65535>  The DNS listen port. Defaults to {DefaultDnsListenPort}.");
             builder.AppendLine($"-dnsfullnode=<0 or 1>     Enables running the DNS Seed service as a full node.");
             builder.AppendLine($"-dnspeerblacklistthresholdinseconds=<seconds>  The number of seconds since a peer last connected before being blacklisted from the DNS nodes. Defaults to {DefaultDnsPeerBlacklistThresholdInSeconds}.");
             builder.AppendLine($"-dnshostname=<string>     The host name for the node when running as a DNS Seed service.");
@@ -84,8 +82,8 @@ namespace Xels.Bitcoin.Features.Dns
         public static void BuildDefaultConfigurationFile(StringBuilder builder, Network network)
         {
             builder.AppendLine("####DNS Settings####");
-            builder.AppendLine($"#The DNS listen port. Defaults to {network.DefaultPort}");
-            builder.AppendLine($"#dnslistenport={network.DefaultPort}");
+            builder.AppendLine($"#The DNS listen port. Defaults to {DefaultDnsListenPort}");
+            builder.AppendLine($"#dnslistenport={DefaultDnsListenPort}");
             builder.AppendLine($"#Enables running the DNS Seed service as a full node.");
             builder.AppendLine($"#dnsfullnode=0");
             builder.AppendLine($"#The number of seconds since a peer last connected before being blacklisted from the DNS nodes. Defaults to {DefaultDnsPeerBlacklistThresholdInSeconds}.");

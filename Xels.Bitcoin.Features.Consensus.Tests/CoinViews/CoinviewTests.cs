@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using NBitcoin;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Logging;
+using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.Consensus.ProvenBlockHeaders;
 using Xels.Bitcoin.Networks;
@@ -36,7 +37,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.CoinViews
             this.dataFolder = TestBase.CreateDataFolder(this);
             this.dateTimeProvider = new DateTimeProvider();
             this.loggerFactory = new ExtendedLoggerFactory();
-            this.nodeStats = new NodeStats(this.dateTimeProvider);
+            this.nodeStats = new NodeStats(this.dateTimeProvider, this.loggerFactory);
 
             this.dbreezeCoinview = new DBreezeCoinView(this.network, this.dataFolder, this.dateTimeProvider, this.loggerFactory, this.nodeStats, new DBreezeSerializer(this.network.Consensus.ConsensusFactory));
             this.dbreezeCoinview.Initialize();
@@ -47,7 +48,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.CoinViews
 
             this.rewindDataIndexCache = new RewindDataIndexCache(this.dateTimeProvider, this.network);
 
-            this.cachedCoinView = new CachedCoinView(this.dbreezeCoinview, this.dateTimeProvider, this.loggerFactory, this.nodeStats, this.stakeChainStore, this.rewindDataIndexCache);
+            this.cachedCoinView = new CachedCoinView(this.dbreezeCoinview, this.dateTimeProvider, this.loggerFactory, this.nodeStats, new ConsensusSettings(new NodeSettings(this.network)), this.stakeChainStore, this.rewindDataIndexCache);
 
             this.rewindDataIndexCache.Initialize(this.chainIndexer.Height, this.cachedCoinView);
 
@@ -93,7 +94,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.CoinViews
                 List<OutPoint> txPointsToSpend = txPoints.Take(txPoints.Count / 2).ToList();
 
                 // First spend in cached coinview
-                FetchCoinsResponse response = this.cachedCoinView.FetchCoins(new[] {txId});
+                FetchCoinsResponse response = this.cachedCoinView.FetchCoins(new[] { txId });
                 Assert.Single(response.UnspentOutputs);
 
                 UnspentOutputs coins = response.UnspentOutputs[0];
@@ -197,7 +198,7 @@ namespace Xels.Bitcoin.Features.Consensus.Tests.CoinViews
                 uint256 txId = outPointsGroup.Key;
                 List<uint> availableIndexes = outPointsGroup.Select(x => x.N).ToList();
 
-                FetchCoinsResponse result = this.cachedCoinView.FetchCoins(new[] {txId});
+                FetchCoinsResponse result = this.cachedCoinView.FetchCoins(new[] { txId });
                 TxOut[] outputsArray = result.UnspentOutputs[0].Outputs;
 
                 // Check expected coins are present.

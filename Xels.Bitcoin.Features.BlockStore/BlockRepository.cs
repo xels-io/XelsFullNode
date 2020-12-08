@@ -107,6 +107,7 @@ namespace Xels.Bitcoin.Features.BlockStore
         public bool TxIndex { get; private set; }
 
         private readonly DBreezeSerializer dBreezeSerializer;
+        private readonly IReadOnlyDictionary<uint256, Transaction> genesisTransactions;
 
         public BlockRepository(Network network, DataFolder dataFolder,
             ILoggerFactory loggerFactory, DBreezeSerializer dBreezeSerializer)
@@ -125,6 +126,7 @@ namespace Xels.Bitcoin.Features.BlockStore
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
             this.network = network;
             this.dBreezeSerializer = dBreezeSerializer;
+            this.genesisTransactions = network.GetGenesis().Transactions.ToDictionary(k => k.GetHash());
         }
 
         /// <inheritdoc />
@@ -161,6 +163,11 @@ namespace Xels.Bitcoin.Features.BlockStore
             {
                 this.logger.LogTrace("(-)[TX_INDEXING_DISABLED]:null");
                 return default(Transaction);
+            }
+
+            if (this.genesisTransactions.TryGetValue(trxid, out Transaction genesisTransaction))
+            {
+                return genesisTransaction;
             }
 
             Transaction res = null;
@@ -216,6 +223,12 @@ namespace Xels.Bitcoin.Features.BlockStore
                         continue;
                     }
 
+                    if (this.genesisTransactions.TryGetValue(trxids[i], out Transaction genesisTransaction))
+                    {
+                        txes[i] = genesisTransaction;
+                        continue;
+                    }
+
                     Row<byte[], byte[]> transactionRow = transaction.Select<byte[], byte[]>(TransactionTableName, trxids[i].ToBytes());
                     if (!transactionRow.Exists)
                     {
@@ -252,11 +265,16 @@ namespace Xels.Bitcoin.Features.BlockStore
                 return default(uint256);
             }
 
+            if (this.genesisTransactions.ContainsKey(trxid))
+            {
+                return this.network.GenesisHash;
+            }
+
             uint256 res = null;
             using (DBreeze.Transactions.Transaction transaction = this.DBreeze.GetTransaction())
             {
                 transaction.ValuesLazyLoadingIsOn = false;
-                //var allRows = transaction.SelectForwardStartFrom<int, int>(TransactionTableName, 10, true).Take(10)
+
                 Row<byte[], byte[]> transactionRow = transaction.Select<byte[], byte[]>(TransactionTableName, trxid.ToBytes());
                 if (transactionRow.Exists)
                     res = new uint256(transactionRow.Value);
@@ -379,7 +397,7 @@ namespace Xels.Bitcoin.Features.BlockStore
             // however we need to find how byte arrays are sorted in DBreeze.
             using (DBreeze.Transactions.Transaction transaction = this.DBreeze.GetTransaction())
             {
-                transaction.SynchronizeTables(BlockTableName, TransactionTableName);
+                transaction.SynchronizeTables(BlockTableName, TransactionTableName, CommonTableName);
                 this.OnInsertBlocks(transaction, blocks);
 
                 // Commit additions
@@ -449,16 +467,10 @@ namespace Xels.Bitcoin.Features.BlockStore
             {
                 transaction.ValuesLazyLoadingIsOn = false;
 
-                byte[] key = hash.ToBytes();
-                Row<byte[], byte[]> blockRow = transaction.Select<byte[], byte[]>(BlockTableName, key);
-                if (blockRow.Exists)
-                    res = this.dBreezeSerializer.Deserialize<Block>(blockRow.Value);
-            }
+                var results = this.GetBlocksFromHashes(transaction, new List<uint256> {hash});
 
-            // If searching for genesis block, return it.
-            if (res == null && hash == this.network.GenesisHash)
-            {
-                res = this.network.GetGenesis();
+                if (results.FirstOrDefault() != null)
+                    res = results.FirstOrDefault();
             }
 
             return res;
@@ -534,18 +546,25 @@ namespace Xels.Bitcoin.Features.BlockStore
 
             foreach ((uint256, byte[]) key in keys)
             {
+                // If searching for genesis block, return it.
+                if (key.Item1 == this.network.GenesisHash)
+                {
+                    results[key.Item1] = this.network.GetGenesis();
+                    continue;
+                }
+
                 Row<byte[], byte[]> blockRow = dbreezeTransaction.Select<byte[], byte[]>(BlockTableName, key.Item2);
                 if (blockRow.Exists)
                 {
                     results[key.Item1] = this.dBreezeSerializer.Deserialize<Block>(blockRow.Value);
 
-                    this.logger.LogTrace("Block hash '{0}' loaded from the store.", key.Item1);
+                    this.logger.LogDebug("Block hash '{0}' loaded from the store.", key.Item1);
                 }
                 else
                 {
                     results[key.Item1] = null;
 
-                    this.logger.LogTrace("Block hash '{0}' not found in the store.", key.Item1);
+                    this.logger.LogDebug("Block hash '{0}' not found in the store.", key.Item1);
                 }
             }
 

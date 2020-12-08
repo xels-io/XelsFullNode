@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
-using Xels.Features.FederatedPeg.CounterChain;
+using Xels.Features.Collateral.CounterChain;
 using TracerAttributes;
 
 namespace Xels.Features.FederatedPeg

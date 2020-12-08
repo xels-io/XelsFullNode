@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -9,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using NBitcoin;
 using Newtonsoft.Json;
 using Xels.Bitcoin.Connection;
+using Xels.Bitcoin.Controllers;
 using Xels.Bitcoin.Features.SmartContracts.Models;
 using Xels.Bitcoin.Features.SmartContracts.Wallet;
 using Xels.Bitcoin.Features.Wallet;
@@ -27,11 +30,10 @@ using Xels.SmartContracts.CLR.Serialization;
 using Xels.SmartContracts.Core;
 using Xels.SmartContracts.Core.Receipts;
 using Xels.SmartContracts.Core.State;
-using State = Xels.SmartContracts.CLR.State;
 
 namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion("1")]
     public class SmartContractsController : Controller
     {
         /// <summary>
@@ -49,6 +51,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         private readonly IStateRepositoryRoot stateRoot;
         private readonly IWalletManager walletManager;
         private readonly ISerializer serializer;
+        private readonly IContractPrimitiveSerializer primitiveSerializer;
         private readonly IReceiptRepository receiptRepository;
         private readonly ILocalExecutor localExecutor;
         private readonly ISmartContractTransactionService smartContractTransactionService;
@@ -58,12 +61,12 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
             IBlockStore blockStore,
             ChainIndexer chainIndexer,
             CSharpContractDecompiler contractDecompiler,
-            IDateTimeProvider dateTimeProvider,
             ILoggerFactory loggerFactory,
             Network network,
             IStateRepositoryRoot stateRoot,
             IWalletManager walletManager,
             ISerializer serializer,
+            IContractPrimitiveSerializer primitiveSerializer,
             IReceiptRepository receiptRepository,
             ILocalExecutor localExecutor,
             ISmartContractTransactionService smartContractTransactionService,
@@ -78,6 +81,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
             this.walletManager = walletManager;
             this.broadcasterManager = broadcasterManager;
             this.serializer = serializer;
+            this.primitiveSerializer = primitiveSerializer;
             this.receiptRepository = receiptRepository;
             this.localExecutor = localExecutor;
             this.smartContractTransactionService = smartContractTransactionService;
@@ -93,7 +97,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         /// <param name="address">The address of the smart contract to retrieve as bytecode and C# source.</param>
         ///
         /// <returns>A response object containing the bytecode and the decompiled C# code.</returns>
-        [Route("code")]
+        [Route("api/[controller]/code")]
         [HttpGet]
         public IActionResult GetCode([FromQuery]string address)
         {
@@ -128,7 +132,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         /// <param name="address">The address of the smart contract to retrieve the balance for.</param>
         /// 
         /// <returns>The balance of a smart contract in STRAT (or the sidechain coin).</returns>
-        [Route("balance")]
+        [Route("api/[controller]/balance")]
         [HttpGet]
         public IActionResult GetBalance([FromQuery]string address)
         {
@@ -151,7 +155,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         /// <param name="request">An object containing the necessary parameters to perform a retrieve stored data request.</param>
         ///
         /// <returns>A single piece of stored smart contract data.</returns>
-        [Route("storage")]
+        [Route("api/[controller]/storage")]
         [HttpGet]
         public IActionResult GetStorage([FromQuery] GetStorageRequest request)
         {
@@ -181,6 +185,41 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         }
 
         /// <summary>
+        /// Test
+        /// </summary>
+        /// <returns></returns>
+        [ActionName("getreceipt")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [ActionDescription("Gets the receipt for this transaction hash.")]
+        public ReceiptResponse GetReceipt(string txHash)
+        {
+            uint256 txHashNum = new uint256(txHash);
+            Receipt receipt = this.receiptRepository.Retrieve(txHashNum);
+
+            if (receipt == null)
+            {
+                return null;
+            }
+
+            uint160 address = receipt.NewContractAddress ?? receipt.To;
+
+            if (!receipt.Logs.Any())
+            {
+                return new ReceiptResponse(receipt, new List<LogResponse>(), this.network);
+            }
+
+            byte[] contractCode = this.stateRoot.GetCode(address);
+
+            Assembly assembly = Assembly.Load(contractCode);
+
+            var deserializer = new ApiLogDeserializer(this.primitiveSerializer, this.network);
+
+            List<LogResponse> logResponses = this.MapLogResponses(receipt, assembly, deserializer);
+
+            return new ReceiptResponse(receipt, logResponses, this.network);
+        }
+
+        /// <summary>
         /// Gets a smart contract transaction receipt. Receipts contain information about how a smart contract transaction was executed.
         /// This includes the value returned from a smart contract call and how much gas was used.  
         /// </summary>
@@ -188,14 +227,13 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         /// <param name="txHash">A hash of the smart contract transaction (the transaction ID).</param>
         /// 
         /// <returns>The receipt for the smart contract.</returns> 
-        [Route("receipt")]
+        [Route("api/[controller]/receipt")]
         [HttpGet]
-        public IActionResult GetReceipt([FromQuery] string txHash)
+        public IActionResult GetReceiptAPI([FromQuery] string txHash)
         {
-            uint256 txHashNum = new uint256(txHash);
-            Receipt receipt = this.receiptRepository.Retrieve(txHashNum);
+            ReceiptResponse receiptResponse = this.GetReceipt(txHash);
 
-            if (receipt == null)
+            if (receiptResponse == null)
             {
                 this.logger.LogTrace("(-)[RECEIPT_NOT_FOUND]");
                 return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest,
@@ -203,9 +241,54 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
                     "No stored transaction could be found for the supplied hash.");
             }
 
-            var receiptResponse = new ReceiptResponse(receipt, this.network);
-
             return this.Json(receiptResponse);
+        }
+
+        /// <summary>
+        /// Searches for receipts that match the given filter criteria. Filter criteria are ANDed together.
+        /// </summary>
+        /// <param name="contractAddress">The contract address from which events were raised.</param>
+        /// <param name="eventName">The name of the event raised.</param>
+        /// <param name="topics">The topics to search. All specified topics must be present.</param>
+        /// <param name="fromBlock">The block number from which to start searching.</param>
+        /// <param name="toBlock">The block number where searching finishes.</param>
+        /// <returns>A list of all matching receipts.</returns>
+        [ActionName("searchreceipts")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [ActionDescription("Searches for receipts matching the filter criteria.")]
+        public List<ReceiptResponse> ReceiptSearch(string contractAddress, string eventName, List<string> topics = null, int fromBlock = 0, int? toBlock = null)
+        {
+            uint160 address = contractAddress.ToUint160(this.network);
+
+            byte[] contractCode = this.stateRoot.GetCode(address);
+
+            if (contractCode == null || !contractCode.Any())
+            {
+                return null;
+            }
+
+            IEnumerable<byte[]> topicsBytes = topics != null ? topics.Where(topic => topic != null).Select(t => t.HexToByteArray()) : new List<byte[]>();
+
+            Assembly assembly = Assembly.Load(contractCode);
+
+            var deserializer = new ApiLogDeserializer(this.primitiveSerializer, this.network);
+
+            var receiptSearcher = new ReceiptSearcher(this.chainIndexer, this.blockStore, this.receiptRepository, this.network);
+
+            List<Receipt> receipts = receiptSearcher.SearchReceipts(contractAddress, eventName, fromBlock, toBlock, topicsBytes);
+
+            var result = new List<ReceiptResponse>();
+
+            foreach (Receipt receipt in receipts)
+            {
+                List<LogResponse> logResponses = this.MapLogResponses(receipt, assembly, deserializer);
+
+                var receiptResponse = new ReceiptResponse(receipt, logResponses, this.network);
+
+                result.Add(receiptResponse);
+            }
+
+            return result;
         }
 
         // Note: We may not know exactly how to best structure "receipt search" queries until we start building 
@@ -223,53 +306,59 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         /// which match a specific event (as defined by the struct name).  
         /// </summary>
         /// 
-        /// <param name="contractAddress">The address of the smart contract to retrieve the receipts for.</param>
-        /// <param name="eventName">The name of the event struct to retrieve matching receipts for.</param>
+        /// <param name="contractAddress">The contract address from which events were raised.</param>
+        /// <param name="eventName">The name of the event raised.</param>
+        /// <param name="topics">The topics to search. All specified topics must be present.</param>
+        /// <param name="fromBlock">The block number from which to start searching.</param>
+        /// <param name="toBlock">The block number where searching finishes.</param>
         /// 
         /// <returns>A list of receipts for transactions relating to a specific smart contract and a specific event in that smart contract.</returns>
-        [Route("receipt-search")]
+        [Route("api/[controller]/receipt-search")]
         [HttpGet]
-        public async Task<IActionResult> ReceiptSearch([FromQuery] string contractAddress, [FromQuery] string eventName)
+        public async Task<IActionResult> ReceiptSearchAPI([FromQuery] string contractAddress, [FromQuery] string eventName, [FromQuery] List<string> topics = null, [FromQuery] int fromBlock = 0, [FromQuery] int? toBlock = null)
         {
-            // Build the bytes we can use to check for this event.
-            uint160 addressUint160 = contractAddress.ToUint160(this.network);
-            byte[] addressBytes = addressUint160.ToBytes();
-            byte[] eventBytes = Encoding.UTF8.GetBytes(eventName);
+            List<ReceiptResponse> result = this.ReceiptSearch(contractAddress, eventName, topics, fromBlock, toBlock);
 
-            // Loop through all headers and check bloom.
-            IEnumerable<ChainedHeader> blockHeaders = this.chainIndexer.EnumerateToTip(this.chainIndexer.Genesis);
-            List<ChainedHeader> matches = new List<ChainedHeader>();
-            foreach(ChainedHeader chainedHeader in blockHeaders)
+            if (result == null)
             {
-                var scHeader = (ISmartContractBlockHeader) chainedHeader.Header;
-                if (scHeader.LogsBloom.Test(addressBytes) && scHeader.LogsBloom.Test(eventBytes)) // TODO: This is really inefficient, should build bloom for query and then compare.
-                    matches.Add(chainedHeader);
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.InternalServerError, "No code exists", $"No contract execution code exists at {contractAddress}");
             }
 
-            // For all matching headers, get the block from local db.
-            List<NBitcoin.Block> blocks = new List<NBitcoin.Block>();
-            foreach(ChainedHeader chainedHeader in matches)
-            {
-                blocks.Add(this.blockStore.GetBlock(chainedHeader.HashBlock));
-            }
+            return this.Json(result);
+        }
 
-            // For each block, get all receipts, and if they match, add to list to return.
-            List<ReceiptResponse> receiptResponses = new List<ReceiptResponse>();
-            foreach(NBitcoin.Block block in blocks)
+        private List<LogResponse> MapLogResponses(Receipt receipt, Assembly assembly, ApiLogDeserializer deserializer)
+        {
+            var logResponses = new List<LogResponse>();
+
+            foreach (Log log in receipt.Logs)
             {
-                foreach(Transaction transaction in block.Transactions)
+                var logResponse = new LogResponse(log, this.network);
+
+                logResponses.Add(logResponse);
+
+                if (log.Topics.Count == 0)
+                    continue;
+
+                // Get receipt struct name
+                string eventTypeName = Encoding.UTF8.GetString(log.Topics[0]);
+
+                // Find the type in the module def
+                Type eventType = assembly.DefinedTypes.FirstOrDefault(t => t.Name == eventTypeName);
+
+                if (eventType == null)
                 {
-                    Receipt storedReceipt = this.receiptRepository.Retrieve(transaction.GetHash());
-                    if (storedReceipt == null) // not a smart contract transaction. Move to next transaction.
-                        continue;
-
-                    // Check if address and first topic (event name) match.
-                    if (storedReceipt.Logs.Any(x => x.Address == addressUint160 && Enumerable.SequenceEqual(x.Topics[0], eventBytes)))
-                        receiptResponses.Add(new ReceiptResponse(storedReceipt, this.network));
+                    // Couldn't match the type, continue?
+                    continue;
                 }
+
+                // Deserialize it
+                dynamic deserialized = deserializer.DeserializeLogData(log.Data, eventType);
+
+                logResponse.Log = deserialized;
             }
 
-            return this.Json(receiptResponses);
+            return logResponses;
         }
 
         /// <summary>
@@ -284,14 +373,19 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         /// <param name="request">An object containing the necessary parameters to build the transaction.</param>
         /// 
         /// <returns>A transaction ready to create a smart contract.</returns>
-        [Route("build-create")]
+        [Route("api/[controller]/build-create")]
         [HttpPost]
         public IActionResult BuildCreateSmartContractTransaction([FromBody] BuildCreateContractTransactionRequest request)
         {
             if (!this.ModelState.IsValid)
                 return ModelStateErrors.BuildErrorResponse(this.ModelState);
 
-            return this.Json(this.smartContractTransactionService.BuildCreateTx(request));
+            BuildCreateContractTransactionResponse response = this.smartContractTransactionService.BuildCreateTx(request);
+
+            if (!response.Success)
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, response.Message, string.Empty);
+
+            return this.Json(response);
         }
 
         /// <summary>
@@ -306,14 +400,72 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         /// <param name="request">An object containing the necessary parameters to build the transaction.</param>
         /// 
         /// <returns>A transaction ready to call a method on a smart contract.</returns>
-        [Route("build-call")]
+        [Route("api/[controller]/build-call")]
         [HttpPost]
         public IActionResult BuildCallSmartContractTransaction([FromBody] BuildCallContractTransactionRequest request)
         {
             if (!this.ModelState.IsValid)
                 return ModelStateErrors.BuildErrorResponse(this.ModelState);
 
-            return this.Json(this.smartContractTransactionService.BuildCallTx(request));
+            var response = this.smartContractTransactionService.BuildCallTx(request);
+
+            if (!response.Success)
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, response.Message, string.Empty);
+
+            return this.Json(response);
+        }
+
+        /// <summary>
+        /// Builds a transaction to transfer funds on a smart contract network.
+        /// </summary>
+        /// 
+        /// <param name="request">An object containing the necessary parameters to build the transaction.</param>
+        /// 
+        /// <returns>The build transaction hex.</returns>
+        [Route("api/[controller]/build-transaction")]
+        [HttpPost]
+        public IActionResult BuildTransaction([FromBody] BuildContractTransactionRequest request)
+        {
+            if (!this.ModelState.IsValid)
+                return ModelStateErrors.BuildErrorResponse(this.ModelState);
+
+            try
+            {
+                BuildContractTransactionResult result = this.smartContractTransactionService.BuildTx(request);
+
+                return this.Json(result.Response);
+            }
+            catch (Exception e)
+            {
+                this.logger.LogError("Exception occurred: {0}", e.ToString());
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, e.Message, e.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Gets a fee estimate for a specific smart contract account-based transfer transaction.
+        /// This differs from fee estimation on standard networks due to the way inputs must be selected for account-based transfers.
+        /// </summary>
+        /// <param name="request">An object containing the parameters used to build the the fee estimation transaction.</param>
+        /// <returns>The estimated fee for the transaction.</returns>
+        [Route("api/[controller]/estimate-fee")]
+        [HttpPost]
+        public IActionResult EstimateFee([FromBody] ScTxFeeEstimateRequest request)
+        {
+            if (!this.ModelState.IsValid)
+                return ModelStateErrors.BuildErrorResponse(this.ModelState);
+
+            try
+            {
+                EstimateFeeResult result = this.smartContractTransactionService.EstimateFee(request);
+
+                return this.Json(result.Fee);
+            }
+            catch (Exception e)
+            {
+                this.logger.LogError("Exception occurred: {0}", e.ToString());
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, e.Message, e.ToString());
+            }
         }
 
         /// <summary>
@@ -325,27 +477,27 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         /// 
         /// <returns>The transaction used to create the smart contract. The result of the transaction broadcast is not returned
         /// and you should check for a transaction receipt to see if it was successful.</returns>
-        [Route("build-and-send-create")]
+        [Route("api/[controller]/build-and-send-create")]
         [HttpPost]
-        public IActionResult BuildAndSendCreateSmartContractTransaction([FromBody] BuildCreateContractTransactionRequest request)
+        public async Task<IActionResult> BuildAndSendCreateSmartContractTransactionAsync([FromBody] BuildCreateContractTransactionRequest request)
         {
             if (!this.ModelState.IsValid)
                 return ModelStateErrors.BuildErrorResponse(this.ModelState);
 
-            BuildCreateContractTransactionResponse response = this.smartContractTransactionService.BuildCreateTx(request);
-
-            if (!response.Success)
-                return this.Json(response);
-
-            Transaction transaction = this.network.CreateTransaction(response.Hex);
-
             if (!this.connectionManager.ConnectedPeers.Any())
             {
                 this.logger.LogTrace("(-)[NO_CONNECTED_PEERS]");
-                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.Forbidden, "Can't send transaction: sending transaction requires at least one connection!", string.Empty);
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.Forbidden, "Can't send transaction as the node requires at least one connection.", string.Empty);
             }
 
-            this.broadcasterManager.BroadcastTransactionAsync(transaction).GetAwaiter().GetResult();
+            BuildCreateContractTransactionResponse response = this.smartContractTransactionService.BuildCreateTx(request);
+
+            if (!response.Success)
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, response.Message, string.Empty);
+
+            Transaction transaction = this.network.CreateTransaction(response.Hex);
+
+            await this.broadcasterManager.BroadcastTransactionAsync(transaction);
 
             // Check if transaction was actually added to a mempool.
             TransactionBroadcastEntry transactionBroadCastEntry = this.broadcasterManager.GetTransaction(transaction.GetHash());
@@ -355,6 +507,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
                 this.logger.LogError("Exception occurred: {0}", transactionBroadCastEntry.ErrorMessage);
                 return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, transactionBroadCastEntry.ErrorMessage, "Transaction Exception");
             }
+
+            response.Message = "Your CREATE contract transaction was successfully built and sent. Check the receipt using the transaction ID once it has been included in a new block.";
 
             return this.Json(response);
         }
@@ -369,12 +523,18 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         ///
         /// <returns>The transaction used to call a smart contract method. The result of the transaction broadcast is not returned
         /// and you should check for a transaction receipt to see if it was successful.</returns>
-        [Route("build-and-send-call")]
+        [Route("api/[controller]/build-and-send-call")]
         [HttpPost]
-        public IActionResult BuildAndSendCallSmartContractTransaction([FromBody] BuildCallContractTransactionRequest request)
+        public async Task<IActionResult> BuildAndSendCallSmartContractTransactionAsync([FromBody] BuildCallContractTransactionRequest request)
         {
             if (!this.ModelState.IsValid)
                 return ModelStateErrors.BuildErrorResponse(this.ModelState);
+
+            if (!this.connectionManager.ConnectedPeers.Any())
+            {
+                this.logger.LogTrace("(-)[NO_CONNECTED_PEERS]");
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.Forbidden, "Can't send transaction as the node requires at least one connection.", string.Empty);
+            }
 
             BuildCallContractTransactionResponse response = this.smartContractTransactionService.BuildCallTx(request);
             if (!response.Success)
@@ -382,13 +542,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
 
             Transaction transaction = this.network.CreateTransaction(response.Hex);
 
-            if (!this.connectionManager.ConnectedPeers.Any())
-            {
-                this.logger.LogTrace("(-)[NO_CONNECTED_PEERS]");
-                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.Forbidden, "Can't send transaction: sending transaction requires at least one connection!", string.Empty);
-            }
-
-            this.broadcasterManager.BroadcastTransactionAsync(transaction).GetAwaiter().GetResult();
+            await this.broadcasterManager.BroadcastTransactionAsync(transaction);
 
             // Check if transaction was actually added to a mempool.
             TransactionBroadcastEntry transactionBroadCastEntry = this.broadcasterManager.GetTransaction(transaction.GetHash());
@@ -398,6 +552,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
                 this.logger.LogError("Exception occurred: {0}", transactionBroadCastEntry.ErrorMessage);
                 return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, transactionBroadCastEntry.ErrorMessage, "Transaction Exception");
             }
+
+            response.Message = $"Your CALL method {request.MethodName} transaction was successfully built and sent. Check the receipt using the transaction ID once it has been included in a new block.";
 
             return this.Json(response);
         }
@@ -414,7 +570,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         /// <param name="request">An object containing the necessary parameters to build the transaction.</param>
         /// 
         /// <results>The result of the local call to the smart contract method.</results>
-        [Route("local-call")]
+        [Route("api/[controller]/local-call")]
         [HttpPost]
         public IActionResult LocalCallSmartContractTransaction([FromBody] LocalCallContractRequest request)
         {
@@ -431,7 +587,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
                 ILocalExecutionResult result = this.localExecutor.Execute(
                     (ulong)this.chainIndexer.Height,
                     request.Sender?.ToUint160(this.network) ?? new uint160(),
-                    string.IsNullOrWhiteSpace(request.Amount) ? (Money) request.Amount : 0,
+                    string.IsNullOrWhiteSpace(request.Amount) ? (Money)request.Amount : 0,
                     txData);
 
                 return this.Json(result, new JsonSerializerSettings
@@ -483,7 +639,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
         /// <param name="walletName">The name of the wallet to retrieve the addresses from.</param>
         /// 
         /// <returns>The addresses owned by a wallet which have a balance associated with them.</returns>
-        [Route("address-balances")]
+        [Route("api/[controller]/address-balances")]
         [HttpGet]
         public IActionResult GetAddressesWithBalances([FromQuery] string walletName)
         {
@@ -497,7 +653,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Controllers
                     Sum = grouping.Sum(x => x.Transaction.GetUnspentAmount(false))
                 });
             }
-            
+
             return this.Json(result);
         }
 

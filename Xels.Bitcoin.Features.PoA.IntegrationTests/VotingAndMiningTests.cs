@@ -12,6 +12,7 @@ using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.Features.Wallet.Models;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
+using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Tests.Common;
 using Xunit;
 
@@ -51,7 +52,7 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests
             await this.node1.MineBlocksAsync(3);
 
             var model = new HexPubKeyModel() { PubKeyHex = "03025fcadedd28b12665de0542c8096f4cd5af8e01791a4d057f67e2866ca66ba7" };
-            this.node1.FullNode.NodeService<FederationVotingController>().VoteAddFedMember(model);
+            this.node1.FullNode.NodeController<FederationVotingController>().VoteAddFedMember(model);
 
             Assert.Single(this.node1.FullNode.NodeService<VotingManager>().GetScheduledVotes());
             Assert.Empty(this.node1.FullNode.NodeService<VotingManager>().GetPendingPolls());
@@ -63,7 +64,7 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests
             Assert.Single(this.node1.FullNode.NodeService<VotingManager>().GetPendingPolls());
 
             // Vote 2nd time and make sure nothing changed.
-            this.node1.FullNode.NodeService<FederationVotingController>().VoteAddFedMember(model);
+            this.node1.FullNode.NodeController<FederationVotingController>().VoteAddFedMember(model);
             await this.node1.MineBlocksAsync(1);
             Assert.Empty(this.node1.FullNode.NodeService<VotingManager>().GetScheduledVotes());
             Assert.Single(this.node1.FullNode.NodeService<VotingManager>().GetPendingPolls());
@@ -71,7 +72,7 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests
             CoreNodePoAExtensions.WaitTillSynced(this.node1, this.node2);
 
             // Node 2 votes. After that it will be enough to change the federation.
-            this.node2.FullNode.NodeService<FederationVotingController>().VoteAddFedMember(model);
+            this.node2.FullNode.NodeController<FederationVotingController>().VoteAddFedMember(model);
 
             await this.node2.MineBlocksAsync((int)this.network.Consensus.MaxReorgLength + 1);
 
@@ -94,8 +95,8 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests
             TestHelper.Connect(this.node1, this.node2);
 
             var model = new HexPubKeyModel() { PubKeyHex = "03025fcadedd28b12665de0542c8096f4cd5af8e01791a4d057f67e2866ca66ba7" };
-            this.node1.FullNode.NodeService<FederationVotingController>().VoteAddFedMember(model);
-            this.node2.FullNode.NodeService<FederationVotingController>().VoteAddFedMember(model);
+            this.node1.FullNode.NodeController<FederationVotingController>().VoteAddFedMember(model);
+            this.node2.FullNode.NodeController<FederationVotingController>().VoteAddFedMember(model);
 
             await this.node1.MineBlocksAsync(1);
             CoreNodePoAExtensions.WaitTillSynced(this.node1, this.node2);
@@ -119,8 +120,8 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests
             TestHelper.Connect(this.node1, this.node2);
 
             var model = new HexPubKeyModel() { PubKeyHex = this.network.FederationKey2.PubKey.ToHex() };
-            this.node1.FullNode.NodeService<FederationVotingController>().VoteKickFedMember(model);
-            this.node2.FullNode.NodeService<FederationVotingController>().VoteKickFedMember(model);
+            this.node1.FullNode.NodeController<FederationVotingController>().VoteKickFedMember(model);
+            this.node2.FullNode.NodeController<FederationVotingController>().VoteKickFedMember(model);
 
             await this.node2.MineBlocksAsync(1);
             CoreNodePoAExtensions.WaitTillSynced(this.node1, this.node2);
@@ -163,12 +164,12 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests
 
             var model = new HexPubKeyModel() { PubKeyHex = this.testPubKey.ToHex() };
 
-            this.node1.FullNode.NodeService<FederationVotingController>().VoteAddFedMember(model);
-            this.node1.FullNode.NodeService<FederationVotingController>().VoteKickFedMember(model);
+            this.node1.FullNode.NodeController<FederationVotingController>().VoteAddFedMember(model);
+            this.node1.FullNode.NodeController<FederationVotingController>().VoteKickFedMember(model);
             await this.node1.MineBlocksAsync(1);
             CoreNodePoAExtensions.WaitTillSynced(this.node1, this.node2);
 
-            this.node2.FullNode.NodeService<FederationVotingController>().VoteAddFedMember(model);
+            this.node2.FullNode.NodeController<FederationVotingController>().VoteAddFedMember(model);
             await this.node2.MineBlocksAsync(1);
             CoreNodePoAExtensions.WaitTillSynced(this.node1, this.node2);
 
@@ -189,7 +190,7 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests
             await this.VoteAndMineBlockAsync(key, add, this.node2);
             await this.VoteAndMineBlockAsync(key, add, this.node3);
 
-            await this.node1.MineBlocksAsync((int) this.network.Consensus.MaxReorgLength + 1);
+            await this.node1.MineBlocksAsync((int)this.network.Consensus.MaxReorgLength + 1);
         }
 
         private async Task VoteAndMineBlockAsync(PubKey key, bool add, CoreNode node)
@@ -197,9 +198,9 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests
             var model = new HexPubKeyModel() { PubKeyHex = key.ToHex() };
 
             if (add)
-                node.FullNode.NodeService<FederationVotingController>().VoteAddFedMember(model);
+                node.FullNode.NodeController<FederationVotingController>().VoteAddFedMember(model);
             else
-                node.FullNode.NodeService<FederationVotingController>().VoteKickFedMember(model);
+                node.FullNode.NodeController<FederationVotingController>().VoteKickFedMember(model);
 
             await node.MineBlocksAsync(1);
 
@@ -209,34 +210,34 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests
         [Fact]
         public async Task CanVoteToWhitelistAndRemoveHashesAsync()
         {
-            int maxReorg = (int) this.network.Consensus.MaxReorgLength;
+            int maxReorg = (int)this.network.Consensus.MaxReorgLength;
 
             Assert.Empty(this.node1.FullNode.NodeService<IWhitelistedHashesRepository>().GetHashes());
             TestHelper.Connect(this.node1, this.node2);
 
             await this.node1.MineBlocksAsync(1);
 
-            var model = new HashModel() { Hash = Hashes.Hash256(RandomUtils.GetUInt64().ToBytes()).ToString()};
+            var model = new HashModel() { Hash = Hashes.Hash256(RandomUtils.GetUInt64().ToBytes()).ToString() };
 
             // Node 1 votes to add hash
-            this.node1.FullNode.NodeService<DefaultVotingController>().VoteWhitelistHash(model);
+            this.node1.FullNode.NodeController<DefaultVotingController>().VoteWhitelistHash(model);
             await this.node1.MineBlocksAsync(1);
             CoreNodePoAExtensions.WaitTillSynced(this.node1, this.node2);
 
             // Node 2 votes to add hash
-            this.node2.FullNode.NodeService<DefaultVotingController>().VoteWhitelistHash(model);
+            this.node2.FullNode.NodeController<DefaultVotingController>().VoteWhitelistHash(model);
             await this.node2.MineBlocksAsync(maxReorg + 2);
             CoreNodePoAExtensions.WaitTillSynced(this.node1, this.node2);
 
             Assert.Single(this.node1.FullNode.NodeService<IWhitelistedHashesRepository>().GetHashes());
 
             // Node 1 votes to remove hash
-            this.node1.FullNode.NodeService<DefaultVotingController>().VoteRemoveHash(model);
+            this.node1.FullNode.NodeController<DefaultVotingController>().VoteRemoveHash(model);
             await this.node1.MineBlocksAsync(1);
             CoreNodePoAExtensions.WaitTillSynced(this.node1, this.node2);
 
             // Node 2 votes to remove hash
-            this.node2.FullNode.NodeService<DefaultVotingController>().VoteRemoveHash(model);
+            this.node2.FullNode.NodeController<DefaultVotingController>().VoteRemoveHash(model);
             await this.node2.MineBlocksAsync(maxReorg + 2);
             CoreNodePoAExtensions.WaitTillSynced(this.node1, this.node2);
 
@@ -300,9 +301,12 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests
 
                 await node.MineBlocksAsync((int)toMineCount).ConfigureAwait(false);
 
-                long balanceAfterPremine = walletManager.GetBalances(walletName, "account 0").Sum(x => x.AmountConfirmed);
+                TestBase.WaitLoop(() =>
+                {
+                    long balanceAfterPremine = walletManager.GetBalances(walletName, "account 0").Sum(x => x.AmountConfirmed);
 
-                Assert.Equal(network.Consensus.PremineReward.Satoshi, balanceAfterPremine);
+                    return network.Consensus.PremineReward.Satoshi ==  balanceAfterPremine;
+                });
             }
         }
 
@@ -346,7 +350,7 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests
 
                 Transaction trx = nodeA.FullNode.WalletTransactionHandler().BuildTransaction(context);
 
-                nodeA.FullNode.NodeService<WalletController>().SendTransaction(new SendTransactionRequest(trx.ToHex()));
+                nodeA.FullNode.NodeController<WalletController>().SendTransaction(new SendTransactionRequest(trx.ToHex()));
 
                 TestBase.WaitLoop(() => nodeA.CreateRPCClient().GetRawMempool().Length == 1 && nodeB.CreateRPCClient().GetRawMempool().Length == 1);
 
@@ -355,9 +359,13 @@ namespace Xels.Bitcoin.Features.PoA.IntegrationTests
                 TestBase.WaitLoop(() => nodeA.CreateRPCClient().GetRawMempool().Length == 0 && nodeB.CreateRPCClient().GetRawMempool().Length == 0);
 
                 IWalletManager walletManager = nodeB.FullNode.NodeService<IWalletManager>();
-                long balance = walletManager.GetBalances(walletName, walletAccount).Sum(x => x.AmountConfirmed);
-                
-                Assert.True(balance == transferAmount + feeAmount);
+
+                TestBase.WaitLoop(() =>
+                {
+                    long balance = walletManager.GetBalances(walletName, walletAccount).Sum(x => x.AmountConfirmed);
+
+                    return balance == (transferAmount + feeAmount);
+                });
             }
         }
 

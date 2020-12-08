@@ -1,6 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Newtonsoft.Json;
 using Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Consensus.Rules;
+using Xels.Bitcoin.Features.Wallet.Models;
 using Xels.Bitcoin.Features.Wallet.Validations;
 using Xels.Bitcoin.Utilities.ValidationAttributes;
 
@@ -29,6 +32,11 @@ namespace Xels.Bitcoin.Features.SmartContracts.Models
         /// Amount field. Defaults to "account 0".
         /// </summary>
         public string AccountName { get; set; }
+
+        /// <summary>
+        /// A list of outpoints to use as inputs for the transaction.
+        /// </summary> 
+        public List<OutpointRequest> Outpoints { get; set; }
 
         /// <summary>
         /// The address of the smart contract containing the method.

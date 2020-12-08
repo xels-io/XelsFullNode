@@ -22,6 +22,7 @@ namespace Xels.Bitcoin.Networks
             this.DefaultRPCPort = 18332;
             this.DefaultAPIPort = 38220;
             this.CoinTicker = "TBTC";
+            this.DefaultBanTimeSeconds = 60 * 60 * 24; // 24 Hours
 
             var consensusFactory = new ConsensusFactory();
 
@@ -45,9 +46,9 @@ namespace Xels.Bitcoin.Networks
 
             var bip9Deployments = new BitcoinBIP9Deployments
             {
-                [BitcoinBIP9Deployments.TestDummy] = new BIP9DeploymentsParameters(28, 1199145601, 1230767999),
-                [BitcoinBIP9Deployments.CSV] = new BIP9DeploymentsParameters(0, 1456790400, 1493596800),
-                [BitcoinBIP9Deployments.Segwit] = new BIP9DeploymentsParameters(1, 1462060800, 1493596800)
+                [BitcoinBIP9Deployments.TestDummy] = new BIP9DeploymentsParameters("TestDummy", 28, 1199145601, 1230767999, BIP9DeploymentsParameters.DefaultTestnetThreshold),
+                [BitcoinBIP9Deployments.CSV] = new BIP9DeploymentsParameters("CSV", 0, 1456790400, 1493596800, BIP9DeploymentsParameters.DefaultTestnetThreshold),
+                [BitcoinBIP9Deployments.Segwit] = new BIP9DeploymentsParameters("Segwit", 1, 1462060800, 1493596800, BIP9DeploymentsParameters.DefaultTestnetThreshold)
             };
 
             this.Consensus = new NBitcoin.Consensus(
@@ -62,7 +63,6 @@ namespace Xels.Bitcoin.Networks
                 buriedDeployments: buriedDeployments,
                 bip9Deployments: bip9Deployments,
                 bip34Hash: new uint256("0x0000000023b3a96d3484e5abb3755c413e7d41500f8e2a5c3f0dd01299cd8ef8"),
-                ruleChangeActivationThreshold: 1512,
                 minerConfirmationWindow: 2016,
                 maxReorgLength: 0,
                 defaultAssumeValid: new uint256("0x0000000000000037a8cd3e06cd5edbfe9dd1dbcc5dacab279376ef7cfc2b4c75"), // 1354312
@@ -128,6 +128,9 @@ namespace Xels.Bitcoin.Networks
             this.StandardScriptsRegistry = new BitcoinStandardScriptsRegistry();
 
             Assert(this.Consensus.HashGenesisBlock == uint256.Parse("0x000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"));
+
+            this.RegisterRules(this.Consensus);
+            this.RegisterMempoolRules(this.Consensus);
         }
     }
 }

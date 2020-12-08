@@ -68,7 +68,7 @@ namespace Xels.Bitcoin.IntegrationTests.Wallet
             this.transaction = this.xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(WalletTests.CreateContext(this.xelsSender.FullNode.Network,
                 new WalletAccountReference(Name, AccountName), Password, this.receivingAddress.ScriptPubKey, Money.COIN * 100, FeeType.Medium, 101));
 
-            this.xelsSender.FullNode.NodeService<WalletController>().SendTransaction(new SendTransactionRequest(this.transaction.ToHex()));
+            this.xelsSender.FullNode.NodeController<WalletController>().SendTransaction(new SendTransactionRequest(this.transaction.ToHex()));
 
             TestBase.WaitLoop(() => this.xelsReceiver.CreateRPCClient().GetRawMempool().Length > 0);
             TestBase.WaitLoop(() => this.xelsReceiver.FullNode.WalletManager().GetSpendableTransactionsInWallet(Name).Any());

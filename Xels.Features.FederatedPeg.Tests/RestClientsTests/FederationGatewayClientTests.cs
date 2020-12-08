@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Xels.Bitcoin;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Controllers;
 using Xels.Bitcoin.Networks;
+using Xels.Features.Collateral.CounterChain;
 using Xels.Features.FederatedPeg.Controllers;
-using Xels.Features.FederatedPeg.CounterChain;
 using Xels.Features.FederatedPeg.Models;
 using Xunit;
 
@@ -29,7 +30,7 @@ namespace Xels.Features.FederatedPeg.Tests.RestClientsTests
         [Fact]
         public async Task ReturnsNullIfCounterChainNodeIsOfflineAsync()
         {
-            List<MaturedBlockDepositsModel> result = await this.client.GetMaturedBlockDepositsAsync(new MaturedBlockRequestModel(100, 10));
+            SerializableResult<List<MaturedBlockDepositsModel>> result = await this.client.GetMaturedBlockDepositsAsync(new MaturedBlockRequestModel(100, 10));
 
             Assert.Null(result);
         }

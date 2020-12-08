@@ -132,62 +132,62 @@ namespace NBitcoin.Tests
             }
         }
 
-        //[Fact]
-        //[Trait("UnitTest", "UnitTest")]
-        //public void EncryptedSecretECmultiplyLotSequence()
-        //{
-        //    var tests = new[]
-        //    {
-        //        new {
-        //        Passphrase= "ΜΟΛΩ�? ΛΑΒΕ",
-        //        PassphraseCode= "passphrased3z9rQJHSyBkNBwTRPkUGNVEVrUAcfAXDyRU1V28ie6hNFbqDwbFBvsTK7yWVK",
-        //        Encrypted = "6PgGWtx25kUg8QWvwuJAgorN6k9FbE25rv5dMRwu5SKMnfpfVe5mar2ngH",
-        //        Address = "1Lurmih3KruL4xDB5FmHof38yawNtP9oGf",
-        //        Unencrypted = "5KMKKuUmAkiNbA3DazMQiLfDq47qs8MAEThm4yL8R2PhV1ov33D",
-        //        ConfirmationCode = "cfrm38V8G4qq2ywYEFfWLD5Cc6msj9UwsG2Mj4Z6QdGJAFQpdatZLavkgRd1i4iBMdRngDqDs51",
-        //        LotSequence = new LotSequence(806938,1),
-        //        Compressed = false
-        //        }
-        //        ,new {
-        //        Passphrase= "MOLON LABE",
-        //        PassphraseCode= "passphraseaB8feaLQDENqCgr4gKZpmf4VoaT6qdjJNJiv7fsKvjqavcJxvuR1hy25aTu5sX",
-        //        Encrypted = "6PgNBNNzDkKdhkT6uJntUXwwzQV8Rr2tZcbkDcuC9DZRsS6AtHts4Ypo1j",
-        //        Address = "1Jscj8ALrYu2y9TD8NrpvDBugPedmbj4Yh",
-        //        Unencrypted = "5JLdxTtcTHcfYcmJsNVy1v2PMDx432JPoYcBTVVRHpPaxUrdtf8",
-        //        ConfirmationCode = "cfrm38V8aXBn7JWA1ESmFMUn6erxeBGZGAxJPY4e36S9QWkzZKtaVqLNMgnifETYw7BPwWC9aPD",
-        //        LotSequence = new LotSequence(263183,1),
-        //        Compressed = false
-        //        }
-        //    };
+        [Fact]
+        [Trait("UnitTest", "UnitTest")]
+        public void EncryptedSecretECmultiplyLotSequence()
+        {
+            var tests = new[]
+            {
+                new {
+                Passphrase= "ΜΟΛΩ�? ΛΑΒΕ",
+                PassphraseCode= "passphrased3z9rQJHSyBkNBwTRPkUGNVEVrUAcfAXDyRU1V28ie6hNFbqDwbFBvsTK7yWVK",
+                Encrypted = "6PgGWtx25kUg8QWvwuJAgorN6k9FbE25rv5dMRwu5SKMnfpfVe5mar2ngH",
+                Address = "1Lurmih3KruL4xDB5FmHof38yawNtP9oGf",
+                Unencrypted = "5KMKKuUmAkiNbA3DazMQiLfDq47qs8MAEThm4yL8R2PhV1ov33D",
+                ConfirmationCode = "cfrm38V8G4qq2ywYEFfWLD5Cc6msj9UwsG2Mj4Z6QdGJAFQpdatZLavkgRd1i4iBMdRngDqDs51",
+                LotSequence = new LotSequence(806938,1),
+                Compressed = false
+                }
+                ,new {
+                Passphrase= "MOLON LABE",
+                PassphraseCode= "passphraseaB8feaLQDENqCgr4gKZpmf4VoaT6qdjJNJiv7fsKvjqavcJxvuR1hy25aTu5sX",
+                Encrypted = "6PgNBNNzDkKdhkT6uJntUXwwzQV8Rr2tZcbkDcuC9DZRsS6AtHts4Ypo1j",
+                Address = "1Jscj8ALrYu2y9TD8NrpvDBugPedmbj4Yh",
+                Unencrypted = "5JLdxTtcTHcfYcmJsNVy1v2PMDx432JPoYcBTVVRHpPaxUrdtf8",
+                ConfirmationCode = "cfrm38V8aXBn7JWA1ESmFMUn6erxeBGZGAxJPY4e36S9QWkzZKtaVqLNMgnifETYw7BPwWC9aPD",
+                LotSequence = new LotSequence(263183,1),
+                Compressed = false
+                }
+            };
 
-        //    foreach(var test in tests)
-        //    {
-        //        //Can generate unencrypted key with password and encrypted key
-        //        var encryptedKey = new BitcoinEncryptedSecretEC(test.Encrypted, this.networkMain);
-        //        AssertSequenceEquals(test.LotSequence, encryptedKey.LotSequence);
-        //        Key actualKey = encryptedKey.GetKey(test.Passphrase);
-        //        Assert.Equal(test.Unencrypted, actualKey.GetBitcoinSecret(this.networkMain).ToString());
-        //        Assert.Equal(test.Address, actualKey.PubKey.GetAddress(this.networkMain).ToString());
-        //        Assert.Equal(test.Compressed, actualKey.IsCompressed);
+            foreach(var test in tests)
+            {
+                //Can generate unencrypted key with password and encrypted key
+                var encryptedKey = new BitcoinEncryptedSecretEC(test.Encrypted, this.networkMain);
+                AssertSequenceEquals(test.LotSequence, encryptedKey.LotSequence);
+                Key actualKey = encryptedKey.GetKey(test.Passphrase);
+                Assert.Equal(test.Unencrypted, actualKey.GetBitcoinSecret(this.networkMain).ToString());
+                Assert.Equal(test.Address, actualKey.PubKey.GetAddress(this.networkMain).ToString());
+                Assert.Equal(test.Compressed, actualKey.IsCompressed);
 
 
-        //        //Can generate same BitcoinPassphraseCode with by using same ownerentropy
-        //        var passCode = new BitcoinPassphraseCode(test.PassphraseCode, this.networkMain);
-        //        AssertSequenceEquals(test.LotSequence, passCode.LotSequence);
-        //        var actualPassCode = new BitcoinPassphraseCode(test.Passphrase, this.networkMain, test.LotSequence, passCode.OwnerEntropy);
-        //        Assert.Equal(passCode.ToString(), actualPassCode.ToString());
+                //Can generate same BitcoinPassphraseCode with by using same ownerentropy
+                var passCode = new BitcoinPassphraseCode(test.PassphraseCode, this.networkMain);
+                AssertSequenceEquals(test.LotSequence, passCode.LotSequence);
+                var actualPassCode = new BitcoinPassphraseCode(test.Passphrase, this.networkMain, test.LotSequence, passCode.OwnerEntropy);
+                Assert.Equal(passCode.ToString(), actualPassCode.ToString());
 
-        //        //Can verify confirmation
-        //        var confirmation = new BitcoinConfirmationCode(test.ConfirmationCode, this.networkMain);
-        //        AssertSequenceEquals(confirmation.LotSequence, test.LotSequence);
-        //        Assert.True(confirmation.Check(test.Passphrase, new BitcoinPubKeyAddress(test.Address, this.networkMain)));
+                //Can verify confirmation
+                var confirmation = new BitcoinConfirmationCode(test.ConfirmationCode, this.networkMain);
+                AssertSequenceEquals(confirmation.LotSequence, test.LotSequence);
+                Assert.True(confirmation.Check(test.Passphrase, new BitcoinPubKeyAddress(test.Address, this.networkMain)));
 
-        //        //Can generate encrypted key from passcode
-        //        BitcoinEncryptedSecretEC generatedEncryptedKey = passCode.GenerateEncryptedSecret(test.Compressed).EncryptedKey;
-        //        AssertEx.CollectionEquals(passCode.OwnerEntropy, generatedEncryptedKey.OwnerEntropy);
-        //        Assert.Equal(test.Compressed, generatedEncryptedKey.IsCompressed);
-        //    }
-        //}
+                //Can generate encrypted key from passcode
+                BitcoinEncryptedSecretEC generatedEncryptedKey = passCode.GenerateEncryptedSecret(test.Compressed).EncryptedKey;
+                AssertEx.CollectionEquals(passCode.OwnerEntropy, generatedEncryptedKey.OwnerEntropy);
+                Assert.Equal(test.Compressed, generatedEncryptedKey.IsCompressed);
+            }
+        }
 
         private void AssertSequenceEquals(LotSequence expected, LotSequence actual)
         {

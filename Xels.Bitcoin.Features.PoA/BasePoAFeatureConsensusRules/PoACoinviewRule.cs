@@ -5,6 +5,7 @@ using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
 using Xels.Bitcoin.Utilities;
+using TracerAttributes;
 
 namespace Xels.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules
 {
@@ -13,6 +14,7 @@ namespace Xels.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules
         private PoANetwork network;
 
         /// <inheritdoc />
+        [NoTrace]
         public override void Initialize()
         {
             base.Initialize();

@@ -1,5 +1,6 @@
 ﻿using NBitcoin;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
+using TracerAttributes;
 
 namespace Xels.Bitcoin.P2P.Protocol
 {
@@ -51,6 +52,7 @@ namespace Xels.Bitcoin.P2P.Protocol
             this.Hash = hash;
         }
 
+        [NoTrace]
         public override void ReadWriteCore(BitcoinStream stream)
         {
             stream.ReadWrite(ref this.type);

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using NBitcoin;
 using Xels.Bitcoin.Utilities;
 
@@ -66,8 +65,5 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
         /// </summary>
         /// <param name="height">The height of the block.</param>
         RewindData GetRewindData(int height);
-
-        Task<FetchCoinsResponse> FetchAllCoinsAsync(CancellationToken cancellationToken = default(CancellationToken));
-
     }
 }

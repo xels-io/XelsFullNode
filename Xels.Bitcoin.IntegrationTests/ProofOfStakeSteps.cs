@@ -19,6 +19,7 @@ using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Tests.Common;
+using Xels.Features.SQLiteWalletRepository;
 using Xunit;
 
 namespace Xels.Bitcoin.IntegrationTests
@@ -56,6 +57,7 @@ namespace Xels.Bitcoin.IntegrationTests
                 .UsePosConsensus()
                 .UseMempool()
                 .UseWallet()
+                .AddSQLiteWalletRepository()
                 .AddPowPosMining()
                 .AddRPC()
                 .MockIBD()

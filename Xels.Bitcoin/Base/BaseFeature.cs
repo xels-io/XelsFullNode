@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
+using NBitcoin.Rules;
 using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.BlockPulling;
@@ -15,7 +16,9 @@ using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
+using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Consensus.Validators;
+using Xels.Bitcoin.Controllers;
 using Xels.Bitcoin.EventBus;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P;
@@ -197,6 +200,7 @@ namespace Xels.Bitcoin.Base
             connectionParameters.IsRelay = this.connectionManager.ConnectionSettings.RelayTxes;
 
             connectionParameters.TemplateBehaviors.Add(new PingPongBehavior());
+            connectionParameters.TemplateBehaviors.Add(new EnforcePeerVersionCheckBehavior(this.chainIndexer, this.nodeSettings, this.network, this.loggerFactory));
             connectionParameters.TemplateBehaviors.Add(new ConsensusManagerBehavior(this.chainIndexer, this.initialBlockDownloadState, this.consensusManager, this.peerBanning, this.loggerFactory));
 
             // TODO: Once a proper rate limiting strategy has been implemented, this check will be removed.
@@ -224,13 +228,11 @@ namespace Xels.Bitcoin.Base
 
             this.consensusRules.Initialize(this.chainIndexer.Tip);
 
-            this.consensusRules.Register();
-
             await this.consensusManager.InitializeAsync(this.chainIndexer.Tip).ConfigureAwait(false);
 
             this.chainState.ConsensusTip = this.consensusManager.Tip;
 
-            this.nodeStats.RegisterStats(sb => sb.Append(this.asyncProvider.GetStatistics(!this.nodeSettings.Log.DebugArgs.Any())), StatsType.Component, 100);
+            this.nodeStats.RegisterStats(sb => sb.Append(this.asyncProvider.GetStatistics(!this.nodeSettings.Log.DebugArgs.Any())), StatsType.Component, this.GetType().Name, 100);
         }
 
         /// <summary>
@@ -379,8 +381,8 @@ namespace Xels.Bitcoin.Base
                     services.AddSingleton<ISignals, Signals.Signals>();
                     services.AddSingleton<ISubscriptionErrorHandler, DefaultSubscriptionErrorHandler>();
                     services.AddSingleton<FullNode>().AddSingleton((provider) => { return provider.GetService<FullNode>() as IFullNode; });
-                    services.AddSingleton<ChainIndexer>(new ChainIndexer(fullNodeBuilder.Network));
-                    services.AddSingleton<IDateTimeProvider>(DateTimeProvider.Default);
+                    services.AddSingleton(new ChainIndexer(fullNodeBuilder.Network));
+                    services.AddSingleton(DateTimeProvider.Default);
                     services.AddSingleton<IInvalidBlockHashStore, InvalidBlockHashStore>();
                     services.AddSingleton<IChainState, ChainState>();
                     services.AddSingleton<IChainRepository, ChainRepository>();
@@ -395,13 +397,26 @@ namespace Xels.Bitcoin.Base
                     // Consensus
                     services.AddSingleton<ConsensusSettings>();
                     services.AddSingleton<ICheckpoints, Checkpoints>();
+                    services.AddSingleton<ConsensusRulesContainer>();
+
+                    foreach (var ruleType in fullNodeBuilder.Network.Consensus.ConsensusRules.HeaderValidationRules)
+                        services.AddSingleton(typeof(IHeaderValidationConsensusRule), ruleType);
+
+                    foreach (var ruleType in fullNodeBuilder.Network.Consensus.ConsensusRules.IntegrityValidationRules)
+                        services.AddSingleton(typeof(IIntegrityValidationConsensusRule), ruleType);
+
+                    foreach (var ruleType in fullNodeBuilder.Network.Consensus.ConsensusRules.PartialValidationRules)
+                        services.AddSingleton(typeof(IPartialValidationConsensusRule), ruleType);
+
+                    foreach (var ruleType in fullNodeBuilder.Network.Consensus.ConsensusRules.FullValidationRules)
+                        services.AddSingleton(typeof(IFullValidationConsensusRule), ruleType);
 
                     // Connection
                     services.AddSingleton<INetworkPeerFactory, NetworkPeerFactory>();
                     services.AddSingleton<NetworkPeerConnectionParameters>();
                     services.AddSingleton<IConnectionManager, ConnectionManager>();
                     services.AddSingleton<ConnectionManagerSettings>();
-                    services.AddSingleton<PayloadProvider>(new PayloadProvider().DiscoverPayloads());
+                    services.AddSingleton(new PayloadProvider().DiscoverPayloads());
                     services.AddSingleton<IVersionProvider, VersionProvider>();
                     services.AddSingleton<IBlockPuller, BlockPuller>();
 
@@ -436,8 +451,9 @@ namespace Xels.Bitcoin.Base
                         connectionManager: provider.GetService<IConnectionManager>(),
                         nodeStats: provider.GetService<INodeStats>(),
                         nodeLifetime: provider.GetService<INodeLifetime>(),
-                        consensusSettings: provider.GetService<ConsensusSettings>()
-                        ));
+                        consensusSettings: provider.GetService<ConsensusSettings>(),
+                        dateTimeProvider: provider.GetService<IDateTimeProvider>()));
+
                     services.AddSingleton<IChainedHeaderTree, ChainedHeaderTree>();
                     services.AddSingleton<IHeaderValidator, HeaderValidator>();
                     services.AddSingleton<IIntegrityValidator, IntegrityValidator>();
@@ -446,6 +462,9 @@ namespace Xels.Bitcoin.Base
 
                     // Console
                     services.AddSingleton<INodeStats, NodeStats>();
+
+                    // Controller
+                    services.AddTransient<NodeController>();
                 });
             });
 

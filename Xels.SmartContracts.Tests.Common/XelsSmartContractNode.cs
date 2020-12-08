@@ -13,6 +13,7 @@ using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.IntegrationTests.Common.Runners;
 using Xels.Bitcoin.P2P;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.SmartContracts.Tests.Common
 {
@@ -39,6 +40,7 @@ namespace Xels.SmartContracts.Tests.Common
                             })
                             .UseSmartContractPowConsensus()
                             .UseSmartContractWallet()
+                            .AddSQLiteWalletRepository()
                             .UseSmartContractPowMining()
                             .MockIBD()
                             .UseTestChainedHeaderTree();

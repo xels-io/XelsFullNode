@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using NBitcoin;
 using NBitcoin.DataEncoders;
+using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
+using Xels.Bitcoin.Features.MemoryPool.Rules;
+using Xels.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules;
 using Xels.Bitcoin.Features.PoA.Policies;
+using Xels.Bitcoin.Features.PoA.Voting.ConsensusRules;
 
 namespace Xels.Bitcoin.Features.PoA
 {
@@ -25,6 +29,11 @@ namespace Xels.Bitcoin.Features.PoA
         private const string NetworkDefaultConfigFilename = "poa.conf";
 
         public PoAConsensusOptions ConsensusOptions => this.Consensus.Options as PoAConsensusOptions;
+
+        /// <summary>
+        /// This is the height at which collateral commitment height data was committed to blocks.
+        /// </summary>
+        public int CollateralCommitmentActivationHeight { get; set; }
 
         public PoANetwork()
         {
@@ -73,9 +82,9 @@ namespace Xels.Bitcoin.Features.PoA
             // and should be the same for all nodes operating on this network.
             var genesisFederationMembers = new List<IFederationMember>()
             {
-                new FederationMember(new PubKey("02977737b49decf55ed8783dd51bba1a62f9421c1b0abcb1c2b1197c5309f82f63")),
-                new FederationMember(new PubKey("030c5a0a9f7031339cd9761af083f8e7cf794a419c1ef73074f811a33d8d37c945")),
-                new FederationMember(new PubKey("03deba53728d26be0fc321fddb48934e193e4396291dda2044c783b96525e50e15"))
+                new FederationMember(new PubKey("03025fcadedd28b12665de0542c8096f4cd5af8e01791a4d057f67e2866ca66ba7")),
+                new FederationMember(new PubKey("027724a9ecc54417ff0250c3355d300cee008747b630f43e791cd02c2b35294d2f")),
+                new FederationMember(new PubKey("022f8ad1799fd281fc9519814d20a407ed120ba84ec24cca8e869b811e6f6d4590"))
             };
 
             var consensusOptions = new PoAConsensusOptions(
@@ -111,7 +120,6 @@ namespace Xels.Bitcoin.Features.PoA
                 buriedDeployments: buriedDeployments,
                 bip9Deployments: bip9Deployments,
                 bip34Hash: new uint256("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8"),
-                ruleChangeActivationThreshold: 1916, // 95% of 2016
                 minerConfirmationWindow: 2016, // nPowTargetTimespan / nPowTargetSpacing
                 maxReorgLength: 500,
                 defaultAssumeValid: null,
@@ -175,6 +183,72 @@ namespace Xels.Bitcoin.Features.PoA
             {
                 throw new Exception("No keys for initial federation are configured!");
             }
+
+            this.RegisterRules(this.Consensus);
+            this.RegisterMempoolRules(this.Consensus);
+        }
+
+        protected virtual void RegisterRules(IConsensus consensus)
+        {
+            // IHeaderValidationConsensusRule
+            consensus.ConsensusRules
+                .Register<HeaderTimeChecksPoARule>()
+                .Register<XelsHeaderVersionRule>()
+                .Register<PoAHeaderDifficultyRule>()
+                .Register<PoAHeaderSignatureRule>();
+            // ------------------------------------------------------
+
+            // IIntegrityValidationConsensusRule
+            consensus.ConsensusRules
+                .Register<BlockMerkleRootRule>()
+                .Register<PoAIntegritySignatureRule>();
+            // ------------------------------------------------------
+
+            // IPartialValidationConsensusRule
+            consensus.ConsensusRules
+                .Register<SetActivationDeploymentsPartialValidationRule>()
+
+                // Rules that are inside the method ContextualCheckBlock
+                .Register<TransactionLocktimeActivationRule>()
+                .Register<CoinbaseHeightActivationRule>()
+                .Register<BlockSizeRule>()
+
+                // Rules that are inside the method CheckBlock
+                .Register<EnsureCoinbaseRule>()
+                .Register<CheckPowTransactionRule>()
+                .Register<CheckSigOpsRule>()
+
+                .Register<PoAVotingCoinbaseOutputFormatRule>();
+            // ------------------------------------------------------
+
+            // IFullValidationConsensusRule
+            consensus.ConsensusRules
+                .Register<SetActivationDeploymentsFullValidationRule>()
+
+                // Rules that require the store to be loaded (coinview)
+                .Register<LoadCoinviewRule>()
+                .Register<TransactionDuplicationActivationRule>() // implements BIP30
+
+                .Register<PoACoinviewRule>()
+                .Register<SaveCoinviewRule>();
+            // ------------------------------------------------------
+        }
+
+        protected virtual void RegisterMempoolRules(IConsensus consensus)
+        {
+            // TODO: These are currently the PoW/PoS rules as PoA does not have smart contracts by itself. Are other specialised rules needed?
+            consensus.MempoolRules = new List<Type>()
+            {
+                typeof(CheckConflictsMempoolRule),
+                typeof(CheckCoinViewMempoolRule),
+                typeof(CreateMempoolEntryMempoolRule),
+                typeof(CheckSigOpsMempoolRule),
+                typeof(CheckFeeMempoolRule),
+                typeof(CheckRateLimitMempoolRule),
+                typeof(CheckAncestorsMempoolRule),
+                typeof(CheckReplacementMempoolRule),
+                typeof(CheckAllInputsMempoolRule)
+            };
         }
 
         protected static Block CreatePoAGenesisBlock(ConsensusFactory consensusFactory, uint nTime, uint nNonce, uint nBits, int nVersion, Money genesisReward)

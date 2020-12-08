@@ -1,4 +1,5 @@
-﻿using Xels.Bitcoin.Features.MemoryPool;
+﻿using NBitcoin;
+using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
@@ -10,7 +11,7 @@ namespace Xels.SmartContracts.IntegrationTests
 {
     public class SmartContractNodeSetupTests
     {
-        [Fact(Skip = "Investigate PeerConnector shutdown timeout issue")]
+        [Fact]
         public void Mainnet_RequireStandard_False()
         {
             var network = new FakeSmartContractMain();
@@ -29,7 +30,7 @@ namespace Xels.SmartContracts.IntegrationTests
         {
             public FakeSmartContractMain()
             {
-                this.Name = "MainnetName"; // Doesn't contain "test" so IsTest() returns false.
+                this.NetworkType = NetworkType.Mainnet;
             }
         }
     }

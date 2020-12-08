@@ -59,7 +59,6 @@ namespace Xels.Bitcoin.Features.WatchOnlyWallet
                     .FeatureServices(services =>
                     {
                         services.AddSingleton<IWatchOnlyWalletManager, WatchOnlyWalletManager>();
-                        services.AddSingleton<WatchOnlyWalletController>();
                     });
             });
 

@@ -7,6 +7,7 @@ using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.CLR.Compilation;
 using Xels.SmartContracts.CLR.Serialization;
 using Xels.SmartContracts.Core;
+using Xels.SmartContracts.Core.Interfaces;
 using Xels.SmartContracts.Tests.Common.MockChain;
 using Xunit;
 

@@ -108,7 +108,6 @@ namespace Xels.Bitcoin.Features.Miner
         /// </summary>
         /// <param name="walletName">The name of the wallet.</param>
         /// <param name="walletPassword">The password of the wallet.</param>
-        /// <param name="powAddressScript"> PoWmining address</param>
         public void StartStaking(string walletName, string walletPassword)
         {
             if (this.timeSyncBehaviorState.IsSystemTimeOutOfSync)
@@ -122,7 +121,7 @@ namespace Xels.Bitcoin.Features.Miner
             if (!string.IsNullOrEmpty(walletName) && !string.IsNullOrEmpty(walletPassword))
             {
                 this.logger.LogInformation("Hybrid PoW Staking enabled on wallet '{0}'.", walletName);
-                
+
                 this.posMinting.Stake(new WalletSecret
                 {
                     WalletPassword = walletPassword,
@@ -235,8 +234,6 @@ namespace Xels.Bitcoin.Features.Miner
                         services.AddSingleton<IPowMining, PowMining>();
                         services.AddSingleton<IBlockProvider, BlockProvider>();
                         services.AddSingleton<BlockDefinition, PowBlockDefinition>();
-                        services.AddSingleton<MiningRpcController>();
-                        services.AddSingleton<MiningController>();
                         services.AddSingleton<MinerSettings>();
                     });
             });
@@ -270,10 +267,6 @@ namespace Xels.Bitcoin.Features.Miner
                         services.AddSingleton<BlockDefinition, PowBlockDefinition>();
                         services.AddSingleton<BlockDefinition, PosBlockDefinition>();
                         services.AddSingleton<BlockDefinition, PosPowBlockDefinition>();
-                        services.AddSingleton<StakingRpcController>();
-                        services.AddSingleton<StakingController>();
-                        services.AddSingleton<MiningRpcController>();
-                        services.AddSingleton<MiningController>();
                         services.AddSingleton<MinerSettings>();
                     });
             });

@@ -6,9 +6,11 @@ using NBitcoin;
 using Nethereum.RLP;
 using Xels.SmartContracts.CLR.Serialization;
 using Xels.SmartContracts.Core;
+using TracerAttributes;
 
 namespace Xels.SmartContracts.CLR
 {
+    [NoTrace]
     public class CallDataSerializer : ICallDataSerializer
     {
         public const int OpcodeSize = sizeof(byte);

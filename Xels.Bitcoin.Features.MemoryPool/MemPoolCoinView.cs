@@ -218,11 +218,5 @@ namespace Xels.Bitcoin.Features.MemoryPool
         {
             return this.Set.GetOutputFor(input);
         }
-
-
-        public Task<FetchCoinsResponse> FetchAllCoinsAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return this.Inner.FetchAllCoinsAsync(cancellationToken);
-        }
     }
 }

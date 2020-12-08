@@ -42,7 +42,5 @@ namespace Xels.SmartContracts.CLR
         public IInternalHashHelper InternalHashHelper { get; }
 
         public Func<ulong> GetBalance { get; }
-
-        public IGasMeter GasMeter => throw new NotImplementedException();
     }
 }

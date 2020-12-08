@@ -38,7 +38,7 @@ namespace FodyNlogAdapter.Adapters
         }
 
         [DebuggerStepThrough]
-        public void TraceEnter(string methodInfo, string[] paramNames, object[] paramValues)
+        public void TraceEnter(string methodInfo, Tuple<string, string>[] methodParameters, string[] paramNames, object[] paramValues)
         {
             if (this.logger.IsTraceEnabled)
             {
@@ -72,7 +72,7 @@ namespace FodyNlogAdapter.Adapters
         }
 
         [DebuggerStepThrough]
-        public void TraceLeave(string methodInfo, long startTicks, long endTicks, string[] paramNames, object[] paramValues)
+        public void TraceLeave(string methodInfo, Tuple<string, string>[] methodParameters, long startTicks, long endTicks, string[] paramNames, object[] paramValues)
         {
             if (this.logger.IsTraceEnabled)
             {

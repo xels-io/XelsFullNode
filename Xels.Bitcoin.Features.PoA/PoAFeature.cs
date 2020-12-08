@@ -1,26 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
-using NBitcoin.Rules;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Builder;
 using Xels.Bitcoin.Builder.Feature;
 using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
-using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.BlockStore;
 using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
-using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
 using Xels.Bitcoin.Features.Miner;
-using Xels.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules;
 using Xels.Bitcoin.Features.PoA.Behaviors;
 using Xels.Bitcoin.Features.PoA.Voting;
-using Xels.Bitcoin.Features.PoA.Voting.ConsensusRules;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.P2P.Protocol.Behaviors;
@@ -152,54 +146,6 @@ namespace Xels.Bitcoin.Features.PoA
         }
     }
 
-    public class PoAConsensusRulesRegistration : IRuleRegistration
-    {
-        public void RegisterRules(IConsensus consensus)
-        {
-            consensus.HeaderValidationRules = new List<IHeaderValidationConsensusRule>()
-            {
-                new HeaderTimeChecksPoARule(),
-                new XelsHeaderVersionRule(),
-                new PoAHeaderDifficultyRule(),
-                new PoAHeaderSignatureRule()
-            };
-
-            consensus.IntegrityValidationRules = new List<IIntegrityValidationConsensusRule>()
-            {
-                new BlockMerkleRootRule(),
-                new PoAIntegritySignatureRule()
-            };
-
-            consensus.PartialValidationRules = new List<IPartialValidationConsensusRule>()
-            {
-                new SetActivationDeploymentsPartialValidationRule(),
-
-                // rules that are inside the method ContextualCheckBlock
-                new TransactionLocktimeActivationRule(), // implements BIP113
-                new CoinbaseHeightActivationRule(), // implements BIP34
-                new BlockSizeRule(),
-
-                // rules that are inside the method CheckBlock
-                new EnsureCoinbaseRule(),
-                new CheckPowTransactionRule(),
-                new CheckSigOpsRule(),
-
-                new PoAVotingCoinbaseOutputFormatRule(),
-            };
-
-            consensus.FullValidationRules = new List<IFullValidationConsensusRule>()
-            {
-                new SetActivationDeploymentsFullValidationRule(),
-
-                // rules that require the store to be loaded (coinview)
-                new LoadCoinviewRule(),
-                new TransactionDuplicationActivationRule(), // implements BIP30
-                new PoACoinviewRule(),
-                new SaveCoinviewRule()
-            };
-        }
-    }
-
     /// <summary>
     /// A class providing extension methods for <see cref="IFullNodeBuilder"/>.
     /// </summary>
@@ -234,19 +180,14 @@ namespace Xels.Bitcoin.Features.PoA
                     {
                         services.AddSingleton<DBreezeCoinView>();
                         services.AddSingleton<ICoinView, CachedCoinView>();
-                        services.AddSingleton<ConsensusController>();
                         services.AddSingleton<IConsensusRuleEngine, PoAConsensusRuleEngine>();
                         services.AddSingleton<IChainState, ChainState>();
                         services.AddSingleton<ConsensusQuery>()
                             .AddSingleton<INetworkDifficulty, ConsensusQuery>(provider => provider.GetService<ConsensusQuery>())
                             .AddSingleton<IGetUnspentTransaction, ConsensusQuery>(provider => provider.GetService<ConsensusQuery>());
 
-                        new PoAConsensusRulesRegistration().RegisterRules(fullNodeBuilder.Network.Consensus);
-
                         // Voting.
                         services.AddSingleton<VotingManager>();
-                        services.AddSingleton<DefaultVotingController>();
-                        services.AddSingleton<FederationVotingController>();
                         services.AddSingleton<IPollResultExecutor, PollResultExecutor>();
                         services.AddSingleton<IWhitelistedHashesRepository, WhitelistedHashesRepository>();
                         services.AddSingleton<IdleFederationMembersKicker>();

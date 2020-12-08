@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NBitcoin;
 using NBitcoin.Protocol;
-using Xels.Bitcoin.Base;
 using Xels.Bitcoin.AsyncWork;
+using Xels.Bitcoin.Base;
 using Xels.Bitcoin.BlockPulling;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Logging;
@@ -45,9 +45,9 @@ namespace Xels.Bitcoin.Tests.BlockPulling
             this.loggerFactory.AddConsoleWithFilters();
 
             this.CallbacksCalled = new Dictionary<uint256, Block>();
-            this.ChainState = new ChainState() {ConsensusTip = ChainedHeadersHelper.CreateGenesisChainedHeader()};
+            this.ChainState = new ChainState() { ConsensusTip = ChainedHeadersHelper.CreateGenesisChainedHeader() };
 
-            this.Puller = new ExtendedBlockPuller(this.ChainState, new NodeSettings(new XelsMain()), new DateTimeProvider(), new NodeStats(new DateTimeProvider()), this.loggerFactory);
+            this.Puller = new ExtendedBlockPuller(this.ChainState, new NodeSettings(new XelsMain()), new DateTimeProvider(), new NodeStats(new DateTimeProvider(), this.loggerFactory), this.loggerFactory);
         }
 
         /// <summary>Creates a peer with extended puller behavior.</summary>

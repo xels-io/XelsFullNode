@@ -6,10 +6,8 @@ using System.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
-using Polly.Utilities;
 using Xels.Bitcoin.Features.Miner.Interfaces;
 using Xels.Bitcoin.Features.Miner.Models;
-using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.Utilities;
 using Xels.Bitcoin.Utilities.JsonErrors;
@@ -19,6 +17,7 @@ namespace Xels.Bitcoin.Features.Miner.Controllers
     /// <summary>
     /// Controller providing operations on mining feature.
     /// </summary>
+    [ApiVersion("1")]
     [Route("api/[controller]")]
     public class StakingController : Controller
     {
@@ -110,7 +109,7 @@ namespace Xels.Bitcoin.Features.Miner.Controllers
                 {
                     throw new SecurityException(ex.Message);
                 }
-
+            
                 this.fullNode.NodeFeature<MiningFeature>(true).StartStaking(request.Name, request.Password);
 
                 return this.Ok();

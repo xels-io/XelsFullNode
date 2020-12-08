@@ -3,6 +3,7 @@ using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.P2P;
+using Xels.Bitcoin.Utilities.Extensions;
 using Xunit;
 
 namespace Xels.Bitcoin.Tests.P2P
@@ -73,7 +74,7 @@ namespace Xels.Bitcoin.Tests.P2P
             this.selfEndpointTracker.UpdateAndAssignMyExternalAddress(oldIpEndpoint, false);
             this.selfEndpointTracker.UpdateAndAssignMyExternalAddress(oldIpEndpoint, false);
 
-            Assert.True(this.selfEndpointTracker.MyExternalAddress.Equals(oldIpEndpoint));
+            Assert.True(this.selfEndpointTracker.MyExternalAddress.Address.Equals(oldIpEndpoint.MapToIpv6().Address));
             Assert.Equal(initialPeerScore + 1, this.selfEndpointTracker.MyExternalAddressPeerScore);
         }
 
@@ -89,7 +90,7 @@ namespace Xels.Bitcoin.Tests.P2P
             Assert.Equal(initialPeerScore, this.selfEndpointTracker.MyExternalAddressPeerScore);
 
             this.selfEndpointTracker.UpdateAndAssignMyExternalAddress(newIpEndpoint, false);
-            Assert.True(this.selfEndpointTracker.MyExternalAddress.Equals(oldIpEndpoint));
+            Assert.True(this.selfEndpointTracker.MyExternalAddress.Address.Equals(oldIpEndpoint.MapToIpv6().Address));
             Assert.Equal(initialPeerScore - 1, this.selfEndpointTracker.MyExternalAddressPeerScore);
         }
 
@@ -108,7 +109,7 @@ namespace Xels.Bitcoin.Tests.P2P
             this.selfEndpointTracker.UpdateAndAssignMyExternalAddress(newIpEndpoint2, false);
             this.selfEndpointTracker.UpdateAndAssignMyExternalAddress(newIpEndpoint3, false);
 
-            Assert.True(this.selfEndpointTracker.MyExternalAddress.Equals(newIpEndpoint3));
+            Assert.True(this.selfEndpointTracker.MyExternalAddress.Address.Equals(newIpEndpoint3.MapToIpv6().Address));
             Assert.Equal(1, this.selfEndpointTracker.MyExternalAddressPeerScore);
         }
 

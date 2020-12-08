@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
-using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Models;
 using Xels.Bitcoin.Utilities;
 using Xels.Bitcoin.Utilities.JsonErrors;
@@ -17,6 +15,7 @@ namespace Xels.Features.FederatedPeg.Controllers
     /// <summary>
     /// Controller providing operations on a wallet.
     /// </summary>
+    [ApiVersion("1")]
     [Route("api/[controller]")]
     public class MultisigController : Controller
     {

@@ -222,6 +222,47 @@ namespace NBitcoin.Tests
             Assert.Single(selected);
         }
 
+        // These 2 next tests cater for the specific situation where the DefaultCoinSelector
+        // performs a random sampling of coins in an attempt to get as close as possible to 
+        // the required total.
+        // Previously this code wasn't functioning correctly and running virtually forever
+        // for large input sizes.
+
+        [Fact]
+        [Trait("UnitTest", "UnitTest")]
+        public void CanSelectCoinsInReasonableTimeDifferentScriptPubKeys()
+        {
+            var selector = new DefaultCoinSelector(0);
+
+            var coins = new ICoin[2000];
+
+            for(int i = 0; i < coins.Length; i++)
+            {
+                coins[i] = this.CreateCoin("1.0", new Key().ScriptPubKey);
+            }
+
+            IEnumerable<ICoin> result = selector.Select(coins, Money.Parse("1.5"));
+        }
+
+        [Fact]
+        [Trait("UnitTest", "UnitTest")]
+        public void CanSelectCoinsInReasonableTimeNoGroupByScriptPubKey()
+        {
+            var selector = new DefaultCoinSelector(0)
+            {
+                GroupByScriptPubKey = false
+            };
+
+            var testCoins = new ICoin[2000];
+
+            for (int i = 0; i < testCoins.Length; i++)
+            {
+                testCoins[i] = this.CreateCoin("1.0");
+            }
+
+            IEnumerable<ICoin> result = selector.Select(testCoins, Money.Parse("1.5"));
+        }
+
         private Coin CreateCoin(Money amount, Script scriptPubKey = null)
         {
             return new Coin(new OutPoint(Rand(), 0), new TxOut()
@@ -1387,7 +1428,7 @@ namespace NBitcoin.Tests
         {
             Action<Transaction, TransactionBuilder> AssertEstimatedSize = (tx, b) =>
             {
-                int expectedVSize = tx.GetVirtualSize();
+                int expectedVSize = tx.GetVirtualSize(KnownNetworks.Main.Consensus.Options.WitnessScaleFactor);
                 int actualVSize = b.EstimateSize(tx, true);
                 int expectedSize = tx.GetSerializedSize();
                 int actualSize = b.EstimateSize(tx, false);

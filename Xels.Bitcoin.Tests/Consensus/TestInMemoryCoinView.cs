@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using NBitcoin;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Utilities;
@@ -104,11 +103,6 @@ namespace Xels.Bitcoin.Tests.Consensus
         }
 
         public RewindData GetRewindData(int height)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<FetchCoinsResponse> FetchAllCoinsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             throw new NotImplementedException();
         }

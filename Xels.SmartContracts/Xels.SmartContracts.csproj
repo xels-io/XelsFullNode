@@ -5,10 +5,10 @@
     <Authors>Xels Group Ltd.</Authors>
     <Company>Xels Group Ltd.</Company>
     <Product>Xels Smart Contracts</Product>
-    <Version>0.7.0-alpha</Version>
+    <Version>1.2.1</Version>
     <PackageId>Xels.SmartContracts</PackageId>
 	<CodeAnalysisRuleSet>..\None.ruleset</CodeAnalysisRuleSet>
-	<AssemblyVersion>0.7.0.0</AssemblyVersion>
+	<AssemblyVersion>1.2.1.0</AssemblyVersion>
   </PropertyGroup>
 
 </Project>

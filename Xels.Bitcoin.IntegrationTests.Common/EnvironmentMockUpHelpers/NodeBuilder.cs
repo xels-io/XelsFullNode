@@ -17,6 +17,7 @@ using Xels.Bitcoin.Features.RPC;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.IntegrationTests.Common.Runners;
 using Xels.Bitcoin.Tests.Common;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
 {
@@ -104,13 +105,23 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         public CoreNode CreateBitcoinCoreNode(string version = "0.13.1", bool useCookieAuth = false)
         {
             string bitcoinDPath = GetBitcoinCorePath(version);
-            return CreateNode(new BitcoinCoreRunner(this.GetNextDataFolderName(), bitcoinDPath), useCookieAuth: useCookieAuth);
+            return this.CreateNode(new BitcoinCoreRunner(this.GetNextDataFolderName(), bitcoinDPath), useCookieAuth: useCookieAuth);
         }
 
         public CoreNode CreateXelsXNode(string version = "2.0.0.5", bool useCookieAuth = false)
         {
             string xelsDPath = GetXelsXPath(version);
-            return CreateNode(new XelsXRunner(this.GetNextDataFolderName(), xelsDPath), "xels.conf", useCookieAuth);
+            return this.CreateNode(new XelsXRunner(this.GetNextDataFolderName(), xelsDPath), "xels.conf", useCookieAuth);
+        }
+
+        public CoreNode CreateMainnetXelsXNode(string version = "2.0.0.5", bool useCookieAuth = false)
+        {
+            var parameters = new NodeConfigParameters();
+            parameters.Add("regtest", "0");
+            parameters.Add("server", "0");
+
+            string xelsDPath = GetXelsXPath(version);
+            return this.CreateNode(new XelsXRunner(this.GetNextDataFolderName(), xelsDPath), "xels.conf", useCookieAuth, parameters);
         }
 
         /// <summary>
@@ -136,6 +147,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
                .UseMempool()
                .AddMining()
                .UseWallet()
+               .AddSQLiteWalletRepository()
                .AddRPC()
                .UseApi()
                .UseTestChainedHeaderTree()
@@ -153,10 +165,11 @@ namespace Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers
         /// <param name="network">The network the node will run on.</param>
         /// <param name="agent">Overrides the node's agent prefix.</param>
         /// <param name="configParameters">Adds to the nodes configuration parameters.</param>
+        /// <param name="isGateway">Whether the node is a Proven Headers gateway node.</param>
         /// <returns>The constructed PoS node.</returns>
-        public CoreNode CreateXelsPosNode(Network network, string agent = "XelsBitcoin", NodeConfigParameters configParameters = null)
+        public CoreNode CreateXelsPosNode(Network network, string agent = "XelsBitcoin", NodeConfigParameters configParameters = null, bool isGateway = false)
         {
-            return CreateNode(new XelsBitcoinPosRunner(this.GetNextDataFolderName(), network, agent), "xels.conf", configParameters: configParameters);
+            return CreateNode(new XelsBitcoinPosRunner(this.GetNextDataFolderName(), network, agent, isGateway), "xels.conf", configParameters: configParameters);
         }
 
         public CoreNode CloneXelsNode(CoreNode cloneNode, string agent = "XelsBitcoin")

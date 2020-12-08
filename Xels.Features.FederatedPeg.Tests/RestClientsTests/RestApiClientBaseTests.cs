@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xels.Bitcoin.Controllers;
-using Xels.Features.FederatedPeg.Interfaces;
+using Xels.Features.Collateral.CounterChain;
 using Xunit;
 
 namespace Xels.Features.FederatedPeg.Tests.RestClientsTests

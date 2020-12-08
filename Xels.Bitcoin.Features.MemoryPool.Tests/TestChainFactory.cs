@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -10,16 +11,21 @@ using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Consensus;
+using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
+using Xels.Bitcoin.Features.Consensus.ProvenBlockHeaders;
 using Xels.Bitcoin.Features.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus.Rules.CommonRules;
 using Xels.Bitcoin.Features.MemoryPool.Fee;
+using Xels.Bitcoin.Features.MemoryPool.Interfaces;
+using Xels.Bitcoin.Features.MemoryPool.Rules;
 using Xels.Bitcoin.Features.Miner;
 using Xels.Bitcoin.Mining;
 using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
+using Xunit;
 
 namespace Xels.Bitcoin.Features.MemoryPool.Tests
 {
@@ -57,6 +63,84 @@ namespace Xels.Bitcoin.Features.MemoryPool.Tests
     /// </summary>
     internal class TestChainFactory
     {
+        public static async Task<ITestChainContext> CreatePosAsync(Network network, Script scriptPubKey, string dataDir)
+        {
+            var nodeSettings = new NodeSettings(network, args: new string[] { $"-datadir={dataDir}" });
+
+            ILoggerFactory loggerFactory = nodeSettings.LoggerFactory;
+            IDateTimeProvider dateTimeProvider = DateTimeProvider.Default;
+
+            network.Consensus.Options = new ConsensusOptions();
+
+            var consensusRulesContainer = new ConsensusRulesContainer();
+            foreach (var ruleType in network.Consensus.ConsensusRules.HeaderValidationRules)
+            {
+                // Dont check PoW of a header in this test.
+                if (ruleType == typeof(CheckDifficultyPowRule))
+                    continue;
+
+                consensusRulesContainer.HeaderValidationRules.Add(Activator.CreateInstance(ruleType) as HeaderValidationConsensusRule);
+            }
+            foreach (var ruleType in network.Consensus.ConsensusRules.FullValidationRules)
+                consensusRulesContainer.FullValidationRules.Add(Activator.CreateInstance(ruleType) as FullValidationConsensusRule);
+            foreach (var ruleType in network.Consensus.ConsensusRules.PartialValidationRules)
+                consensusRulesContainer.PartialValidationRules.Add(Activator.CreateInstance(ruleType) as PartialValidationConsensusRule);
+
+            var consensusSettings = new ConsensusSettings(nodeSettings);
+            var chain = new ChainIndexer(network);
+            var inMemoryCoinView = new InMemoryCoinView(chain.Tip.HashBlock);
+
+            var chainState = new ChainState();
+            var deployments = new NodeDeployments(network, chain);
+            ConsensusRuleEngine consensusRules;
+
+            var asyncProvider = new AsyncProvider(loggerFactory, new Mock<ISignals>().Object, new NodeLifetime());
+
+            var stakeChain = new StakeChainStore(network, chain, null, loggerFactory);
+            consensusRules = new PosConsensusRuleEngine(network, loggerFactory, dateTimeProvider, chain, deployments, consensusSettings, new Checkpoints(),
+                inMemoryCoinView, stakeChain, new StakeValidator(network, stakeChain, chain, inMemoryCoinView, loggerFactory), chainState, new InvalidBlockHashStore(dateTimeProvider),
+                new NodeStats(dateTimeProvider, loggerFactory), new RewindDataIndexCache(dateTimeProvider, network), asyncProvider, consensusRulesContainer).SetupRulesEngineParent();
+
+            ConsensusManager consensus = ConsensusManagerHelper.CreateConsensusManager(network, dataDir, chainState, chainIndexer: chain, consensusRules: consensusRules, inMemoryCoinView: inMemoryCoinView);
+
+            var genesis = new ChainedHeader(network.GetGenesis().Header, network.GenesisHash, 0);
+            chainState.BlockStoreTip = genesis;
+            await consensus.InitializeAsync(genesis).ConfigureAwait(false);
+
+            var mempoolSettings = new MempoolSettings(nodeSettings);
+            var blockPolicyEstimator = new BlockPolicyEstimator(mempoolSettings, loggerFactory, nodeSettings);
+            var mempool = new TxMempool(dateTimeProvider, blockPolicyEstimator, loggerFactory, nodeSettings);
+            var mempoolLock = new MempoolSchedulerLock();
+
+            // The mempool rule constructors aren't parameterless, so we have to manually inject the dependencies for every rule
+            var mempoolRules = new List<MempoolRule>
+            {
+                new CheckConflictsMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CheckCoinViewMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CreateMempoolEntryMempoolRule(network, mempool, mempoolSettings, chain, consensusRules, loggerFactory),
+                new CheckSigOpsMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CheckFeeMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CheckRateLimitMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CheckAncestorsMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CheckReplacementMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CheckAllInputsMempoolRule(network, mempool, mempoolSettings, chain, consensusRules, loggerFactory),
+                new CheckTxOutDustRule(network, mempool, mempoolSettings, chain, loggerFactory),
+            };
+
+            // We also have to check that the manually instantiated rules match the ones in the network, or the test isn't valid
+            for (int i = 0; i < network.Consensus.MempoolRules.Count; i++)
+            {
+                if (network.Consensus.MempoolRules[i] != mempoolRules[i].GetType())
+                {
+                    throw new Exception("Mempool rule type mismatch");
+                }
+            }
+
+            var nodeDeployments = new NodeDeployments(network, chain);
+            var mempoolValidator = new MempoolValidator(mempool, mempoolLock, dateTimeProvider, new MempoolSettings(nodeSettings), chain, inMemoryCoinView, loggerFactory, nodeSettings, consensusRules, mempoolRules, nodeDeployments);
+            return new TestChainContext { MempoolValidator = mempoolValidator };
+        }
+
         /// <summary>
         /// Creates the test chain with some default blocks and txs.
         /// </summary>
@@ -71,10 +155,20 @@ namespace Xels.Bitcoin.Features.MemoryPool.Tests
             IDateTimeProvider dateTimeProvider = DateTimeProvider.Default;
 
             network.Consensus.Options = new ConsensusOptions();
-            new FullNodeBuilderConsensusExtension.PowConsensusRulesRegistration().RegisterRules(network.Consensus);
 
-            // Dont check PoW of a header in this test.
-            network.Consensus.HeaderValidationRules.RemoveAll(x => x.GetType() == typeof(CheckDifficultyPowRule));
+            var consensusRulesContainer = new ConsensusRulesContainer();
+            foreach (var ruleType in network.Consensus.ConsensusRules.HeaderValidationRules)
+            {
+                // Dont check PoW of a header in this test.
+                if (ruleType == typeof(CheckDifficultyPowRule))
+                    continue;
+
+                consensusRulesContainer.HeaderValidationRules.Add(Activator.CreateInstance(ruleType) as HeaderValidationConsensusRule);
+            }
+            foreach (var ruleType in network.Consensus.ConsensusRules.FullValidationRules)
+                consensusRulesContainer.FullValidationRules.Add(Activator.CreateInstance(ruleType) as FullValidationConsensusRule);
+            foreach (var ruleType in network.Consensus.ConsensusRules.PartialValidationRules)
+                consensusRulesContainer.PartialValidationRules.Add(Activator.CreateInstance(ruleType) as PartialValidationConsensusRule);
 
             var consensusSettings = new ConsensusSettings(nodeSettings);
             var chain = new ChainIndexer(network);
@@ -84,10 +178,11 @@ namespace Xels.Bitcoin.Features.MemoryPool.Tests
 
             var chainState = new ChainState();
             var deployments = new NodeDeployments(network, chain);
-            ConsensusRuleEngine consensusRules = new PowConsensusRuleEngine(network, loggerFactory, dateTimeProvider, chain, deployments, consensusSettings, new Checkpoints(),
-                inMemoryCoinView, chainState, new InvalidBlockHashStore(dateTimeProvider), new NodeStats(dateTimeProvider), asyncProvider).Register();
 
-            ConsensusManager consensus = ConsensusManagerHelper.CreateConsensusManager(network, dataDir, chainState);
+            ConsensusRuleEngine consensusRules = new PowConsensusRuleEngine(network, loggerFactory, dateTimeProvider, chain, deployments, consensusSettings, new Checkpoints(),
+                inMemoryCoinView, chainState, new InvalidBlockHashStore(dateTimeProvider), new NodeStats(dateTimeProvider, loggerFactory), asyncProvider, consensusRulesContainer).SetupRulesEngineParent();
+
+            ConsensusManager consensus = ConsensusManagerHelper.CreateConsensusManager(network, dataDir, chainState, chainIndexer: chain, consensusRules: consensusRules, inMemoryCoinView: inMemoryCoinView);
 
             var genesis = new ChainedHeader(network.GetGenesis().Header, network.GenesisHash, 0);
             chainState.BlockStoreTip = genesis;
@@ -139,7 +234,35 @@ namespace Xels.Bitcoin.Features.MemoryPool.Tests
             blockDefinition = new PowBlockDefinition(consensus, dateTimeProvider, loggerFactory, mempool, mempoolLock, minerSettings, network, consensusRules);
             blockDefinition.Build(chain.Tip, scriptPubKey);
 
-            var mempoolValidator = new MempoolValidator(mempool, mempoolLock, dateTimeProvider, new MempoolSettings(nodeSettings), chain, inMemoryCoinView, loggerFactory, nodeSettings, consensusRules);
+            var mempoolSettings = new MempoolSettings(nodeSettings);
+
+            // The mempool rule constructors aren't parameterless, so we have to manually inject the dependencies for every rule
+            var mempoolRules = new List<MempoolRule>
+            {
+                new CheckConflictsMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CheckCoinViewMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CreateMempoolEntryMempoolRule(network, mempool, mempoolSettings, chain, consensusRules, loggerFactory),
+                new CheckSigOpsMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CheckFeeMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CheckRateLimitMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CheckAncestorsMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CheckReplacementMempoolRule(network, mempool, mempoolSettings, chain, loggerFactory),
+                new CheckAllInputsMempoolRule(network, mempool, mempoolSettings, chain, consensusRules, loggerFactory),
+                new CheckTxOutDustRule(network, mempool, mempoolSettings, chain, loggerFactory),
+            };
+
+            // We also have to check that the manually instantiated rules match the ones in the network, or the test isn't valid
+            for (int i = 0; i < network.Consensus.MempoolRules.Count; i++)
+            {
+                if (network.Consensus.MempoolRules[i] != mempoolRules[i].GetType())
+                {
+                    throw new Exception("Mempool rule type mismatch");
+                }
+            }
+
+            Assert.Equal(network.Consensus.MempoolRules.Count, mempoolRules.Count);
+
+            var mempoolValidator = new MempoolValidator(mempool, mempoolLock, dateTimeProvider, mempoolSettings, chain, inMemoryCoinView, loggerFactory, nodeSettings, consensusRules, mempoolRules, new NodeDeployments(network, chain));
 
             var outputs = new List<UnspentOutputs>();
 
@@ -150,7 +273,7 @@ namespace Xels.Bitcoin.Features.MemoryPool.Tests
                 outputs.Add(output);
             }
 
-            inMemoryCoinView.SaveChanges(outputs, new List<TxOut[]>(), chain.GetHeader(0).HashBlock, chain.GetHeader(1).HashBlock, chain.GetHeader(0).Height);
+            inMemoryCoinView.SaveChanges(outputs, new List<TxOut[]>(), chain.GetHeader(1).HashBlock, chain.GetHeader(2).HashBlock, chain.GetHeader(0).Height);
 
             return new TestChainContext { MempoolValidator = mempoolValidator, SrcTxs = srcTxs };
         }

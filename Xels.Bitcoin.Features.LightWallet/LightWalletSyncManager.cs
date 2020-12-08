@@ -8,6 +8,7 @@ using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.EventBus;
 using Xels.Bitcoin.EventBus.CoreEvents;
+using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.Notifications.Interfaces;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
@@ -37,7 +38,8 @@ namespace Xels.Bitcoin.Features.LightWallet
 
         protected ChainedHeader walletTip;
 
-        private SubscriptionToken transactionReceivedSubscription;
+        private SubscriptionToken transactionAddedSubscription;
+        private SubscriptionToken transactionRemovedSubscription;
         private SubscriptionToken blockConnectedSubscription;
 
         /// <summary>Global application life cycle control - triggers when application shuts down.</summary>
@@ -81,7 +83,6 @@ namespace Xels.Bitcoin.Features.LightWallet
         /// <inheritdoc />
         public void Start()
         {
-            this.transactionReceivedSubscription = this.signals.Subscribe<TransactionReceived>(ev => this.ProcessTransaction(ev.ReceivedTransaction));
             this.blockConnectedSubscription = this.signals.Subscribe<BlockConnected>(this.OnBlockConnected);
 
             // if there is no wallet created yet, the wallet tip is the chain tip.
@@ -92,55 +93,20 @@ namespace Xels.Bitcoin.Features.LightWallet
             else
             {
                 this.walletTip = this.chainIndexer.GetHeader(this.walletManager.WalletTipHash);
-                if (this.walletTip == null && this.chainIndexer.Height > 0)
-                {
-                    // the wallet tip was not found in the main chain.
-                    // this can happen if the node crashes unexpectedly.
-                    // to recover we need to find the first common fork
-                    // with the best chain, as the wallet does not have a
-                    // list of chain headers we use a BlockLocator and persist
-                    // that in the wallet. the block locator will help finding
-                    // a common fork and bringing the wallet back to a good
-                    // state (behind the best chain)
-                    ICollection<uint256> locators = this.walletManager.ContainsWallets ? this.walletManager.GetFirstWalletBlockLocator() : new[] { this.chainIndexer.Tip.HashBlock };
-                    var blockLocator = new BlockLocator { Blocks = locators.ToList() };
-                    ChainedHeader fork = this.chainIndexer.FindFork(blockLocator);
-                    this.walletManager.RemoveBlocks(fork);
-                    this.walletManager.WalletTipHash = fork.HashBlock;
-                    this.walletManager.WalletTipHeight = fork.Height;
-                    this.walletTip = fork;
-                    this.logger.LogWarning($"Wallet tip was out of sync, wallet tip reverted back to Height = {this.walletTip.Height} hash = {this.walletTip.HashBlock}.");
-                }
-
-                // we're looking from where to start syncing the wallets.
-                // we start by looking at the heights of the wallets and we start syncing from the oldest one (the smallest height).
-                // if for some reason we can't find a height, we look at the creation date of the wallets and we start syncing from the earliest date.
-                int? earliestWalletHeight = this.walletManager.GetEarliestWalletHeight();
-                if (earliestWalletHeight == null)
-                {
-                    DateTimeOffset oldestWalletDate = this.walletManager.GetOldestWalletCreationTime();
-
-                    if (oldestWalletDate > this.walletTip.Header.BlockTime)
-                    {
-                        oldestWalletDate = this.walletTip.Header.BlockTime;
-                    }
-
-                    this.SyncFromDate(oldestWalletDate.LocalDateTime);
-                }
-                else
-                {
-                    // If we reorged and the fork point is before the earliest wallet height start to
-                    // sync from the fork point.
-                    // We'll also get into this branch if the chain has been deleted but wallets are present.
-                    // In this case, the wallet tip will be null so the next statement will be skipped.
-                    if (this.walletTip != null && earliestWalletHeight.Value > this.walletTip.Height)
-                    {
-                        earliestWalletHeight = this.walletTip.Height;
-                    }
-
-                    this.SyncFromHeight(earliestWalletHeight.Value);
-                }
             }
+
+            this.transactionAddedSubscription = this.signals.Subscribe<TransactionAddedToMemoryPool>(this.OnTransactionAdded);
+            this.transactionRemovedSubscription = this.signals.Subscribe<TransactionRemovedFromMemoryPool>(this.OnTransactionRemoved);
+        }
+
+        private void OnTransactionAdded(TransactionAddedToMemoryPool transactionAdded)
+        {
+            this.walletManager.ProcessTransaction(transactionAdded.AddedTransaction);
+        }
+
+        private void OnTransactionRemoved(TransactionRemovedFromMemoryPool transactionRemoved)
+        {
+            this.walletManager.RemoveUnconfirmedTransaction(transactionRemoved.RemovedTransaction);
         }
 
         private void OnBlockConnected(BlockConnected blockConnected)
@@ -157,8 +123,9 @@ namespace Xels.Bitcoin.Features.LightWallet
                 this.asyncLoop = null;
             }
 
-            this.signals.Unsubscribe(this.transactionReceivedSubscription);
             this.signals.Unsubscribe(this.blockConnectedSubscription);
+            this.signals.Unsubscribe(this.transactionAddedSubscription);
+            this.signals.Unsubscribe(this.transactionRemovedSubscription);
         }
 
         /// <inheritdoc />
@@ -195,7 +162,7 @@ namespace Xels.Bitcoin.Features.LightWallet
                     this.walletManager.RemoveBlocks(fork);
                     this.walletTip = fork;
 
-                    this.logger.LogTrace("Wallet tip set to '{0}'.", this.walletTip);
+                    this.logger.LogDebug("Wallet tip set to '{0}'.", this.walletTip);
                 }
 
                 // The new tip can be ahead or behind the wallet.
@@ -211,7 +178,7 @@ namespace Xels.Bitcoin.Features.LightWallet
                         return;
                     }
 
-                    this.logger.LogTrace("Wallet tip '{0}' is behind the new tip '{1}'.", this.walletTip, newTip);
+                    this.logger.LogDebug("Wallet tip '{0}' is behind the new tip '{1}'.", this.walletTip, newTip);
 
                     // The wallet is falling behind we need to catch up.
                     this.logger.LogWarning("New tip '{0}' is too far in advance.", newTip);
@@ -274,11 +241,11 @@ namespace Xels.Bitcoin.Features.LightWallet
                         return;
                     }
 
-                    this.logger.LogTrace("Wallet tip '{0}' is ahead or equal to the new tip '{1}'.", this.walletTip, newTip.HashBlock);
+                    this.logger.LogDebug("Wallet tip '{0}' is ahead or equal to the new tip '{1}'.", this.walletTip, newTip.HashBlock);
                 }
             }
             else
-                this.logger.LogTrace("New block follows the previously known block '{0}'.", this.walletTip);
+                this.logger.LogDebug("New block follows the previously known block '{0}'.", this.walletTip);
 
             this.walletTip = newTip;
             this.walletManager.ProcessBlock(block, newTip);
@@ -291,20 +258,20 @@ namespace Xels.Bitcoin.Features.LightWallet
         }
 
         /// <inheritdoc />
-        public void SyncFromDate(DateTime date)
+        public void SyncFromDate(DateTime date, string walletName = null)
         {
             // Before we start syncing we need to make sure that the chain is at a certain level.
             // If the chain is behind the date from which we want to sync, we wait for it to catch up, and then we start syncing.
             // If the chain is already past the date we want to sync from, we don't wait, even though the chain might not be fully downloaded.
             if (this.chainIndexer.Tip.Header.BlockTime.LocalDateTime < date)
             {
-                this.logger.LogTrace("The chain tip's date ({0}) is behind the date from which we want to sync ({1}). Waiting for the chain to catch up.", this.chainIndexer.Tip.Header.BlockTime.LocalDateTime, date);
+                this.logger.LogDebug("The chain tip's date ({0}) is behind the date from which we want to sync ({1}). Waiting for the chain to catch up.", this.chainIndexer.Tip.Header.BlockTime.LocalDateTime, date);
 
                 this.asyncLoop = this.asyncProvider.CreateAndRunAsyncLoopUntil("LightWalletSyncManager.SyncFromDate", this.nodeLifetime.ApplicationStopping,
                     () => this.chainIndexer.Tip.Header.BlockTime.LocalDateTime >= date,
                     () =>
                     {
-                        this.logger.LogTrace("Start syncing from {0}.", date);
+                        this.logger.LogDebug("Start syncing from {0}.", date);
                         this.StartSync(this.chainIndexer.GetHeightAtTime(date));
                     },
                     (ex) =>
@@ -318,13 +285,13 @@ namespace Xels.Bitcoin.Features.LightWallet
             }
             else
             {
-                this.logger.LogTrace("Start syncing from {0}", date);
+                this.logger.LogDebug("Start syncing from {0}", date);
                 this.StartSync(this.chainIndexer.GetHeightAtTime(date));
             }
         }
 
         /// <inheritdoc />
-        public void SyncFromHeight(int height)
+        public void SyncFromHeight(int height, string walletName = null)
         {
             if (height < 0)
             {
@@ -336,13 +303,13 @@ namespace Xels.Bitcoin.Features.LightWallet
             // If the chain is already past the height we want to sync from, we don't wait, even though the chain might  not be fully downloaded.
             if (this.chainIndexer.Tip.Height < height)
             {
-                this.logger.LogTrace("The chain tip's height ({0}) is lower than the tip height from which we want to sync ({1}). Waiting for the chain to catch up.", this.chainIndexer.Tip.Height, height);
+                this.logger.LogDebug("The chain tip's height ({0}) is lower than the tip height from which we want to sync ({1}). Waiting for the chain to catch up.", this.chainIndexer.Tip.Height, height);
 
                 this.asyncLoop = this.asyncProvider.CreateAndRunAsyncLoopUntil("LightWalletSyncManager.SyncFromHeight", this.nodeLifetime.ApplicationStopping,
                     () => this.chainIndexer.Tip.Height >= height,
                     () =>
                     {
-                        this.logger.LogTrace("Start syncing from height {0}.", height);
+                        this.logger.LogDebug("Start syncing from height {0}.", height);
                         this.StartSync(height);
                     },
                     (ex) =>
@@ -356,7 +323,7 @@ namespace Xels.Bitcoin.Features.LightWallet
             }
             else
             {
-                this.logger.LogTrace("Start syncing from height {0}.", height);
+                this.logger.LogDebug("Start syncing from height {0}.", height);
                 this.StartSync(height);
             }
         }
@@ -369,9 +336,7 @@ namespace Xels.Bitcoin.Features.LightWallet
         {
             // TODO add support for the case where there is a reorg, like in the initialize method
             ChainedHeader chainedHeader = this.chainIndexer.GetHeader(height);
-            this.walletTip = chainedHeader ?? throw new WalletException("Invalid block height");
-            this.walletManager.WalletTipHash = chainedHeader.HashBlock;
-            this.walletManager.WalletTipHeight = chainedHeader.Height;
+            this.walletTip = this.walletManager.WalletCommonTip(chainedHeader ?? throw new WalletException("Invalid block height"));
             this.blockNotification.SyncFrom(chainedHeader.HashBlock);
         }
     }

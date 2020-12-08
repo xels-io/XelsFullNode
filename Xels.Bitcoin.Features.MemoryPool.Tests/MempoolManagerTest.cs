@@ -6,6 +6,7 @@ using NBitcoin;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.MemoryPool.Fee;
+using Xels.Bitcoin.Features.MemoryPool.Interfaces;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
 using Xunit;

@@ -6,6 +6,7 @@ namespace Xels.Bitcoin.Controllers
     /// <summary>
     /// Controller providing HTML Dashboard
     /// </summary>
+    [ApiVersion("1")]
     [Route("api/[controller]")]
     public class DashboardController : Controller
     {

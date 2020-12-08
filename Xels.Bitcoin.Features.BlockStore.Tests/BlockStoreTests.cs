@@ -152,15 +152,15 @@ namespace Xels.Bitcoin.Features.BlockStore.Tests
             Assert.Equal(initializationHeader, this.chainState.BlockStoreTip);
         }
 
-        //[Fact]
-        //public void BlockStoreRecoversToLastCommonBlockOnInitialization()
-        //{
-        //    this.repositoryTipHashAndHeight = new HashHeightPair(uint256.One, 1);
+        [Fact]
+        public void BlockStoreRecoversToLastCommonBlockOnInitialization()
+        {
+            this.repositoryTipHashAndHeight = new HashHeightPair(uint256.One, 1);
 
-        //    this.blockStoreQueue.Initialize();
+            this.blockStoreQueue.Initialize();
 
-        //    Assert.Equal(this.chainIndexer.Genesis, this.chainState.BlockStoreTip);
-        //}
+            Assert.Equal(this.chainIndexer.Genesis, this.chainState.BlockStoreTip);
+        }
 
         [Fact]
         public async Task BatchIsSavedAfterSizeThresholdReachedAsync()
@@ -415,15 +415,15 @@ namespace Xels.Bitcoin.Features.BlockStore.Tests
         }
 
         [Fact]
-        public async Task ThrowIfConsensusIsInitializedBeforeBlockStoreAsync()
+        public void ThrowIfConsensusIsInitializedBeforeBlockStore()
         {
             this.repositoryTipHashAndHeight = new HashHeightPair(this.chainIndexer.Genesis.HashBlock, 0);
             this.chainState.ConsensusTip = this.chainIndexer.Tip;
 
-            await Assert.ThrowsAsync<BlockStoreException>(async () =>
+            Assert.Throws<BlockStoreException>(() =>
             {
                 this.blockStoreQueue.Initialize();
-            }).ConfigureAwait(false);
+            });
         }
 
         [Fact]

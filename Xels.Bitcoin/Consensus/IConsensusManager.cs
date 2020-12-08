@@ -49,6 +49,11 @@ namespace Xels.Bitcoin.Consensus
         void PeerDisconnected(int peerId);
 
         /// <summary>
+        /// Gets the Header Tip
+        /// </summary>
+        int? HeaderTip { get; }
+
+        /// <summary>
         /// Provides block data for the given block hashes.
         /// </summary>
         /// <remarks>
@@ -62,6 +67,10 @@ namespace Xels.Bitcoin.Consensus
         /// <summary>Loads the block data from <see cref="ChainedHeaderTree"/> or block store if it's enabled.</summary>
         /// <param name="blockHash">The block hash.</param>
         ChainedHeaderBlock GetBlockData(uint256 blockHash);
+
+        /// <summary>Loads the block data from <see cref="ChainedHeaderTree"/> or block store if it's enabled.</summary>
+        /// <param name="blockHashes">The block hashes.</param>
+        ChainedHeaderBlock[] GetBlockData(List<uint256> blockHashes);
 
         /// <summary>
         /// A new block was mined by the node and is attempted to connect to tip.

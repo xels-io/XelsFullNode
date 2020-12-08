@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using NBitcoin;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Features.MemoryPool;
+using Xels.Bitcoin.Features.MemoryPool.Interfaces;
 using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin.Features.Wallet.Broadcasting

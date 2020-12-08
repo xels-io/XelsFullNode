@@ -20,41 +20,41 @@ namespace Xels.Bitcoin.IntegrationTests.Common
             Directory.CreateDirectory(DataPath);
         }
 
-        //[Fact(Skip = SkipTestMessage)]
-        //public void CreateXelsBlockchainDataWith10Blocks()
-        //{
-        //    this.GenerateXelsBlockchainData(new XelsRegTest(), 10, true, true, true);
-        //}
+        [Fact(Skip = SkipTestMessage)]
+        public void CreateXelsBlockchainDataWith10Blocks()
+        {
+            this.GenerateXelsBlockchainData(new XelsRegTest(), 10, true, true, true);
+        }
 
-        //[Fact(Skip = SkipTestMessage)]
-        //public void CreateXelsBlockchainDataWith100Blocks()
-        //{
-        //    this.GenerateXelsBlockchainData(new XelsRegTest(), 100, true, true, true);
-        //}
+        [Fact(Skip = SkipTestMessage)]
+        public void CreateXelsBlockchainDataWith100Blocks()
+        {
+            this.GenerateXelsBlockchainData(new XelsRegTest(), 100, true, true, true);
+        }
 
-        //[Fact(Skip = SkipTestMessage)]
-        //public void CreateXelsBlockchainDataWith150Blocks()
-        //{
-        //    this.GenerateXelsBlockchainData(new XelsRegTest(), 150, true, true, true);
-        //}
+        [Fact(Skip = SkipTestMessage)]
+        public void CreateXelsBlockchainDataWith150Blocks()
+        {
+            this.GenerateXelsBlockchainData(new XelsRegTest(), 150, true, true, true);
+        }
 
-        //[Fact(Skip = SkipTestMessage)]
-        //public void CreateBitcoinBlockchainDataWith10Blocks()
-        //{
-        //    this.GenerateBitcoinBlockchainData(new BitcoinRegTest(), 10, true, true, true);
-        //}
+        [Fact(Skip = SkipTestMessage)]
+        public void CreateBitcoinBlockchainDataWith10Blocks()
+        {
+            this.GenerateBitcoinBlockchainData(new BitcoinRegTest(), 10, true, true, true);
+        }
 
-        //[Fact(Skip = SkipTestMessage)]
-        //public void CreateBitcoinBlockchainDataWith100Blocks()
-        //{
-        //    this.GenerateBitcoinBlockchainData(new BitcoinRegTest(), 100, true, true, true);
-        //}
+        [Fact(Skip = SkipTestMessage)]
+        public void CreateBitcoinBlockchainDataWith100Blocks()
+        {
+            this.GenerateBitcoinBlockchainData(new BitcoinRegTest(), 100, true, true, true);
+        }
 
-        //[Fact(Skip = SkipTestMessage)]
-        //public void CreateBitcoinBlockchainDataWith150Blocks()
-        //{
-        //    this.GenerateBitcoinBlockchainData(new BitcoinRegTest(), 150, true, true, true);
-        //}
+        [Fact(Skip = SkipTestMessage)]
+        public void CreateBitcoinBlockchainDataWith150Blocks()
+        {
+            this.GenerateBitcoinBlockchainData(new BitcoinRegTest(), 150, true, true, true);
+        }
 
         private void GenerateXelsBlockchainData(Network network, int blockCount, bool saveMinerFolderWithWallet, bool saveListenerFolderWithSyncedEmptyWallet, bool saveFolderWithoutWallet)
         {

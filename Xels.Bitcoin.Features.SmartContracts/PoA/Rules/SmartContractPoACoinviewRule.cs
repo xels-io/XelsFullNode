@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using NBitcoin;
 using Xels.Bitcoin.Base.Deployments;
 using Xels.Bitcoin.Consensus.Rules;
 using Xels.Bitcoin.Features.Consensus.CoinViews;
 using Xels.Bitcoin.Features.PoA.BasePoAFeatureConsensusRules;
+using Xels.Bitcoin.Features.SmartContracts.Caching;
 using Xels.Bitcoin.Features.SmartContracts.Rules;
 using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.Core;
@@ -23,11 +24,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoA.Rules
         private readonly ISenderRetriever senderRetriever;
         private readonly IReceiptRepository receiptRepository;
         private readonly ICoinView coinView;
-        private readonly List<Transaction> blockTxsProcessed;
-        private Transaction generatedTransaction;
-        private readonly IList<Receipt> receipts;
-        private uint refundCounter;
-        private IStateRepositoryRoot mutableStateRepository;
+        private readonly IBlockExecutionResultCache executionCache;
+        private readonly ILoggerFactory loggerFactory;
 
         public SmartContractPoACoinviewRule(
             IStateRepositoryRoot stateRepositoryRoot,
@@ -35,7 +33,9 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoA.Rules
             ICallDataSerializer callDataSerializer,
             ISenderRetriever senderRetriever,
             IReceiptRepository receiptRepository,
-            ICoinView coinView)
+            ICoinView coinView,
+            IBlockExecutionResultCache executionCache,
+            ILoggerFactory loggerFactory)
         {
             this.stateRepositoryRoot = stateRepositoryRoot;
             this.executorFactory = executorFactory;
@@ -43,6 +43,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoA.Rules
             this.senderRetriever = senderRetriever;
             this.receiptRepository = receiptRepository;
             this.coinView = coinView;
+            this.executionCache = executionCache;
+            this.loggerFactory = loggerFactory;
         }
 
         /// <inheritdoc />
@@ -50,7 +52,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.PoA.Rules
         {
             base.Initialize();
 
-            this.logic = new SmartContractCoinViewRuleLogic(this.stateRepositoryRoot, this.executorFactory, this.callDataSerializer, this.senderRetriever, this.receiptRepository, this.coinView);
+            this.logic = new SmartContractCoinViewRuleLogic(this.stateRepositoryRoot, this.executorFactory, this.callDataSerializer, this.senderRetriever, this.receiptRepository, this.coinView, this.executionCache, this.loggerFactory);
         }
 
         /// <inheritdoc />

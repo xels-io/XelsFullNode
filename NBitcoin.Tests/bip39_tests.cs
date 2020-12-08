@@ -59,15 +59,15 @@ namespace NBitcoin.Tests
         }
 
 
-        //[Fact]
-        //[Trait("UnitTest", "UnitTest")]
-        //public void KDTableCanNormalize()
-        //{
-        //    string input = "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ã‚‰";
-        //    string expected = "ï¿½?ï¿½ï¿½?ï¿½ï¿½??ã‚™ã‚‰";
-        //    Assert.False(input == expected);
-        //    Assert.Equal(expected, KDTable.NormalizeKD(input));
-        //}
+        [Fact]
+        [Trait("UnitTest", "UnitTest")]
+        public void KDTableCanNormalize()
+        {
+            string input = "ã?‚ã?Šã?žã‚‰";
+            string expected = "ã?‚ã?Šã??ã‚™ã‚‰";
+            Assert.False(input == expected);
+            Assert.Equal(expected, KDTable.NormalizeKD(input));
+        }
 
         [Fact]
         [Trait("UnitTest", "UnitTest")]
@@ -101,12 +101,12 @@ namespace NBitcoin.Tests
             Assert.Equal(Language.English, Wordlist.AutoDetectLanguage(new string[] { "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "abandon", "about" }));
         }
 
-        //[Fact]
-        //[Trait("UnitTest", "UnitTest")]
-        //public void TestKnownJapenese()
-        //{
-        //    Assert.Equal(Language.Japanese, Wordlist.AutoDetectLanguage(new string[] { "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½??ï¿½?ï¿½ã‚“", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ã‚™", "ï¿½?ï¿½ï¿½?ï¿½ï¿½??ã‚™ã‚‰", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ã‚ƒã‚“", "ï¿½?ï¿½ï¿½??ã‚‹", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ã‚™ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ï¿½ã‚‹", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ã‚™ã‚Œã‚‹", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ï¿½ã‚™ï¿½?ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ï¿½ã‚™ï¿½?ï¿½ã‚‹", "ï¿½?ï¿½ï¿½?ï¿½ã‚™ï¿½??", "ï¿½?ï¿½ï¿½??ï¿½?ï¿½ã‚™", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ã‚‹", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ã‚‹", "ï¿½?ï¿½ï¿½?ï¿½ã‚Šï¿½?ï¿½ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ï¿½ã‚‹", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ã‚…ï¿½??", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ã‚Š", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ã‚‹", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ã‚‹", "ï¿½?ï¿½ï¿½?ï¿½ã‚‹", "ï¿½?ï¿½ï¿½?ï¿½ã‚™ã‚‰", "ï¿½?ï¿½ï¿½?ï¿½ã‚™ã‚‹", "ï¿½?ï¿½ï¿½?ï¿½ã‚Œã‚‹", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ã‚™", "ï¿½?ï¿½ï¿½?ï¿½ã‚„ï¿½?ï¿½ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ï¿½ã‚Š", "ï¿½?ï¿½ï¿½?ï¿½ã‚‚ï¿½?ï¿½", "ï¿½?ï¿½ï¿½?ã‚Šï¿½?ï¿½" }));
-        //}
+        [Fact]
+        [Trait("UnitTest", "UnitTest")]
+        public void TestKnownJapenese()
+        {
+            Assert.Equal(Language.Japanese, Wordlist.AutoDetectLanguage(new string[] { "ã?‚ã?„ã?“ã??ã?—ã‚“", "ã?‚ã?„ã?•ã?¤", "ã?‚ã?„ã?Ÿã‚™", "ã?‚ã?Šã??ã‚™ã‚‰", "ã?‚ã?‹ã?¡ã‚ƒã‚“", "ã?‚ã??ã‚‹", "ã?‚ã?‘ã?‹ã‚™ã?Ÿ", "ã?‚ã?‘ã‚‹", "ã?‚ã?“ã?‹ã‚™ã‚Œã‚‹", "ã?‚ã?•ã?„", "ã?‚ã?•ã?²", "ã?‚ã?—ã?‚ã?¨", "ã?‚ã?—ã‚™ã‚?ã?†", "ã?‚ã?™ã‚™ã?‹ã‚‹", "ã?‚ã?™ã‚™ã??", "ã?‚ã??ã?µã‚™", "ã?‚ã?Ÿã?ˆã‚‹", "ã?‚ã?Ÿã?Ÿã‚?ã‚‹", "ã?‚ã?Ÿã‚Šã?¾ã?ˆ", "ã?‚ã?Ÿã‚‹", "ã?‚ã?¤ã?„", "ã?‚ã?¤ã?‹ã?†", "ã?‚ã?£ã?—ã‚…ã??", "ã?‚ã?¤ã?¾ã‚Š", "ã?‚ã?¤ã‚?ã‚‹", "ã?‚ã?¦ã?ª", "ã?‚ã?¦ã?¯ã?¾ã‚‹", "ã?‚ã?²ã‚‹", "ã?‚ã?µã‚™ã‚‰", "ã?‚ã?µã‚™ã‚‹", "ã?‚ã?µã‚Œã‚‹", "ã?‚ã?¾ã?„", "ã?‚ã?¾ã?¨ã‚™", "ã?‚ã?¾ã‚„ã?‹ã?™", "ã?‚ã?¾ã‚Š", "ã?‚ã?¿ã‚‚ã?®", "ã?‚ã‚?ã‚Šã?‹" }));
+        }
 
         [Fact]
         [Trait("UnitTest", "UnitTest")]
@@ -126,14 +126,14 @@ namespace NBitcoin.Tests
         [Trait("UnitTest", "UnitTest")]
         public void TestKnownChineseSimplified()
         {
-            Assert.Equal(Language.ChineseSimplified, Wordlist.AutoDetectLanguage(new string[] { "çš„", "ä¸€", "æ˜¯", "åœ¨", "ï¿½?", "äº†", "æœ‰", "å’Œ", "äºº", "è¿™" }));
+            Assert.Equal(Language.ChineseSimplified, Wordlist.AutoDetectLanguage(new string[] { "çš„", "ä¸€", "æ˜¯", "åœ¨", "ä¸?", "äº†", "æœ‰", "å’Œ", "äºº", "è¿™" }));
         }
 
         [Fact]
         [Trait("UnitTest", "UnitTest")]
         public void TestKnownChineseTraditional()
         {
-            Assert.Equal(Language.ChineseTraditional, Wordlist.AutoDetectLanguage(new string[] { "çš„", "ä¸€", "æ˜¯", "åœ¨", "ï¿½?", "äº†", "æœ‰", "å’Œ", "è¼‰" }));
+            Assert.Equal(Language.ChineseTraditional, Wordlist.AutoDetectLanguage(new string[] { "çš„", "ä¸€", "æ˜¯", "åœ¨", "ä¸?", "äº†", "æœ‰", "å’Œ", "è¼‰" }));
         }
 
         [Fact]

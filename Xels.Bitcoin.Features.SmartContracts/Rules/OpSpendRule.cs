@@ -13,6 +13,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.Rules
     /// </summary>
     public class OpSpendRule : FullValidationConsensusRule
     {
+        /// <inheritdoc/>
         public override Task RunAsync(RuleContext context)
         {
             Block block = context.ValidationContext.BlockToValidate;

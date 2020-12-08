@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using DBreeze;
 using DBreeze.DataTypes;
 using Microsoft.Extensions.Logging;
@@ -81,7 +80,7 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
             this.network = network;
             this.performanceCounter = new BackendPerformanceCounter(dateTimeProvider);
 
-            nodeStats.RegisterStats(this.AddBenchStats, StatsType.Benchmark, 400);
+            nodeStats.RegisterStats(this.AddBenchStats, StatsType.Benchmark, this.GetType().Name, 400);
 
         }
 
@@ -142,7 +141,7 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
                         Row<byte[], byte[]> row = transaction.Select<byte[], byte[]>("Coins", input.ToBytes(false));
                         UnspentOutputs outputs = row.Exists ? new UnspentOutputs(input, this.dBreezeSerializer.Deserialize<Coins>(row.Value)) : null;
 
-                        this.logger.LogTrace("Outputs for '{0}' were {1}.", input, outputs == null ? "NOT loaded" : "loaded");
+                        this.logger.LogDebug("Outputs for '{0}' were {1}.", input, outputs == null ? "NOT loaded" : "loaded");
 
                         result[i++] = outputs;
                     }
@@ -216,7 +215,7 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
                     {
                         if (coin.IsPrunable)
                         {
-                            this.logger.LogTrace("Outputs of transaction ID '{0}' are prunable and will be removed from the database.", coin.TransactionId);
+                            this.logger.LogDebug("Outputs of transaction ID '{0}' are prunable and will be removed from the database.", coin.TransactionId);
                             transaction.RemoveKey("Coins", coin.TransactionId.ToBytes(false));
                         }
                         else
@@ -230,7 +229,7 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
                     for (int i = 0; i < toInsert.Count; i++)
                     {
                         var coin = toInsert[i];
-                        this.logger.LogTrace("Outputs of transaction ID '{0}' are NOT PRUNABLE and will be inserted into the database. {1}/{2}.", coin.TransactionId, i, toInsert.Count);
+                        this.logger.LogDebug("Outputs of transaction ID '{0}' are NOT PRUNABLE and will be inserted into the database. {1}/{2}.", coin.TransactionId, i, toInsert.Count);
 
                         transaction.Insert("Coins", coin.TransactionId.ToBytes(false), this.dBreezeSerializer.Serialize(coin.ToCoins()));
                     }
@@ -240,7 +239,7 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
                         int nextRewindIndex = this.GetRewindIndex(transaction) + 1;
                         foreach (RewindData rewindData in rewindDataList)
                         {
-                            this.logger.LogTrace("Rewind state #{0} created.", nextRewindIndex);
+                            this.logger.LogDebug("Rewind state #{0} created.", nextRewindIndex);
 
                             transaction.Insert("Rewind", nextRewindIndex, this.dBreezeSerializer.Serialize(rewindData));
                             nextRewindIndex++;
@@ -317,13 +316,13 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
 
                     foreach (uint256 txId in rewindData.TransactionsToRemove)
                     {
-                        this.logger.LogTrace("Outputs of transaction ID '{0}' will be removed.", txId);
+                        this.logger.LogDebug("Outputs of transaction ID '{0}' will be removed.", txId);
                         transaction.RemoveKey("Coins", txId.ToBytes(false));
                     }
 
                     foreach (UnspentOutputs coin in rewindData.OutputsToRestore)
                     {
-                        this.logger.LogTrace("Outputs of transaction ID '{0}' will be restored.", coin.TransactionId);
+                        this.logger.LogDebug("Outputs of transaction ID '{0}' will be restored.", coin.TransactionId);
                         transaction.Insert("Coins", coin.TransactionId.ToBytes(false), this.dBreezeSerializer.Serialize(coin.ToCoins()));
                     }
 
@@ -380,7 +379,7 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
 
                 foreach (StakeItem blockStake in blocklist)
                 {
-                    this.logger.LogTrace("Loading POS block hash '{0}' from the database.", blockStake.BlockId);
+                    this.logger.LogDebug("Loading POS block hash '{0}' from the database.", blockStake.BlockId);
                     Row<byte[], byte[]> stakeRow = transaction.Select<byte[], byte[]>("Stake", blockStake.BlockId.ToBytes(false));
 
                     if (stakeRow.Exists)
@@ -410,32 +409,6 @@ namespace Xels.Bitcoin.Features.Consensus.CoinViews
         public void Dispose()
         {
             this.dBreeze.Dispose();
-        }
-
-
-        public Task<FetchCoinsResponse> FetchAllCoinsAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            Task<FetchCoinsResponse> task = Task.Run(() =>
-            {
-                FetchCoinsResponse res = null;
-                using (DBreeze.Transactions.Transaction transaction = this.CreateTransaction())
-                {
-                    transaction.SynchronizeTables("BlockHash", "Coins");
-                    transaction.ValuesLazyLoadingIsOn = false;
-
-                    uint256 blockHash = this.GetTipHash(transaction);
-                    var result = new List<UnspentOutputs>();
-                    foreach (var row in transaction.SelectForward<byte[], byte[]>("Coins"))
-                    {
-                        UnspentOutputs outputs = row.Exists ? new UnspentOutputs(this.dBreezeSerializer.Deserialize<uint256>(row.Key), this.dBreezeSerializer.Deserialize<Coins>(row.Value)) : null;
-                        result.Add(outputs);
-                    }
-                    res = new FetchCoinsResponse(result.ToArray(), blockHash);
-                }
-                return res;
-            }, cancellationToken);
-
-            return task;
         }
     }
 }

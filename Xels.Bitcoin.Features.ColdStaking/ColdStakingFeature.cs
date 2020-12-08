@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
-using NBitcoin.Policy;
 using Xels.Bitcoin.Builder;
 using Xels.Bitcoin.Builder.Feature;
 using Xels.Bitcoin.Configuration;
@@ -14,12 +14,10 @@ using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Features.BlockStore;
-using Xels.Bitcoin.Features.ColdStaking.Controllers;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.RPC;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Broadcasting;
-using Xels.Bitcoin.Features.Wallet.Controllers;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Utilities;
@@ -116,8 +114,11 @@ namespace Xels.Bitcoin.Features.ColdStaking
             this.nodeSettings = nodeSettings;
             this.walletSettings = walletSettings;
 
-            nodeStats.RegisterStats(this.AddComponentStats, StatsType.Component);
-            nodeStats.RegisterStats(this.AddInlineStats, StatsType.Inline, 800);
+            //nodeStats.RemoveStats(StatsType.Component, typeof(WalletFeature).Name);
+            //nodeStats.RemoveStats(StatsType.Inline, typeof(WalletFeature).Name);
+
+            //nodeStats.RegisterStats(this.AddComponentStats, StatsType.Component, this.GetType().Name);
+            //nodeStats.RegisterStats(this.AddInlineStats, StatsType.Inline, this.GetType().Name, 800);
         }
 
         /// <summary>
@@ -126,7 +127,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
         /// <param name="network">The network to extract values from.</param>
         public static void PrintHelp(Network network)
         {
-            WalletSettings.PrintHelp(network);
+            // The wallet feature will print the help.
         }
 
         /// <summary>
@@ -136,12 +137,12 @@ namespace Xels.Bitcoin.Features.ColdStaking
         /// <param name="network">The network to base the defaults off.</param>
         public static void BuildDefaultConfigurationFile(StringBuilder builder, Network network)
         {
-            WalletSettings.BuildDefaultConfigurationFile(builder, network);
+            // The wallet feature will add its own settings to the config.
         }
 
         private void AddInlineStats(StringBuilder benchLogs)
         {
-            var walletManager = this.coldStakingManager;
+            ColdStakingManager walletManager = this.coldStakingManager;
 
             if (walletManager != null)
             {
@@ -160,7 +161,7 @@ namespace Xels.Bitcoin.Features.ColdStaking
             if (walletNames.Any())
             {
                 benchLog.AppendLine();
-                benchLog.AppendLine("======Wallets======");
+                benchLog.AppendLine("======Wallets123======");
 
                 foreach (string walletName in walletNames)
                 {
@@ -198,11 +199,6 @@ namespace Xels.Bitcoin.Features.ColdStaking
         /// <inheritdoc />
         public override Task InitializeAsync()
         {
-            this.coldStakingManager.Start();
-            this.walletSyncManager.Start();
-            this.addressBookManager.Initialize();
-
-            this.connectionManager.Parameters.TemplateBehaviors.Add(this.broadcasterBehavior);
 
             return Task.CompletedTask;
         }
@@ -210,8 +206,6 @@ namespace Xels.Bitcoin.Features.ColdStaking
         /// <inheritdoc />
         public override void Dispose()
         {
-            this.coldStakingManager.Stop();
-            this.walletSyncManager.Stop();
         }
     }
 
@@ -221,6 +215,13 @@ namespace Xels.Bitcoin.Features.ColdStaking
     /// <exception cref="InvalidOperationException">Thrown if this is not a Xels network.</exception>
     public static class FullNodeBuilderColdStakingExtension
     {
+        // TODO: Move to IServiceCollection helper class.
+        public static bool RemoveSingleton<T>(this IServiceCollection services)
+        {
+            // Remove the service if it exists.
+            return services.Remove(services.Where(sd => sd.ServiceType == typeof(T)).FirstOrDefault());
+        }
+
         public static IFullNodeBuilder UseColdStakingWallet(this IFullNodeBuilder fullNodeBuilder)
         {
             // Ensure that this feature is only used on a Xels network.
@@ -232,6 +233,8 @@ namespace Xels.Bitcoin.Features.ColdStaking
 
             LoggingConfiguration.RegisterFeatureNamespace<ColdStakingFeature>("wallet");
 
+            fullNodeBuilder.UseWallet();
+
             fullNodeBuilder.ConfigureFeature(features =>
             {
                 features
@@ -241,19 +244,11 @@ namespace Xels.Bitcoin.Features.ColdStaking
                 .DependOn<RPCFeature>()
                 .FeatureServices(services =>
                 {
-                    services.AddSingleton<IWalletSyncManager, WalletSyncManager>();
-                    services.AddSingleton<IWalletTransactionHandler, WalletTransactionHandler>();
+                    services.RemoveSingleton<IWalletManager>();
                     services.AddSingleton<IWalletManager, ColdStakingManager>();
-                    services.AddSingleton<IWalletFeePolicy, WalletFeePolicy>();
-                    services.AddSingleton<ColdStakingController>();
-                    services.AddSingleton<WalletController>();
-                    services.AddSingleton<WalletRPCController>();
-                    services.AddSingleton<IBroadcasterManager, FullNodeBroadcasterManager>();
-                    services.AddSingleton<BroadcasterBehavior>();
-                    services.AddSingleton<WalletSettings>();
-                    services.AddSingleton<IScriptAddressReader>(new ScriptAddressReader());
-                    services.AddSingleton<StandardTransactionPolicy>();
-                    services.AddSingleton<IAddressBookManager, AddressBookManager>();
+
+                    services.AddSingleton<ScriptAddressReader>();
+                    services.Replace(new ServiceDescriptor(typeof(IScriptAddressReader), typeof(ColdStakingDestinationReader), ServiceLifetime.Singleton));
                 });
             });
 

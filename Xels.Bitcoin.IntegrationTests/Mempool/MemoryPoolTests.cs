@@ -349,236 +349,236 @@ namespace Xels.Bitcoin.IntegrationTests.Mempool
             }
         }
 
-        //[Fact]
-        //public void Mempool_SendPosTransaction_AheadOfFutureDrift_ShouldRejectByMempool()
-        //{
-        //    var network = new XelsRegTest();
+        [Fact]
+        public void Mempool_SendPosTransaction_AheadOfFutureDrift_ShouldRejectByMempool()
+        {
+            var network = new XelsRegTest();
 
-        //    using (NodeBuilder builder = NodeBuilder.Create(this))
-        //    {
-        //        CoreNode xelsSender = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
+            using (NodeBuilder builder = NodeBuilder.Create(this))
+            {
+                CoreNode xelsSender = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
 
-        //        TestHelper.MineBlocks(xelsSender, 5);
+                TestHelper.MineBlocks(xelsSender, 5);
 
-        //        // Send coins to the receiver
-        //        var context = WalletTests.CreateContext(network, new WalletAccountReference(WalletName, Account), Password, new Key().PubKey.GetAddress(network).ScriptPubKey, Money.COIN * 100, FeeType.Medium, 1);
+                // Send coins to the receiver
+                var context = WalletTests.CreateContext(network, new WalletAccountReference(WalletName, Account), Password, new Key().PubKey.GetAddress(network).ScriptPubKey, Money.COIN * 100, FeeType.Medium, 1);
 
-        //        Transaction trx = xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(context);
+                Transaction trx = xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(context);
 
-        //        // This should make the mempool reject a POS trx.
-        //        trx.Time = Utils.DateTimeToUnixTime(Utils.UnixTimeToDateTime(trx.Time).AddMinutes(5));
+                // This should make the mempool reject a POS trx.
+                trx.Time = Utils.DateTimeToUnixTime(Utils.UnixTimeToDateTime(trx.Time).AddMinutes(5));
 
-        //        // Sign trx again after changing the time property.
-        //        trx = context.TransactionBuilder.SignTransaction(trx);
+                // Sign trx again after changing the time property.
+                trx = context.TransactionBuilder.SignTransaction(trx);
 
-        //        // Enable standard policy relay.
-        //        xelsSender.FullNode.NodeService<MempoolSettings>().RequireStandard = true;
+                // Enable standard policy relay.
+                xelsSender.FullNode.NodeService<MempoolSettings>().RequireStandard = true;
 
-        //        var broadcaster = xelsSender.FullNode.NodeService<IBroadcasterManager>();
+                var broadcaster = xelsSender.FullNode.NodeService<IBroadcasterManager>();
 
-        //        broadcaster.BroadcastTransactionAsync(trx).GetAwaiter().GetResult();
-        //        var entry = broadcaster.GetTransaction(trx.GetHash());
+                broadcaster.BroadcastTransactionAsync(trx).GetAwaiter().GetResult();
+                var entry = broadcaster.GetTransaction(trx.GetHash());
 
-        //        Assert.Equal("time-too-new", entry.ErrorMessage);
-        //    }
-        //}
+                Assert.Equal("time-too-new", entry.ErrorMessage);
+            }
+        }
 
-        //[Fact]
-        //public void Mempool_SendPosTransaction_WithElapsedLockTime_ShouldBeAcceptedByMempool()
-        //{
-        //    // See CheckFinalTransaction_WithElapsedLockTime_ReturnsTrueAsync for the 'unit test' version
+        [Fact]
+        public void Mempool_SendPosTransaction_WithElapsedLockTime_ShouldBeAcceptedByMempool()
+        {
+            // See CheckFinalTransaction_WithElapsedLockTime_ReturnsTrueAsync for the 'unit test' version
 
-        //    var network = new XelsRegTest();
+            var network = new XelsRegTest();
 
-        //    using (NodeBuilder builder = NodeBuilder.Create(this))
-        //    {
-        //        CoreNode xelsSender = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
+            using (NodeBuilder builder = NodeBuilder.Create(this))
+            {
+                CoreNode xelsSender = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
 
-        //        TestHelper.MineBlocks(xelsSender, 5);
+                TestHelper.MineBlocks(xelsSender, 5);
 
-        //        // Send coins to the receiver.
-        //        var context = WalletTests.CreateContext(network, new WalletAccountReference(WalletName, Account), Password, new Key().PubKey.GetAddress(network).ScriptPubKey, Money.COIN * 100, FeeType.Medium, 1);
+                // Send coins to the receiver.
+                var context = WalletTests.CreateContext(network, new WalletAccountReference(WalletName, Account), Password, new Key().PubKey.GetAddress(network).ScriptPubKey, Money.COIN * 100, FeeType.Medium, 1);
 
-        //        Transaction trx = xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(context);
+                Transaction trx = xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(context);
 
-        //        // Treat the locktime as absolute, not relative.
-        //        trx.Inputs.First().Sequence = new Sequence(Sequence.SEQUENCE_LOCKTIME_DISABLE_FLAG);
+                // Treat the locktime as absolute, not relative.
+                trx.Inputs.First().Sequence = new Sequence(Sequence.SEQUENCE_LOCKTIME_DISABLE_FLAG);
 
-        //        // Set the nLockTime to be behind the current tip so that locktime has elapsed.
-        //        trx.LockTime = new LockTime(xelsSender.FullNode.ChainIndexer.Height - 1);
+                // Set the nLockTime to be behind the current tip so that locktime has elapsed.
+                trx.LockTime = new LockTime(xelsSender.FullNode.ChainIndexer.Height - 1);
 
-        //        // Sign trx again after changing the nLockTime.
-        //        trx = context.TransactionBuilder.SignTransaction(trx);
+                // Sign trx again after changing the nLockTime.
+                trx = context.TransactionBuilder.SignTransaction(trx);
 
-        //        // Enable standard policy relay.
-        //        xelsSender.FullNode.NodeService<MempoolSettings>().RequireStandard = true;
+                // Enable standard policy relay.
+                xelsSender.FullNode.NodeService<MempoolSettings>().RequireStandard = true;
 
-        //        var broadcaster = xelsSender.FullNode.NodeService<IBroadcasterManager>();
+                var broadcaster = xelsSender.FullNode.NodeService<IBroadcasterManager>();
 
-        //        broadcaster.BroadcastTransactionAsync(trx);
+                broadcaster.BroadcastTransactionAsync(trx);
 
-        //        TestBase.WaitLoop(() => xelsSender.CreateRPCClient().GetRawMempool().Length == 1);
-        //    }
-        //}
+                TestBase.WaitLoop(() => xelsSender.CreateRPCClient().GetRawMempool().Length == 1);
+            }
+        }
 
-        //[Fact]
-        //public void Mempool_SendPosTransaction_WithFutureLockTime_ShouldBeRejectedByMempool()
-        //{
-        //    // See AcceptToMemoryPool_TxFinalCannotMine_ReturnsFalseAsync for the 'unit test' version
+        [Fact]
+        public void Mempool_SendPosTransaction_WithFutureLockTime_ShouldBeRejectedByMempool()
+        {
+            // See AcceptToMemoryPool_TxFinalCannotMine_ReturnsFalseAsync for the 'unit test' version
 
-        //    var network = new XelsRegTest();
+            var network = new XelsRegTest();
 
-        //    using (NodeBuilder builder = NodeBuilder.Create(this))
-        //    {
-        //        CoreNode xelsSender = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
+            using (NodeBuilder builder = NodeBuilder.Create(this))
+            {
+                CoreNode xelsSender = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
 
-        //        TestHelper.MineBlocks(xelsSender, 5);
+                TestHelper.MineBlocks(xelsSender, 5);
 
-        //        // Send coins to the receiver.
-        //        var context = WalletTests.CreateContext(network, new WalletAccountReference(WalletName, Account), Password, new Key().PubKey.GetAddress(network).ScriptPubKey, Money.COIN * 100, FeeType.Medium, 1);
+                // Send coins to the receiver.
+                var context = WalletTests.CreateContext(network, new WalletAccountReference(WalletName, Account), Password, new Key().PubKey.GetAddress(network).ScriptPubKey, Money.COIN * 100, FeeType.Medium, 1);
 
-        //        Transaction trx = xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(context);
+                Transaction trx = xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(context);
 
-        //        // Treat the locktime as absolute, not relative.
-        //        trx.Inputs.First().Sequence = new Sequence(Sequence.SEQUENCE_LOCKTIME_DISABLE_FLAG);
+                // Treat the locktime as absolute, not relative.
+                trx.Inputs.First().Sequence = new Sequence(Sequence.SEQUENCE_LOCKTIME_DISABLE_FLAG);
 
-        //        // Set the nLockTime to be ahead of the current tip so that locktime has not elapsed.
-        //        trx.LockTime = new LockTime(xelsSender.FullNode.ChainIndexer.Height + 1);
+                // Set the nLockTime to be ahead of the current tip so that locktime has not elapsed.
+                trx.LockTime = new LockTime(xelsSender.FullNode.ChainIndexer.Height + 1);
 
-        //        // Sign trx again after changing the nLockTime.
-        //        trx = context.TransactionBuilder.SignTransaction(trx);
+                // Sign trx again after changing the nLockTime.
+                trx = context.TransactionBuilder.SignTransaction(trx);
 
-        //        // Enable standard policy relay.
-        //        xelsSender.FullNode.NodeService<MempoolSettings>().RequireStandard = true;
+                // Enable standard policy relay.
+                xelsSender.FullNode.NodeService<MempoolSettings>().RequireStandard = true;
 
-        //        var broadcaster = xelsSender.FullNode.NodeService<IBroadcasterManager>();
+                var broadcaster = xelsSender.FullNode.NodeService<IBroadcasterManager>();
 
-        //        broadcaster.BroadcastTransactionAsync(trx).GetAwaiter().GetResult();
-        //        var entry = broadcaster.GetTransaction(trx.GetHash());
+                broadcaster.BroadcastTransactionAsync(trx).GetAwaiter().GetResult();
+                var entry = broadcaster.GetTransaction(trx.GetHash());
 
-        //        Assert.Equal("non-final", entry.ErrorMessage);
-        //    }
-        //}
+                Assert.Equal("non-final", entry.ErrorMessage);
+            }
+        }
 
-        //[Fact]
-        //public void Mempool_SendOversizeTransaction_ShouldRejectByMempool()
-        //{
-        //    var network = new XelsRegTest();
+        [Fact]
+        public void Mempool_SendOversizeTransaction_ShouldRejectByMempool()
+        {
+            var network = new XelsRegTest();
 
-        //    using (NodeBuilder builder = NodeBuilder.Create(this))
-        //    {
-        //        CoreNode xelsSender = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
+            using (NodeBuilder builder = NodeBuilder.Create(this))
+            {
+                CoreNode xelsSender = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
 
-        //        TestHelper.MineBlocks(xelsSender, 5);
+                TestHelper.MineBlocks(xelsSender, 5);
 
-        //        // Send coins to the receiver
-        //        var context = WalletTests.CreateContext(network, new WalletAccountReference(WalletName, Account), Password, new Key().PubKey.GetAddress(network).ScriptPubKey, Money.COIN * 100, FeeType.Medium, 1);
+                // Send coins to the receiver
+                var context = WalletTests.CreateContext(network, new WalletAccountReference(WalletName, Account), Password, new Key().PubKey.GetAddress(network).ScriptPubKey, Money.COIN * 100, FeeType.Medium, 1);
 
-        //        Transaction trx = xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(context);
+                Transaction trx = xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(context);
 
-        //        // Add nonsense script to make tx large.
-        //        Script script = Script.FromBytesUnsafe(new string('A', network.Consensus.Options.MaxStandardTxWeight).Select(c => (byte)c).ToArray());
-        //        trx.Outputs.Add(new TxOut(new Money(1), script));
+                // Add nonsense script to make tx large.
+                Script script = Script.FromBytesUnsafe(new string('A', network.Consensus.Options.MaxStandardTxWeight).Select(c => (byte)c).ToArray());
+                trx.Outputs.Add(new TxOut(new Money(1), script));
 
-        //        // Sign trx again after adding an output
-        //        trx = context.TransactionBuilder.SignTransaction(trx);
+                // Sign trx again after adding an output
+                trx = context.TransactionBuilder.SignTransaction(trx);
 
-        //        // Enable standard policy relay.
-        //        xelsSender.FullNode.NodeService<MempoolSettings>().RequireStandard = true;
+                // Enable standard policy relay.
+                xelsSender.FullNode.NodeService<MempoolSettings>().RequireStandard = true;
 
-        //        var broadcaster = xelsSender.FullNode.NodeService<IBroadcasterManager>();
+                var broadcaster = xelsSender.FullNode.NodeService<IBroadcasterManager>();
 
-        //        broadcaster.BroadcastTransactionAsync(trx).GetAwaiter().GetResult();
-        //        var entry = broadcaster.GetTransaction(trx.GetHash());
+                broadcaster.BroadcastTransactionAsync(trx).GetAwaiter().GetResult();
+                var entry = broadcaster.GetTransaction(trx.GetHash());
 
-        //        Assert.Equal("tx-size", entry.ErrorMessage);
-        //    }
-        //}
+                Assert.Equal("tx-size", entry.ErrorMessage);
+            }
+        }
 
-        //[Fact]
-        //public void Mempool_SendTransactionWithEarlyTimestamp_ShouldRejectByMempool()
-        //{
-        //    var network = new XelsRegTest();
+        [Fact]
+        public void Mempool_SendTransactionWithEarlyTimestamp_ShouldRejectByMempool()
+        {
+            var network = new XelsRegTest();
 
-        //    using (NodeBuilder builder = NodeBuilder.Create(this))
-        //    {
-        //        CoreNode xelsSender = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
+            using (NodeBuilder builder = NodeBuilder.Create(this))
+            {
+                CoreNode xelsSender = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
 
-        //        TestHelper.MineBlocks(xelsSender, 5);
+                TestHelper.MineBlocks(xelsSender, 5);
 
-        //        // Send coins to the receiver
-        //        var context = WalletTests.CreateContext(network, new WalletAccountReference(WalletName, Account), Password, new Key().PubKey.GetAddress(network).ScriptPubKey, Money.COIN * 100, FeeType.Medium, 1);
+                // Send coins to the receiver
+                var context = WalletTests.CreateContext(network, new WalletAccountReference(WalletName, Account), Password, new Key().PubKey.GetAddress(network).ScriptPubKey, Money.COIN * 100, FeeType.Medium, 1);
 
-        //        Transaction trx = xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(context);
+                Transaction trx = xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(context);
 
-        //        // Use timestamp value that is definitely earlier than the input's timestamp
-        //        trx.Time = 1;
+                // Use timestamp value that is definitely earlier than the input's timestamp
+                trx.Time = 1;
 
-        //        // Sign trx again after mutating timestamp
-        //        trx = context.TransactionBuilder.SignTransaction(trx);
+                // Sign trx again after mutating timestamp
+                trx = context.TransactionBuilder.SignTransaction(trx);
 
-        //        // Enable standard policy relay.
-        //        xelsSender.FullNode.NodeService<MempoolSettings>().RequireStandard = true;
+                // Enable standard policy relay.
+                xelsSender.FullNode.NodeService<MempoolSettings>().RequireStandard = true;
 
-        //        var broadcaster = xelsSender.FullNode.NodeService<IBroadcasterManager>();
+                var broadcaster = xelsSender.FullNode.NodeService<IBroadcasterManager>();
 
-        //        broadcaster.BroadcastTransactionAsync(trx).GetAwaiter().GetResult();
-        //        var entry = broadcaster.GetTransaction(trx.GetHash());
+                broadcaster.BroadcastTransactionAsync(trx).GetAwaiter().GetResult();
+                var entry = broadcaster.GetTransaction(trx.GetHash());
 
-        //        Assert.Equal("timestamp earlier than input", entry.ErrorMessage);
-        //    }
-        //}
+                Assert.Equal("timestamp earlier than input", entry.ErrorMessage);
+            }
+        }
 
         // TODO: There is no need for this to be a full integration test, there just needs to be a PoS version of the test chain used in the validator unit tests
-        //[Fact]
-        //public void Mempool_SendTransactionWithLargeOpReturn_ShouldRejectByMempool()
-        //{
-        //    var network = new XelsRegTest();
+        [Fact]
+        public void Mempool_SendTransactionWithLargeOpReturn_ShouldRejectByMempool()
+        {
+            var network = new XelsRegTest();
 
-        //    using (NodeBuilder builder = NodeBuilder.Create(this))
-        //    {
-        //        CoreNode xelsSender = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
+            using (NodeBuilder builder = NodeBuilder.Create(this))
+            {
+                CoreNode xelsSender = builder.CreateXelsPosNode(network).WithReadyBlockchainData(ReadyBlockchain.XelsRegTest10Miner).Start();
 
-        //        TestHelper.MineBlocks(xelsSender, 5);
+                TestHelper.MineBlocks(xelsSender, 5);
 
-        //        // Send coins to the receiver.
-        //        var context = WalletTests.CreateContext(network, new WalletAccountReference(WalletName, Account), Password, new Key().PubKey.GetAddress(network).ScriptPubKey, Money.COIN * 100, FeeType.Medium, 1);
-        //        context.OpReturnData = "1";
-        //        context.OpReturnAmount = Money.Coins(0.01m);
-        //        Transaction trx = xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(context);
+                // Send coins to the receiver.
+                var context = WalletTests.CreateContext(network, new WalletAccountReference(WalletName, Account), Password, new Key().PubKey.GetAddress(network).ScriptPubKey, Money.COIN * 100, FeeType.Medium, 1);
+                context.OpReturnData = "1";
+                context.OpReturnAmount = Money.Coins(0.01m);
+                Transaction trx = xelsSender.FullNode.WalletTransactionHandler().BuildTransaction(context);
 
-        //        foreach (TxOut output in trx.Outputs)
-        //        {
-        //            if (output.ScriptPubKey.IsUnspendable)
-        //            {
-        //                int[] data =
-        //                {
-        //                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        //                };
-        //                var ops = new Op[data.Length + 1];
-        //                ops[0] = OpcodeType.OP_RETURN;
-        //                for (int i = 0; i < data.Length; i++)
-        //                {
-        //                    ops[1 + i] = Op.GetPushOp(data[i]);
-        //                }
+                foreach (TxOut output in trx.Outputs)
+                {
+                    if (output.ScriptPubKey.IsUnspendable)
+                    {
+                        int[] data =
+                        {
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                        };
+                        var ops = new Op[data.Length + 1];
+                        ops[0] = OpcodeType.OP_RETURN;
+                        for (int i = 0; i < data.Length; i++)
+                        {
+                            ops[1 + i] = Op.GetPushOp(data[i]);
+                        }
 
-        //                output.ScriptPubKey = new Script(ops);
-        //            }
-        //        }
+                        output.ScriptPubKey = new Script(ops);
+                    }
+                }
 
-        //        // Sign trx again after lengthening nulldata output.
-        //        trx = context.TransactionBuilder.SignTransaction(trx);
+                // Sign trx again after lengthening nulldata output.
+                trx = context.TransactionBuilder.SignTransaction(trx);
 
-        //        // Enable standard policy relay.
-        //        xelsSender.FullNode.NodeService<MempoolSettings>().RequireStandard = true;
+                // Enable standard policy relay.
+                xelsSender.FullNode.NodeService<MempoolSettings>().RequireStandard = true;
 
-        //        var broadcaster = xelsSender.FullNode.NodeService<IBroadcasterManager>();
+                var broadcaster = xelsSender.FullNode.NodeService<IBroadcasterManager>();
 
-        //        broadcaster.BroadcastTransactionAsync(trx).GetAwaiter().GetResult();
-        //        var entry = broadcaster.GetTransaction(trx.GetHash());
+                broadcaster.BroadcastTransactionAsync(trx).GetAwaiter().GetResult();
+                var entry = broadcaster.GetTransaction(trx.GetHash());
 
-        //        Assert.Equal("scriptpubkey", entry.ErrorMessage);
-        //    }
-        //}
+                Assert.Equal("scriptpubkey", entry.ErrorMessage);
+            }
+        }
     }
 }

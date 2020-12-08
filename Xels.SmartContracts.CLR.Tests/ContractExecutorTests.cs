@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using NBitcoin;
 using Xels.Bitcoin.Configuration.Logging;
 using Stratis.Patricia;
+using Xels.SmartContracts.CLR.Caching;
 using Xels.SmartContracts.CLR.Compilation;
 using Xels.SmartContracts.CLR.Loader;
 using Xels.SmartContracts.CLR.ResultProcessors;
@@ -29,6 +30,7 @@ namespace Xels.SmartContracts.CLR.Tests
         private readonly IContractTransferProcessor transferProcessor;
         private readonly SmartContractValidator validator;
         private IInternalExecutorFactory internalTxExecutorFactory;
+        private readonly IContractAssemblyCache contractCache;
         private IVirtualMachine vm;
         private readonly ICallDataSerializer callDataSerializer;
         private readonly StateFactory stateFactory;
@@ -55,7 +57,8 @@ namespace Xels.SmartContracts.CLR.Tests
             this.moduleDefinitionReader = new ContractModuleDefinitionReader();
             this.contractPrimitiveSerializer = new ContractPrimitiveSerializer(this.network);
             this.serializer = new Serializer(this.contractPrimitiveSerializer);
-            this.vm = new ReflectionVirtualMachine(this.validator, this.loggerFactory, this.assemblyLoader, this.moduleDefinitionReader);
+            this.contractCache = new ContractAssemblyCache();
+            this.vm = new ReflectionVirtualMachine(this.validator, this.loggerFactory, this.assemblyLoader, this.moduleDefinitionReader, this.contractCache);
             this.stateProcessor = new StateProcessor(this.vm, this.addressGenerator);
             this.internalTxExecutorFactory = new InternalExecutorFactory(this.loggerFactory, this.stateProcessor);
             this.smartContractStateFactory = new SmartContractStateFactory(this.contractPrimitiveSerializer, this.internalTxExecutorFactory, this.serializer);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using FluentAssertions;
 using NBitcoin;
 using Xels.Bitcoin.Features.Wallet;
@@ -67,7 +68,7 @@ namespace Xels.Bitcoin.IntegrationTests.BlockStore
             TestHelper.MineBlocks(this.sendingXelsBitcoinNode, this.coinbaseMaturity);
         }
 
-        private void spending_the_coins_from_original_block()
+        private async Task spending_the_coins_from_original_block()
         {
             HdAddress sendtoAddress = this.receivingXelsBitcoinNode.FullNode.WalletManager().GetUnusedAddress();
 
@@ -89,7 +90,7 @@ namespace Xels.Bitcoin.IntegrationTests.BlockStore
                 this.lastTransaction = this.sendingXelsBitcoinNode.FullNode.WalletTransactionHandler()
                     .BuildTransaction(transactionBuildContext);
 
-                this.sendingXelsBitcoinNode.FullNode.NodeService<WalletController>()
+                await this.sendingXelsBitcoinNode.FullNode.NodeController<WalletController>()
                     .SendTransaction(new SendTransactionRequest(this.lastTransaction.ToHex()));
             }
             catch (Exception exception)

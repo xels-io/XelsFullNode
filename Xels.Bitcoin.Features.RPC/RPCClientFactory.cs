@@ -30,7 +30,7 @@ namespace Xels.Bitcoin.Features.RPC
             Guard.NotNull(network, nameof(network));
             Guard.NotNull(rpcSettings, nameof(rpcSettings));
 
-            return new RPCClient(rpcSettings, address.ToString(), network);
+            return new RPCClient(rpcSettings, address, network);
         }
     }
 }

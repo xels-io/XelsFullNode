@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
-//using System.Net;
-//using System.Net.Mail;
+
 namespace Xels.Bitcoin.Utilities
 {
     /// <summary>
@@ -94,18 +93,6 @@ namespace Xels.Bitcoin.Utilities
                 try
                 {
                     this.stoppingSource.Cancel(false);
-
-                    //SmtpClient client = new SmtpClient("host19.server.ae");
-                    //client.UseDefaultCredentials = false;
-                    //client.Credentials = new NetworkCredential("noreply@xels.io", "&jJFNb@ekhLEB8VzT&UY");
-
-                    //MailMessage mailMessage = new MailMessage();
-                    //mailMessage.From = new MailAddress("noreply@xels.io");
-                    //mailMessage.To.Add("rahhh.mask@gmail.com");
-                    //mailMessage.Body = "Dear Xels User,\n The application has been sttopped.";
-                    //mailMessage.Subject = "Xels Backend Application Stopping Notifiaction";
-                    //client.Send(mailMessage);
-
                 }
                 catch (Exception)
                 {

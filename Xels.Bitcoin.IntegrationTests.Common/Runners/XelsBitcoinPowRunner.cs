@@ -12,6 +12,7 @@ using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.Bitcoin.IntegrationTests.Common.Runners
 {
@@ -39,6 +40,7 @@ namespace Xels.Bitcoin.IntegrationTests.Common.Runners
                             .UseMempool()
                             .AddMining()
                             .UseWallet()
+                            .AddSQLiteWalletRepository()
                             .AddRPC()
                             .UseApi()
                             .UseTestChainedHeaderTree()

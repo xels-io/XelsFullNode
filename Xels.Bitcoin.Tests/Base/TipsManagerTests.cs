@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Xels.Bitcoin.Tests.Base

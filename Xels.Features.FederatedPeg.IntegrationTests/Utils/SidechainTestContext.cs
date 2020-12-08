@@ -11,11 +11,12 @@ using Flurl.Http;
 using NBitcoin;
 using Newtonsoft.Json;
 using Xels.Bitcoin.Features.Wallet.Models;
+using Xels.Bitcoin.IntegrationTests;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.EnvironmentMockUpHelpers;
 using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Tests.Common;
-using Xels.Features.FederatedPeg.CounterChain;
+using Xels.Features.Collateral.CounterChain;
 using Xels.Features.FederatedPeg.Models;
 using Xels.Sidechains.Networks;
 

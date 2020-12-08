@@ -565,11 +565,6 @@ namespace NBitcoin
         }
 
         public bool IsEmpty => (this.Value == 0 && this.ScriptPubKey.Length == 0);
-        
-        /// <summary>
-        /// Brinti: explain !
-        /// </summary>
-        public bool ncoinStake = false;
 
         public TxOut()
         {
@@ -1178,9 +1173,9 @@ namespace NBitcoin
             }
         }
 
-        public TxInList vin;
-        public TxOutList vout;
-        public LockTime nLockTime;
+        private TxInList vin;
+        private TxOutList vout;
+        private LockTime nLockTime;
 
         public Transaction()
         {
@@ -1478,12 +1473,12 @@ namespace NBitcoin
             return @in;
         }
 
-        internal static readonly int WITNESS_SCALE_FACTOR = 4;
         /// <summary>
         /// Size of the transaction discounting the witness (Used for fee calculation)
         /// </summary>
+        /// <param name="witnessScaleFactor">Witness scale factor from network settings (i.e. 4 for BTC).</param>
         /// <returns>Transaction size</returns>
-        public int GetVirtualSize()
+        public int GetVirtualSize(int witnessScaleFactor)
         {
             int totalSize = this.GetSerializedSize(TransactionOptions.Witness);
             int strippedSize = this.GetSerializedSize(TransactionOptions.None);
@@ -1491,8 +1486,8 @@ namespace NBitcoin
             // using only serialization with and without witness data. As witness_size
             // is equal to total_size - stripped_size, this formula is identical to:
             // weight = (stripped_size * 3) + total_size.
-            int weight = strippedSize * (WITNESS_SCALE_FACTOR - 1) + totalSize;
-            return (weight + WITNESS_SCALE_FACTOR - 1) / WITNESS_SCALE_FACTOR;
+            int weight = strippedSize * (witnessScaleFactor - 1) + totalSize;
+            return (weight + witnessScaleFactor - 1) / witnessScaleFactor;
         }
 
         public TxIn AddInput(Transaction prevTx, int outIndex)
@@ -1723,14 +1718,15 @@ namespace NBitcoin
         /// <summary>
         /// Calculate the fee rate of the transaction
         /// </summary>
+        /// <param name="witnessScaleFactor">Witness scale factor from network settings (i.e. 4 for BTC).</param>
         /// <param name="spentCoins">Coins being spent</param>
         /// <returns>Fee or null if some spent coins are missing or if spentCoins is null</returns>
-        public FeeRate GetFeeRate(ICoin[] spentCoins)
+        public FeeRate GetFeeRate(int witnessScaleFactor, ICoin[] spentCoins)
         {
             Money fee = GetFee(spentCoins);
             if(fee == null)
                 return null;
-            return new FeeRate(fee, GetVirtualSize());
+            return new FeeRate(fee, GetVirtualSize(witnessScaleFactor));
         }
 
         public bool IsFinal(ChainedHeader block)
@@ -1903,7 +1899,7 @@ namespace NBitcoin
         }
 
         private static readonly uint MAX_BLOCK_SIZE = 1000000;
-        private static readonly ulong MAX_MONEY = 2537175000ul * Money.COIN;//long.MaxValue; // 21000000ul * Money.COIN;
+        private static readonly ulong MAX_MONEY = long.MaxValue; // 21000000ul * Money.COIN;
 
         /// <summary>
         /// Context free transaction check

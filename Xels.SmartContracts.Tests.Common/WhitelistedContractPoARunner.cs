@@ -12,6 +12,7 @@ using Xels.Bitcoin.Features.SmartContracts.Wallet;
 using Xels.Bitcoin.IntegrationTests.Common;
 using Xels.Bitcoin.IntegrationTests.Common.Runners;
 using Xels.Bitcoin.Utilities;
+using Xels.Features.SQLiteWalletRepository;
 
 namespace Xels.SmartContracts.Tests.Common
 {
@@ -33,6 +34,7 @@ namespace Xels.SmartContracts.Tests.Common
             this.FullNode = (FullNode)new FullNodeBuilder()
                 .UseNodeSettings(settings)
                 .UseBlockStore()
+                // Defer injection of the mempool rules until the smart contract feature.
                 .UseMempool()
                 .AddRPC()
                 .AddSmartContracts(options =>
@@ -43,6 +45,7 @@ namespace Xels.SmartContracts.Tests.Common
                 .UseSmartContractPoAConsensus()
                 .UseSmartContractPoAMining()
                 .UseSmartContractWallet()
+                .AddSQLiteWalletRepository()
                 .ReplaceTimeProvider(this.dateTimeProvider)
                 .MockIBD()
                 .AddFastMiningCapability()

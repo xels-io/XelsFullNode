@@ -11,11 +11,11 @@ using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Connection;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Features.BlockStore.AddressIndexing;
-using Xels.Bitcoin.Features.BlockStore.Controllers;
 using Xels.Bitcoin.Features.BlockStore.Pruning;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.P2P.Protocol.Payloads;
 using Xels.Bitcoin.Utilities;
+using TracerAttributes;
 
 [assembly: InternalsVisibleTo("Xels.Bitcoin.Features.BlockStore.Tests")]
 
@@ -79,9 +79,10 @@ namespace Xels.Bitcoin.Features.BlockStore
             this.prunedBlockRepository = prunedBlockRepository;
             this.addressIndexer = addressIndexer;
 
-            nodeStats.RegisterStats(this.AddInlineStats, StatsType.Inline, 900);
+            nodeStats.RegisterStats(this.AddInlineStats, StatsType.Inline, this.GetType().Name, 900);
         }
 
+        [NoTrace]
         private void AddInlineStats(StringBuilder log)
         {
             ChainedHeader highestBlock = this.chainState.BlockStoreTip;
@@ -114,9 +115,9 @@ namespace Xels.Bitcoin.Features.BlockStore
             StoreSettings.BuildDefaultConfigurationFile(builder, network);
         }
 
-        public override async Task InitializeAsync()
+        public override Task InitializeAsync()
         {
-            await this.prunedBlockRepository.InitializeAsync().ConfigureAwait(false);
+            this.prunedBlockRepository.Initialize();
 
             if (!this.storeSettings.PruningEnabled && this.prunedBlockRepository.PrunedTip != null)
                 throw new BlockStoreException("The node cannot start as it has been previously pruned, please clear the data folders and resync.");
@@ -127,7 +128,7 @@ namespace Xels.Bitcoin.Features.BlockStore
                     throw new BlockStoreException($"The amount of blocks to prune [{this.storeSettings.AmountOfBlocksToKeep}] (blocks to keep) cannot be less than the node's max reorg length of {this.network.Consensus.MaxReorgLength}.");
 
                 this.logger.LogInformation("Pruning BlockStore...");
-                await this.prunedBlockRepository.PruneAndCompactDatabase(this.chainState.BlockStoreTip, this.network, true);
+                this.prunedBlockRepository.PruneAndCompactDatabase(this.chainState.BlockStoreTip, this.network, true);
             }
 
             // Use ProvenHeadersBlockStoreBehavior for PoS Networks
@@ -153,6 +154,8 @@ namespace Xels.Bitcoin.Features.BlockStore
             this.blockStoreSignaled.Initialize();
 
             this.addressIndexer.Initialize();
+
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -197,7 +200,6 @@ namespace Xels.Bitcoin.Features.BlockStore
                             services.AddSingleton<BlockStoreSignaled>();
 
                         services.AddSingleton<StoreSettings>();
-                        services.AddSingleton<BlockStoreController>();
                         services.AddSingleton<IBlockStoreQueueFlushCondition, BlockStoreQueueFlushCondition>();
                         services.AddSingleton<IAddressIndexer, AddressIndexer>();
                     });

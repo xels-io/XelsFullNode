@@ -7,14 +7,15 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NBitcoin;
 using Xels.Bitcoin.Connection;
+using Xels.Bitcoin.Features.SmartContracts.Models;
 using Xels.Bitcoin.Features.SmartContracts.ReflectionExecutor.Consensus.Rules;
 using Xels.Bitcoin.Features.SmartContracts.Wallet;
 using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using Xels.Bitcoin.Tests.Wallet.Common;
-using Xels.SmartContracts.Core.Receipts;
 using Xels.SmartContracts.CLR;
 using Xels.SmartContracts.CLR.Serialization;
+using Xels.SmartContracts.Core.Receipts;
 using Xels.SmartContracts.Networks;
 using Xunit;
 
@@ -49,7 +50,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Controllers
             ulong gasPrice = SmartContractMempoolValidator.MinGasPrice;
             int vmVersion = 1;
             var gasLimit = (Xels.SmartContracts.RuntimeObserver.Gas)(SmartContractFormatLogic.GasLimitMaximum / 2);
-            var contractTxData = new ContractTxData(vmVersion, gasPrice, gasLimit, new byte[]{0, 1, 2, 3});
+            var contractTxData = new ContractTxData(vmVersion, gasPrice, gasLimit, new byte[] { 0, 1, 2, 3 });
             var callDataSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(new SmartContractsRegTest()));
             var contractCreateScript = new Script(callDataSerializer.Serialize(contractTxData));
 
@@ -77,24 +78,23 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Controllers
 
             var addresses = new List<HdAddress> { address };
             Features.Wallet.Wallet wallet = WalletTestsHelpers.CreateWallet(walletName);
-            var account = new HdAccount { ExternalAddresses = addresses };
-            wallet.AccountsRoot.Add(new AccountRoot()
-            {
-                Accounts = new List<HdAccount> { account }
-            });
+            HdAccount account = wallet.AddNewAccount((ExtPubKey)null);
+
+            foreach (HdAddress addr in addresses)
+                account.ExternalAddresses.Add(address);
 
             List<FlatHistory> flat = addresses.SelectMany(s => s.Transactions.Select(t => new FlatHistory { Address = s, Transaction = t })).ToList();
 
             var accountsHistory = new List<AccountHistory> { new AccountHistory { History = flat, Account = account } };
             this.walletManager.Setup(w => w.GetHistory(walletName, It.IsAny<string>())).Returns(accountsHistory);
-            this.walletManager.Setup(w => w.GetWalletByName(walletName)).Returns(wallet);
-            this.walletManager.Setup(w => w.GetAccounts(walletName)).Returns(new List<HdAccount> {account});
+            this.walletManager.Setup(w => w.GetWallet(walletName)).Returns(wallet);
+            this.walletManager.Setup(w => w.GetAccounts(walletName)).Returns(new List<HdAccount> { account });
 
             var receipt = new Receipt(null, 12345, new Log[0], null, null, null, uint160.Zero, true, null, null, 2, 100000);
-            this.receiptRepository.Setup(x => x.Retrieve(It.IsAny<uint256>()))
-                .Returns(receipt);
+            this.receiptRepository.Setup(x => x.RetrieveMany(It.IsAny<IList<uint256>>()))
+                .Returns(new List<Receipt> {receipt});
             this.callDataSerializer.Setup(x => x.Deserialize(It.IsAny<byte[]>()))
-                .Returns(Result.Ok(new ContractTxData(0, 0, (Xels.SmartContracts.RuntimeObserver.Gas) 0, new uint160(0), null, null)));
+                .Returns(Result.Ok(new ContractTxData(0, 0, (Xels.SmartContracts.RuntimeObserver.Gas)0, new uint160(0), null, null)));
 
             var controller = new SmartContractWalletController(
                 this.broadcasterManager.Object,
@@ -106,13 +106,19 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Controllers
                 this.walletManager.Object,
                 this.smartContractTransactionService.Object);
 
-            IActionResult result = controller.GetHistory(walletName, address.Address);
+            var request = new GetHistoryRequest
+            {
+                Address = address.Address,
+                WalletName = walletName
+            };
 
-            var viewResult = Assert.IsType<JsonResult>(result);
+            IActionResult result = controller.GetHistory(request);
+
+            JsonResult viewResult = Assert.IsType<JsonResult>(result);
             var model = viewResult.Value as IEnumerable<ContractTransactionItem>;
 
             Assert.NotNull(model);
-            Assert.Equal(1, model.Count());
+            Assert.Single(model);
 
             ContractTransactionItem resultingTransaction = model.ElementAt(0);
 
@@ -124,6 +130,99 @@ namespace Xels.Bitcoin.Features.SmartContracts.Tests.Controllers
             Assert.Equal(createTransaction.SpendingDetails.BlockHeight, resultingTransaction.BlockHeight);
             Assert.Equal((createTransaction.Amount - createTransaction.SpendingDetails.Payments.First().Amount).ToUnit(MoneyUnit.Satoshi), resultingTransaction.TransactionFee);
             Assert.Equal(receipt.GasPrice * receipt.GasUsed, resultingTransaction.GasFee);
+        }
+
+        [Fact]
+        public void GetHistoryWithValidModelWithSkipAndTakeReturnsWalletHistoryModel()
+        {
+            ulong gasPrice = SmartContractMempoolValidator.MinGasPrice;
+            int vmVersion = 1;
+            var gasLimit = (Xels.SmartContracts.RuntimeObserver.Gas)(SmartContractFormatLogic.GasLimitMaximum / 2);
+            var contractTxData = new ContractTxData(vmVersion, gasPrice, gasLimit, new byte[] { 0, 1, 2, 3 });
+            var callDataSerializer = new CallDataSerializer(new ContractPrimitiveSerializer(new SmartContractsRegTest()));
+            var contractCreateScript = new Script(callDataSerializer.Serialize(contractTxData));
+
+            string walletName = "myWallet";
+            HdAddress address = WalletTestsHelpers.CreateAddress();
+
+            const int totalHistoryLength = 100;
+            const int toSkip = 10;
+            const int toTake = 10;
+
+            for (int i = 0; i < totalHistoryLength; i++)
+            {
+                TransactionData createTransaction = WalletTestsHelpers.CreateTransaction(new uint256((ulong) i), new Money(500000), 100 + i);
+                createTransaction.SpendingDetails = new SpendingDetails
+                {
+                    BlockHeight = 100 + i,
+                    CreationTime = DateTimeOffset.Now,
+                    TransactionId = new uint256((ulong) i),
+                    Payments = new List<PaymentDetails>
+                    {
+                        new PaymentDetails
+                        {
+                            Amount = new Money(100000),
+                            DestinationScriptPubKey = contractCreateScript
+                        }
+                    }
+                };
+
+                address.Transactions.Add(createTransaction);
+            }
+
+            var addresses = new List<HdAddress> { address };
+            Features.Wallet.Wallet wallet = WalletTestsHelpers.CreateWallet(walletName);
+            HdAccount account = wallet.AddNewAccount((ExtPubKey)null);
+
+            foreach (HdAddress addr in addresses)
+                account.ExternalAddresses.Add(addr);
+
+            List<FlatHistory> flat = addresses.SelectMany(s => s.Transactions.Select(t => new FlatHistory { Address = s, Transaction = t })).ToList();
+
+            var accountsHistory = new List<AccountHistory> { new AccountHistory { History = flat, Account = account } };
+            this.walletManager.Setup(w => w.GetHistory(walletName, It.IsAny<string>())).Returns(accountsHistory);
+            this.walletManager.Setup(w => w.GetWallet(walletName)).Returns(wallet);
+            this.walletManager.Setup(w => w.GetAccounts(walletName)).Returns(new List<HdAccount> { account });
+
+            var receipt = new Receipt(null, 12345, new Log[0], null, null, null, uint160.Zero, true, null, null, 2, 100000);
+            var receiptList = new List<Receipt>();
+            for (int i = 0; i < totalHistoryLength; i++)
+            {
+                receiptList.Add(receipt);
+            }
+
+            this.receiptRepository.Setup(x => x.RetrieveMany(It.IsAny<IList<uint256>>()))
+                .Returns(receiptList);
+            this.callDataSerializer.Setup(x => x.Deserialize(It.IsAny<byte[]>()))
+                .Returns(Result.Ok(new ContractTxData(0, 0, (Xels.SmartContracts.RuntimeObserver.Gas)0, new uint160(0), null, null)));
+
+            var controller = new SmartContractWalletController(
+                this.broadcasterManager.Object,
+                this.callDataSerializer.Object,
+                this.connectionManager.Object,
+                this.loggerFactory.Object,
+                this.network,
+                this.receiptRepository.Object,
+                this.walletManager.Object,
+                this.smartContractTransactionService.Object);
+
+            var request = new GetHistoryRequest
+            {
+                Address = address.Address,
+                WalletName = walletName,
+                Skip = toSkip,
+                Take = toTake
+            };
+
+            IActionResult result = controller.GetHistory(request);
+
+            JsonResult viewResult = Assert.IsType<JsonResult>(result);
+            var model = viewResult.Value as IEnumerable<ContractTransactionItem>;
+
+            Assert.NotNull(model);
+            Assert.Equal(toTake, model.Count());
+            Assert.Equal(new uint256(toSkip), model.ElementAt(toTake - 1).Hash);
+            Assert.Equal(new uint256(toSkip + toTake - 1), model.ElementAt(0).Hash);
         }
     }
 }

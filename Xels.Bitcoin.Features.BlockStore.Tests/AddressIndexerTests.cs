@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using LiteDB;
 using Moq;
 using NBitcoin;
@@ -12,7 +11,6 @@ using Xels.Bitcoin.Configuration.Logging;
 using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Controllers.Models;
 using Xels.Bitcoin.Features.BlockStore.AddressIndexing;
-using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Primitives;
 using Xels.Bitcoin.Tests.Common;
@@ -45,11 +43,14 @@ namespace Xels.Bitcoin.Features.BlockStore.Tests
 
             var dataFolder = new DataFolder(TestBase.CreateTestDir(this));
             var stats = new Mock<INodeStats>();
+            var indexer = new ChainIndexer(this.network);
+
             this.consensusManagerMock = new Mock<IConsensusManager>();
 
             this.asyncProviderMock = new Mock<IAsyncProvider>();
 
-            this.addressIndexer = new AddressIndexer(storeSettings, dataFolder, new ExtendedLoggerFactory(), this.network, stats.Object, this.consensusManagerMock.Object, this.asyncProviderMock.Object);
+            this.addressIndexer = new AddressIndexer(storeSettings, dataFolder, new ExtendedLoggerFactory(), this.network, stats.Object,
+                this.consensusManagerMock.Object, this.asyncProviderMock.Object, indexer, new DateTimeProvider());
 
             this.genesisHeader = new ChainedHeader(this.network.GetGenesis().Header, this.network.GetGenesis().Header.GetHash(), 0);
         }
