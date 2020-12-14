@@ -78,6 +78,13 @@ namespace Xels.Bitcoin.Controllers.Models
         [JsonProperty("chaintrust")]
         public string PosChainTrust { get; set; }
 
+        [JsonProperty("blockreward")]
+        public Money BlockReward { get; set; }
+
+        [JsonProperty("totalout")]
+        public Money TotalOut { get; set; }
+
+
         /// <summary>
         /// Creates a block model
         /// Used for deserializing from Json
@@ -94,6 +101,8 @@ namespace Xels.Bitcoin.Controllers.Models
             this.Version = block.Header.Version;
             this.VersionHex = block.Header.Version.ToString("x8");
             this.MerkleRoot = block.Header.HashMerkleRoot.ToString();
+
+            this.TotalOut = block.Transactions.Select(t => t.TotalOut).Sum();
 
             if (verbosity == 1)
                 this.Transactions = block.Transactions.Select(t => t.GetHash().ToString()).ToArray();

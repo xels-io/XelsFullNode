@@ -197,7 +197,7 @@ namespace Xels.Bitcoin.Features.Wallet.Services
                     var transactionItems = new List<TransactionItemModel>();
                     var uniqueProcessedTxIds = new HashSet<uint256>();
 
-                    IEnumerable<FlatHistory> query = accountHistory.History;
+                    IEnumerable<FlatHistory> query = accountHistory.History; 
 
                     if (!string.IsNullOrEmpty(request.Address))
                     {
@@ -358,7 +358,7 @@ namespace Xels.Bitcoin.Features.Wallet.Services
                                 // Add incoming fund transaction details.
                                 var receivedItem = new TransactionItemModel
                                 {
-                                    Type = transaction.IsCoinBase.HasValue ? TransactionItemType.Mined : TransactionItemType.Received,
+                                    Type = transaction.IsCoinBase == true ? TransactionItemType.Mined : TransactionItemType.Received,//TransactionItemType.Received,
                                     ToAddress = address.Address,
                                     Amount = transaction.Amount,
                                     Id = transaction.Id,

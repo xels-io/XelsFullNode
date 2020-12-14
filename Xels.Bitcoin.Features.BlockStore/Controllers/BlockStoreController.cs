@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using DBreeze.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
+using NBitcoin.BitcoinCore;
 using Xels.Bitcoin.Base;
+using Xels.Bitcoin.Consensus;
 using Xels.Bitcoin.Controllers.Models;
 using Xels.Bitcoin.Features.BlockStore.AddressIndexing;
 using Xels.Bitcoin.Features.BlockStore.Models;
@@ -124,6 +127,9 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
                     ? new BlockTransactionDetailsModel(block, chainedHeader, this.chainIndexer.Tip, this.network)
                     : new BlockModel(block, chainedHeader, this.chainIndexer.Tip, this.network);
 
+
+                blockModel.BlockReward = GetRewardFromHeight(blockModel.Height);
+
                 if (this.network.Consensus.IsProofOfStake)
                 {
                     var posBlock = block as PosBlock;
@@ -141,6 +147,7 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
                 return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, e.Message, e.ToString());
             }
         }
+        
 
         [Route("getallblocksfromheight")]
         [HttpGet]
@@ -175,6 +182,7 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
                         blockModel.PosBlockTrust = new Target(chainedHeader.GetBlockProof()).ToUInt256().ToString();
                         blockModel.PosChainTrust = chainedHeader.ChainWork.ToString(); // this should be similar to ChainWork
                     }
+                    blockModel.BlockReward = GetRewardFromHeight(height);
                     lstBlockModel.Add(blockModel);
                 }
                 return this.Json(lstBlockModel);
@@ -183,6 +191,57 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
             {
                 this.logger.LogError("Exception occurred: {0}", e.ToString());
                 return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, e.Message, e.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Neo: We've to find some way to invoke this method from PosCoinViewRule
+        /// </summary>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        private Money GetRewardFromHeight(int height)
+        {
+            if (height <= this.network.Consensus.PremineHeight)
+            {
+                return this.network.Consensus.PremineReward;
+            }
+            else if (height <= this.network.Consensus.FirstMiningPeriodHeight)
+            {
+                return this.network.Consensus.ProofOfStakeReward;
+            }
+            else if (height <= this.network.Consensus.SecondMiningPeriodHeight)
+            {
+                return this.network.Consensus.ProofOfStakeReward - (Money.Satoshis(3256) * (height - this.network.Consensus.FirstMiningPeriodHeight));
+            }
+            else if (height <= this.network.Consensus.ThirdMiningPeriodHeight)
+            {
+                return this.network.Consensus.ProofOfStakeReward / 2;
+            }
+            else if (height <= this.network.Consensus.ForthMiningPeriodHeight)
+            {
+                return (this.network.Consensus.ProofOfStakeReward / 2) - (Money.Satoshis(1628) * (height - this.network.Consensus.ThirdMiningPeriodHeight));
+            }
+            else if (height <= this.network.Consensus.FifthMiningPeriodHeight)
+            {
+                return this.network.Consensus.ProofOfStakeReward / 4;
+            }
+            else
+            {
+                int multiplier = (int)(height - this.network.Consensus.FifthMiningPeriodHeight) / (int)210240;
+                double returnAmount = 1449770000;
+
+                if (multiplier == 0)
+                {
+                    return Money.Satoshis(1449770000);
+                }
+                else
+                {
+                    for (int i = 0; i < multiplier; i++)
+                    {
+                        returnAmount *= 1.02;
+                    }
+                }
+                return Money.Satoshis((decimal)returnAmount);
             }
         }
 

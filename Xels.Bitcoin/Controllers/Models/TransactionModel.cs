@@ -76,6 +76,9 @@ namespace Xels.Bitcoin.Controllers.Models
                 this.VSize = trx.HasWitness ? trx.GetVirtualSize(network.Consensus.Options.WitnessScaleFactor) : trx.GetSerializedSize();
                 this.Version = trx.Version;
                 this.LockTime = trx.LockTime;
+                this.Time = trx.Time;
+                this.IsCoinBase = trx.IsCoinBase;
+                this.IsCoinStake = trx.IsCoinStake;
 
                 // size = (weight + WITNESS_SCALE_FACTOR - 1) / WITNESS_SCALE_FACTOR;
                 // hence, weight = size * WITNESS_SCALE_FACTOR - (WITNESS_SCALE_FACTOR - 1) (only subtract if has witness).
@@ -147,6 +150,12 @@ namespace Xels.Bitcoin.Controllers.Models
         /// <summary>The time the block was confirmed.</summary>
         [JsonProperty(Order = 13, PropertyName = "blocktime", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public uint? BlockTime { get; set; }
+
+        [JsonProperty(Order = 14, PropertyName = "iscoinbase", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool? IsCoinBase { get; set; }
+
+        [JsonProperty(Order = 15, PropertyName = "iscoinstake", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool? IsCoinStake { get; set; }
     }
 
     /// <summary>
