@@ -39,6 +39,8 @@ namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
         /// <summary>Returns verbose balances data.</summary>
         /// <param name="addresses">The set of addresses that will be queried.</param>
         VerboseAddressBalancesResult GetAddressIndexerState(string[] addresses);
+        //AddressIndexRepository GetAddressIndexRepo();
+
     }
 
     public class AddressIndexer : IAddressIndexer
@@ -408,6 +410,7 @@ namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
                             Outpoint = outPoint.ToString(),
                             ScriptPubKeyBytes = tx.Outputs[i].ScriptPubKey.ToBytes(),
                             Money = tx.Outputs[i].Value
+                            //TxHash = tx.Outputs[i].ToHex(this.network,SerializationType.Disk)
                         };
 
                         // TODO: When the outpoint cache is full, adding outpoints singly causes overhead writing evicted entries out to the repository
@@ -454,7 +457,7 @@ namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
                         continue;
                     }
 
-                    this.ProcessBalanceChangeLocked(header.Height, address, amountSpent, false);
+                    this.ProcessBalanceChangeLocked(header.Height, address, amountSpent, false, input.PrevOut.Hash.ToString(), -1);
                 }
 
                 // Process outputs.
@@ -476,8 +479,8 @@ namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
                             // possible address formats already.
                             continue;
                         }
-
-                        this.ProcessBalanceChangeLocked(header.Height, address, amountReceived, true);
+                        
+                        this.ProcessBalanceChangeLocked(header.Height, address, amountReceived, true, tx.GetHash().ToString(), tx.Outputs.IndexOf(txOut));
                     }
                 }
 
@@ -505,7 +508,7 @@ namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
         /// <param name="amount">The amount being received.</param>
         /// <param name="deposited"><c>false</c> if this is an output being spent, <c>true</c> otherwise.</param>
         /// <remarks>Should be protected by <see cref="lockObject"/>.</remarks>
-        private void ProcessBalanceChangeLocked(int height, string address, Money amount, bool deposited)
+        private void ProcessBalanceChangeLocked(int height, string address, Money amount, bool deposited, string txHash, int nIndex)
         {
             AddressIndexerData indexData = this.addressIndexRepository.GetOrCreateAddress(address);
 
@@ -514,7 +517,14 @@ namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
             {
                 BalanceChangedHeight = height,
                 Satoshi = amount.Satoshi,
-                Deposited = deposited
+                Deposited = deposited,
+                TxHash = txHash,
+                Index = nIndex
+                //StrScript = strScript,
+                //TxOutputN = 
+                //TxHash = trxOut == null ? "" : trxOut.ScriptPubKey.GetDestinationAddress(this.network) + "  |  " + trxOut.ScriptPubKey.ToString() + "  |  " + trxOut.ScriptPubKey.Hash.ToString(),
+                //StrScript = trxOut == null ? "" : trxOut.ScriptPubKey.GetDestination(this.network) + "  |  " + trxOut.ToHex(this.network) + "  |  " + trxOut.ToHex(this.network, SerializationType.Hash) + "  |  " + trxOut.ToHex(this.network, SerializationType.Hash),
+                //Value = trxOut == null ? 0 : trxOut.Value
             });
 
             // Anything less than that should be compacted.
@@ -535,7 +545,12 @@ namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
                 {
                     BalanceChangedHeight = 0,
                     Satoshi = 0,
-                    Deposited = true
+                    Deposited = true,
+                    TxHash = txHash,
+                    Index = nIndex
+                    //TxHash = trxOut == null ? "" :  trxOut.ScriptPubKey.GetDestinationAddress(this.network) + "  |  " + trxOut.ScriptPubKey.ToString() + "  |  " + trxOut.ScriptPubKey.Hash.ToString(),
+                    //StrScript = trxOut == null ? "" :  trxOut.ScriptPubKey.GetDestination(this.network) + "  |  " + trxOut.ToHex(this.network) + "  |  " + trxOut.ToHex(this.network, SerializationType.Hash) + "  |  " + trxOut.ToHex(this.network, SerializationType.Hash),
+                    //Value = trxOut == null ? 0 :  trxOut.Value
                 }
             };
 
@@ -655,5 +670,18 @@ namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
 
             this.db?.Dispose();
         }
+        public AddressIndexRepository GetAddressIndexRepo()
+        {
+            return this.addressIndexRepository;
+        }
+        //public void GetAddressOutpoint(string address)
+        //{
+        //    foreach( OutPoint outPoint in this.outpointsRepository.to)
+        //    {
+
+        //    }
+
+        //    //string address = this.scriptAddressReader.GetAddressFromScriptPubKey(this.network, new Script(consumedOutputData.ScriptPubKeyBytes));
+        //}
     }
 }

@@ -15,7 +15,7 @@ using Xels.Bitcoin.Features.RPC;
 using Xels.Bitcoin.Features.SignalR;
 using Xels.Bitcoin.Features.SignalR.Broadcasters;
 using Xels.Bitcoin.Features.SignalR.Events;
-//using Xels.Bitcoin.Features.Wallet;
+using Xels.Bitcoin.Features.Wallet;
 using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Utilities;
 using Xels.Features.Diagnostic;
@@ -43,6 +43,7 @@ namespace Xels.XelsD
                 IFullNodeBuilder nodeBuilder = new FullNodeBuilder()
                     .UseNodeSettings(nodeSettings)
                     .UseBlockStore()
+                    //.UseWallet()
                     //.UseBlockExplorer()
                     .UsePosConsensus()
                     .UseMempool()
@@ -50,9 +51,9 @@ namespace Xels.XelsD
                     .AddSQLiteWalletRepository()
                     .AddPowPosMining()
                     .UseApi()
-                    .AddRPC()
+                    .AddRPC();
                     //.UseDns()
-                    .UseDiagnosticFeature();
+                    //.UseDiagnosticFeature();
 
                 if (nodeSettings.EnableSignalR)
                 {

@@ -90,6 +90,16 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
             }
         }
 
+        //[Route("getaddressoutpoint")]
+        //[HttpGet]
+        //public IActionResult GetAddressOutpoint(string address)
+        //{
+        //    AddressIndexerData indexData = this.addressIndexer.GetAddressIndexRepo().GetOrCreateAddress(address);
+        //    indexData.
+        //    //this.addressIndexer.get
+        //}
+
+
         /// <summary>
         /// Retrieves the block which matches the supplied block hash.
         /// </summary>

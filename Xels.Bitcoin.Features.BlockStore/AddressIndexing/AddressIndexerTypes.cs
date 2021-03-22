@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using LiteDB;
+//using NBitcoin;
 
 namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
 {
@@ -26,6 +27,8 @@ namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
         public byte[] ScriptPubKeyBytes { get; set; }
 
         public long Money { get; set; }
+        
+        //public string Outpoint { get; set; }
     }
 
     public class AddressIndexerRewindData

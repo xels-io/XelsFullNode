@@ -408,19 +408,41 @@ namespace Xels.Bitcoin.Configuration
         /// <param name="network">The network to base the defaults off.</param>
         public static void BuildDefaultConfigurationFile(StringBuilder builder, Network network)
         {
+            builder.AppendLine("forcelisten=1");
             builder.AppendLine("connect=52.68.239.4");
             builder.AppendLine("connect=54.64.43.45");
             builder.AppendLine("connect=54.238.248.117");
             builder.AppendLine("connect=13.114.52.87");
             builder.AppendLine("connect=52.192.229.45");
             builder.AppendLine("connect=52.199.121.139");
-
             builder.AppendLine("whitelist=52.68.239.4");
             builder.AppendLine("whitelist=54.64.43.45");
             builder.AppendLine("whitelist=54.238.248.117");
             builder.AppendLine("whitelist=13.114.52.87");
             builder.AppendLine("whitelist=52.192.229.45");
             builder.AppendLine("whitelist=52.199.121.139");
+            //builder.AppendLine("forcelisten=1");
+            //builder.AppendLine("connect=52.68.239.4:27976");
+            //builder.AppendLine("connect=54.64.43.45:27976");
+            //builder.AppendLine("connect=54.238.248.117:27976");
+            //builder.AppendLine("connect=13.114.52.87:27976");
+            //builder.AppendLine("connect=52.192.229.45:27976");
+            //builder.AppendLine("connect=52.199.121.139:27976");
+
+
+            //builder.AppendLine("addnode=52.68.239.4:27976");
+            //builder.AppendLine("addnode=54.64.43.45:27976");
+            //builder.AppendLine("addnode=54.238.248.117:27976");
+            //builder.AppendLine("addnode=13.114.52.87:27976");
+            //builder.AppendLine("addnode=52.192.229.45:27976");
+            //builder.AppendLine("addnode=52.199.121.139:27976");
+
+            //builder.AppendLine("whitelist=52.68.239.4:27976");
+            //builder.AppendLine("whitelist=54.64.43.45:27976");
+            //builder.AppendLine("whitelist=54.238.248.117:27976");
+            //builder.AppendLine("whitelist=13.114.52.87:27976");
+            //builder.AppendLine("whitelist=52.192.229.45:27976");
+            //builder.AppendLine("whitelist=52.199.121.139:27976");
 
             builder.AppendLine("####Node Settings####");
             builder.AppendLine($"#Test network. Defaults to 0.");

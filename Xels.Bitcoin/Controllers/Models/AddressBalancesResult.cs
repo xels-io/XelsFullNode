@@ -98,6 +98,12 @@ namespace Xels.Bitcoin.Controllers.Models
         /// <summary>Height of a block in which operation was confirmed.</summary>
         public int BalanceChangedHeight { get; set; }
 
+        public string TxHash { get; set; }
+
+        public int Index { get; set; }
+
+        //public string TxOutputN { get; set; }
+
         /// <inheritdoc />
         public override string ToString()
         {

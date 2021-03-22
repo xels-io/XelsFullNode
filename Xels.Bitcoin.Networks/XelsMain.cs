@@ -61,8 +61,8 @@ namespace Xels.Bitcoin.Networks
             var consensusFactory = new PosConsensusFactory();
 
             // Create the genesis block.
-            this.GenesisTime = Utils.DateTimeToUnixTime(new DateTimeOffset(2018, 11, 8, 0, 0, 0, TimeSpan.Zero)); //1470467000;
-            this.GenesisNonce = 1676861;// 1831645;
+            this.GenesisTime = Utils.DateTimeToUnixTime(new DateTimeOffset(2020, 12, 16, 0, 0, 0, TimeSpan.Zero)); //1609459200;
+            this.GenesisNonce = 471955; // 0;// 1676861;// 1831645;
             this.GenesisBits = 0x1e0fffff;
             this.GenesisVersion = 1;
             this.GenesisReward = Money.Zero;
@@ -109,7 +109,7 @@ namespace Xels.Bitcoin.Networks
                 bip34Hash: new uint256("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8"),
                 minerConfirmationWindow: 2016, // nPowTargetTimespan / nPowTargetSpacing
                 maxReorgLength: 500,
-                defaultAssumeValid: new uint256("0x0000033ab02dbdf95788721b78fcbaac559fde8bdc0948ad2dbeeedf45c99c4e"), // 1213518
+                defaultAssumeValid: new uint256("0x00000a1f1a078943309f2465bea7807b6f4d288c52b2c2b5f1a7ed13655817d7"), // 1213518
                 maxMoney: long.MaxValue,
                 coinbaseMaturity: 1,
                 premineHeight: 1,
@@ -150,7 +150,7 @@ namespace Xels.Bitcoin.Networks
 
             this.Checkpoints = new Dictionary<int, CheckpointInfo>
             {
-                { 0, new CheckpointInfo(new uint256("0x0000033ab02dbdf95788721b78fcbaac559fde8bdc0948ad2dbeeedf45c99c4e"), new uint256("0x0000000000000000000000000000000000000000000000000000000000000000")) }
+                { 0, new CheckpointInfo(new uint256("0x00000a1f1a078943309f2465bea7807b6f4d288c52b2c2b5f1a7ed13655817d7"), new uint256("0x0000000000000000000000000000000000000000000000000000000000000000")) }
             };
 
             this.Bech32Encoders = new Bech32Encoder[2];
@@ -164,7 +164,7 @@ namespace Xels.Bitcoin.Networks
             this.DNSSeeds = new List<DNSSeedData>();
             this.DNSSeeds = new List<DNSSeedData>
             {
-                //new DNSSeedData("api.xels.io","api.xels.io"),
+                new DNSSeedData("api.xels.io","api.xels.io"),
                 new DNSSeedData("mainnet.xels.io","mainnet.xels.io")
                 //new DNSSeedData("testnet.xels.io","testnet.xels.io")
                 //    new DNSSe                new NetworkAddress(IPAddress.Parse("52.68.239.4"), this.DefaultPort), // Redistribution node with DNS Server EnablededData("mainnet2.xelsnetwork.com", "mainnet2.xelsnetwork.com"),
@@ -176,7 +176,7 @@ namespace Xels.Bitcoin.Networks
             this.SeedNodes = new List<NetworkAddress>
             {
 
-                //new NetworkAddress(IPAddress.Parse("52.68.239.4"), this.DefaultPort ), // public node with DNS Server Enabled
+                new NetworkAddress(IPAddress.Parse("52.68.239.4"), this.DefaultPort ), // public node with DNS Server Enabled
                 new NetworkAddress(IPAddress.Parse("54.64.43.45"), this.DefaultPort ) // public node with DNS Server Enabled
                 //new NetworkAddress(IPAddress.Parse("54.238.248.117"), this.DefaultPort), // public node
                 //new NetworkAddress(IPAddress.Parse("13.114.52.87"), this.DefaultPort), // public node
@@ -194,8 +194,8 @@ namespace Xels.Bitcoin.Networks
 
             // 64 below should be changed to TargetSpacingSeconds when we move that field.
             Assert(this.DefaultBanTimeSeconds <= this.Consensus.MaxReorgLength * 64 / 2);
-            Assert(this.Consensus.HashGenesisBlock == uint256.Parse("0x0000033ab02dbdf95788721b78fcbaac559fde8bdc0948ad2dbeeedf45c99c4e"));
-            Assert(this.Genesis.Header.HashMerkleRoot == uint256.Parse("0xb89a84007e56441da69efe6177920a2359574f7944c73ae61871a9e2a0f8e4a5"));
+            Assert(this.Consensus.HashGenesisBlock == uint256.Parse("0x00000a1f1a078943309f2465bea7807b6f4d288c52b2c2b5f1a7ed13655817d7"));
+            Assert(this.Genesis.Header.HashMerkleRoot == uint256.Parse("0x4438bf0c97c1a574e3fa3a26f14f36c4d14c9724e5171b400f0474f265c76b2b"));
 
 
             this.RegisterRules(this.Consensus);
@@ -269,7 +269,7 @@ namespace Xels.Bitcoin.Networks
 
         protected static Block CreateXelsGenesisBlock(ConsensusFactory consensusFactory, uint nTime, uint nNonce, uint nBits, int nVersion, Money genesisReward)
         {
-            string pszTimestamp = "http://www.theonion.com/article/olympics-head-priestess-slits-throat-official-rio--53466";
+            string pszTimestamp = "There is hope yet! We all need to work together. WE GOT THIS!!!";
 
             Transaction txNew = consensusFactory.CreateTransaction();
             txNew.Version = 1;

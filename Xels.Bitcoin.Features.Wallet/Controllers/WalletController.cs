@@ -315,14 +315,23 @@ namespace Xels.Bitcoin.Features.Wallet.Controllers
                 async (req, token) => Json(await this.walletService.GetTransactionFeeEstimate(req, token)));
         }
 
+        /// <summary>
+        /// Gets a fee estimate for a specific transaction.
+        /// Fee can be estimated by creating a <see cref="TransactionBuildContext"/> with no password
+        /// and then building the transaction and retrieving the fee from the context.
+        /// </summary>
+        /// <param name="request">An object containing the parameters used to estimate the fee 
+        /// for a specific transaction.</param>
+        /// <returns>The estimated fee for the transaction.</returns>
         [Route("estimate-txfee")]
         [HttpGet]
-        public async Task<IActionResult> GetTxnFeeEstimate([FromBody] TxFeeEstimateRequest request,
-            CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IActionResult> GetTxnFeeEstimate([FromQuery]TxFeeEstimateRequest request)
         {
+            CancellationToken cancellationToken = default(CancellationToken);
             return await this.Execute(request, cancellationToken,
                 async (req, token) => Json(await this.walletService.GetTransactionFeeEstimate(req, token)));
         }
+
         /// <summary>
         /// Builds a transaction and returns the hex to use when executing the transaction.
         /// </summary>
