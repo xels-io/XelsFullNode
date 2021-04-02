@@ -582,7 +582,7 @@
           "dependencies": {
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
-              "version": "[16.4.0, )"
+              "version": "[16.9.4, )"
             },
             "Microsoft.NETCore.App": {
               "suppressParent": "All",
@@ -592,7 +592,7 @@
             },
             "Newtonsoft.Json": {
               "target": "Package",
-              "version": "[11.0.2, )"
+              "version": "[13.0.1, )"
             },
             "xunit": {
               "target": "Package",
@@ -602,7 +602,7 @@
               "include": "Runtime, Build, Native, ContentFiles, Analyzers",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[2.4.1, )"
+              "version": "[2.4.3, )"
             }
           },
           "imports": [

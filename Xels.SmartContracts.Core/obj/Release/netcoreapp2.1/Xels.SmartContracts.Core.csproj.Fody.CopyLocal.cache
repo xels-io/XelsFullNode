@@ -1,18 +1,18 @@
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\FodyNlogAdapter\bin\Release\netstandard2.0\FodyNlogAdapter.dll
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\NBitcoin\bin\Release\netstandard2.0\NBitcoin.dll
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin\bin\Release\netstandard2.0\Xels.Bitcoin.dll
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Consensus\bin\Release\netstandard2.0\Xels.Bitcoin.Features.Consensus.dll
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.MemoryPool\bin\Release\netstandard2.0\Xels.Bitcoin.Features.MemoryPool.dll
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.CLR.Validation\bin\Release\netcoreapp2.1\Xels.SmartContracts.CLR.Validation.dll
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts\bin\Release\netcoreapp2.1\Xels.SmartContracts.dll
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.RuntimeObserver\bin\Release\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.dll
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.Standards\bin\Release\netcoreapp2.1\Xels.SmartContracts.Standards.dll
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\NBitcoin\bin\Release\netstandard2.0\NBitcoin.pdb
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Consensus\bin\Release\netstandard2.0\Xels.Bitcoin.Features.Consensus.pdb
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.MemoryPool\bin\Release\netstandard2.0\Xels.Bitcoin.Features.MemoryPool.pdb
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin\bin\Release\netstandard2.0\Xels.Bitcoin.pdb
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.CLR.Validation\bin\Release\netcoreapp2.1\Xels.SmartContracts.CLR.Validation.pdb
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.RuntimeObserver\bin\Release\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.pdb
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\FodyNlogAdapter\bin\Release\netstandard2.0\FodyNlogAdapter.pdb
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts\bin\Release\netcoreapp2.1\Xels.SmartContracts.pdb
-F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.Standards\bin\Release\netcoreapp2.1\Xels.SmartContracts.Standards.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FodyNlogAdapter\bin\Release\netstandard2.0\FodyNlogAdapter.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\NBitcoin\bin\Release\netstandard2.0\NBitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin\bin\Release\netstandard2.0\Xels.Bitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.Consensus\bin\Release\netstandard2.0\Xels.Bitcoin.Features.Consensus.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.MemoryPool\bin\Release\netstandard2.0\Xels.Bitcoin.Features.MemoryPool.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.CLR.Validation\bin\Release\netcoreapp2.1\Xels.SmartContracts.CLR.Validation.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\bin\Release\netcoreapp2.1\Xels.SmartContracts.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\bin\Release\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Standards\bin\Release\netcoreapp2.1\Xels.SmartContracts.Standards.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\NBitcoin\bin\Release\netstandard2.0\NBitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.Consensus\bin\Release\netstandard2.0\Xels.Bitcoin.Features.Consensus.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.MemoryPool\bin\Release\netstandard2.0\Xels.Bitcoin.Features.MemoryPool.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin\bin\Release\netstandard2.0\Xels.Bitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.CLR.Validation\bin\Release\netcoreapp2.1\Xels.SmartContracts.CLR.Validation.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\bin\Release\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FodyNlogAdapter\bin\Release\netstandard2.0\FodyNlogAdapter.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\bin\Release\netcoreapp2.1\Xels.SmartContracts.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Standards\bin\Release\netcoreapp2.1\Xels.SmartContracts.Standards.pdb

@@ -58,3 +58,22 @@ F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin
 F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netstandard2.0\Xels.Bitcoin.Networks.csproj.CopyComplete
 F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netstandard2.0\Xels.Bitcoin.Networks.dll
 F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netstandard2.0\Xels.Bitcoin.Networks.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\Xels.Bitcoin.Networks.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\Xels.Bitcoin.Networks.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\Xels.Bitcoin.Networks.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\FodyNlogAdapter.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\NBitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\Xels.Bitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\Xels.Bitcoin.Features.Consensus.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\Xels.Bitcoin.Features.MemoryPool.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\NBitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\Xels.Bitcoin.Features.Consensus.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\Xels.Bitcoin.Features.MemoryPool.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\Xels.Bitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\bin\Release\netstandard2.0\FodyNlogAdapter.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netstandard2.0\Xels.Bitcoin.Networks.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netstandard2.0\Xels.Bitcoin.Networks.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netstandard2.0\Xels.Bitcoin.Networks.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netstandard2.0\Xels.Bitcoin.Networks.csproj.CopyComplete
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netstandard2.0\Xels.Bitcoin.Networks.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netstandard2.0\Xels.Bitcoin.Networks.pdb

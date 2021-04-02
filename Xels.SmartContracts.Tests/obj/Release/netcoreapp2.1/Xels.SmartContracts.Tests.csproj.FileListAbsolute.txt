@@ -16,3 +16,21 @@ G:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.Tests
 G:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.Tests\obj\Release\netcoreapp2.1\Xels.SmartContracts.Tests.dll
 G:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.Tests\obj\Release\netcoreapp2.1\Xels.SmartContracts.Tests.pdb
 G:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.Tests\obj\Release\netcoreapp2.1\Xels.SmartContracts.Tests.genruntimeconfig.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\bin\Release\netcoreapp2.1\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\bin\Release\netcoreapp2.1\xunit.runner.reporters.netcoreapp10.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\bin\Release\netcoreapp2.1\xunit.runner.utility.netcoreapp10.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\bin\Release\netcoreapp2.1\Xels.SmartContracts.Tests.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\bin\Release\netcoreapp2.1\Xels.SmartContracts.Tests.runtimeconfig.json
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\bin\Release\netcoreapp2.1\Xels.SmartContracts.Tests.runtimeconfig.dev.json
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\bin\Release\netcoreapp2.1\Xels.SmartContracts.Tests.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\bin\Release\netcoreapp2.1\Xels.SmartContracts.Tests.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\bin\Release\netcoreapp2.1\Xels.SmartContracts.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\bin\Release\netcoreapp2.1\Xels.SmartContracts.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\obj\Release\netcoreapp2.1\Xels.SmartContracts.Tests.csprojAssemblyReference.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\obj\Release\netcoreapp2.1\Xels.SmartContracts.Tests.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\obj\Release\netcoreapp2.1\Xels.SmartContracts.Tests.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\obj\Release\netcoreapp2.1\Xels.SmartContracts.Tests.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\obj\Release\netcoreapp2.1\Xels.SmartContracts.Tests.csproj.CopyComplete
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\obj\Release\netcoreapp2.1\Xels.SmartContracts.Tests.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\obj\Release\netcoreapp2.1\Xels.SmartContracts.Tests.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Tests\obj\Release\netcoreapp2.1\Xels.SmartContracts.Tests.genruntimeconfig.cache

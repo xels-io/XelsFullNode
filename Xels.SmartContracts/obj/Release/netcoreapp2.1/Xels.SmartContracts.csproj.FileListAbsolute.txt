@@ -16,3 +16,12 @@ F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts\obj\R
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts\obj\Release\netcoreapp2.1\Xels.SmartContracts.dll
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts\obj\Release\netcoreapp2.1\Xels.SmartContracts.pdb
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts\obj\Release\netcoreapp2.1\Xels.SmartContracts.csprojAssemblyReference.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\bin\Release\netcoreapp2.1\Xels.SmartContracts.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\bin\Release\netcoreapp2.1\Xels.SmartContracts.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\bin\Release\netcoreapp2.1\Xels.SmartContracts.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\obj\Release\netcoreapp2.1\Xels.SmartContracts.csprojAssemblyReference.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\obj\Release\netcoreapp2.1\Xels.SmartContracts.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\obj\Release\netcoreapp2.1\Xels.SmartContracts.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\obj\Release\netcoreapp2.1\Xels.SmartContracts.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\obj\Release\netcoreapp2.1\Xels.SmartContracts.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\obj\Release\netcoreapp2.1\Xels.SmartContracts.pdb

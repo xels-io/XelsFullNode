@@ -91,3 +91,33 @@ F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin
 F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.SignalR\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.dll
 F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.SignalR\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.pdb
 F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.SignalR\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.genruntimeconfig.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.runtimeconfig.json
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.runtimeconfig.dev.json
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\FodyNlogAdapter.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\NBitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockStore.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.Consensus.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.MemoryPool.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.Miner.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.RPC.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.Wallet.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.Miner.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.Wallet.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\NBitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockStore.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.Consensus.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.MemoryPool.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.RPC.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\bin\Release\netcoreapp2.1\FodyNlogAdapter.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.csproj.CopyComplete
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.SignalR\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.SignalR.genruntimeconfig.cache

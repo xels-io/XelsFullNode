@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "0MQuNuu7M0xhmSdeKsDWbB5TQapwtobfh710grQXV3T6n5DDghRkjE7yEynkHFMaeL6BHsJFkZzaHg6W73lqgw==",
-  "success": false,
+  "dgSpecHash": "r1JFGFt+Njj9vHfkeUQLCGSZThmTmKJPpEAXkmQzLjapaPClofFNYk5nn3SNtiKiuZngqqMJmTUn9Z2kQwOMjg==",
+  "success": true,
   "projectFilePath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Dns.Tests\\Xels.Bitcoin.Features.Dns.Tests.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\FR\\.nuget\\packages\\castle.core\\4.3.1\\castle.core.4.3.1.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\castle.core\\4.4.0\\castle.core.4.4.0.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\concurrenthashset\\1.0.2\\concurrenthashset.1.0.2.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\dbreeze\\1.89.0\\dbreeze.1.89.0.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\dns\\2.1.0\\dns.2.1.0.nupkg.sha512",
@@ -47,7 +47,7 @@
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.aspnetcore.server.kestrel.transport.abstractions\\2.1.3\\microsoft.aspnetcore.server.kestrel.transport.abstractions.2.1.3.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.aspnetcore.server.kestrel.transport.sockets\\2.1.3\\microsoft.aspnetcore.server.kestrel.transport.sockets.2.1.3.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.aspnetcore.webutilities\\2.1.1\\microsoft.aspnetcore.webutilities.2.1.1.nupkg.sha512",
-    "C:\\Users\\FR\\.nuget\\packages\\microsoft.codecoverage\\16.4.0\\microsoft.codecoverage.16.4.0.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\microsoft.codecoverage\\16.9.4\\microsoft.codecoverage.16.9.4.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.dotnet.platformabstractions\\2.1.0\\microsoft.dotnet.platformabstractions.2.1.0.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.extensions.caching.abstractions\\2.1.1\\microsoft.extensions.caching.abstractions.2.1.1.nupkg.sha512",
@@ -80,25 +80,25 @@
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.extensions.primitives\\2.1.1\\microsoft.extensions.primitives.2.1.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.extensions.webencoders\\2.1.1\\microsoft.extensions.webencoders.2.1.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.net.http.headers\\2.1.1\\microsoft.net.http.headers.2.1.1.nupkg.sha512",
-    "C:\\Users\\FR\\.nuget\\packages\\microsoft.net.test.sdk\\16.4.0\\microsoft.net.test.sdk.16.4.0.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\microsoft.net.test.sdk\\16.9.4\\microsoft.net.test.sdk.16.9.4.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.netcore.app\\2.1.1\\microsoft.netcore.app.2.1.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.netcore.dotnetapphost\\2.1.1\\microsoft.netcore.dotnetapphost.2.1.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.netcore.dotnethostpolicy\\2.1.1\\microsoft.netcore.dotnethostpolicy.2.1.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.netcore.dotnethostresolver\\2.1.1\\microsoft.netcore.dotnethostresolver.2.1.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.netcore.platforms\\2.1.0\\microsoft.netcore.platforms.2.1.0.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.netcore.targets\\2.0.0\\microsoft.netcore.targets.2.0.0.nupkg.sha512",
-    "C:\\Users\\FR\\.nuget\\packages\\microsoft.testplatform.objectmodel\\16.4.0\\microsoft.testplatform.objectmodel.16.4.0.nupkg.sha512",
-    "C:\\Users\\FR\\.nuget\\packages\\microsoft.testplatform.testhost\\16.4.0\\microsoft.testplatform.testhost.16.4.0.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\microsoft.testplatform.objectmodel\\16.9.4\\microsoft.testplatform.objectmodel.16.9.4.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\microsoft.testplatform.testhost\\16.9.4\\microsoft.testplatform.testhost.16.9.4.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.win32.primitives\\4.0.1\\microsoft.win32.primitives.4.0.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\microsoft.win32.registry\\4.5.0\\microsoft.win32.registry.4.5.0.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\moq\\4.9.0\\moq.4.9.0.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
-    "C:\\Users\\FR\\.nuget\\packages\\newtonsoft.json\\11.0.2\\newtonsoft.json.11.0.2.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\newtonsoft.json.bson\\1.0.1\\newtonsoft.json.bson.1.0.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nlog\\5.0.0-beta09\\nlog.5.0.0-beta09.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nlog.extensions.logging\\1.0.0-rtm-beta5\\nlog.extensions.logging.1.0.0-rtm-beta5.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nstratis.hashlib\\1.0.0.1\\nstratis.hashlib.1.0.0.1.nupkg.sha512",
-    "C:\\Users\\FR\\.nuget\\packages\\nsubstitute\\3.1.0\\nsubstitute.3.1.0.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\nsubstitute\\4.2.2\\nsubstitute.4.2.2.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nuget.frameworks\\5.0.0\\nuget.frameworks.5.0.0.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\polly\\6.1.2\\polly.6.1.2.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl\\4.3.0\\runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl.4.3.0.nupkg.sha512",
@@ -215,44 +215,7 @@
     "C:\\Users\\FR\\.nuget\\packages\\xunit.core\\2.4.1\\xunit.core.2.4.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\xunit.extensibility.core\\2.4.1\\xunit.extensibility.core.2.4.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\xunit.extensibility.execution\\2.4.1\\xunit.extensibility.execution.2.4.1.nupkg.sha512",
-    "C:\\Users\\FR\\.nuget\\packages\\xunit.runner.visualstudio\\2.4.1\\xunit.runner.visualstudio.2.4.1.nupkg.sha512"
+    "C:\\Users\\FR\\.nuget\\packages\\xunit.runner.visualstudio\\2.4.3\\xunit.runner.visualstudio.2.4.3.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1605",
-      "level": "Error",
-      "message": "Detected package downgrade: Newtonsoft.Json from 12.0.3 to 11.0.2. Reference the package directly from the project to select a different version. \r\n Xels.Bitcoin.Features.Dns.Tests -> Xels.Bitcoin.Features.Dns -> Newtonsoft.Json (>= 12.0.3) \r\n Xels.Bitcoin.Features.Dns.Tests -> Newtonsoft.Json (>= 11.0.2)",
-      "libraryId": "Newtonsoft.Json",
-      "targetGraphs": [
-        ".NETCoreApp,Version=v2.1"
-      ]
-    },
-    {
-      "code": "NU1605",
-      "level": "Error",
-      "message": "Detected package downgrade: Newtonsoft.Json from 12.0.3 to 11.0.2. Reference the package directly from the project to select a different version. \r\n Xels.Bitcoin.Features.Dns.Tests -> Xels.Bitcoin.Tests.Common -> Xels.Bitcoin.Networks -> NStratis -> Newtonsoft.Json (>= 12.0.3) \r\n Xels.Bitcoin.Features.Dns.Tests -> Newtonsoft.Json (>= 11.0.2)",
-      "libraryId": "Newtonsoft.Json",
-      "targetGraphs": [
-        ".NETCoreApp,Version=v2.1"
-      ]
-    },
-    {
-      "code": "NU1605",
-      "level": "Error",
-      "message": "Detected package downgrade: Newtonsoft.Json from 12.0.3 to 11.0.2. Reference the package directly from the project to select a different version. \r\n Xels.Bitcoin.Features.Dns.Tests -> Xels.Bitcoin.Tests.Common -> Xels.Bitcoin -> NStratis -> Newtonsoft.Json (>= 12.0.3) \r\n Xels.Bitcoin.Features.Dns.Tests -> Newtonsoft.Json (>= 11.0.2)",
-      "libraryId": "Newtonsoft.Json",
-      "targetGraphs": [
-        ".NETCoreApp,Version=v2.1"
-      ]
-    },
-    {
-      "code": "NU1605",
-      "level": "Error",
-      "message": "Detected package downgrade: Newtonsoft.Json from 12.0.3 to 11.0.2. Reference the package directly from the project to select a different version. \r\n Xels.Bitcoin.Features.Dns.Tests -> Xels.Bitcoin.Tests.Common -> Xels.Bitcoin.Features.Consensus -> NStratis -> Newtonsoft.Json (>= 12.0.3) \r\n Xels.Bitcoin.Features.Dns.Tests -> Newtonsoft.Json (>= 11.0.2)",
-      "libraryId": "Newtonsoft.Json",
-      "targetGraphs": [
-        ".NETCoreApp,Version=v2.1"
-      ]
-    }
-  ]
+  "logs": []
 }

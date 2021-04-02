@@ -7,3 +7,12 @@ F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.Runti
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.RuntimeObserver\bin\Debug\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.dll
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.RuntimeObserver\bin\Debug\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.pdb
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.SmartContracts.RuntimeObserver\obj\Debug\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.csproj.Fody.CopyLocal.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\bin\Debug\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\bin\Debug\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\bin\Debug\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Debug\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Debug\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Debug\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Debug\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.csproj.Fody.CopyLocal.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Debug\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Debug\netcoreapp2.1\Xels.SmartContracts.RuntimeObserver.pdb
