@@ -32,3 +32,20 @@ F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Not
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Notifications\obj\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.csproj.CopyComplete
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Notifications\obj\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.dll
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Notifications\obj\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\bin\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\bin\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\bin\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\bin\Release\netstandard2.0\FodyNlogAdapter.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\bin\Release\netstandard2.0\NBitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\bin\Release\netstandard2.0\Xels.Bitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\bin\Release\netstandard2.0\NBitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\bin\Release\netstandard2.0\Xels.Bitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\bin\Release\netstandard2.0\FodyNlogAdapter.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\obj\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.csprojAssemblyReference.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\obj\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\obj\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\obj\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\obj\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.csproj.Fody.CopyLocal.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\obj\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.csproj.CopyComplete
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\obj\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Notifications\obj\Release\netstandard2.0\Xels.Bitcoin.Features.Notifications.pdb

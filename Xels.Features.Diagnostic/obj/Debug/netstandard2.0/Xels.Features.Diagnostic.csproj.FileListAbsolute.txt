@@ -14,3 +14,19 @@ F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Features.Diagnostic\
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Features.Diagnostic\obj\Debug\netstandard2.0\Xels.Features.Diagnostic.csproj.CopyComplete
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Features.Diagnostic\obj\Debug\netstandard2.0\Xels.Features.Diagnostic.dll
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Features.Diagnostic\obj\Debug\netstandard2.0\Xels.Features.Diagnostic.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\bin\Debug\netstandard2.0\Xels.Features.Diagnostic.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\bin\Debug\netstandard2.0\Xels.Features.Diagnostic.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\bin\Debug\netstandard2.0\Xels.Features.Diagnostic.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\bin\Debug\netstandard2.0\FodyNlogAdapter.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\bin\Debug\netstandard2.0\NBitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\bin\Debug\netstandard2.0\Xels.Bitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\bin\Debug\netstandard2.0\NBitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\bin\Debug\netstandard2.0\Xels.Bitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\bin\Debug\netstandard2.0\FodyNlogAdapter.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\obj\Debug\netstandard2.0\Xels.Features.Diagnostic.csprojAssemblyReference.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\obj\Debug\netstandard2.0\Xels.Features.Diagnostic.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\obj\Debug\netstandard2.0\Xels.Features.Diagnostic.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\obj\Debug\netstandard2.0\Xels.Features.Diagnostic.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\obj\Debug\netstandard2.0\Xels.Features.Diagnostic.csproj.CopyComplete
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\obj\Debug\netstandard2.0\Xels.Features.Diagnostic.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Features.Diagnostic\obj\Debug\netstandard2.0\Xels.Features.Diagnostic.pdb

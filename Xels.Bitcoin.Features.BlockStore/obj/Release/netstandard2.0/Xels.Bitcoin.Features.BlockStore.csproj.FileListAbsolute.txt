@@ -32,3 +32,20 @@ F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Blo
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.BlockStore\obj\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.csproj.CopyComplete
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.BlockStore\obj\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.dll
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.BlockStore\obj\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\bin\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\bin\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\bin\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\bin\Release\netstandard2.0\FodyNlogAdapter.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\bin\Release\netstandard2.0\NBitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\bin\Release\netstandard2.0\Xels.Bitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\bin\Release\netstandard2.0\NBitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\bin\Release\netstandard2.0\Xels.Bitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\bin\Release\netstandard2.0\FodyNlogAdapter.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\obj\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.csprojAssemblyReference.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\obj\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\obj\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\obj\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\obj\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.csproj.Fody.CopyLocal.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\obj\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.csproj.CopyComplete
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\obj\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockStore\obj\Release\netstandard2.0\Xels.Bitcoin.Features.BlockStore.pdb

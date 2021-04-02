@@ -14689,23 +14689,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Lenovo\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\FR\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.XoyD\\Xels.XoyD.csproj",
+      "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.XoyD\\Xels.XoyD.csproj",
       "projectName": "Xels.XoyD",
-      "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.XoyD\\Xels.XoyD.csproj",
-      "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-      "outputPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.XoyD\\obj\\",
+      "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.XoyD\\Xels.XoyD.csproj",
+      "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
+      "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.XoyD\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -14720,20 +14722,20 @@
         "netcoreapp2.1": {
           "targetAlias": "netcoreapp2.1",
           "projectReferences": {
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Features.SignalR\\Xels.Bitcoin.Features.SignalR.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Features.SignalR\\Xels.Bitcoin.Features.SignalR.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.SignalR\\Xels.Bitcoin.Features.SignalR.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.SignalR\\Xels.Bitcoin.Features.SignalR.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Features.Diagnostic\\Xels.Features.Diagnostic.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Features.Diagnostic\\Xels.Features.Diagnostic.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Features.Diagnostic\\Xels.Features.Diagnostic.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Features.Diagnostic\\Xels.Features.Diagnostic.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Features.FederatedPeg\\Xels.Features.FederatedPeg.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Features.FederatedPeg\\Xels.Features.FederatedPeg.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Features.FederatedPeg\\Xels.Features.FederatedPeg.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Features.FederatedPeg\\Xels.Features.FederatedPeg.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Features.SQLiteWalletRepository\\Xels.Features.SQLiteWalletRepository.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Features.SQLiteWalletRepository\\Xels.Features.SQLiteWalletRepository.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Features.SQLiteWalletRepository\\Xels.Features.SQLiteWalletRepository.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Features.SQLiteWalletRepository\\Xels.Features.SQLiteWalletRepository.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj"
             }
           }
         }
@@ -14765,7 +14767,7 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.200\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

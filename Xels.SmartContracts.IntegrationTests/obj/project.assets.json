@@ -15713,23 +15713,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Lenovo\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\FR\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.IntegrationTests\\Xels.SmartContracts.IntegrationTests.csproj",
+      "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.IntegrationTests\\Xels.SmartContracts.IntegrationTests.csproj",
       "projectName": "Xels.SmartContracts.IntegrationTests",
-      "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.IntegrationTests\\Xels.SmartContracts.IntegrationTests.csproj",
-      "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-      "outputPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.IntegrationTests\\obj\\",
+      "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.IntegrationTests\\Xels.SmartContracts.IntegrationTests.csproj",
+      "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
+      "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.IntegrationTests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -15744,26 +15746,26 @@
         "netcoreapp2.1": {
           "targetAlias": "netcoreapp2.1",
           "projectReferences": {
-            "F:\\XelsPublicRepos\\XelsFullNode\\NBitcoin\\NBitcoin.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\NBitcoin\\NBitcoin.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Features.PoA.IntegrationTests.Common\\Xels.Bitcoin.Features.PoA.IntegrationTests.Common.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Features.PoA.IntegrationTests.Common\\Xels.Bitcoin.Features.PoA.IntegrationTests.Common.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.PoA.IntegrationTests.Common\\Xels.Bitcoin.Features.PoA.IntegrationTests.Common.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.PoA.IntegrationTests.Common\\Xels.Bitcoin.Features.PoA.IntegrationTests.Common.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Features.SmartContracts\\Xels.Bitcoin.Features.SmartContracts.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Features.SmartContracts\\Xels.Bitcoin.Features.SmartContracts.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.SmartContracts\\Xels.Bitcoin.Features.SmartContracts.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.SmartContracts\\Xels.Bitcoin.Features.SmartContracts.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.IntegrationTests.Common\\Xels.Bitcoin.IntegrationTests.Common.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.IntegrationTests.Common\\Xels.Bitcoin.IntegrationTests.Common.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.IntegrationTests.Common\\Xels.Bitcoin.IntegrationTests.Common.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.IntegrationTests.Common\\Xels.Bitcoin.IntegrationTests.Common.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.Networks\\Xels.SmartContracts.Networks.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.Networks\\Xels.SmartContracts.Networks.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Networks\\Xels.SmartContracts.Networks.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Networks\\Xels.SmartContracts.Networks.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.Standards\\Xels.SmartContracts.Standards.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.Standards\\Xels.SmartContracts.Standards.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Standards\\Xels.SmartContracts.Standards.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Standards\\Xels.SmartContracts.Standards.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.Tests.Common\\Xels.SmartContracts.Tests.Common.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.Tests.Common\\Xels.SmartContracts.Tests.Common.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Tests.Common\\Xels.SmartContracts.Tests.Common.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Tests.Common\\Xels.SmartContracts.Tests.Common.csproj"
             }
           }
         }
@@ -15803,7 +15805,7 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.200\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

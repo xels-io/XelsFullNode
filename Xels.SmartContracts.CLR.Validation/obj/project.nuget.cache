@@ -1,19 +1,19 @@
 {
   "version": 2,
-  "dgSpecHash": "wKfz7nUeKQES7EXWxvtBjXjHYofy62e5WGN9NGy731CjDuEmz2NpzQESk4WMkZEhnHEEuPw75DRv6JDuCLUDDw==",
+  "dgSpecHash": "N7ZXLdpHnYahERU2YCtefp54vwsiH0l8jUL70m6gmvQpRjOmu7MTJfy/emJOpzwLdX5jCcZ686GAv1ijFpk7hg==",
   "success": true,
-  "projectFilePath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.CLR.Validation\\Xels.SmartContracts.CLR.Validation.csproj",
+  "projectFilePath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.CLR.Validation\\Xels.SmartContracts.CLR.Validation.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Lenovo\\.nuget\\packages\\fody\\4.2.1\\fody.4.2.1.nupkg.sha512",
-    "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.netcore.app\\2.1.1\\microsoft.netcore.app.2.1.1.nupkg.sha512",
-    "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.netcore.dotnetapphost\\2.1.1\\microsoft.netcore.dotnetapphost.2.1.1.nupkg.sha512",
-    "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.netcore.dotnethostpolicy\\2.1.1\\microsoft.netcore.dotnethostpolicy.2.1.1.nupkg.sha512",
-    "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.netcore.dotnethostresolver\\2.1.1\\microsoft.netcore.dotnethostresolver.2.1.1.nupkg.sha512",
-    "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.netcore.platforms\\2.1.0\\microsoft.netcore.platforms.2.1.0.nupkg.sha512",
-    "C:\\Users\\Lenovo\\.nuget\\packages\\microsoft.netcore.targets\\2.0.0\\microsoft.netcore.targets.2.0.0.nupkg.sha512",
-    "C:\\Users\\Lenovo\\.nuget\\packages\\mono.cecil\\0.11.3\\mono.cecil.0.11.3.nupkg.sha512",
-    "C:\\Users\\Lenovo\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
-    "C:\\Users\\Lenovo\\.nuget\\packages\\tracer.fody\\3.3.1\\tracer.fody.3.3.1.nupkg.sha512"
+    "C:\\Users\\FR\\.nuget\\packages\\fody\\4.2.1\\fody.4.2.1.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\microsoft.netcore.app\\2.1.1\\microsoft.netcore.app.2.1.1.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\microsoft.netcore.dotnetapphost\\2.1.1\\microsoft.netcore.dotnetapphost.2.1.1.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\microsoft.netcore.dotnethostpolicy\\2.1.1\\microsoft.netcore.dotnethostpolicy.2.1.1.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\microsoft.netcore.dotnethostresolver\\2.1.1\\microsoft.netcore.dotnethostresolver.2.1.1.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\microsoft.netcore.platforms\\2.1.0\\microsoft.netcore.platforms.2.1.0.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\microsoft.netcore.targets\\2.0.0\\microsoft.netcore.targets.2.0.0.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\mono.cecil\\0.11.3\\mono.cecil.0.11.3.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\tracer.fody\\3.3.1\\tracer.fody.3.3.1.nupkg.sha512"
   ],
   "logs": []
 }

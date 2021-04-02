@@ -23,3 +23,28 @@ F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Api
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.dll
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.pdb
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.genruntimeconfig.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\appsettings.json
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\web.config
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.runtimeconfig.json
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.runtimeconfig.dev.json
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\FodyNlogAdapter.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\NBitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\Xels.Bitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\Xels.Bitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\NBitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\bin\Debug\netcoreapp2.1\FodyNlogAdapter.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.csprojAssemblyReference.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.RazorAssemblyInfo.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.RazorAssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.csproj.Fody.CopyLocal.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.RazorTargetAssemblyInfo.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.csproj.CopyComplete
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Debug\netcoreapp2.1\Xels.Bitcoin.Features.Api.genruntimeconfig.cache

@@ -20,3 +20,25 @@ F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Blo
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.BlockExplorer\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.csproj.CopyComplete
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.BlockExplorer\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.dll
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.BlockExplorer\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\FodyNlogAdapter.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\NBitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\Xels.Bitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockStore.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.Consensus.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.RPC.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\NBitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockStore.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.RPC.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\Xels.Bitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\Xels.Bitcoin.Features.Consensus.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\bin\Release\netcoreapp2.1\FodyNlogAdapter.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.csprojAssemblyReference.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.csproj.CopyComplete
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.BlockExplorer\obj\Release\netcoreapp2.1\Xels.Bitcoin.Features.BlockExplorer.pdb

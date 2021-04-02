@@ -14,3 +14,11 @@ F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\NBitcoin\obj\Debug\netsta
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\NBitcoin\obj\Debug\netstandard2.0\NBitcoin.csproj.CoreCompileInputs.cache
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\NBitcoin\obj\Debug\netstandard2.0\NBitcoin.dll
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\NBitcoin\obj\Debug\netstandard2.0\NBitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\NBitcoin\bin\Debug\netstandard2.0\NBitcoin.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\NBitcoin\bin\Debug\netstandard2.0\NBitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\NBitcoin\bin\Debug\netstandard2.0\NBitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\NBitcoin\obj\Debug\netstandard2.0\NBitcoin.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\NBitcoin\obj\Debug\netstandard2.0\NBitcoin.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\NBitcoin\obj\Debug\netstandard2.0\NBitcoin.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\NBitcoin\obj\Debug\netstandard2.0\NBitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\NBitcoin\obj\Debug\netstandard2.0\NBitcoin.pdb

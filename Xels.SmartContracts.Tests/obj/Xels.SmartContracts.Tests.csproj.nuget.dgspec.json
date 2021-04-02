@@ -1,23 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.Tests\\Xels.SmartContracts.Tests.csproj": {}
+    "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Tests\\Xels.SmartContracts.Tests.csproj": {}
   },
   "projects": {
-    "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.Tests\\Xels.SmartContracts.Tests.csproj": {
+    "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Tests\\Xels.SmartContracts.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.Tests\\Xels.SmartContracts.Tests.csproj",
+        "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Tests\\Xels.SmartContracts.Tests.csproj",
         "projectName": "Xels.SmartContracts.Tests",
-        "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.Tests\\Xels.SmartContracts.Tests.csproj",
-        "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts.Tests\\obj\\",
+        "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Tests\\Xels.SmartContracts.Tests.csproj",
+        "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
+        "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -32,8 +33,8 @@
           "netcoreapp2.1": {
             "targetAlias": "netcoreapp2.1",
             "projectReferences": {
-              "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts\\Xels.SmartContracts.csproj": {
-                "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts\\Xels.SmartContracts.csproj"
+              "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts\\Xels.SmartContracts.csproj": {
+                "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts\\Xels.SmartContracts.csproj"
               }
             }
           }
@@ -77,24 +78,25 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.200\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts\\Xels.SmartContracts.csproj": {
+    "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts\\Xels.SmartContracts.csproj": {
       "version": "1.2.1",
       "restore": {
-        "projectUniqueName": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts\\Xels.SmartContracts.csproj",
+        "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts\\Xels.SmartContracts.csproj",
         "projectName": "Xels.SmartContracts",
-        "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts\\Xels.SmartContracts.csproj",
-        "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.SmartContracts\\obj\\",
+        "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts\\Xels.SmartContracts.csproj",
+        "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
+        "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -138,7 +140,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.200\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     }

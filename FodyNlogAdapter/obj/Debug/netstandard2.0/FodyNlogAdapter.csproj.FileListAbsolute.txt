@@ -16,3 +16,12 @@ F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\FodyNlogAdapter\obj\Debug
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\FodyNlogAdapter\obj\Debug\netstandard2.0\FodyNlogAdapter.csproj.CoreCompileInputs.cache
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\FodyNlogAdapter\obj\Debug\netstandard2.0\FodyNlogAdapter.dll
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\FodyNlogAdapter\obj\Debug\netstandard2.0\FodyNlogAdapter.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\FodyNlogAdapter\bin\Debug\netstandard2.0\FodyNlogAdapter.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\FodyNlogAdapter\bin\Debug\netstandard2.0\FodyNlogAdapter.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\FodyNlogAdapter\bin\Debug\netstandard2.0\FodyNlogAdapter.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\FodyNlogAdapter\obj\Debug\netstandard2.0\FodyNlogAdapter.csprojAssemblyReference.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\FodyNlogAdapter\obj\Debug\netstandard2.0\FodyNlogAdapter.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\FodyNlogAdapter\obj\Debug\netstandard2.0\FodyNlogAdapter.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\FodyNlogAdapter\obj\Debug\netstandard2.0\FodyNlogAdapter.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\FodyNlogAdapter\obj\Debug\netstandard2.0\FodyNlogAdapter.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\FodyNlogAdapter\obj\Debug\netstandard2.0\FodyNlogAdapter.pdb

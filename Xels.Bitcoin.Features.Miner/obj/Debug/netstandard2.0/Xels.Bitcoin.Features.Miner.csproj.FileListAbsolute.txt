@@ -25,3 +25,30 @@ F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Min
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Miner\obj\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.csproj.CopyComplete
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Miner\obj\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.dll
 F:\XelCodeRepo\XelsCore-master\XelsBitcoinFullNode\src\Xels.Bitcoin.Features.Miner\obj\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\FodyNlogAdapter.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\NBitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.BlockStore.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.Consensus.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.MemoryPool.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.RPC.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.Wallet.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\NBitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.MemoryPool.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.RPC.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.Wallet.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.BlockStore.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\Xels.Bitcoin.Features.Consensus.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\bin\Debug\netstandard2.0\FodyNlogAdapter.pdb
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\obj\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.csprojAssemblyReference.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\obj\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\obj\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\obj\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\obj\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.csproj.Fody.CopyLocal.cache
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\obj\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.csproj.CopyComplete
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\obj\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.dll
+F:\Remnant\Project Work\Office Projects\SOL\New folder\XelsFullNode\Xels.Bitcoin.Features.Miner\obj\Debug\netstandard2.0\Xels.Bitcoin.Features.Miner.pdb

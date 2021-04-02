@@ -15335,23 +15335,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Lenovo\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\FR\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Tests\\Xels.Bitcoin.Tests.csproj",
+      "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests\\Xels.Bitcoin.Tests.csproj",
       "projectName": "Xels.Bitcoin.Tests",
-      "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Tests\\Xels.Bitcoin.Tests.csproj",
-      "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-      "outputPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Tests\\obj\\",
+      "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests\\Xels.Bitcoin.Tests.csproj",
+      "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
+      "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -15366,26 +15368,26 @@
         "netcoreapp2.1": {
           "targetAlias": "netcoreapp2.1",
           "projectReferences": {
-            "F:\\XelsPublicRepos\\XelsFullNode\\NBitcoin\\NBitcoin.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\NBitcoin\\NBitcoin.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Features.Api\\Xels.Bitcoin.Features.Api.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Features.Api\\Xels.Bitcoin.Features.Api.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Api\\Xels.Bitcoin.Features.Api.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Api\\Xels.Bitcoin.Features.Api.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Features.Consensus\\Xels.Bitcoin.Features.Consensus.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Features.Consensus\\Xels.Bitcoin.Features.Consensus.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Consensus\\Xels.Bitcoin.Features.Consensus.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Consensus\\Xels.Bitcoin.Features.Consensus.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Tests.Common\\Xels.Bitcoin.Tests.Common.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Tests.Common\\Xels.Bitcoin.Tests.Common.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests.Common\\Xels.Bitcoin.Tests.Common.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests.Common\\Xels.Bitcoin.Tests.Common.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Tests.Wallet.Common\\Xels.Bitcoin.Tests.Wallet.Common.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin.Tests.Wallet.Common\\Xels.Bitcoin.Tests.Wallet.Common.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests.Wallet.Common\\Xels.Bitcoin.Tests.Wallet.Common.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests.Wallet.Common\\Xels.Bitcoin.Tests.Wallet.Common.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj"
             },
-            "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj": {
-              "projectPath": "F:\\XelsPublicRepos\\XelsFullNode\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj"
+            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj": {
+              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj"
             }
           }
         }
@@ -15431,7 +15433,7 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.200\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }
