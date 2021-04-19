@@ -308,10 +308,10 @@ namespace Xels.Bitcoin.IntegrationTests.Wallet
                 var exception = act.Should().Throw<FlurlHttpException>().Which;
                 var response = exception.Call.Response;
 
-                ErrorResponse errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(await response.Content.ReadAsStringAsync());
+                ErrorResponse errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(await response.GetStringAsync()); //Content.ReadAsStringAsync
                 List<ErrorModel> errors = errorResponse.Errors;
 
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
                 errors.Should().ContainSingle();
                 errors.First().Message.Should().Be($"One of the query parameters '{nameof(RemoveTransactionsModel.DeleteAll)}', '{nameof(RemoveTransactionsModel.TransactionsIds)}' or '{nameof(RemoveTransactionsModel.FromDate)}' must be set.");
             }
@@ -363,16 +363,16 @@ namespace Xels.Bitcoin.IntegrationTests.Wallet
 
                 // Assert.
                 FlurlHttpException exception1 = act1.Should().Throw<FlurlHttpException>().Which;
-                HttpResponseMessage response1 = exception1.Call.Response;
+                HttpResponseMessage response1 = (HttpResponseMessage)exception1.Call.Response;
 
                 FlurlHttpException exception2 = act2.Should().Throw<FlurlHttpException>().Which;
-                HttpResponseMessage response2 = exception2.Call.Response;
+                HttpResponseMessage response2 = (HttpResponseMessage)exception2.Call.Response;
 
                 FlurlHttpException exception3 = act3.Should().Throw<FlurlHttpException>().Which;
-                HttpResponseMessage response3 = exception3.Call.Response;
+                HttpResponseMessage response3 = (HttpResponseMessage)exception3.Call.Response;
 
                 FlurlHttpException exception4 = act4.Should().Throw<FlurlHttpException>().Which;
-                HttpResponseMessage response4 = exception4.Call.Response;
+                HttpResponseMessage response4 = (HttpResponseMessage)exception4.Call.Response;
 
                 ErrorResponse errorResponse1 = JsonConvert.DeserializeObject<ErrorResponse>(await response1.Content.ReadAsStringAsync());
                 ErrorResponse errorResponse2 = JsonConvert.DeserializeObject<ErrorResponse>(await response2.Content.ReadAsStringAsync());

@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+using Microsoft.Extensions.Options;
+
 using NLog;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
+
+using TracerAttributes;
+
 using Xels.Bitcoin.Configuration.Settings;
 using Xels.Bitcoin.Utilities;
-using TracerAttributes;
 
 namespace Xels.Bitcoin.Configuration.Logging
 {
@@ -24,7 +29,7 @@ namespace Xels.Bitcoin.Configuration.Logging
         private const string NLogConfigFileName = "NLog.config";
 
         /// <summary>Configuration of console logger.</summary>
-        public ConsoleLoggerSettings ConsoleSettings { get; set; }
+        public ConsoleLoggerOptions ConsoleSettings { get; set; }
 
         /// <summary>Provider of console logger.</summary>
         public ConsoleLoggerProvider ConsoleLoggerProvider { get; set; }
@@ -37,7 +42,7 @@ namespace Xels.Bitcoin.Configuration.Logging
 
             string configPath = Path.Combine(dataFolder.RootPath, NLogConfigFileName);
             if (File.Exists(configPath))
-                this.ConfigureNLog(configPath);
+                _ = this.ConfigureNLog(configPath);
         }
     }
 
@@ -224,24 +229,48 @@ namespace Xels.Bitcoin.Configuration.Logging
         /// <param name="loggerFactory">The logger factory to add the console logger.</param>
         public static void AddConsoleWithFilters(this ILoggerFactory loggerFactory)
         {
-            var consoleLoggerSettings = new ConsoleLoggerSettings
-            {
-                Switches =
-                {
-                    {"Default", Microsoft.Extensions.Logging.LogLevel.Information},
-                    {"System", Microsoft.Extensions.Logging.LogLevel.Warning},
-                    {"Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning},
-                    {"Microsoft.AspNetCore", Microsoft.Extensions.Logging.LogLevel.Error}
-                }
-            };
+            //var consoleLoggerSettings = new ConsoleLoggerSettings
+            //{
+            //    Switches =
+            //    {
+            //        {"Default", Microsoft.Extensions.Logging.LogLevel.Information},
+            //        {"System", Microsoft.Extensions.Logging.LogLevel.Warning},
+            //        {"Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning},
+            //        {"Microsoft.AspNetCore", Microsoft.Extensions.Logging.LogLevel.Error}
+            //    }
+            //};
 
-            var consoleLoggerProvider = new ConsoleLoggerProvider(consoleLoggerSettings);
-            loggerFactory.AddProvider(consoleLoggerProvider);
+           
+
+            //var consoleLoggerProvider = new ConsoleLoggerProvider(consoleLoggerSettings);
+            //loggerFactory.AddProvider(consoleLoggerProvider);             
+
+            //var extendedLoggerFactory = loggerFactory as ExtendedLoggerFactory;
+            //Guard.NotNull(extendedLoggerFactory, nameof(extendedLoggerFactory));
+            //extendedLoggerFactory.ConsoleLoggerProvider = consoleLoggerProvider;
+            //extendedLoggerFactory.ConsoleSettings = consoleLoggerSettings;
+
+
+
+            var loggerFactoryy = LoggerFactory.Create(builder =>
+            {
+                builder
+                .AddFilter("default", Microsoft.Extensions.Logging.LogLevel.Information)
+                .AddFilter("Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning)
+                .AddFilter("System", Microsoft.Extensions.Logging.LogLevel.Warning)
+                .AddFilter("Microsoft.AspNetCore", Microsoft.Extensions.Logging.LogLevel.Error)
+                .AddConsole()
+                .AddDebug();
+            });
+
+            //var consoleLoggerProvder = new ConsoleLoggerProvider((IOptionsMonitor<ConsoleLoggerOptions>)loggerFactoryy);
+            //loggerFactory.AddProvider(consoleLoggerProvder);
 
             var extendedLoggerFactory = loggerFactory as ExtendedLoggerFactory;
             Guard.NotNull(extendedLoggerFactory, nameof(extendedLoggerFactory));
-            extendedLoggerFactory.ConsoleLoggerProvider = consoleLoggerProvider;
-            extendedLoggerFactory.ConsoleSettings = consoleLoggerSettings;
+            //extendedLoggerFactory.ConsoleLoggerProvider = consoleLoggerProvder;
+            //extendedLoggerFactory.ConsoleSettings = consoleLoggerSettings;
+
         }
 
         /// <summary>
@@ -250,7 +279,7 @@ namespace Xels.Bitcoin.Configuration.Logging
         /// <param name="loggerFactory">Not used.</param>
         /// <param name="consoleLoggerSettings">Console settings to filter.</param>
         /// <param name="settings">Settings that hold potential debug arguments, if null no debug arguments will be loaded."/></param>
-        public static void ConfigureConsoleFilters(this ILoggerFactory loggerFactory, ConsoleLoggerSettings consoleLoggerSettings, LogSettings settings)
+        public static void ConfigureConsoleFilters(this ILoggerFactory loggerFactory,/* ConsoleLoggerSettings consoleLoggerSettings,*/ LogSettings settings)
         {
             if (settings != null)
             {
@@ -259,7 +288,14 @@ namespace Xels.Bitcoin.Configuration.Logging
                     if (settings.DebugArgs[0] == "1")
                     {
                         // Increase all logging to Debug.
-                        consoleLoggerSettings.Switches.Add($"{nameof(Xels)}.{nameof(Bitcoin)}", Microsoft.Extensions.Logging.LogLevel.Debug);
+                        // consoleLoggerSettings.Switches.Add($"{nameof(Xels)}.{nameof(Bitcoin)}", Microsoft.Extensions.Logging.LogLevel.Debug);
+
+                        LoggerFactory.Create(builder =>
+                       {
+                           builder.AddFilter($"{nameof(Xels)}.{nameof(Bitcoin)}", Microsoft.Extensions.Logging.LogLevel.Debug)
+                           .AddConsole();
+                       });
+
                     }
                     else
                     {
@@ -279,7 +315,13 @@ namespace Xels.Bitcoin.Configuration.Logging
                                 if (!usedCategories.Contains(category))
                                 {
                                     usedCategories.Add(category);
-                                    consoleLoggerSettings.Switches.Add(category.TrimEnd('*').TrimEnd('.'), Microsoft.Extensions.Logging.LogLevel.Debug);
+                                    // consoleLoggerSettings.Switches.Add(category.TrimEnd('*').TrimEnd('.'), Microsoft.Extensions.Logging.LogLevel.Debug);
+
+                               var lFactory =     LoggerFactory.Create(builder =>
+                                    {
+                                        builder.AddFilter(category.TrimEnd('*').TrimEnd('.'), Microsoft.Extensions.Logging.LogLevel.Debug)
+                                        .AddConsole();
+                                    });
                                 }
                             }
                         }
@@ -287,7 +329,8 @@ namespace Xels.Bitcoin.Configuration.Logging
                 }
             }
 
-            consoleLoggerSettings.Reload();
+            //consoleLoggerSettings.Reload();
+             
         }
 
         /// <summary>
@@ -295,7 +338,7 @@ namespace Xels.Bitcoin.Configuration.Logging
         /// </summary>
         /// <param name="loggerFactory">Logger factory interface being extended.</param>
         /// <returns>Console logger settings.</returns>
-        public static ConsoleLoggerSettings GetConsoleSettings(this ILoggerFactory loggerFactory)
+        public static ConsoleLoggerOptions GetConsoleSettings(this ILoggerFactory loggerFactory)
         {
             var extendedLoggerFactory = loggerFactory as ExtendedLoggerFactory;
             Guard.NotNull(extendedLoggerFactory, nameof(extendedLoggerFactory));

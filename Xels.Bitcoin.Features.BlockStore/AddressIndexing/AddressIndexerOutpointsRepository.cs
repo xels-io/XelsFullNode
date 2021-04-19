@@ -30,8 +30,8 @@ namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
         public AddressIndexerOutpointsRepository(LiteDatabase db, ILoggerFactory loggerFactory, int maxItems = 60_000)
         {
             this.logger = loggerFactory.CreateLogger(this.GetType().FullName);
-            this.addressIndexerOutPointData = db.GetCollection<OutPointData>(DbOutputsDataKey);
-            this.addressIndexerRewindData = db.GetCollection<AddressIndexerRewindData>(DbOutputsRewindDataKey);
+            this.addressIndexerOutPointData = (LiteCollection<OutPointData>) db.GetCollection<OutPointData>(DbOutputsDataKey);
+            this.addressIndexerRewindData =(LiteCollection<AddressIndexerRewindData>) db.GetCollection<AddressIndexerRewindData>(DbOutputsRewindDataKey);
             this.maxCacheItems = maxItems;
         }
 

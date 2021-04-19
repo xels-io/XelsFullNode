@@ -25,8 +25,9 @@ namespace Xels.Features.FederatedPeg.Controllers
     /// API used to communicate across to the counter chain.
     /// </summary>
     [ApiVersion("1")]
+    [ApiController]
     [Route("api/[controller]")]
-    public class FederationGatewayController : Controller
+    public class FederationGatewayController : ControllerBase
     {
         /// <summary>Instance logger.</summary>
         private readonly ILogger logger;
@@ -73,7 +74,7 @@ namespace Xels.Features.FederatedPeg.Controllers
             try
             {
                 SerializableResult<List<MaturedBlockDepositsModel>> depositsResult = this.maturedBlocksProvider.GetMaturedDeposits(blockRequest.BlockHeight, blockRequest.MaxBlocksToSend);
-                return this.Json(depositsResult);
+                return this.Ok(depositsResult);
             }
             catch (Exception e)
             {
@@ -108,7 +109,7 @@ namespace Xels.Features.FederatedPeg.Controllers
                     MinimumDepositConfirmations = this.federatedPegSettings.MinimumDepositConfirmations
                 };
 
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {

@@ -22,12 +22,15 @@ namespace Xels.Bitcoin.Features.RPC
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IObjectModelValidator, NoObjectModelValidator>();
+            services.AddControllers()
+                    .AddNewtonsoftJson();
             services.AddMvcCore(o =>
             {
                 o.ValueProviderFactories.Clear();
                 o.ValueProviderFactories.Add(new RPCParametersValueProvider());
             })
-                .AddJsonFormatters()
+                //.AddJsonFormatters()
+                .AddNewtonsoftJson()
                 .AddFormatterMappings();
 
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, RPCJsonMvcOptionsSetup>());
@@ -60,15 +63,15 @@ namespace Xels.Bitcoin.Features.RPC
             }
             authorizedAccess.AllowIp.AddRange(rpcSettings.AllowIp);
 
-            MvcJsonOptions options = GetMVCOptions(serviceProvider);
+            MvcNewtonsoftJsonOptions options = GetMVCOptions(serviceProvider);
             Serializer.RegisterFrontConverters(options.SerializerSettings, fullNode.Network);
             app.UseMiddleware(typeof(RPCMiddleware), authorizedAccess);
             app.UseRPC();
         }
 
-        private static MvcJsonOptions GetMVCOptions(IServiceProvider serviceProvider)
+        private static MvcNewtonsoftJsonOptions GetMVCOptions(IServiceProvider serviceProvider)
         {
-            return serviceProvider.GetRequiredService<IOptions<MvcJsonOptions>>().Value;
+            return serviceProvider.GetRequiredService<IOptions<MvcNewtonsoftJsonOptions>>().Value;
         }
     }
 

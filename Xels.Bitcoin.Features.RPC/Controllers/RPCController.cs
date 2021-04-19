@@ -19,7 +19,8 @@ namespace Xels.Bitcoin.Features.RPC.Controllers
     /// </summary>
     [ApiVersion("1")]
     [Route("api/[controller]")]
-    public class RPCController : Controller
+    [ApiController]
+    public class RPCController : ControllerBase
     {
         /// <summary>Instance logger.</summary>
         private readonly ILogger logger;
@@ -140,7 +141,7 @@ namespace Xels.Bitcoin.Features.RPC.Controllers
                     throw new Exception(response.Error.Message);
 
                 // Return a Json result from the API call.
-                return this.Json(response?.Result);
+                return this.Ok(response?.Result);
             }
             catch (Exception e)
             {
@@ -189,7 +190,7 @@ namespace Xels.Bitcoin.Features.RPC.Controllers
                     listMethods.Add(new Models.RpcCommandModel { Command = method.Trim(), Description = description });
                 }
 
-                return this.Json(listMethods);
+                return this.Ok(listMethods);
             }
             catch (Exception e)
             {

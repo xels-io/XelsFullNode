@@ -21,6 +21,6 @@
     <Import Project="$(NuGetPackageRoot)tracer.fody\3.3.1\build\Tracer.Fody.props" Condition="Exists('$(NuGetPackageRoot)tracer.fody\3.3.1\build\Tracer.Fody.props')" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgStyleCop_Analyzers Condition=" '$(PkgStyleCop_Analyzers)' == '' ">C:\Users\FR\.nuget\packages\stylecop.analyzers\1.0.2</PkgStyleCop_Analyzers>
+    <PkgStyleCop_Analyzers Condition=" '$(PkgStyleCop_Analyzers)' == '' ">C:\Users\FR\.nuget\packages\stylecop.analyzers\1.1.118</PkgStyleCop_Analyzers>
   </PropertyGroup>
 </Project>

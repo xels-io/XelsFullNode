@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Xels Bitcoin FullNode</Description>
     <AssemblyTitle>Xels.Bitcoin.Networks</AssemblyTitle>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>Xels.Bitcoin.Networks</AssemblyName>
     <PackageId>Xels.Bitcoin.Networks</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -18,6 +18,10 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Authors>Xels Group Ltd.</Authors>
   </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NBitcoin\NBitcoin.csproj" />

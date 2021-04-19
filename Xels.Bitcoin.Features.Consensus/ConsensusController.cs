@@ -69,7 +69,7 @@ namespace Xels.Bitcoin.Features.Consensus
 
                 List<ThresholdStateModel> metrics = ruleEngine.NodeDeployments.BIP9.GetThresholdStateMetrics(this.ChainState.ConsensusTip.Previous, thresholdStates);
 
-                return this.Json(metrics);
+                return this.Ok(metrics);
             }
             catch (Exception e)
             {
@@ -89,7 +89,7 @@ namespace Xels.Bitcoin.Features.Consensus
         {
             try
             {
-                return this.Json(this.GetBestBlockHashRPC());
+                return this.Ok(this.GetBestBlockHashRPC());
             }
             catch (Exception e)
             {
@@ -130,7 +130,7 @@ namespace Xels.Bitcoin.Features.Consensus
         {
             try
             {
-                return this.Json(this.GetBlockHashRPC(height));
+                return this.Ok(this.GetBlockHashRPC(height));
             }
             catch (Exception e)
             {

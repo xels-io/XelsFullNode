@@ -87,7 +87,7 @@ namespace Xels.Bitcoin.Connection
                 Guard.NotEmpty(endpoint, nameof(endpoint));
                 Guard.NotEmpty(command, nameof(command));
 
-                return this.Json(this.AddNodeRPC(endpoint, command));
+                return this.Ok(this.AddNodeRPC(endpoint, command));
             }
             catch (Exception e)
             {
@@ -159,7 +159,7 @@ namespace Xels.Bitcoin.Connection
         {
             try
             {
-                return this.Json(this.GetPeerInfoRPC());
+                return this.Ok(this.GetPeerInfoRPC());
             }
             catch (Exception e)
             {

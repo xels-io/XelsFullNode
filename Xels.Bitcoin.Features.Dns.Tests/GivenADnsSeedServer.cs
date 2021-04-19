@@ -5,17 +5,22 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+
 using DNS.Protocol;
 using DNS.Protocol.ResourceRecords;
+
 using FluentAssertions;
+
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
+
 using Moq;
+
 using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
+
 using Xunit;
 
 namespace Xels.Bitcoin.Features.Dns.Tests
@@ -253,7 +258,10 @@ namespace Xels.Bitcoin.Features.Dns.Tests
 
             var logger = new Mock<ILogger>(MockBehavior.Loose);
             bool receivedSocketException = false;
-            logger.Setup(l => l.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>())).Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((level, id, state, e, f) =>
+            logger.Setup(l => l.Log(LogLevel.Error, It.IsAny<EventId>(), 
+                It.IsAny<object>(), //FormattedLogValues
+                It.IsAny<Exception>(),
+                It.IsAny<Func<object, Exception, string>>())).Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((level, id, state, e, f) =>
             {
                 // Don't reset if we found the error message we were looking for
                 if (!receivedSocketException)
@@ -315,7 +323,11 @@ namespace Xels.Bitcoin.Features.Dns.Tests
 
             var logger = new Mock<ILogger>();
             bool receivedRequest = false;
-            logger.Setup(l => l.Log(LogLevel.Debug, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>())).Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((level, id, state, e, f) =>
+            logger.Setup(l => l.Log(LogLevel.Debug, 
+                It.IsAny<EventId>(), 
+                It.IsAny<object>(), //FormattedLogValues
+                It.IsAny<Exception>(),
+                It.IsAny<Func<object, Exception, string>>())).Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((level, id, state, e, f) =>
             {
                 // Don't reset if we found the trace message we were looking for
                 if (!receivedRequest)
@@ -326,7 +338,10 @@ namespace Xels.Bitcoin.Features.Dns.Tests
             });
 
             bool receivedBadRequest = false;
-            logger.Setup(l => l.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>())).Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((level, id, state, e, f) =>
+            logger.Setup(l => l.Log(LogLevel.Warning, It.IsAny<EventId>(), 
+                It.IsAny<object>(), //FormattedLogValues
+                It.IsAny<Exception>(),
+                It.IsAny<Func<object, Exception, string>>())).Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((level, id, state, e, f) =>
             {
                 // Don't reset if we found the warning message we were looking for
                 if (!receivedBadRequest)
@@ -391,7 +406,11 @@ namespace Xels.Bitcoin.Features.Dns.Tests
 
             var logger = new Mock<ILogger>();
             bool receivedRequest = false;
-            logger.Setup(l => l.Log(LogLevel.Debug, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>())).Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((level, id, state, e, f) =>
+            logger.Setup(l => l.Log(LogLevel.Debug, It.IsAny<EventId>(), 
+                It.IsAny<object>(), //FormattedLogValues
+                                    //
+                It.IsAny<Exception>(), 
+                It.IsAny<Func<object, Exception, string>>())).Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((level, id, state, e, f) =>
             {
                 // Don't reset if we found the trace message we were looking for
                 if (!receivedRequest)
@@ -552,7 +571,11 @@ namespace Xels.Bitcoin.Features.Dns.Tests
 
             var logger = new Mock<ILogger>();
             bool startedLoop = false;
-            logger.Setup(l => l.Log(LogLevel.Information, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>())).Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((level, id, state, e, f) =>
+            logger.Setup(l => l.Log(LogLevel.Information, 
+                It.IsAny<EventId>(), 
+                It.IsAny<object>(), //FormattedLogValues
+                It.IsAny<Exception>(), 
+                It.IsAny<Func<object, Exception, string>>())).Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((level, id, state, e, f) =>
             {
                 // Don't reset if we found the trace message we were looking for
                 if (!startedLoop)
@@ -564,7 +587,7 @@ namespace Xels.Bitcoin.Features.Dns.Tests
             var loggerFactory = new Mock<ILoggerFactory>();
             loggerFactory.Setup<ILogger>(f => f.CreateLogger(It.IsAny<string>())).Returns(logger.Object);
 
-            IAsyncProvider asyncProvider = new AsyncProvider(loggerFactory.Object,new Mock<ISignals>().Object, new Mock<INodeLifetime>().Object);
+            IAsyncProvider asyncProvider = new AsyncProvider(loggerFactory.Object, new Mock<ISignals>().Object, new Mock<INodeLifetime>().Object);
 
             IDateTimeProvider dateTimeProvider = new Mock<IDateTimeProvider>().Object;
             DnsSettings dnsSettings = new DnsSettings(NodeSettings.Default(this.Network));

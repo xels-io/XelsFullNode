@@ -1,0 +1,9 @@
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\bin\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.deps.json
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\bin\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\bin\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.AssemblyInfoInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.AssemblyInfo.cs
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.csproj.CoreCompileInputs.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.csproj.Fody.CopyLocal.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.pdb

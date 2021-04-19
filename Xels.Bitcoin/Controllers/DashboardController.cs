@@ -8,7 +8,8 @@ namespace Xels.Bitcoin.Controllers
     /// </summary>
     [ApiVersion("1")]
     [Route("api/[controller]")]
-    public class DashboardController : Controller
+    [ApiController]
+    public class DashboardController : ControllerBase
     {
         private readonly IFullNode fullNode;
         private readonly IAsyncProvider asyncProvider;

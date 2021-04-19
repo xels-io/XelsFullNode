@@ -29,7 +29,7 @@ namespace Xels.SmartContracts.Core.State.AccountAbstractionLayer
 
         public ContractUnspentOutput(byte[] bytes)
         {
-            RLPCollection list = RLP.Decode(bytes);
+            RLPCollection list = (RLPCollection)RLP.Decode(bytes);
             RLPCollection innerList = (RLPCollection)list[0];
             this.Hash = new uint256(innerList[0].RLPData);
             this.Nvout = BitConverter.ToUInt32(innerList[1].RLPData, 0);
