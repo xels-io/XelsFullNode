@@ -16,3 +16,4 @@ F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.N
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.Notifications\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.Notifications.csproj.CopyComplete
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.Notifications\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.Notifications.dll
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.Notifications\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.Notifications.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.Notifications\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.Notifications.csprojAssemblyReference.cache

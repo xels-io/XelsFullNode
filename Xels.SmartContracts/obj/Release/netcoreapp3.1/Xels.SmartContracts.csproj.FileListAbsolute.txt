@@ -6,3 +6,4 @@ F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\obj
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\obj\Release\netcoreapp3.1\Xels.SmartContracts.csproj.CoreCompileInputs.cache
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\obj\Release\netcoreapp3.1\Xels.SmartContracts.dll
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\obj\Release\netcoreapp3.1\Xels.SmartContracts.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts\obj\Release\netcoreapp3.1\Xels.SmartContracts.csprojAssemblyReference.cache

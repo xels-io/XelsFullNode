@@ -9,6 +9,7 @@
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.15.1" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="5.0.5" />
+    <PackageReference Include="System.Security.Principal" Version="4.3.0" />
     <!--<FrameworkReference Include="Microsoft.AspNetCore.App" />-->
   </ItemGroup>
 

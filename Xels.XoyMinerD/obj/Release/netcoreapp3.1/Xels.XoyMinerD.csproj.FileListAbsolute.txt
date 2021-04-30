@@ -167,3 +167,8 @@ F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XoyMinerD\obj\Rele
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XoyMinerD\obj\Release\netcoreapp3.1\Xels.XoyMinerD.dll
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XoyMinerD\obj\Release\netcoreapp3.1\Xels.XoyMinerD.pdb
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XoyMinerD\obj\Release\netcoreapp3.1\Xels.XoyMinerD.genruntimeconfig.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XoyMinerD\bin\Release\netcoreapp3.1\NLog.Web.AspNetCore.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XoyMinerD\obj\Release\netcoreapp3.1\Xels.XoyMinerD.csprojAssemblyReference.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XoyMinerD\bin\Release\netcoreapp3.1\Interop.IWshRuntimeLibrary.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XoyMinerD\obj\Release\netcoreapp3.1\Interop.IWshRuntimeLibrary.dll
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XoyMinerD\obj\Release\netcoreapp3.1\Xels.XoyMinerD.csproj.ResolveComReference.cache

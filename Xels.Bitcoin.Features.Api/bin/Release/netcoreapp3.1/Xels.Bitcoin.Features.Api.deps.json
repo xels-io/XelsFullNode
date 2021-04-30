@@ -37,10 +37,11 @@
           "Microsoft.Extensions.Logging": "5.0.0",
           "Microsoft.Extensions.Logging.Console": "5.0.0",
           "Microsoft.OpenApi": "1.2.3",
-          "Swashbuckle.AspNetCore.Newtonsoft": "6.1.1",
-          "Swashbuckle.AspNetCore.Swagger": "6.1.1",
-          "Swashbuckle.AspNetCore.SwaggerGen": "6.1.1",
-          "Swashbuckle.AspNetCore.SwaggerUI": "6.1.1",
+          "NLog.Web.AspNetCore": "4.12.0",
+          "Swashbuckle.AspNetCore.Newtonsoft": "6.1.2",
+          "Swashbuckle.AspNetCore.Swagger": "6.1.2",
+          "Swashbuckle.AspNetCore.SwaggerGen": "6.1.2",
+          "Swashbuckle.AspNetCore.SwaggerUI": "6.1.2",
           "System.Reactive": "5.0.0",
           "System.Runtime.Loader": "4.3.0",
           "Tracer.Fody": "3.3.1",
@@ -1165,7 +1166,7 @@
           "System.Runtime.Loader": "4.3.0",
           "System.Runtime.Serialization.Primitives": "4.1.1",
           "System.Security.AccessControl": "4.5.0",
-          "System.Security.Principal": "4.0.1",
+          "System.Security.Principal": "4.3.0",
           "System.Threading": "4.3.0",
           "System.Threading.AccessControl": "4.0.0",
           "System.Threading.Thread": "4.3.0",
@@ -1198,6 +1199,20 @@
           "lib/netcoreapp3.0/NLog.Extensions.Logging.dll": {}
         }
       },
+      "NLog.Web.AspNetCore/4.12.0": {
+        "dependencies": {
+          "NLog.Extensions.Logging": "1.7.2"
+        },
+        "runtime": {
+          "lib/netcoreapp3.0/NLog.Web.AspNetCore.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "4.12.0.1931"
+          }
+        },
+        "compile": {
+          "lib/netcoreapp3.0/NLog.Web.AspNetCore.dll": {}
+        }
+      },
       "NStratis.HashLib/1.0.0.1": {
         "dependencies": {
           "NETStandard.Library": "1.6.1"
@@ -1212,11 +1227,11 @@
           "lib/netstandard1.3/HashLib.dll": {}
         }
       },
-      "Polly/7.2.1": {
+      "Polly/7.2.2": {
         "runtime": {
           "lib/netstandard2.0/Polly.dll": {
             "assemblyVersion": "7.0.0.0",
-            "fileVersion": "7.2.1.0"
+            "fileVersion": "7.2.2.0"
           }
         },
         "compile": {
@@ -1271,54 +1286,54 @@
       "runtime.ubuntu.14.04-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {},
       "runtime.ubuntu.16.04-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {},
       "runtime.ubuntu.16.10-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {},
-      "Swashbuckle.AspNetCore.Newtonsoft/6.1.1": {
+      "Swashbuckle.AspNetCore.Newtonsoft/6.1.2": {
         "dependencies": {
           "Microsoft.AspNetCore.Mvc.NewtonsoftJson": "3.0.0",
-          "Swashbuckle.AspNetCore.SwaggerGen": "6.1.1"
+          "Swashbuckle.AspNetCore.SwaggerGen": "6.1.2"
         },
         "runtime": {
           "lib/netcoreapp3.0/Swashbuckle.AspNetCore.Newtonsoft.dll": {
-            "assemblyVersion": "6.1.1.0",
-            "fileVersion": "6.1.1.0"
+            "assemblyVersion": "6.1.2.0",
+            "fileVersion": "6.1.2.0"
           }
         },
         "compile": {
           "lib/netcoreapp3.0/Swashbuckle.AspNetCore.Newtonsoft.dll": {}
         }
       },
-      "Swashbuckle.AspNetCore.Swagger/6.1.1": {
+      "Swashbuckle.AspNetCore.Swagger/6.1.2": {
         "dependencies": {
           "Microsoft.OpenApi": "1.2.3"
         },
         "runtime": {
           "lib/netcoreapp3.0/Swashbuckle.AspNetCore.Swagger.dll": {
-            "assemblyVersion": "6.1.1.0",
-            "fileVersion": "6.1.1.0"
+            "assemblyVersion": "6.1.2.0",
+            "fileVersion": "6.1.2.0"
           }
         },
         "compile": {
           "lib/netcoreapp3.0/Swashbuckle.AspNetCore.Swagger.dll": {}
         }
       },
-      "Swashbuckle.AspNetCore.SwaggerGen/6.1.1": {
+      "Swashbuckle.AspNetCore.SwaggerGen/6.1.2": {
         "dependencies": {
-          "Swashbuckle.AspNetCore.Swagger": "6.1.1"
+          "Swashbuckle.AspNetCore.Swagger": "6.1.2"
         },
         "runtime": {
           "lib/netcoreapp3.0/Swashbuckle.AspNetCore.SwaggerGen.dll": {
-            "assemblyVersion": "6.1.1.0",
-            "fileVersion": "6.1.1.0"
+            "assemblyVersion": "6.1.2.0",
+            "fileVersion": "6.1.2.0"
           }
         },
         "compile": {
           "lib/netcoreapp3.0/Swashbuckle.AspNetCore.SwaggerGen.dll": {}
         }
       },
-      "Swashbuckle.AspNetCore.SwaggerUI/6.1.1": {
+      "Swashbuckle.AspNetCore.SwaggerUI/6.1.2": {
         "runtime": {
           "lib/netcoreapp3.0/Swashbuckle.AspNetCore.SwaggerUI.dll": {
-            "assemblyVersion": "6.1.1.0",
-            "fileVersion": "6.1.1.0"
+            "assemblyVersion": "6.1.2.0",
+            "fileVersion": "6.1.2.0"
           }
         },
         "compile": {
@@ -2052,7 +2067,7 @@
           "System.Security.AccessControl": "4.5.0"
         }
       },
-      "System.Security.Principal/4.0.1": {
+      "System.Security.Principal/4.3.0": {
         "dependencies": {
           "System.Runtime": "4.3.1"
         }
@@ -2289,8 +2304,9 @@
           "NLog": "5.0.0-beta09",
           "NLog.Extensions.Logging": "1.7.2",
           "NStratis": "4.0.0.75",
-          "Polly": "7.2.1",
+          "Polly": "7.2.2",
           "System.Reactive": "5.0.0",
+          "System.Security.Principal": "4.3.0",
           "System.ValueTuple": "4.5.0",
           "System.Xml.XmlSerializer": "4.3.0",
           "Xels.FodyNlogAdapter": "3.0.8"
@@ -4503,6 +4519,13 @@
       "path": "nlog.extensions.logging/1.7.2",
       "hashPath": "nlog.extensions.logging.1.7.2.nupkg.sha512"
     },
+    "NLog.Web.AspNetCore/4.12.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-imBvT0hmVd1bhDpd4cNwurcPDZ9jdHwxH5C3+dzcLQ8stq/wpP/1wbpd3hTzpfrwFkVp06rMXrbdXWcmnw4/Cw==",
+      "path": "nlog.web.aspnetcore/4.12.0",
+      "hashPath": "nlog.web.aspnetcore.4.12.0.nupkg.sha512"
+    },
     "NStratis.HashLib/1.0.0.1": {
       "type": "package",
       "serviceable": true,
@@ -4510,12 +4533,12 @@
       "path": "nstratis.hashlib/1.0.0.1",
       "hashPath": "nstratis.hashlib.1.0.0.1.nupkg.sha512"
     },
-    "Polly/7.2.1": {
+    "Polly/7.2.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Od8SnPlpQr+PuAS0YzY3jgtzaDNknlIuAaldN2VEIyTvm/wCg22C5nUkUV1BEG8rIsub5RFMoV/NEQ0tM/+7Uw==",
-      "path": "polly/7.2.1",
-      "hashPath": "polly.7.2.1.nupkg.sha512"
+      "sha512": "sha512-E6CeKyS513j7taKAq4q2MESDBvzuzWnR1rQ2Y2zqJvpiVtKMm699Aubb20MUPBDmb0Ov8PmcLHTCVFdCjoy2kA==",
+      "path": "polly/7.2.2",
+      "hashPath": "polly.7.2.2.nupkg.sha512"
     },
     "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
       "type": "package",
@@ -4629,33 +4652,33 @@
       "path": "runtime.ubuntu.16.10-x64.runtime.native.system.security.cryptography.openssl/4.3.0",
       "hashPath": "runtime.ubuntu.16.10-x64.runtime.native.system.security.cryptography.openssl.4.3.0.nupkg.sha512"
     },
-    "Swashbuckle.AspNetCore.Newtonsoft/6.1.1": {
+    "Swashbuckle.AspNetCore.Newtonsoft/6.1.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-9pgAKFDZP0EAnKjIPAO2JsfKLc9iAbMSckLtcYVKkkJxLYJY0GgzlSksi0EOyPRE+5pfJ8TlTermt8llNXRMMQ==",
-      "path": "swashbuckle.aspnetcore.newtonsoft/6.1.1",
-      "hashPath": "swashbuckle.aspnetcore.newtonsoft.6.1.1.nupkg.sha512"
+      "sha512": "sha512-XDIgLzCSqwH9XY/yj/boB0P3Qj33Vqn5djjdfGRbWYYuUbfuZGJ23Gl0D80s1U1FCoFrbQhhF7mJ92nwjDkklg==",
+      "path": "swashbuckle.aspnetcore.newtonsoft/6.1.2",
+      "hashPath": "swashbuckle.aspnetcore.newtonsoft.6.1.2.nupkg.sha512"
     },
-    "Swashbuckle.AspNetCore.Swagger/6.1.1": {
+    "Swashbuckle.AspNetCore.Swagger/6.1.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-JbLsVspdKevDJ6NZT+uP06Zfr1iCDbFjmIvUyoG88GgFkM/Daaq2EGUAG7INZl+FEcoVxPG9A+yWRik75ATGbw==",
-      "path": "swashbuckle.aspnetcore.swagger/6.1.1",
-      "hashPath": "swashbuckle.aspnetcore.swagger.6.1.1.nupkg.sha512"
+      "sha512": "sha512-0x6aI9QAqBqO6ykwT/S41EYoF6JLNA4Y7AZqu3qVpQeqJazpJBCfvvY0hvedbbL8mwBDZWbup8229UIoZO/9UA==",
+      "path": "swashbuckle.aspnetcore.swagger/6.1.2",
+      "hashPath": "swashbuckle.aspnetcore.swagger.6.1.2.nupkg.sha512"
     },
-    "Swashbuckle.AspNetCore.SwaggerGen/6.1.1": {
+    "Swashbuckle.AspNetCore.SwaggerGen/6.1.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-kfoGF5scayoUVXo9wIN8OgvdYJr97V/yPdSrLNXcvbthOCU1vXTv8HJQMJ3OGyG9CpIAp2wfHI2gCmvbVKkMCQ==",
-      "path": "swashbuckle.aspnetcore.swaggergen/6.1.1",
-      "hashPath": "swashbuckle.aspnetcore.swaggergen.6.1.1.nupkg.sha512"
+      "sha512": "sha512-uyKbxMkC4Fol/TVn9VYa2pQs9Mp11JaZyFYY7Q5GGG4yqjjSzM4mpWKmhxotl++myK+0uBVtY0unmEjdMItVCA==",
+      "path": "swashbuckle.aspnetcore.swaggergen/6.1.2",
+      "hashPath": "swashbuckle.aspnetcore.swaggergen.6.1.2.nupkg.sha512"
     },
-    "Swashbuckle.AspNetCore.SwaggerUI/6.1.1": {
+    "Swashbuckle.AspNetCore.SwaggerUI/6.1.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-NlR3zDm0kGWNClJWPzWrGBoQn4SY6Fgpz9D5p30bKsUYzFfM7L5vVo88BktpUyCJb6zHtCOsazN+vzQn7NVjUg==",
-      "path": "swashbuckle.aspnetcore.swaggerui/6.1.1",
-      "hashPath": "swashbuckle.aspnetcore.swaggerui.6.1.1.nupkg.sha512"
+      "sha512": "sha512-McaeMF4smYn6qK4ijJ2qvlKVt9gmXgYA3bAk7f9MH953o5C+U6vwKNPl8Vi/JdxZwWTAWm4Ex+BV+K/v1D0oeA==",
+      "path": "swashbuckle.aspnetcore.swaggerui/6.1.2",
+      "hashPath": "swashbuckle.aspnetcore.swaggerui.6.1.2.nupkg.sha512"
     },
     "System.AppContext/4.3.0": {
       "type": "package",
@@ -5175,12 +5198,12 @@
       "path": "system.security.permissions/4.5.0",
       "hashPath": "system.security.permissions.4.5.0.nupkg.sha512"
     },
-    "System.Security.Principal/4.0.1": {
+    "System.Security.Principal/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-On+SKhXY5rzxh/S8wlH1Rm0ogBlu7zyHNxeNBiXauNrhHRXAe9EuX8Yl5IOzLPGU5Z4kLWHMvORDOCG8iu9hww==",
-      "path": "system.security.principal/4.0.1",
-      "hashPath": "system.security.principal.4.0.1.nupkg.sha512"
+      "sha512": "sha512-I1tkfQlAoMM2URscUtpcRo/hX0jinXx6a/KUtEQoz3owaYwl3qwsO8cbzYVVnjxrzxjHo3nJC+62uolgeGIS9A==",
+      "path": "system.security.principal/4.3.0",
+      "hashPath": "system.security.principal.4.3.0.nupkg.sha512"
     },
     "System.Security.Principal.Windows/4.5.0": {
       "type": "package",

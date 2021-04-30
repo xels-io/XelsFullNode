@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
+  <asmv1:assemblyIdentity name="Xels.XelsD.exe" version="1.0.0.14" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
+  <application />
+  <entryPoint>
+    <assemblyIdentity name="Launcher" version="5.0.0.0" language="neutral" processorArchitecture="msil" />
+    <commandLine file="Launcher.exe" parameters="" />
+  </entryPoint>
+  <trustInfo>
+    <security>
+      <applicationRequestMinimum>
+        <PermissionSet Unrestricted="true" ID="Custom" SameSite="site" />
+        <defaultAssemblyRequest permissionSetReference="Custom" />
+      </applicationRequestMinimum>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <!--
+          UAC Manifest Options
+          If you want to change the Windows User Account Control level replace the
+          requestedExecutionLevel node with one of the following.
+
+        <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
+        <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
+        <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
+
+         If you want to utilize File and Registry Virtualization for backward
+         compatibility then delete the requestedExecutionLevel node.
+    -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+  <dependency>
+    <dependentOS>
+      <osVersionInfo>
+        <os majorVersion="4" minorVersion="10" buildNumber="0" servicePackMajor="0" />
+      </osVersionInfo>
+    </dependentOS>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
+      <assemblyIdentity name="Microsoft.Windows.CommonLanguageRuntime" version="4.0.30319.0" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Launcher.exe" size="14336">
+      <assemblyIdentity name="Launcher" version="5.0.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>DvZcjHuPeDdwrQ73+sZGmEVe8v8s4rQ288NiAGI+e1Y=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <file name="FodyNlogAdapter.pdb" size="18272">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>otromPUc9XWdsRADKTngIHcoZm8yOyuIYTy+PuCt4RY=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="NBitcoin.pdb" size="346528">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>lUGVkjdg197N0w/zoyEQIoWGh2OqbqsqmDl05xBNbrc=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Features.Api.pdb" size="26404">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>yDgEEGGTnkaOLb4BzPaQlfI7kUfSwFKUC1qW6C4d+n4=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Features.BlockExplorer.pdb" size="23984">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>sZgYXSMiqMpPDXkyVtuaivuspputdnvHGAn99tBghoc=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Features.BlockStore.pdb" size="48280">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>vskG8JHeAH1kZMigch785h7bjQ+F61b7hmnsk4MYDyU=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Features.ColdStaking.pdb" size="31060">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>es8Cwk+DOAdxy5+bStijxALsDLX1PwVyvIIq8g4JBA0=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Features.Consensus.pdb" size="61380">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>EhUv+/0STuiNUUGHJrQv/jTVSDBtqmZULaryrqSXDRU=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Features.Dns.pdb" size="31060">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>k46RpE876vFHKBPryHD3/14PVzm09LjHMFHJja3CD8M=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Features.MemoryPool.pdb" size="62628">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>hZx6P1AYINjvzr6QFb89YQdjljnffdXOOi9g8EvgCWs=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Features.Miner.pdb" size="41928">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>4M4L8/6Cq6XzNNYvLEhxr/gKaSQITyGYOs/LdvEUvtM=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Features.Notifications.pdb" size="24044">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>ifFeA8G2PldTKiG4Uu+NG5WU9upMSNCIYQAPFF50rAE=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Features.RPC.pdb" size="73444">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>UcODnzsa+hd9kCUZL4fgxOHoneMbUhWGEFQ7m0IFFII=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Features.SignalR.pdb" size="28340">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>ZrzL5/0vd2lPw+QJwWw7pHTCpDPSgrOxHZFn1i5mPgc=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Features.Wallet.pdb" size="105056">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>WrSYttBuZHZE8fatWjMXbhup8LLNWW2ar8Dn8VydHu0=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.Networks.pdb" size="24740">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>WQ0ZYy+5nCJX5qb/KwZLdt0RWTsa6KGmXpWlRG58W3o=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Bitcoin.pdb" size="224012">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>IAa51+TGkmiuvsN1K55xOjEkGkTafx1oTRqfLhxLICg=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Features.Diagnostic.pdb" size="25124">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>d/w71KAxU52A9Ka/cJo+6egQ06Ris4Az5rng8/5471E=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.Features.SQLiteWalletRepository.pdb" size="52680">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>87Be3JptmCw7nQqDdp0yAAhPaWhSPbrClcKA01POBBY=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Xels.XelsD.exe" size="19028662">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>VrRJ9gVm/k/eCl1oZr0uZUjOxx/dlnUcrSnCitv8veM=</dsig:DigestValue>
+    </hash>
+  </file>
+</asmv1:assembly>

@@ -30,3 +30,4 @@ F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.C
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.ColdStaking\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.ColdStaking.csproj.CopyComplete
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.ColdStaking\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.ColdStaking.dll
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.ColdStaking\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.ColdStaking.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.ColdStaking\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.ColdStaking.csprojAssemblyReference.cache

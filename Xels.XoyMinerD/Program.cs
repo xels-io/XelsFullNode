@@ -1,9 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
+using IWshRuntimeLibrary;
+
 using NBitcoin;
 using NBitcoin.Protocol;
+
 using Xels.Bitcoin;
 using Xels.Bitcoin.Builder;
 using Xels.Bitcoin.Configuration;
@@ -42,6 +48,9 @@ namespace Xels.XoyMinerD
         public static void Main(string[] args)
         {
             MainAsync(args).Wait();
+
+            CreateShortCut();
+
         }
 
         public static async Task MainAsync(string[] args)
@@ -125,6 +134,30 @@ namespace Xels.XoyMinerD
                 .Build();
 
             return node;
+        }
+
+
+        public static void CreateShortCut()
+        {
+
+            string[] argumentList = { "-mainchain", "-sidechain" };
+
+            string distinationPath = Directory.GetCurrentDirectory();
+            Console.WriteLine(distinationPath);
+            Console.ReadLine();
+            foreach (var arg in argumentList)
+            {
+                object shDesktop = (object)"Desktop";
+                WshShell shell = new WshShell();
+                string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-miner-d" +arg + ".lnk";
+                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
+
+                shortcut.Arguments = arg;
+                shortcut.TargetPath = distinationPath + @"\Xels.XoyMinerD.exe";
+                shortcut.Save();
+
+                
+            }
         }
     }
 }

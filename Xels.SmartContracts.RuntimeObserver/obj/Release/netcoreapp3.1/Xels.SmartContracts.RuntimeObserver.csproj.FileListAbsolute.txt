@@ -7,3 +7,4 @@ F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Run
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.csproj.Fody.CopyLocal.cache
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.dll
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.RuntimeObserver\obj\Release\netcoreapp3.1\Xels.SmartContracts.RuntimeObserver.csprojAssemblyReference.cache

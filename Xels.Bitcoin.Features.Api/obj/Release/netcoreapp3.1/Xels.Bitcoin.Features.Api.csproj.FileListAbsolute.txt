@@ -22,3 +22,4 @@ F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.A
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.Api.csproj.CopyComplete
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.Api.dll
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.Api.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.Api\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.Api.csprojAssemblyReference.cache

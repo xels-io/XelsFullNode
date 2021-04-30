@@ -44,3 +44,4 @@ F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Net
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Networks\obj\Release\netcoreapp3.1\Xels.SmartContracts.Networks.csproj.CopyComplete
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Networks\obj\Release\netcoreapp3.1\Xels.SmartContracts.Networks.dll
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Networks\obj\Release\netcoreapp3.1\Xels.SmartContracts.Networks.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.SmartContracts.Networks\obj\Release\netcoreapp3.1\Xels.SmartContracts.Networks.csprojAssemblyReference.cache

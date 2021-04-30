@@ -409,6 +409,10 @@
               "target": "Package",
               "version": "[5.0.1, )"
             },
+            "System.Security.Principal": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
             "Tracer.Fody": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
@@ -609,6 +613,10 @@
             "Microsoft.Extensions.Logging.Filter": {
               "target": "Package",
               "version": "[1.1.2, )"
+            },
+            "System.Security.Principal": {
+              "target": "Package",
+              "version": "[4.3.0, )"
             },
             "Tracer.Fody": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -1009,7 +1017,7 @@
             },
             "Polly": {
               "target": "Package",
-              "version": "[7.2.1, )"
+              "version": "[7.2.2, )"
             },
             "StyleCop.Analyzers": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -1020,6 +1028,10 @@
             "System.Reactive": {
               "target": "Package",
               "version": "[5.0.0, )"
+            },
+            "System.Security.Principal": {
+              "target": "Package",
+              "version": "[4.3.0, )"
             },
             "System.ValueTuple": {
               "target": "Package",
@@ -1132,6 +1144,10 @@
             "System.Reactive": {
               "target": "Package",
               "version": "[5.0.0, )"
+            },
+            "System.Security.Principal": {
+              "target": "Package",
+              "version": "[4.3.0, )"
             },
             "System.Xml.XmlSerializer": {
               "target": "Package",

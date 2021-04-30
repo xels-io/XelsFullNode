@@ -123,3 +123,4 @@ F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XelsD\obj\Release\
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XelsD\obj\Release\netcoreapp3.1\Xels.XelsD.dll
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XelsD\obj\Release\netcoreapp3.1\Xels.XelsD.pdb
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XelsD\obj\Release\netcoreapp3.1\Xels.XelsD.genruntimeconfig.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.XelsD\bin\Release\netcoreapp3.1\NLog.Web.AspNetCore.dll

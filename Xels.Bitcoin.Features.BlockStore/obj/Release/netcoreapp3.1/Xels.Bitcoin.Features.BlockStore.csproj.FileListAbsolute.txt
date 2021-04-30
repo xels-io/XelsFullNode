@@ -16,3 +16,4 @@ F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.B
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.BlockStore\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.BlockStore.csproj.CopyComplete
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.BlockStore\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.BlockStore.dll
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.BlockStore\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.BlockStore.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Features.BlockStore\obj\Release\netcoreapp3.1\Xels.Bitcoin.Features.BlockStore.csprojAssemblyReference.cache

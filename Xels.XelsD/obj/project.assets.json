@@ -1384,7 +1384,7 @@
           "lib/netstandard1.3/HashLib.dll": {}
         }
       },
-      "Polly/7.2.1": {
+      "Polly/7.2.2": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/Polly.dll": {}
@@ -3449,8 +3449,9 @@
           "NLog": "5.0.0-beta09",
           "NLog.Extensions.Logging": "1.7.2",
           "NStratis": "4.0.0.75",
-          "Polly": "7.2.1",
+          "Polly": "7.2.2",
           "System.Reactive": "5.0.0",
+          "System.Security.Principal": "4.3.0",
           "System.ValueTuple": "4.5.0",
           "System.Xml.XmlSerializer": "4.3.0",
           "Xels.FodyNlogAdapter": "3.0.8"
@@ -3500,6 +3501,7 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection": "5.0.1",
           "NStratis": "4.0.0.75",
+          "System.Security.Principal": "4.3.0",
           "Xels.Bitcoin": "3.0.8",
           "Xels.Bitcoin.Features.BlockStore": "3.0.8",
           "Xels.Bitcoin.Features.RPC": "3.0.8"
@@ -3562,6 +3564,7 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection": "5.0.1",
           "NStratis": "4.0.0.75",
+          "System.Security.Principal": "4.3.0",
           "Xels.Bitcoin": "3.0.8"
         },
         "compile": {
@@ -3580,6 +3583,7 @@
         "dependencies": {
           "DNS": "2.1.0",
           "Newtonsoft.Json": "12.0.3",
+          "System.Security.Principal": "4.3.0",
           "Xels.Bitcoin": "3.0.8"
         },
         "compile": {
@@ -3622,6 +3626,7 @@
           "Microsoft.AspNetCore.Mvc.Core": "2.2.5",
           "Microsoft.Extensions.DependencyInjection": "5.0.1",
           "NStratis": "4.0.0.75",
+          "System.Security.Principal": "4.3.0",
           "Xels.Bitcoin": "3.0.8",
           "Xels.Bitcoin.Features.MemoryPool": "3.0.8",
           "Xels.Bitcoin.Features.RPC": "3.0.8",
@@ -3648,6 +3653,7 @@
           "Microsoft.Extensions.Logging.Debug": "5.0.0",
           "Microsoft.Extensions.Logging.Filter": "1.1.2",
           "NStratis": "4.0.0.75",
+          "System.Security.Principal": "4.3.0",
           "Xels.Bitcoin": "3.0.8"
         },
         "compile": {
@@ -3694,6 +3700,7 @@
           "CSharpFunctionalExtensions": "2.15.1",
           "Microsoft.AspNetCore.SignalR": "1.1.0",
           "Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson": "5.0.5",
+          "System.Security.Principal": "4.3.0",
           "Xels.Bitcoin": "3.0.8",
           "Xels.Bitcoin.Features.Miner": "3.0.8",
           "Xels.Bitcoin.Features.Wallet": "3.0.8"
@@ -3775,6 +3782,7 @@
           "Microsoft.Extensions.Logging.Filter": "1.1.2",
           "NStratis": "4.0.0.75",
           "System.Reactive": "5.0.0",
+          "System.Security.Principal": "4.3.0",
           "System.Xml.XmlSerializer": "4.3.0",
           "Xels.Bitcoin": "3.0.8",
           "Xels.Bitcoin.Features.Wallet": "3.0.8",
@@ -5470,10 +5478,10 @@
         "nstratis.hashlib.nuspec"
       ]
     },
-    "Polly/7.2.1": {
-      "sha512": "Od8SnPlpQr+PuAS0YzY3jgtzaDNknlIuAaldN2VEIyTvm/wCg22C5nUkUV1BEG8rIsub5RFMoV/NEQ0tM/+7Uw==",
+    "Polly/7.2.2": {
+      "sha512": "E6CeKyS513j7taKAq4q2MESDBvzuzWnR1rQ2Y2zqJvpiVtKMm699Aubb20MUPBDmb0Ov8PmcLHTCVFdCjoy2kA==",
       "type": "package",
-      "path": "polly/7.2.1",
+      "path": "polly/7.2.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -5489,7 +5497,7 @@
         "lib/netstandard2.0/Polly.dll",
         "lib/netstandard2.0/Polly.pdb",
         "lib/netstandard2.0/Polly.xml",
-        "polly.7.2.1.nupkg.sha512",
+        "polly.7.2.2.nupkg.sha512",
         "polly.nuspec"
       ]
     },

@@ -19,3 +19,4 @@ F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\o
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netcoreapp3.1\Xels.Bitcoin.Networks.csproj.CopyComplete
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netcoreapp3.1\Xels.Bitcoin.Networks.dll
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netcoreapp3.1\Xels.Bitcoin.Networks.pdb
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\Xels.Bitcoin.Networks\obj\Release\netcoreapp3.1\Xels.Bitcoin.Networks.csprojAssemblyReference.cache
