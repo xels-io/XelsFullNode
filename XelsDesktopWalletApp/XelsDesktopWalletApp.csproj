@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Commands\**" />
+    <Compile Remove="ViewModels\**" />
+    <EmbeddedResource Remove="Commands\**" />
+    <EmbeddedResource Remove="ViewModels\**" />
+    <None Remove="Commands\**" />
+    <None Remove="ViewModels\**" />
+    <Page Remove="Commands\**" />
+    <Page Remove="ViewModels\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\Images\home-xels-logo-01.png" />
+    <None Remove="Views\home-xels-logo-01.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="QRCoder" Version="1.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Images\home-xels-logo-01.png" />
+  </ItemGroup>
+
+</Project>

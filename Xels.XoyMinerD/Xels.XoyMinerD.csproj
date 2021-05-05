@@ -3,6 +3,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageIcon>icon.ico</PackageIcon>
+    <Copyright>xels.io</Copyright>
+    <SignAssembly>true</SignAssembly>
     <!--<RuntimeFrameworkVersion>3.1.13</RuntimeFrameworkVersion>-->
   </PropertyGroup>
 
@@ -29,6 +34,13 @@
     <ProjectReference Include="..\Xels.Features.Collateral\Xels.Features.Collateral.csproj" />
     <ProjectReference Include="..\Xels.Features.SQLiteWalletRepository\Xels.Features.SQLiteWalletRepository.csproj" />
     <ProjectReference Include="..\Xels.Sidechains.Networks\Xels.Sidechains.Networks.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="..\icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

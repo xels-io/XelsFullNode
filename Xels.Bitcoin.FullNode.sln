@@ -182,6 +182,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xels.SmartContracts.Standar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xels.Bitcoin.Features.BlockExplorer", "Xels.Bitcoin.Features.BlockExplorer\Xels.Bitcoin.Features.BlockExplorer.csproj", "{41FA41CD-24CD-4DE8-B5F8-CAC5F754D127}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XellsFrontEnd", "XellsFrontEnd\XellsFrontEnd.csproj", "{B2DB0993-3020-460E-9143-2C81F4597C30}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XelsDesktopWalletApp", "XelsDesktopWalletApp\XelsDesktopWalletApp.csproj", "{7BA48567-1712-4FA6-A232-CA5B09790F95}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -774,6 +778,22 @@ Global
 		{41FA41CD-24CD-4DE8-B5F8-CAC5F754D127}.Release|Any CPU.Build.0 = Release|Any CPU
 		{41FA41CD-24CD-4DE8-B5F8-CAC5F754D127}.Release|x64.ActiveCfg = Release|Any CPU
 		{41FA41CD-24CD-4DE8-B5F8-CAC5F754D127}.Release|x64.Build.0 = Release|Any CPU
+		{B2DB0993-3020-460E-9143-2C81F4597C30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2DB0993-3020-460E-9143-2C81F4597C30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2DB0993-3020-460E-9143-2C81F4597C30}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B2DB0993-3020-460E-9143-2C81F4597C30}.Debug|x64.Build.0 = Debug|Any CPU
+		{B2DB0993-3020-460E-9143-2C81F4597C30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2DB0993-3020-460E-9143-2C81F4597C30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2DB0993-3020-460E-9143-2C81F4597C30}.Release|x64.ActiveCfg = Release|Any CPU
+		{B2DB0993-3020-460E-9143-2C81F4597C30}.Release|x64.Build.0 = Release|Any CPU
+		{7BA48567-1712-4FA6-A232-CA5B09790F95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BA48567-1712-4FA6-A232-CA5B09790F95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BA48567-1712-4FA6-A232-CA5B09790F95}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7BA48567-1712-4FA6-A232-CA5B09790F95}.Debug|x64.Build.0 = Debug|Any CPU
+		{7BA48567-1712-4FA6-A232-CA5B09790F95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BA48567-1712-4FA6-A232-CA5B09790F95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BA48567-1712-4FA6-A232-CA5B09790F95}.Release|x64.ActiveCfg = Release|Any CPU
+		{7BA48567-1712-4FA6-A232-CA5B09790F95}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

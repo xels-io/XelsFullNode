@@ -1,21 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xrml="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <assemblyIdentity name="Xels.XoyMinerD.application" version="1.0.0.5" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" xmlns="urn:schemas-microsoft-com:asm.v1" />
-  <description asmv2:publisher="Xels.XoyMinerD" asmv2:product="Xels.XoyMinerD" xmlns="urn:schemas-microsoft-com:asm.v1" />
-  <deployment install="true" mapFileExtensions="true" co.v1:createDesktopShortcut="true" />
+  <assemblyIdentity name="Xels.XoyMinerD.application" version="1.0.0.13" publicKeyToken="8b5a09599ba6feab" language="neutral" processorArchitecture="msil" xmlns="urn:schemas-microsoft-com:asm.v1" />
+  <description asmv2:publisher="xels" co.v1:suiteName="xels" asmv2:product="xels coin" asmv2:supportUrl="http://www.xels.io/" xmlns="urn:schemas-microsoft-com:asm.v1" />
+  <deployment install="true" co.v1:createDesktopShortcut="true">
+    <subscription>
+      <update>
+        <beforeApplicationStartup />
+      </update>
+    </subscription>
+    <deploymentProvider codebase="file://52.68.219.147/Users/Public/Documents/fullnode-publish/Xels.XoyMinerD.application" />
+  </deployment>
   <compatibleFrameworks xmlns="urn:schemas-microsoft-com:clickonce.v2">
     <framework targetVersion="4.5" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="Application Files\Xels.XoyMinerD_1_0_0_5\Xels.XoyMinerD.dll.manifest" size="13287">
-      <assemblyIdentity name="Xels.XoyMinerD.exe" version="1.0.0.5" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
+    <dependentAssembly dependencyType="install" codebase="Application Files\Xels.XoyMinerD_1_0_0_13\Xels.XoyMinerD.dll.manifest" size="17223">
+      <assemblyIdentity name="Xels.XoyMinerD.exe" version="1.0.0.13" publicKeyToken="8b5a09599ba6feab" language="neutral" processorArchitecture="msil" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>pV/dqK3mj3r0SHByGcylRDwQDyMTiIRekiuWqh4bgvw=</dsig:DigestValue>
+        <dsig:DigestValue>1D7rSbnref3/TQQBZUL8Oi6UqcoRgxJJFErNh5xrROo=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
-</asmv1:assembly>
+<publisherIdentity name="CN=DESKTOP-BH3D1R8\FR" issuerKeyHash="a9c8788b40550a6fdfd5b6d7c7343f940a92fd54" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>t0CqfVJq0E/gHMdGY3OqBajLq6M3DwulTMm+dWgFdNA=</DigestValue></Reference></SignedInfo><SignatureValue>biKbq0WO43rxcCI2mJPKUHYL5R3hIfJ9I3kPe0J2WmAOjxTBIkQWqzuM3rBUEZVH3X+E+lzdAZLKeNm3DzrTe1xP2DdQUVNk2xZBAg2OrPAo3Vwwfr6q8yKdUMVXu+d98E1QJ7x/bfMOuO5hW2Y7bAS8kBzY9wjM7ejt00y3Ps0=</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>zH+6e7Igwo39Qkc11drqxXEHZfPzySU7k/rYlpvxrqbiF9yRRz91jUJZkxcv0kd2hzSb9cK46AdqgOwJH0UtaQKsStRzWFQ1BkwptW3vuukrTaBGVVGKyqxT5/RXJk+0EX36/CyR4AL44AcOk7hVBrYBMljTO1BwRihzPgTaLuE=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="d074056875bec94ca50b0f37a3abcba805aa736346c71ce04fd06a527daa40b7" Description="" Url=""><as:assemblyIdentity name="Xels.XoyMinerD.application" version="1.0.0.13" publicKeyToken="8b5a09599ba6feab" language="neutral" processorArchitecture="msil" xmlns="urn:schemas-microsoft-com:asm.v1" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>CN=DESKTOP-BH3D1R8\FR</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>+7hXPj2xXpfLTMnTtPVp0/9CHicMaYwPnQCG++OWs/0=</DigestValue></Reference></SignedInfo><SignatureValue>O6RI4icNVTtF9ojVtilD165GB3CEMfSVZzxLmSaOcxBJpK0rz5k7Soi5WYMVAN3YcEGxcK7ywsgq7rJzEsiRRB8C0T1j1ZtTifsZdmrTzKvyCmCZWQW1+diRPDiPyh2aPggb9Kt98cAYK3pUtMMck4rq7s933xfed1OCxkr+C9Y=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>zH+6e7Igwo39Qkc11drqxXEHZfPzySU7k/rYlpvxrqbiF9yRRz91jUJZkxcv0kd2hzSb9cK46AdqgOwJH0UtaQKsStRzWFQ1BkwptW3vuukrTaBGVVGKyqxT5/RXJk+0EX36/CyR4AL44AcOk7hVBrYBMljTO1BwRihzPgTaLuE=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIB4TCCAUqgAwIBAgIQGZn1IyVX5rZAl37ASU3JJzANBgkqhkiG9w0BAQsFADAvMS0wKwYDVQQDHiQARABFAFMASwBUAE8AUAAtAEIASAAzAEQAMQBSADgAXABGAFIwHhcNMjEwNTAzMDYxNzMxWhcNMjIwNTAzMTIxNzMxWjAvMS0wKwYDVQQDHiQARABFAFMASwBUAE8AUAAtAEIASAAzAEQAMQBSADgAXABGAFIwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMx/unuyIMKN/UJHNdXa6sVxB2Xz88klO5P62Jab8a6m4hfckUc/dY1CWZMXL9JHdoc0m/XCuOgHaoDsCR9FLWkCrErUc1hUNQZMKbVt77rpK02gRlVRisqsU+f0VyZPtBF9+vwskeAC+OAHDpO4VQa2ATJY0ztQcEYocz4E2i7hAgMBAAEwDQYJKoZIhvcNAQELBQADgYEAe3oWtEUgm9SdG1EW5zSNNRJMEnSqb6qOcWgFMrA64PdgereW0IiyOBA6cnEwOJ6jlVb/WUluMBr8LMi8tXmJ8ZftA+qVmzzgujlA2V5Mw6g43FfirrBLML2hlYpRgQZKBriSMMUdEBtbBfGMoADtvl8v3TYQ2dV3wLhsCbaRLtE=</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>

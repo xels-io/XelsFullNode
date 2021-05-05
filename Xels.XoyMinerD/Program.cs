@@ -143,8 +143,8 @@ namespace Xels.XoyMinerD
             string[] argumentList = { "-mainchain", "-sidechain" };
 
             string distinationPath = Directory.GetCurrentDirectory();
-            Console.WriteLine(distinationPath);
-            Console.ReadLine();
+            //Console.WriteLine(distinationPath);
+            //Console.ReadLine();
             foreach (var arg in argumentList)
             {
                 object shDesktop = (object)"Desktop";

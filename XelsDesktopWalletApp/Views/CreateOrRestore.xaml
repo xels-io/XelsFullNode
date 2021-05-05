@@ -1,0 +1,60 @@
+﻿<Window x:Class="XelsDesktopWalletApp.Views.CreateOrRestore"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XelsDesktopWalletApp.Views"
+        mc:Ignorable="d"
+        Title="CreateOrRestore" Height="450" Width="800">
+    <Border Padding="10">
+        <StackPanel>
+            <Grid Background="LimeGreen">
+                <Image Width="100" Source="/Images/home-xels-logo-01.png" />
+
+            </Grid>
+
+            <TextBlock Background="White" Margin="0 10 10 0" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light" TextDecorations="" Width="26" RenderTransformOrigin="0.51,0.144" Height="42">
+                <Hyperlink  NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_RequestNavigate" TextDecorations="">
+                    <Hyperlink.Style>
+                    <Style TargetType="{x:Type Hyperlink}"
+                            BasedOn="{StaticResource {x:Type Hyperlink}}">
+                        <Setter Property="Foreground" Value="Black"/>
+                    </Style>
+                    </Hyperlink.Style><Run Text="back"/>
+                </Hyperlink>
+            </TextBlock>
+
+            <TextBlock Margin="0,10,0,0" Width="104" Height="61" Text="Welcome" FontWeight="Bold"  FontSize="24" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light"/>
+            <TextBlock Width="462" Height="20" FontSize="14" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light" Opacity="0.7">
+                If you would like to create a new wallet,please click Create.If you have used the wallet</TextBlock>
+            <TextBlock Margin="0,1" Width="303" Height="20" FontSize="14" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light" Opacity="0.7">
+                before, please select Restore to recover your old wallet.</TextBlock>
+
+            <Grid Width="420" Margin="0,20,0,0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Width="200" x:Name="restoreButton" Click="restoreButton_Click" Margin="0,0,10,0" Grid.Column="0" Content="Restore" Height="28" VerticalAlignment="Center" TextBlock.FontFamily="Microsoft YaHei Light" Background="White" Foreground="#FF53E253" BorderThickness="1,1,1,1" BorderBrush="#FF53E253" FontSize="14" Padding="5,5,5,5" >
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Width="200" x:Name="createButton" Click="createButton_Click" Grid.Column="1" Content="Create" TextBlock.FontFamily="Microsoft YaHei Light" Background="#FF53E253" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" Foreground="White" FontSize="14" Padding="5,5,5,5">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+            </Grid>
+
+        </StackPanel>
+    </Border>
+</Window>

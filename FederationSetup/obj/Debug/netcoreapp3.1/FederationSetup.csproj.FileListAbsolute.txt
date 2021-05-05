@@ -142,3 +142,4 @@ F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FederationSetup\obj\Deb
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FederationSetup\obj\Debug\netcoreapp3.1\FederationSetup.dll
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FederationSetup\obj\Debug\netcoreapp3.1\FederationSetup.pdb
 F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FederationSetup\obj\Debug\netcoreapp3.1\FederationSetup.genruntimeconfig.cache
+F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FederationSetup\obj\Debug\netcoreapp3.1\FederationSetup.csprojAssemblyReference.cache

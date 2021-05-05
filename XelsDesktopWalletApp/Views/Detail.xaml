@@ -1,0 +1,104 @@
+﻿<Window x:Class="XelsDesktopWalletApp.Views.Detail"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XelsDesktopWalletApp.Views"
+        mc:Ignorable="d"
+        Title="Detail" Height="450" Width="800">
+    <Border Padding="10">
+        <StackPanel>
+            <Grid Background="LimeGreen">
+                <TextBlock  Margin="0 10 10 0" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Hyperlink NavigateUri="http://www.google.com"  >
+                Dashboard
+            </Hyperlink>
+                </TextBlock>
+                <TextBlock  Margin="80 10 10 0" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Hyperlink NavigateUri="http://www.google.com"  >
+                History
+            </Hyperlink>
+                </TextBlock>
+
+                <Image Width="100" Source="/Images/home-xels-logo-01.png" />
+
+            </Grid>
+
+            <TextBlock Margin="0,10,0,0" Width="200" Height="50" Text="AVAILABLE BALANCE"  FontSize="18" HorizontalAlignment="Center"/>
+            <TextBlock Width="400" Height="50" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+                1871551750.00000000 XELS</TextBlock>
+
+            <Grid Width="420" Margin="0,20,0,0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Width="200" x:Name="showButton" Click="Show_Click" Margin="0,0,10,0" Grid.Column="0" Content="RECEIVE" Height="20" VerticalAlignment="Top" />
+                <Popup Name="MyPopup"
+
+               Placement="Mouse">
+
+
+
+                    <Border Padding="10">
+                        <StackPanel>
+
+                            <TextBlock Background="White" Margin="0 10 10 0" HorizontalAlignment="Center">
+
+                            </TextBlock>
+                            <TextBlock Margin="0,10,0,0" Width="200" Height="30" Text="Receive" HorizontalAlignment="Center" VerticalAlignment="Center"  FontSize="20" />
+
+
+                            <Image x:Name="image" Height="100" Width="100"/>
+                            <TextBox Margin="0,10,0,0" Width="400"  x:Name="textBoxTextToQr"/>
+                            <TextBlock  Margin="0 10 10 0" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Hyperlink NavigateUri="http://www.google.com"  >
+                Show all addresses
+            </Hyperlink>
+                            </TextBlock>
+                            <Grid Width="420" Margin="0,20,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Button Width="150"  Margin="0,0,10,0" Grid.Column="0" x:Name="restoreButton" Click="restoreButton_Click"  Content="QR Code Generate" />
+                                <Button  Width="150" x:Name="closeButton" Click="closeButton_Click" Grid.Column="1" Content="ok" />
+
+                            </Grid>
+
+
+                        </StackPanel>
+                    </Border>
+
+
+
+                </Popup>
+
+                <Button Width="200" x:Name="createButton" Click="Show_Click" Grid.Column="1" Content="SEND" />
+                <Popup Name="sendPopup"
+
+               Placement="Mouse"
+
+               HorizontalOffset="-100"
+
+               VerticalOffset="-100"
+
+               AllowsTransparency="True">
+
+                    <Grid>
+
+                        <Ellipse Width="200" Height="200" Fill="Aquamarine"/>
+
+                        <Button Click="Hide_Click" Margin="80">Hide</Button>
+
+                    </Grid>
+
+                </Popup>
+            </Grid>
+
+        </StackPanel>
+    </Border>
+</Window>

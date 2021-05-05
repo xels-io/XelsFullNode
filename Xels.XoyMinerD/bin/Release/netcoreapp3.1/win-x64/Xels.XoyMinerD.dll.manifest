@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="Xels.XoyMinerD.exe" version="1.0.0.5" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
+  <asmv1:assemblyIdentity name="Xels.XoyMinerD.exe" version="1.0.0.13" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
+  <description asmv2:iconFile="icon.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
     <assemblyIdentity name="Launcher" version="5.0.0.0" language="neutral" processorArchitecture="msil" />
@@ -42,14 +43,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Launcher.exe" size="14336">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Launcher.exe" size="15312">
       <assemblyIdentity name="Launcher" version="5.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>hrPbThw8COe9y8NgOC7dwQqWpZsb64n8OTrI3OvZyA8=</dsig:DigestValue>
+        <dsig:DigestValue>5u1AcZx2ZkaztpSAdzDz07rWBK2Gb/asm/yc0ttXr/c=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -60,6 +61,15 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
       <dsig:DigestValue>otromPUc9XWdsRADKTngIHcoZm8yOyuIYTy+PuCt4RY=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="icon.ico" size="46685">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>S0JfXilmItOeDqLY70u46HgxTyQtUWLb7iAdYAP85Z0=</dsig:DigestValue>
     </hash>
   </file>
   <file name="NBitcoin.pdb" size="346528">
@@ -269,13 +279,13 @@
       <dsig:DigestValue>ObvTGro3DnlZcLPgSqMJwSN/park54N87YutsGouP9A=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Xels.XoyMinerD.exe" size="38548120">
+  <file name="Xels.XoyMinerD.exe" size="38644280">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>urFm1lQurQ53BvI5XIFJPeAMrHI+o5BlaV8nRwJydtY=</dsig:DigestValue>
+      <dsig:DigestValue>KffsS+hCxZKBeJf1UkbMGPNjEc3U6i0AVl7ItuQIg48=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>
