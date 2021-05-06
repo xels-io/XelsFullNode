@@ -1,0 +1,24 @@
+From 5d85a2ce749b1a626462928754ae2151d39e3cd2 Mon Sep 17 00:00:00 2001
+From: Towsif <towsifpatwary@gmail.com>
+Date: Thu, 6 May 2021 21:35:52 +0600
+Subject: [PATCH] branch created for WPF project
+
+---
+ .gitignore | 5 +++++
+ 1 file changed, 5 insertions(+)
+ create mode 100644 .gitignore
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 00000000..99e068fe
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,5 @@
++﻿################################################################################
++# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
++################################################################################
++
++/NBitcoin/obj/Debug/netstandard2.0/NBitcoin.csprojAssemblyReference.cache
+-- 
+2.31.1.windows.1
+
