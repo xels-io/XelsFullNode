@@ -11253,26 +11253,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\FR\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\Matiur\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Core.Tests\\Xels.SmartContracts.Core.Tests.csproj",
+      "projectUniqueName": "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.Core.Tests\\Xels.SmartContracts.Core.Tests.csproj",
       "projectName": "Xels.SmartContracts.Core.Tests",
-      "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Core.Tests\\Xels.SmartContracts.Core.Tests.csproj",
-      "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
-      "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Core.Tests\\obj\\",
+      "projectPath": "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.Core.Tests\\Xels.SmartContracts.Core.Tests.csproj",
+      "packagesPath": "C:\\Users\\Matiur\\.nuget\\packages\\",
+      "outputPath": "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.Core.Tests\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\Matiur\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -11286,17 +11279,17 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests.Common\\Xels.Bitcoin.Tests.Common.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests.Common\\Xels.Bitcoin.Tests.Common.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Tests.Common\\Xels.Bitcoin.Tests.Common.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Tests.Common\\Xels.Bitcoin.Tests.Common.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Core\\Xels.SmartContracts.Core.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Core\\Xels.SmartContracts.Core.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.Core\\Xels.SmartContracts.Core.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.Core\\Xels.SmartContracts.Core.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Networks\\Xels.SmartContracts.Networks.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Networks\\Xels.SmartContracts.Networks.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.Networks\\Xels.SmartContracts.Networks.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.Networks\\Xels.SmartContracts.Networks.csproj"
             }
           }
         }
@@ -11344,7 +11337,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -9998,26 +9998,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\FR\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\Matiur\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "3.0.8",
     "restore": {
-      "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.CLR\\Xels.SmartContracts.CLR.csproj",
+      "projectUniqueName": "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.CLR\\Xels.SmartContracts.CLR.csproj",
       "projectName": "Xels.SmartContracts.CLR",
-      "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.CLR\\Xels.SmartContracts.CLR.csproj",
-      "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
-      "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.CLR\\obj\\",
+      "projectPath": "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.CLR\\Xels.SmartContracts.CLR.csproj",
+      "packagesPath": "C:\\Users\\Matiur\\.nuget\\packages\\",
+      "outputPath": "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.CLR\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\Matiur\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -10031,11 +10024,11 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Core\\Xels.SmartContracts.Core.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Core\\Xels.SmartContracts.Core.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.Core\\Xels.SmartContracts.Core.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.Core\\Xels.SmartContracts.Core.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Standards\\Xels.SmartContracts.Standards.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.Standards\\Xels.SmartContracts.Standards.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.Standards\\Xels.SmartContracts.Standards.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.Standards\\Xels.SmartContracts.Standards.csproj"
             }
           }
         }
@@ -10083,7 +10076,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

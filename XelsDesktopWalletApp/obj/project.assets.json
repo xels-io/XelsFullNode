@@ -211,26 +211,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\FR\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\Matiur\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\XelsDesktopWalletApp\\XelsDesktopWalletApp.csproj",
+      "projectUniqueName": "D:\\Towsif\\Projects\\git\\XelsDesktopWalletApp\\XelsDesktopWalletApp.csproj",
       "projectName": "XelsDesktopWalletApp",
-      "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\XelsDesktopWalletApp\\XelsDesktopWalletApp.csproj",
-      "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
-      "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\XelsDesktopWalletApp\\obj\\",
+      "projectPath": "D:\\Towsif\\Projects\\git\\XelsDesktopWalletApp\\XelsDesktopWalletApp.csproj",
+      "packagesPath": "C:\\Users\\Matiur\\.nuget\\packages\\",
+      "outputPath": "D:\\Towsif\\Projects\\git\\XelsDesktopWalletApp\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\Matiur\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -283,7 +276,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

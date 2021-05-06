@@ -1,25 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\FodyNlogAdapter\\FodyNlogAdapter.csproj": {}
+    "D:\\Towsif\\Projects\\git\\FodyNlogAdapter\\FodyNlogAdapter.csproj": {}
   },
   "projects": {
-    "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\FodyNlogAdapter\\FodyNlogAdapter.csproj": {
+    "D:\\Towsif\\Projects\\git\\FodyNlogAdapter\\FodyNlogAdapter.csproj": {
       "version": "3.0.8",
       "restore": {
-        "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\FodyNlogAdapter\\FodyNlogAdapter.csproj",
+        "projectUniqueName": "D:\\Towsif\\Projects\\git\\FodyNlogAdapter\\FodyNlogAdapter.csproj",
         "projectName": "Xels.FodyNlogAdapter",
-        "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\FodyNlogAdapter\\FodyNlogAdapter.csproj",
-        "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
-        "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\FodyNlogAdapter\\obj\\",
+        "projectPath": "D:\\Towsif\\Projects\\git\\FodyNlogAdapter\\FodyNlogAdapter.csproj",
+        "packagesPath": "C:\\Users\\Matiur\\.nuget\\packages\\",
+        "outputPath": "D:\\Towsif\\Projects\\git\\FodyNlogAdapter\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Matiur\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -65,7 +60,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     }

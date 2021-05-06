@@ -1525,7 +1525,7 @@
           "lib/netstandard2.0/NuGet.Frameworks.dll": {}
         }
       },
-      "Polly/7.2.1": {
+      "Polly/7.2.2": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/Polly.dll": {}
@@ -3167,10 +3167,10 @@
           "lib/netstandard2.0/System.Security.Permissions.dll": {}
         }
       },
-      "System.Security.Principal/4.0.1": {
+      "System.Security.Principal/4.3.0": {
         "type": "package",
         "dependencies": {
-          "System.Runtime": "4.1.0"
+          "System.Runtime": "4.3.0"
         },
         "compile": {
           "ref/netstandard1.0/System.Security.Principal.dll": {}
@@ -3622,8 +3622,9 @@
           "NLog": "5.0.0-beta09",
           "NLog.Extensions.Logging": "1.7.2",
           "NStratis": "4.0.0.75",
-          "Polly": "7.2.1",
+          "Polly": "7.2.2",
           "System.Reactive": "5.0.0",
+          "System.Security.Principal": "4.3.0",
           "System.ValueTuple": "4.5.0",
           "System.Xml.XmlSerializer": "4.3.0",
           "Xels.FodyNlogAdapter": "3.0.8"
@@ -3686,6 +3687,7 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection": "5.0.1",
           "NStratis": "4.0.0.75",
+          "System.Security.Principal": "4.3.0",
           "Xels.Bitcoin": "3.0.8"
         },
         "compile": {
@@ -3732,6 +3734,7 @@
           "Microsoft.Extensions.Logging.Debug": "5.0.0",
           "Microsoft.Extensions.Logging.Filter": "1.1.2",
           "NStratis": "4.0.0.75",
+          "System.Security.Principal": "4.3.0",
           "Xels.Bitcoin": "3.0.8"
         },
         "compile": {
@@ -3866,6 +3869,7 @@
           "Microsoft.Extensions.Logging.Filter": "1.1.2",
           "NStratis": "4.0.0.75",
           "System.Reactive": "5.0.0",
+          "System.Security.Principal": "4.3.0",
           "System.Xml.XmlSerializer": "4.3.0",
           "Xels.Bitcoin": "3.0.8",
           "Xels.Bitcoin.Features.Wallet": "3.0.8",
@@ -5704,10 +5708,10 @@
         "nuget.frameworks.nuspec"
       ]
     },
-    "Polly/7.2.1": {
-      "sha512": "Od8SnPlpQr+PuAS0YzY3jgtzaDNknlIuAaldN2VEIyTvm/wCg22C5nUkUV1BEG8rIsub5RFMoV/NEQ0tM/+7Uw==",
+    "Polly/7.2.2": {
+      "sha512": "E6CeKyS513j7taKAq4q2MESDBvzuzWnR1rQ2Y2zqJvpiVtKMm699Aubb20MUPBDmb0Ov8PmcLHTCVFdCjoy2kA==",
       "type": "package",
-      "path": "polly/7.2.1",
+      "path": "polly/7.2.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -5723,7 +5727,7 @@
         "lib/netstandard2.0/Polly.dll",
         "lib/netstandard2.0/Polly.pdb",
         "lib/netstandard2.0/Polly.xml",
-        "polly.7.2.1.nupkg.sha512",
+        "polly.7.2.2.nupkg.sha512",
         "polly.nuspec"
       ]
     },
@@ -9756,10 +9760,10 @@
         "version.txt"
       ]
     },
-    "System.Security.Principal/4.0.1": {
-      "sha512": "On+SKhXY5rzxh/S8wlH1Rm0ogBlu7zyHNxeNBiXauNrhHRXAe9EuX8Yl5IOzLPGU5Z4kLWHMvORDOCG8iu9hww==",
+    "System.Security.Principal/4.3.0": {
+      "sha512": "I1tkfQlAoMM2URscUtpcRo/hX0jinXx6a/KUtEQoz3owaYwl3qwsO8cbzYVVnjxrzxjHo3nJC+62uolgeGIS9A==",
       "type": "package",
-      "path": "system.security.principal/4.0.1",
+      "path": "system.security.principal/4.3.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -9811,7 +9815,7 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
-        "system.security.principal.4.0.1.nupkg.sha512",
+        "system.security.principal.4.3.0.nupkg.sha512",
         "system.security.principal.nuspec"
       ]
     },
@@ -11050,26 +11054,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\FR\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\Matiur\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.ColdStaking.Tests\\Xels.Bitcoin.Features.ColdStaking.Tests.csproj",
+      "projectUniqueName": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.ColdStaking.Tests\\Xels.Bitcoin.Features.ColdStaking.Tests.csproj",
       "projectName": "Xels.Bitcoin.Features.ColdStaking.Tests",
-      "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.ColdStaking.Tests\\Xels.Bitcoin.Features.ColdStaking.Tests.csproj",
-      "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
-      "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.ColdStaking.Tests\\obj\\",
+      "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.ColdStaking.Tests\\Xels.Bitcoin.Features.ColdStaking.Tests.csproj",
+      "packagesPath": "C:\\Users\\Matiur\\.nuget\\packages\\",
+      "outputPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.ColdStaking.Tests\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\Matiur\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -11083,26 +11080,26 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj"
+            "D:\\Towsif\\Projects\\git\\NBitcoin\\NBitcoin.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\NBitcoin\\NBitcoin.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.ColdStaking\\Xels.Bitcoin.Features.ColdStaking.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.ColdStaking\\Xels.Bitcoin.Features.ColdStaking.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.ColdStaking\\Xels.Bitcoin.Features.ColdStaking.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.ColdStaking\\Xels.Bitcoin.Features.ColdStaking.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Wallet\\Xels.Bitcoin.Features.Wallet.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Wallet\\Xels.Bitcoin.Features.Wallet.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Wallet\\Xels.Bitcoin.Features.Wallet.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Wallet\\Xels.Bitcoin.Features.Wallet.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests.Common\\Xels.Bitcoin.Tests.Common.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests.Common\\Xels.Bitcoin.Tests.Common.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Tests.Common\\Xels.Bitcoin.Tests.Common.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Tests.Common\\Xels.Bitcoin.Tests.Common.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests.Wallet.Common\\Xels.Bitcoin.Tests.Wallet.Common.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Tests.Wallet.Common\\Xels.Bitcoin.Tests.Wallet.Common.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Tests.Wallet.Common\\Xels.Bitcoin.Tests.Wallet.Common.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Tests.Wallet.Common\\Xels.Bitcoin.Tests.Wallet.Common.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin\\Xels.Bitcoin.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin\\Xels.Bitcoin.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Features.SQLiteWalletRepository\\Xels.Features.SQLiteWalletRepository.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Features.SQLiteWalletRepository\\Xels.Features.SQLiteWalletRepository.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Features.SQLiteWalletRepository\\Xels.Features.SQLiteWalletRepository.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Features.SQLiteWalletRepository\\Xels.Features.SQLiteWalletRepository.csproj"
             }
           }
         }

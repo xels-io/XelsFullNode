@@ -1,25 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Notifications\\Xels.Bitcoin.Features.Notifications.csproj": {}
+    "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Notifications\\Xels.Bitcoin.Features.Notifications.csproj": {}
   },
   "projects": {
-    "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\FodyNlogAdapter\\FodyNlogAdapter.csproj": {
+    "D:\\Towsif\\Projects\\git\\FodyNlogAdapter\\FodyNlogAdapter.csproj": {
       "version": "3.0.8",
       "restore": {
-        "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\FodyNlogAdapter\\FodyNlogAdapter.csproj",
+        "projectUniqueName": "D:\\Towsif\\Projects\\git\\FodyNlogAdapter\\FodyNlogAdapter.csproj",
         "projectName": "Xels.FodyNlogAdapter",
-        "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\FodyNlogAdapter\\FodyNlogAdapter.csproj",
-        "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
-        "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\FodyNlogAdapter\\obj\\",
+        "projectPath": "D:\\Towsif\\Projects\\git\\FodyNlogAdapter\\FodyNlogAdapter.csproj",
+        "packagesPath": "C:\\Users\\Matiur\\.nuget\\packages\\",
+        "outputPath": "D:\\Towsif\\Projects\\git\\FodyNlogAdapter\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Matiur\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -65,26 +60,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj": {
+    "D:\\Towsif\\Projects\\git\\NBitcoin\\NBitcoin.csproj": {
       "version": "4.0.0.75",
       "restore": {
-        "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj",
+        "projectUniqueName": "D:\\Towsif\\Projects\\git\\NBitcoin\\NBitcoin.csproj",
         "projectName": "NStratis",
-        "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj",
-        "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
-        "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\obj\\",
+        "projectPath": "D:\\Towsif\\Projects\\git\\NBitcoin\\NBitcoin.csproj",
+        "packagesPath": "C:\\Users\\Matiur\\.nuget\\packages\\",
+        "outputPath": "D:\\Towsif\\Projects\\git\\NBitcoin\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Matiur\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -161,26 +151,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Notifications\\Xels.Bitcoin.Features.Notifications.csproj": {
+    "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Notifications\\Xels.Bitcoin.Features.Notifications.csproj": {
       "version": "3.0.8",
       "restore": {
-        "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Notifications\\Xels.Bitcoin.Features.Notifications.csproj",
+        "projectUniqueName": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Notifications\\Xels.Bitcoin.Features.Notifications.csproj",
         "projectName": "Xels.Bitcoin.Features.Notifications",
-        "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Notifications\\Xels.Bitcoin.Features.Notifications.csproj",
-        "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
-        "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Notifications\\obj\\",
+        "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Notifications\\Xels.Bitcoin.Features.Notifications.csproj",
+        "packagesPath": "C:\\Users\\Matiur\\.nuget\\packages\\",
+        "outputPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Notifications\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Matiur\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -194,11 +179,11 @@
           "netcoreapp3.1": {
             "targetAlias": "netcoreapp3.1",
             "projectReferences": {
-              "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj": {
-                "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj"
+              "D:\\Towsif\\Projects\\git\\NBitcoin\\NBitcoin.csproj": {
+                "projectPath": "D:\\Towsif\\Projects\\git\\NBitcoin\\NBitcoin.csproj"
               },
-              "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj": {
-                "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj"
+              "D:\\Towsif\\Projects\\git\\Xels.Bitcoin\\Xels.Bitcoin.csproj": {
+                "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin\\Xels.Bitcoin.csproj"
               }
             }
           }
@@ -263,26 +248,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj": {
+    "D:\\Towsif\\Projects\\git\\Xels.Bitcoin\\Xels.Bitcoin.csproj": {
       "version": "3.0.8",
       "restore": {
-        "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj",
+        "projectUniqueName": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin\\Xels.Bitcoin.csproj",
         "projectName": "Xels.Bitcoin",
-        "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj",
-        "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
-        "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin\\obj\\",
+        "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin\\Xels.Bitcoin.csproj",
+        "packagesPath": "C:\\Users\\Matiur\\.nuget\\packages\\",
+        "outputPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Matiur\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -296,11 +276,11 @@
           "netcoreapp3.1": {
             "targetAlias": "netcoreapp3.1",
             "projectReferences": {
-              "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\FodyNlogAdapter\\FodyNlogAdapter.csproj": {
-                "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\FodyNlogAdapter\\FodyNlogAdapter.csproj"
+              "D:\\Towsif\\Projects\\git\\FodyNlogAdapter\\FodyNlogAdapter.csproj": {
+                "projectPath": "D:\\Towsif\\Projects\\git\\FodyNlogAdapter\\FodyNlogAdapter.csproj"
               },
-              "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj": {
-                "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj"
+              "D:\\Towsif\\Projects\\git\\NBitcoin\\NBitcoin.csproj": {
+                "projectPath": "D:\\Towsif\\Projects\\git\\NBitcoin\\NBitcoin.csproj"
               }
             }
           }
@@ -438,7 +418,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     }

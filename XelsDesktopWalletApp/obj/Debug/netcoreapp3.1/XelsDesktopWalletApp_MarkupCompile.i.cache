@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\XelsDesktopWalletApp\obj\Debug\netcoreapp3.1\
+D:\Towsif\Projects\git\XelsDesktopWalletApp\obj\Debug\netcoreapp3.1\
 XelsDesktopWalletApp
 none
 false
 TRACE;DEBUG;NETCOREAPP;NETCOREAPP3_1;
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\XelsDesktopWalletApp\App.xaml
+D:\Towsif\Projects\git\XelsDesktopWalletApp\App.xaml
 14-699133687
 
 201665227218
-1951863809137
+195-853854844
 MainWindow.xaml;UserControls\logo.xaml;Views\Create.xaml;Views\CreateConfirmMnemonic.xaml;Views\CreateOrRestore.xaml;Views\CreateShowMnemonic.xaml;Views\Dashboard.xaml;Views\Detail.xaml;Views\History.xaml;Views\Login.xaml;Views\Receive.xaml;Views\ReceiveShowall.xaml;Views\Restore.xaml;Views\Send.xaml;
 
-False
+True
 

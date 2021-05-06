@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "t/+gfei0cqmN7nfCXxqeBsrcfNYXderRcJXUS8cl/piJ6iaiFoqlUPB8TXXs4evLtHRw1aoHWlCOK6ybb2OLdQ==",
+  "dgSpecHash": "yU+3/5XGR03esFtfXgp+4Z/xjdVTTLalDDxJMj+Hv3GciouFl1YaM6FDN6bxd1w1rexesgRLPpPyk1U2HZS/hw==",
   "success": true,
-  "projectFilePath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.SmartContracts.CLR.Validation\\Xels.SmartContracts.CLR.Validation.csproj",
+  "projectFilePath": "D:\\Towsif\\Projects\\git\\Xels.SmartContracts.CLR.Validation\\Xels.SmartContracts.CLR.Validation.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\FR\\.nuget\\packages\\fody\\4.2.1\\fody.4.2.1.nupkg.sha512",
-    "C:\\Users\\FR\\.nuget\\packages\\mono.cecil\\0.11.3\\mono.cecil.0.11.3.nupkg.sha512",
-    "C:\\Users\\FR\\.nuget\\packages\\tracer.fody\\3.3.1\\tracer.fody.3.3.1.nupkg.sha512"
+    "C:\\Users\\Matiur\\.nuget\\packages\\fody\\4.2.1\\fody.4.2.1.nupkg.sha512",
+    "C:\\Users\\Matiur\\.nuget\\packages\\mono.cecil\\0.11.3\\mono.cecil.0.11.3.nupkg.sha512",
+    "C:\\Users\\Matiur\\.nuget\\packages\\tracer.fody\\3.3.1\\tracer.fody.3.3.1.nupkg.sha512"
   ],
   "logs": []
 }

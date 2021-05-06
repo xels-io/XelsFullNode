@@ -10805,26 +10805,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\FR\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\Matiur\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.XelsD\\Xels.XelsD.csproj",
+      "projectUniqueName": "D:\\Towsif\\Projects\\git\\Xels.XelsD\\Xels.XelsD.csproj",
       "projectName": "Xels.XelsD",
-      "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.XelsD\\Xels.XelsD.csproj",
-      "packagesPath": "C:\\Users\\FR\\.nuget\\packages\\",
-      "outputPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.XelsD\\obj\\",
+      "projectPath": "D:\\Towsif\\Projects\\git\\Xels.XelsD\\Xels.XelsD.csproj",
+      "packagesPath": "C:\\Users\\Matiur\\.nuget\\packages\\",
+      "outputPath": "D:\\Towsif\\Projects\\git\\Xels.XelsD\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\FR\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\Matiur\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -10838,53 +10831,53 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\NBitcoin\\NBitcoin.csproj"
+            "D:\\Towsif\\Projects\\git\\NBitcoin\\NBitcoin.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\NBitcoin\\NBitcoin.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Api\\Xels.Bitcoin.Features.Api.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Api\\Xels.Bitcoin.Features.Api.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Api\\Xels.Bitcoin.Features.Api.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Api\\Xels.Bitcoin.Features.Api.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.BlockExplorer\\Xels.Bitcoin.Features.BlockExplorer.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.BlockExplorer\\Xels.Bitcoin.Features.BlockExplorer.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.BlockExplorer\\Xels.Bitcoin.Features.BlockExplorer.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.BlockExplorer\\Xels.Bitcoin.Features.BlockExplorer.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.BlockStore\\Xels.Bitcoin.Features.BlockStore.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.BlockStore\\Xels.Bitcoin.Features.BlockStore.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.BlockStore\\Xels.Bitcoin.Features.BlockStore.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.BlockStore\\Xels.Bitcoin.Features.BlockStore.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.ColdStaking\\Xels.Bitcoin.Features.ColdStaking.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.ColdStaking\\Xels.Bitcoin.Features.ColdStaking.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.ColdStaking\\Xels.Bitcoin.Features.ColdStaking.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.ColdStaking\\Xels.Bitcoin.Features.ColdStaking.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Consensus\\Xels.Bitcoin.Features.Consensus.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Consensus\\Xels.Bitcoin.Features.Consensus.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Consensus\\Xels.Bitcoin.Features.Consensus.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Consensus\\Xels.Bitcoin.Features.Consensus.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Dns\\Xels.Bitcoin.Features.Dns.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Dns\\Xels.Bitcoin.Features.Dns.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Dns\\Xels.Bitcoin.Features.Dns.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Dns\\Xels.Bitcoin.Features.Dns.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.MemoryPool\\Xels.Bitcoin.Features.MemoryPool.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.MemoryPool\\Xels.Bitcoin.Features.MemoryPool.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.MemoryPool\\Xels.Bitcoin.Features.MemoryPool.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.MemoryPool\\Xels.Bitcoin.Features.MemoryPool.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Miner\\Xels.Bitcoin.Features.Miner.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Miner\\Xels.Bitcoin.Features.Miner.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Miner\\Xels.Bitcoin.Features.Miner.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Miner\\Xels.Bitcoin.Features.Miner.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.RPC\\Xels.Bitcoin.Features.RPC.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.RPC\\Xels.Bitcoin.Features.RPC.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.RPC\\Xels.Bitcoin.Features.RPC.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.RPC\\Xels.Bitcoin.Features.RPC.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.SignalR\\Xels.Bitcoin.Features.SignalR.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.SignalR\\Xels.Bitcoin.Features.SignalR.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.SignalR\\Xels.Bitcoin.Features.SignalR.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.SignalR\\Xels.Bitcoin.Features.SignalR.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Wallet\\Xels.Bitcoin.Features.Wallet.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.Wallet\\Xels.Bitcoin.Features.Wallet.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Wallet\\Xels.Bitcoin.Features.Wallet.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Features.Wallet\\Xels.Bitcoin.Features.Wallet.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Networks\\Xels.Bitcoin.Networks.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Networks\\Xels.Bitcoin.Networks.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Networks\\Xels.Bitcoin.Networks.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin.Networks\\Xels.Bitcoin.Networks.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin\\Xels.Bitcoin.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Bitcoin\\Xels.Bitcoin.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Bitcoin\\Xels.Bitcoin.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Features.Diagnostic\\Xels.Features.Diagnostic.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Features.Diagnostic\\Xels.Features.Diagnostic.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Features.Diagnostic\\Xels.Features.Diagnostic.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Features.Diagnostic\\Xels.Features.Diagnostic.csproj"
             },
-            "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Features.SQLiteWalletRepository\\Xels.Features.SQLiteWalletRepository.csproj": {
-              "projectPath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Features.SQLiteWalletRepository\\Xels.Features.SQLiteWalletRepository.csproj"
+            "D:\\Towsif\\Projects\\git\\Xels.Features.SQLiteWalletRepository\\Xels.Features.SQLiteWalletRepository.csproj": {
+              "projectPath": "D:\\Towsif\\Projects\\git\\Xels.Features.SQLiteWalletRepository\\Xels.Features.SQLiteWalletRepository.csproj"
             }
           }
         }
@@ -10926,6 +10919,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[3.1.3, 3.1.3]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -10934,7 +10933,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }
