@@ -1,0 +1,5 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/NBitcoin/obj/Debug/netstandard2.0/NBitcoin.csprojAssemblyReference.cache
