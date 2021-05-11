@@ -139,7 +139,7 @@ namespace Xels.Bitcoin.Configuration
             
             this.LoggerFactory = loggerFactory;
             this.LoggerFactory.AddConsoleWithFilters();
-            this.LoggerFactory.AddNLog();
+            //this.LoggerFactory.AddNLog();
             this.Logger = this.LoggerFactory.CreateLogger(typeof(NodeSettings).FullName);
 
             // Record arguments.
