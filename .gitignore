@@ -3,12 +3,12 @@ OS junk files
 *.DS_Store
 
 #Visual Studio files
-**/[Oo]bj
-**/[Bb]in
-**/[Dd]ebug
-**/[Rr]elease
-**/v16
-**/.vs
+**/[Oo]bj/
+**/[Bb]in/
+**/[Dd]ebug/
+**/[Rr]elease/
+**/v16/
+**/.vs/
 
 *.[Cc]ache
 *.suo
