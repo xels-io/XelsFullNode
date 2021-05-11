@@ -22,14 +22,16 @@ namespace XelsDesktopWalletApp.Views
     public partial class Restore : Window
     {
 
-        private readonly IWalletManager walletManager;
+        private readonly IWalletManager _walletManager;
         //static HttpClient client = new HttpClient();
         //string baseURL = "http://localhost:37221/api/wallet";
 
 
 
-        public Restore()
+        public Restore(IWalletManager walletManager)
         {
+            this._walletManager = walletManager;
+
             InitializeComponent();
         }
 
@@ -81,13 +83,13 @@ namespace XelsDesktopWalletApp.Views
 
                 WalletRecovery recovery = new WalletRecovery();
                 recovery.name = name.Text;
-                recovery.creationDate = creationDate.Text;
+                recovery.creationDate = creationDate.SelectedDate.Value;
                 recovery.mnemonic = mnemonic.Text;
                 recovery.passphrase = passphrase.Text;
                 recovery.password = password.Text;
 
-                //this.walletManager.RecoverWallet(recovery.Password, recovery.Name, recovery.Mnemonic,
-                //        recovery.CreationDate, passphrase: recovery.Passphrase);
+                this._walletManager.RecoverWallet(recovery.password, recovery.name, recovery.mnemonic,
+                        recovery.creationDate, passphrase: recovery.passphrase);
 
 
                 //HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(recovery), Encoding.UTF8, "application/json"));
