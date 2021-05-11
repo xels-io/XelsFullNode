@@ -43,6 +43,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
+    <PackageReference Include="NLog.Config" Version="4.7.9" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="4.12.0" />
     <PackageReference Include="System.Security.Principal" Version="4.3.0" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

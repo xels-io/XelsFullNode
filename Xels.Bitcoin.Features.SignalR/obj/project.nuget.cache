@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "1ozfItxQ399HJ04P4Um+ulxneI2rDu841zG8+rT7H9ik3DEY5J8Imm54WjfJPGfgk/FIE90WyXfYJ+VCJcwqSQ==",
+  "dgSpecHash": "Kj48WgWyCoPMbOCrUxODLMn+NA9feRGx84v9nPycqLKADeS5su42M48MJ2PE9d+7iy9ct7rqK0aGxaqH7erXkg==",
   "success": true,
   "projectFilePath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Bitcoin.Features.SignalR\\Xels.Bitcoin.Features.SignalR.csproj",
   "expectedPackageFiles": [
@@ -95,6 +95,7 @@
     "C:\\Users\\FR\\.nuget\\packages\\newtonsoft.json.bson\\1.0.2\\newtonsoft.json.bson.1.0.2.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nlog\\5.0.0-beta09\\nlog.5.0.0-beta09.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nlog.extensions.logging\\1.7.2\\nlog.extensions.logging.1.7.2.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\nlog.web.aspnetcore\\4.12.0\\nlog.web.aspnetcore.4.12.0.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nstratis.hashlib\\1.0.0.1\\nstratis.hashlib.1.0.0.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\polly\\7.2.2\\polly.7.2.2.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl\\4.3.0\\runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl.4.3.0.nupkg.sha512",

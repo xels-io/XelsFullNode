@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "M+SLBvLJD1xEhUUp0GCjI8BNW3NofW8ganuX76GIDcLdrIgizasNj71cAsNaMR+kGEEb83DUi4fGqYMfPYU0qA==",
+  "dgSpecHash": "6RZK08nduQCHGYrj33DPcL7TDnXTHx58B9E+iqFgAR16ZY9KU2ylwDTpaVWrwhWvPnxJNWF85/f1XOxSRbfu+A==",
   "success": true,
   "projectFilePath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.Sidechains.Networks\\Xels.Sidechains.Networks.csproj",
   "expectedPackageFiles": [
@@ -96,6 +96,7 @@
     "C:\\Users\\FR\\.nuget\\packages\\newtonsoft.json.bson\\1.0.2\\newtonsoft.json.bson.1.0.2.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nlog\\5.0.0-beta09\\nlog.5.0.0-beta09.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nlog.extensions.logging\\1.7.2\\nlog.extensions.logging.1.7.2.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\nlog.web.aspnetcore\\4.12.0\\nlog.web.aspnetcore.4.12.0.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nstratis.hashlib\\1.0.0.1\\nstratis.hashlib.1.0.0.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\polly\\7.2.2\\polly.7.2.2.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\portable.bouncycastle\\1.8.2\\portable.bouncycastle.1.8.2.nupkg.sha512",

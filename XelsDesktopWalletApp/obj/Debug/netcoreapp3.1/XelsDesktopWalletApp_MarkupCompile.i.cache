@@ -16,5 +16,5 @@ F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\XelsDesktopWalletApp\Ap
 1951863809137
 MainWindow.xaml;UserControls\logo.xaml;Views\Create.xaml;Views\CreateConfirmMnemonic.xaml;Views\CreateOrRestore.xaml;Views\CreateShowMnemonic.xaml;Views\Dashboard.xaml;Views\Detail.xaml;Views\History.xaml;Views\Login.xaml;Views\Receive.xaml;Views\ReceiveShowall.xaml;Views\Restore.xaml;Views\Send.xaml;
 
-False
+True
 

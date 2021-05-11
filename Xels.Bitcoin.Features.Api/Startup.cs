@@ -7,6 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
+using NLog.Extensions.Logging;
+
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -119,6 +122,8 @@ namespace Xels.Bitcoin.Features.Api
                 logging.AddConfiguration(this.Configuration.GetSection("Logging"));
                 logging.AddConsole();
                 logging.AddDebug();
+                logging.SetMinimumLevel(LogLevel.Trace);
+                logging.AddNLog();
             });
 
             services.AddSingleton(typeof(ILogger), typeof(Logger<Startup>));

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "yQb2r7/D/l5GcyCejPsgki2qnRdDjJ2oWy2kVZVPWlF47uVOQJlz10mtNAOVggtOT4IBXCijGwDJbuKxbPa70g==",
+  "dgSpecHash": "tHgagE5Q5zOA3Y4VWzn2/fP8VRnS3dDy7E6DMe7E22fgc7M7Dnt5Ht35HEYWGobVCVKvKYHlMeESize8yrgOUw==",
   "success": true,
   "projectFilePath": "F:\\Remnant\\Project Work\\Office Projects\\SOL\\XelsFullNode\\Xels.XelsD\\Xels.XelsD.csproj",
   "expectedPackageFiles": [
@@ -97,7 +97,9 @@
     "C:\\Users\\FR\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\newtonsoft.json.bson\\1.0.2\\newtonsoft.json.bson.1.0.2.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nlog\\5.0.0-beta09\\nlog.5.0.0-beta09.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\nlog.config\\4.7.9\\nlog.config.4.7.9.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nlog.extensions.logging\\1.7.2\\nlog.extensions.logging.1.7.2.nupkg.sha512",
+    "C:\\Users\\FR\\.nuget\\packages\\nlog.schema\\4.7.9\\nlog.schema.4.7.9.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nlog.web.aspnetcore\\4.12.0\\nlog.web.aspnetcore.4.12.0.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\nstratis.hashlib\\1.0.0.1\\nstratis.hashlib.1.0.0.1.nupkg.sha512",
     "C:\\Users\\FR\\.nuget\\packages\\polly\\7.2.2\\polly.7.2.2.nupkg.sha512",

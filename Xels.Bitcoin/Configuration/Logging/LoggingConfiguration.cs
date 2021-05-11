@@ -227,7 +227,7 @@ namespace Xels.Bitcoin.Configuration.Logging
         /// Configure the console logger and set it to filter logs not related to the fullnode.
         /// </summary>
         /// <param name="loggerFactory">The logger factory to add the console logger.</param>
-        public static void AddConsoleWithFilters(this ILoggerFactory loggerFactory)
+        public static void AddConsoleWithFilters(this ILoggerFactory loggerFactory/*, ILoggingBuilder loggingBuilder*/)
         {
             //var consoleLoggerSettings = new ConsoleLoggerSettings
             //{
@@ -240,7 +240,7 @@ namespace Xels.Bitcoin.Configuration.Logging
             //    }
             //};
 
-           
+
 
             //var consoleLoggerProvider = new ConsoleLoggerProvider(consoleLoggerSettings);
             //loggerFactory.AddProvider(consoleLoggerProvider);             
@@ -250,25 +250,34 @@ namespace Xels.Bitcoin.Configuration.Logging
             //extendedLoggerFactory.ConsoleLoggerProvider = consoleLoggerProvider;
             //extendedLoggerFactory.ConsoleSettings = consoleLoggerSettings;
 
+            using (var loggerFactoryy = LoggerFactory.Create(builder =>
+             {
+                 builder
+                 .AddFilter("default", Microsoft.Extensions.Logging.LogLevel.Information)
+                 .AddFilter("Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning)
+                 .AddFilter("System", Microsoft.Extensions.Logging.LogLevel.Warning)
+                 .AddFilter("Microsoft.AspNetCore", Microsoft.Extensions.Logging.LogLevel.Error).AddConsole();
 
-
-            var loggerFactoryy = LoggerFactory.Create(builder =>
+             }))
             {
-                builder
-                .AddFilter("default", Microsoft.Extensions.Logging.LogLevel.Information)
-                .AddFilter("Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning)
-                .AddFilter("System", Microsoft.Extensions.Logging.LogLevel.Warning)
-                .AddFilter("Microsoft.AspNetCore", Microsoft.Extensions.Logging.LogLevel.Error)
-                .AddConsole()
-                .AddDebug();
-            });
+                //loggingBuilder.AddFilter("default", Microsoft.Extensions.Logging.LogLevel.Information);
+                //loggingBuilder.AddFilter("Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning);
+                //loggingBuilder.AddFilter("System", Microsoft.Extensions.Logging.LogLevel.Warning);
+                //loggingBuilder.AddFilter("Microsoft.AspNetCore", Microsoft.Extensions.Logging.LogLevel.Error);
 
-            //var consoleLoggerProvder = new ConsoleLoggerProvider((IOptionsMonitor<ConsoleLoggerOptions>)loggerFactoryy);
-            //loggerFactory.AddProvider(consoleLoggerProvder);
+                //var consoleLoggerProvder = new ConsoleLoggerProvider((IOptionsMonitor<ConsoleLoggerOptions>)loggingBuilder);
+                //loggerFactory.AddProvider(consoleLoggerProvder);
 
-            var extendedLoggerFactory = loggerFactory as ExtendedLoggerFactory;
-            Guard.NotNull(extendedLoggerFactory, nameof(extendedLoggerFactory));
-            //extendedLoggerFactory.ConsoleLoggerProvider = consoleLoggerProvder;
+
+
+                var consoleLoggerProvder = new ConsoleLoggerProvider((IOptionsMonitor<ConsoleLoggerOptions>)loggerFactoryy);
+                loggerFactory.AddProvider(consoleLoggerProvder);
+
+                var extendedLoggerFactory = loggerFactory as ExtendedLoggerFactory;
+                Guard.NotNull(extendedLoggerFactory, nameof(extendedLoggerFactory));
+                extendedLoggerFactory.ConsoleLoggerProvider = consoleLoggerProvder;
+            }
+
             //extendedLoggerFactory.ConsoleSettings = consoleLoggerSettings;
 
         }
@@ -279,7 +288,7 @@ namespace Xels.Bitcoin.Configuration.Logging
         /// <param name="loggerFactory">Not used.</param>
         /// <param name="consoleLoggerSettings">Console settings to filter.</param>
         /// <param name="settings">Settings that hold potential debug arguments, if null no debug arguments will be loaded."/></param>
-        public static void ConfigureConsoleFilters(this ILoggerFactory loggerFactory,/* ConsoleLoggerSettings consoleLoggerSettings,*/ LogSettings settings)
+        public static void ConfigureConsoleFilters(this ILoggerFactory loggerFactory, ConsoleLoggerOptions consoleLoggerSettings, LogSettings settings)
         {
             if (settings != null)
             {

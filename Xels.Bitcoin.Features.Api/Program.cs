@@ -8,6 +8,9 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
+
+using NLog.Web;
+
 using Xels.Bitcoin.Utilities;
 
 namespace Xels.Bitcoin.Features.Api
@@ -42,6 +45,7 @@ namespace Xels.Bitcoin.Features.Api
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseUrls(apiUri.ToString())
+                .UseNLog()
                 .ConfigureServices(collection =>
                 {
                     if (services == null)
