@@ -270,12 +270,12 @@ namespace Xels.Bitcoin.Configuration.Logging
 
 
 
-                var consoleLoggerProvder = new ConsoleLoggerProvider((IOptionsMonitor<ConsoleLoggerOptions>)loggerFactoryy);
-                loggerFactory.AddProvider(consoleLoggerProvder);
+                //var consoleLoggerProvder = new ConsoleLoggerProvider((IOptionsMonitor<ConsoleLoggerOptions>)loggerFactoryy);
+                //loggerFactory.AddProvider(consoleLoggerProvder);
 
                 var extendedLoggerFactory = loggerFactory as ExtendedLoggerFactory;
                 Guard.NotNull(extendedLoggerFactory, nameof(extendedLoggerFactory));
-                extendedLoggerFactory.ConsoleLoggerProvider = consoleLoggerProvder;
+                //extendedLoggerFactory.ConsoleLoggerProvider = consoleLoggerProvder;
             }
 
             //extendedLoggerFactory.ConsoleSettings = consoleLoggerSettings;
