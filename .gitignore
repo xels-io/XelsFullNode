@@ -36,12 +36,13 @@ obj/
 [Dd]ebug*/
 [Rr]elease*/
 
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-bld/
-[Bb]in/
+**/[Dd]ebug
+**/[Dd]ebugPublic
+**/[Rr]elease
+**/[Rr]eleases
+**/x64
+**/x86
+**/[Bb]in
+
+
 [Oo]bj/Ankh.NoLoad
