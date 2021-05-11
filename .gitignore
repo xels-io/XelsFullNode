@@ -16,3 +16,6 @@ OS junk files
 
 **/.[Cc]ache
 **/.suo
+
+
+**/.g.i.cs
