@@ -1,9 +1,0 @@
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FodyNlogAdapter\bin\Debug\netcoreapp3.1\FodyNlogAdapter.deps.json
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FodyNlogAdapter\bin\Debug\netcoreapp3.1\FodyNlogAdapter.dll
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FodyNlogAdapter\bin\Debug\netcoreapp3.1\FodyNlogAdapter.pdb
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FodyNlogAdapter\obj\Debug\netcoreapp3.1\FodyNlogAdapter.csprojAssemblyReference.cache
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FodyNlogAdapter\obj\Debug\netcoreapp3.1\FodyNlogAdapter.AssemblyInfoInputs.cache
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FodyNlogAdapter\obj\Debug\netcoreapp3.1\FodyNlogAdapter.AssemblyInfo.cs
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FodyNlogAdapter\obj\Debug\netcoreapp3.1\FodyNlogAdapter.csproj.CoreCompileInputs.cache
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FodyNlogAdapter\obj\Debug\netcoreapp3.1\FodyNlogAdapter.dll
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\FodyNlogAdapter\obj\Debug\netcoreapp3.1\FodyNlogAdapter.pdb

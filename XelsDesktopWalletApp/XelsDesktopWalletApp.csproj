@@ -28,6 +28,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Wallet\Xels.Bitcoin.Features.Wallet.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Assets\Images\home-xels-logo-01.png" />
   </ItemGroup>
 

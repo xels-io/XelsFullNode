@@ -1,9 +1,0 @@
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\NBitcoin\bin\Debug\netcoreapp3.1\NBitcoin.deps.json
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\NBitcoin\bin\Debug\netcoreapp3.1\NBitcoin.dll
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\NBitcoin\bin\Debug\netcoreapp3.1\NBitcoin.pdb
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\NBitcoin\obj\Debug\netcoreapp3.1\NBitcoin.csprojAssemblyReference.cache
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\NBitcoin\obj\Debug\netcoreapp3.1\NBitcoin.AssemblyInfoInputs.cache
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\NBitcoin\obj\Debug\netcoreapp3.1\NBitcoin.AssemblyInfo.cs
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\NBitcoin\obj\Debug\netcoreapp3.1\NBitcoin.csproj.CoreCompileInputs.cache
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\NBitcoin\obj\Debug\netcoreapp3.1\NBitcoin.dll
-F:\Remnant\Project Work\Office Projects\SOL\XelsFullNode\NBitcoin\obj\Debug\netcoreapp3.1\NBitcoin.pdb

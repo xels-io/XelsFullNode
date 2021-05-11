@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Xels.Bitcoin.Features.Wallet.Interfaces;
 using XelsDesktopWalletApp.Models;
 
 namespace XelsDesktopWalletApp.Views
@@ -21,8 +22,9 @@ namespace XelsDesktopWalletApp.Views
     public partial class Restore : Window
     {
 
-        static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api/wallet";
+        private readonly IWalletManager walletManager;
+        //static HttpClient client = new HttpClient();
+        //string baseURL = "http://localhost:37221/api/wallet";
 
 
 
@@ -75,7 +77,7 @@ namespace XelsDesktopWalletApp.Views
         {
             if (isValid())
             {
-                string postUrl = baseURL + "/recover";
+                //string postUrl = baseURL + "/recover";
 
                 WalletRecovery recovery = new WalletRecovery();
                 recovery.name = name.Text;
@@ -84,16 +86,20 @@ namespace XelsDesktopWalletApp.Views
                 recovery.passphrase = passphrase.Text;
                 recovery.password = password.Text;
 
-                HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(recovery), Encoding.UTF8, "application/json"));
+                //this.walletManager.RecoverWallet(recovery.Password, recovery.Name, recovery.Mnemonic,
+                //        recovery.CreationDate, passphrase: recovery.Passphrase);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    MessageBox.Show("Successfully saved data with Name: " + recovery.name);
-                }
-                else
-                {
-                    MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
-                }
+
+                //HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(recovery), Encoding.UTF8, "application/json"));
+
+                //if (response.IsSuccessStatusCode)
+                //{
+                //    MessageBox.Show("Successfully saved data with Name: " + recovery.name);
+                //}
+                //else
+                //{
+                //    MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+                //}
             }
 
         }

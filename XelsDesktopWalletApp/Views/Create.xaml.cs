@@ -36,7 +36,7 @@ namespace XelsDesktopWalletApp.Views
 
         public async void LoadCreate()
         {
-            _mnemonic = await GetAPIAsync(baseURL);
+            this._mnemonic = await GetAPIAsync(this.baseURL);
         }
 
         public bool isValid()
