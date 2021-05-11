@@ -10,4 +10,5 @@ OS junk files
 **/v16
 **/.vs
 
-**.[Cc]ache
+**/.[Cc]ache
+**/.suo
