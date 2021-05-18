@@ -30,6 +30,10 @@ namespace Xels.Bitcoin.Features.Api
                 : null;
 
             webHostBuilder
+                //.ConfigureLogging(loggin =>
+                //{
+                //    loggin.ConfigureNLog(
+                //})
                 .UseKestrel(options =>
                     {
                         if (!apiSettings.UseHttps)
