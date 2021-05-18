@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog.Config" Version="4.7.9" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Xels.Bitcoin.Features.SmartContracts\Xels.Bitcoin.Features.SmartContracts.csproj" />
   </ItemGroup>
 

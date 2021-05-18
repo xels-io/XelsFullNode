@@ -23,6 +23,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="NLog.Config" Version="4.7.9" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\Xels.Bitcoin.Features.Api\Xels.Bitcoin.Features.Api.csproj" />
       <ProjectReference Include="..\Xels.Bitcoin.Features.Dns\Xels.Bitcoin.Features.Dns.csproj" />
       <ProjectReference Include="..\Xels.Bitcoin\Xels.Bitcoin.csproj" />

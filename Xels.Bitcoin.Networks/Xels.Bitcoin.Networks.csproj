@@ -22,6 +22,9 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
 
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NLog.Config" Version="4.7.9" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NBitcoin\NBitcoin.csproj" />

@@ -22,6 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog.Config" Version="4.7.9" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Xels.Bitcoin.Features.Wallet\Xels.Bitcoin.Features.Wallet.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Tests.Common\Xels.Bitcoin.Tests.Common.csproj" />
   </ItemGroup>

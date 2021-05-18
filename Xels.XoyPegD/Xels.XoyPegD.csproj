@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog.Config" Version="4.7.9" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Xels.Bitcoin.Features.Notifications\Xels.Bitcoin.Features.Notifications.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Networks\Xels.Bitcoin.Networks.csproj" />
     <ProjectReference Include="..\Xels.Features.Collateral\Xels.Features.Collateral.csproj" />
