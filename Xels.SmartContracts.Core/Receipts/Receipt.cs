@@ -212,10 +212,10 @@ namespace Xels.SmartContracts.Core.Receipts
         /// </summary>
         public static Receipt FromConsensusBytesRlp(byte[] bytes)
         {
-            RLPCollection list = RLP.Decode(bytes);
+            RLPCollection list = (RLPCollection)RLP.Decode(bytes);
             RLPCollection innerList = (RLPCollection) list[0];
 
-            RLPCollection logList = RLP.Decode(innerList[3].RLPData);
+            RLPCollection logList = (RLPCollection)RLP.Decode(innerList[3].RLPData);
             RLPCollection innerLogList = (RLPCollection)logList[0];
             Log[] logs = innerLogList.Select(x => Log.FromBytesRlp(x.RLPData)).ToArray();
 
@@ -244,10 +244,10 @@ namespace Xels.SmartContracts.Core.Receipts
         /// </summary>
         public static Receipt FromStorageBytesRlp(byte[] bytes)
         {
-            RLPCollection list = RLP.Decode(bytes);
+            RLPCollection list = (RLPCollection)RLP.Decode(bytes);
             RLPCollection innerList = (RLPCollection)list[0];
 
-            RLPCollection logList = RLP.Decode(innerList[3].RLPData);
+            RLPCollection logList = (RLPCollection)RLP.Decode(innerList[3].RLPData);
             RLPCollection innerLogList = (RLPCollection)logList[0];
             Log[] logs = innerLogList.Select(x => Log.FromBytesRlp(x.RLPData)).ToArray();
 

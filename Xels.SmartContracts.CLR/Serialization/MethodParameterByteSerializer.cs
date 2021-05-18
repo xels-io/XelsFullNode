@@ -36,7 +36,7 @@ namespace Xels.SmartContracts.CLR.Serialization
 
         public object[] Deserialize(byte[] bytes)
         {
-            RLPCollection list = RLP.Decode(bytes);
+            RLPCollection list = (RLPCollection)RLP.Decode(bytes);
 
             RLPCollection innerList = (RLPCollection)list[0];
 

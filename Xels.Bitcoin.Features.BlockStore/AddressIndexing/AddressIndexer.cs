@@ -18,7 +18,7 @@ using Xels.Bitcoin.Controllers.Models;
 using Xels.Bitcoin.Interfaces;
 using Xels.Bitcoin.Primitives;
 using Xels.Bitcoin.Utilities;
-using FileMode = LiteDB.FileMode;
+//using FileMode = LiteDB.FileMode;
 using Script = NBitcoin.Script;
 
 namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
@@ -178,14 +178,15 @@ namespace Xels.Bitcoin.Features.BlockStore.AddressIndexing
 
             string dbPath = Path.Combine(this.dataFolder.RootPath, AddressIndexerDatabaseFilename);
 
-            FileMode fileMode = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? FileMode.Exclusive : FileMode.Shared;
-            this.db = new LiteDatabase(new ConnectionString() { Filename = dbPath, Mode = fileMode });
+            // 07.04.20121 -- commented on
+            //FileMode fileMode = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? FileMode.Exclusive : FileMode.Shared;
+            this.db = new LiteDatabase(new ConnectionString() { Filename = dbPath/*, Mode = fileMode*/ });
 
             this.addressIndexRepository = new AddressIndexRepository(this.db, this.loggerFactory);
 
             this.logger.LogDebug("Address indexing is enabled.");
 
-            this.tipDataStore = this.db.GetCollection<AddressIndexerTipData>(DbTipDataKey);
+            this.tipDataStore = (LiteCollection<AddressIndexerTipData>)this.db.GetCollection<AddressIndexerTipData>(DbTipDataKey);
 
             lock (this.lockObject)
             {

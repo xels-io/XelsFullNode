@@ -136,9 +136,10 @@ namespace Xels.Bitcoin.Configuration
         {
             // Create the default logger factory and logger.
             var loggerFactory = new ExtendedLoggerFactory();
+            
             this.LoggerFactory = loggerFactory;
             this.LoggerFactory.AddConsoleWithFilters();
-            this.LoggerFactory.AddNLog();
+            //this.LoggerFactory.AddNLog();
             this.Logger = this.LoggerFactory.CreateLogger(typeof(NodeSettings).FullName);
 
             // Record arguments.

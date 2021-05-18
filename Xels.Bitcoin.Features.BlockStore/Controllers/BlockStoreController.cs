@@ -30,7 +30,8 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
     /// <summary>Controller providing operations on a blockstore.</summary>
     [ApiVersion("1")]
     [Route("api/[controller]")]
-    public class BlockStoreController : Controller
+    [ApiController]
+    public class BlockStoreController : ControllerBase
     {
         private readonly IAddressIndexer addressIndexer;
 
@@ -81,7 +82,7 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
             try
             {
                 ChainedHeader addressIndexerTip = this.addressIndexer.IndexerTip;
-                return this.Json(new AddressIndexerTipModel() { TipHash = addressIndexerTip?.HashBlock, TipHeight = addressIndexerTip?.Height });
+                return this.Ok(new AddressIndexerTipModel() { TipHash = addressIndexerTip?.HashBlock, TipHeight = addressIndexerTip?.Height });
             }
             catch (Exception e)
             {
@@ -130,7 +131,7 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
 
                 if (!query.OutputJson)
                 {
-                    return this.Json(block);
+                    return this.Ok(block);
                 }
 
                 BlockModel blockModel = query.ShowTransactionDetails
@@ -149,7 +150,7 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
                     blockModel.PosChainTrust = chainedHeader.ChainWork.ToString(); // this should be similar to ChainWork
                 }
 
-                return this.Json(blockModel);
+                return this.Ok(blockModel);
             }
             catch (Exception e)
             {
@@ -195,7 +196,7 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
                     blockModel.BlockReward = GetRewardFromHeight(height);
                     lstBlockModel.Add(blockModel);
                 }
-                return this.Json(lstBlockModel);
+                return this.Ok(lstBlockModel);
             }
             catch (Exception e)
             {
@@ -266,7 +267,7 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
         {
             try
             {
-                return this.Json(this.chainState.ConsensusTip.Height);
+                return this.Ok(this.chainState.ConsensusTip.Height);
             }
             catch (Exception e)
             {
@@ -293,7 +294,7 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
 
                 this.logger.LogDebug("Sending data for {0} addresses.", result.Balances.Count);
 
-                return this.Json(result);
+                return this.Ok(result);
             }
             catch (Exception e)
             {
@@ -318,7 +319,7 @@ namespace Xels.Bitcoin.Features.BlockStore.Controllers
 
                 VerboseAddressBalancesResult result = this.addressIndexer.GetAddressIndexerState(addressesArray);
 
-                return this.Json(result);
+                return this.Ok(result);
             }
             catch (Exception e)
             {

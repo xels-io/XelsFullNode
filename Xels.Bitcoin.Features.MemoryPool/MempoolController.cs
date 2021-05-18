@@ -48,7 +48,7 @@ namespace Xels.Bitcoin.Features.MemoryPool
         {
             try
             {
-                return this.Json(await this.GetRawMempool().ConfigureAwait(false));
+                return this.Ok(await this.GetRawMempool().ConfigureAwait(false));
             }
             catch (Exception e)
             {

@@ -17,7 +17,8 @@ namespace Xels.Bitcoin.Features.ColdStaking.Controllers
     /// </summary>
     [ApiVersion("1")]
     [Route("api/[controller]")]
-    public class ColdStakingController : Controller
+    [ApiController]
+    public class ColdStakingController : ControllerBase
     {
         public ColdStakingManager ColdStakingManager { get; private set; }
         private readonly IWalletTransactionHandler walletTransactionHandler;
@@ -67,7 +68,7 @@ namespace Xels.Bitcoin.Features.ColdStaking.Controllers
                 GetColdStakingInfoResponse model = this.ColdStakingManager.GetColdStakingInfo(request.WalletName);
 
                 this.logger.LogTrace("(-):'{0}'", model);
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {
@@ -106,7 +107,7 @@ namespace Xels.Bitcoin.Features.ColdStaking.Controllers
                 };
 
                 this.logger.LogTrace("(-):'{0}'", model);
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {
@@ -148,7 +149,7 @@ namespace Xels.Bitcoin.Features.ColdStaking.Controllers
                     throw new WalletException("The cold staking account does not exist.");
 
                 this.logger.LogTrace("(-):'{0}'", model);
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {
@@ -194,7 +195,7 @@ namespace Xels.Bitcoin.Features.ColdStaking.Controllers
                 };
 
                 this.logger.LogTrace("(-):'{0}'", model);
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {
@@ -239,7 +240,7 @@ namespace Xels.Bitcoin.Features.ColdStaking.Controllers
 
                 this.logger.LogTrace("(-):'{0}'", model);
 
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {

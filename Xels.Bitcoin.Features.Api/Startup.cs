@@ -1,11 +1,15 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
+using NLog.Extensions.Logging;
+
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -56,19 +60,32 @@ namespace Xels.Bitcoin.Features.Api
                 });
 
             // Add framework services.
+            //services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddMvc(options =>
                 {
                     options.Filters.Add(typeof(LoggingActionFilter));
-
+                    options.EnableEndpointRouting = false;
+                    
                     ServiceProvider serviceProvider = services.BuildServiceProvider();
+
+                    services.AddSingleton(typeof(ApiSettings));
                     var apiSettings = (ApiSettings)serviceProvider.GetRequiredService(typeof(ApiSettings));
                     if (apiSettings.KeepaliveTimer != null)
                     {
                         options.Filters.Add(typeof(KeepaliveActionFilter));
                     }
                 })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                
+
+
                 // add serializers for NBitcoin objects
-                .AddJsonOptions(options => Utilities.JsonConverters.Serializer.RegisterFrontConverters(options.SerializerSettings))
+
+                //previous
+                //.AddJsonOptions(options => Utilities.JsonConverters.Serializer.RegisterFrontConverters(options.SerializerSettings))
+
+                //new added
+                .AddNewtonsoftJson(opt => Utilities.JsonConverters.Serializer.RegisterFrontConverters(opt.SerializerSettings))
                 .AddControllers(this.fullNode.Services.Features, services);
 
             // Enable API versioning.
@@ -98,13 +115,31 @@ namespace Xels.Bitcoin.Features.Api
 
             // Register the Swagger generator. This will use the options we injected just above.
             services.AddSwaggerGen();
+
+
+            services.AddLogging(logging =>
+            {
+                logging.AddConfiguration(this.Configuration.GetSection("Logging"));
+                logging.AddConsole();
+                logging.AddDebug();
+                logging.SetMinimumLevel(LogLevel.Trace);
+                logging.AddNLog();
+            });
+
+            services.AddSingleton(typeof(ILogger), typeof(Logger<Startup>));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApiVersionDescriptionProvider provider)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, /*ILoggerFactory loggerFactory, */IApiVersionDescriptionProvider provider/*, ILoggingBuilder loggingBuilder*/)
         {
-            loggerFactory.AddConsole(this.Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            //previous
+            //loggerFactory.AddConsole(this.Configuration.GetSection("Logging"));
+            //loggerFactory.AddDebug();
+
+            //new added
+            //loggingBuilder.AddConsole();
+            //loggingBuilder.AddDebug();
+
 
             app.UseCors("CorsPolicy");
 

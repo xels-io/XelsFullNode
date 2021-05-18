@@ -18,6 +18,7 @@ namespace Xels.Features.Diagnostic.Controllers
     /// Controller providing diagnostic operations on fullnode.
     /// </summary>
     [ApiVersion("1")]
+    [ApiController]
     [Route("api/[controller]/[action]")]
     public class DiagnosticController : FeatureController
     {
@@ -45,7 +46,7 @@ namespace Xels.Features.Diagnostic.Controllers
                     return new { peer.IsConnected, peer.DisconnectReason, peer.State, EndPoint = peer.PeerEndPoint.ToString() };
                 }
 
-                return this.Json(new
+                return this.Ok(new
                 {
                     peersByPeerId = peersByPeerId.Select(DumpPeer),
                     connectedPeers = connectedPeers.Select(DumpPeer),
@@ -67,7 +68,7 @@ namespace Xels.Features.Diagnostic.Controllers
         {
             try
             {
-                return this.Json(new
+                return this.Ok(new
                 {
                     PeerStatistics = this.peerStatisticsCollector.Enabled ? "Enabled" : "Disabled"
                 });
@@ -96,7 +97,7 @@ namespace Xels.Features.Diagnostic.Controllers
                     peerStatistics = peerStatistics.Where(peer => connectedPeersEndpoints.Contains(peer.PeerEndPoint));
                 }
 
-                return this.Json(peerStatistics.Select(peer => new PeerStatisticsModel(peer, connectedPeersEndpoints.Contains(peer.PeerEndPoint))));
+                return this.Ok(peerStatistics.Select(peer => new PeerStatisticsModel(peer, connectedPeersEndpoints.Contains(peer.PeerEndPoint))));
             }
             catch (Exception e)
             {

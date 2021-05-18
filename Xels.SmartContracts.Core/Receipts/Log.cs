@@ -48,10 +48,10 @@ namespace Xels.SmartContracts.Core.Receipts
 
         public static Log FromBytesRlp(byte[] bytes)
         {
-            RLPCollection list = RLP.Decode(bytes);
+            RLPCollection list = (RLPCollection)RLP.Decode(bytes);
             RLPCollection innerList = (RLPCollection)list[0];
 
-            RLPCollection topicList = RLP.Decode(innerList[1].RLPData);
+            RLPCollection topicList = (RLPCollection)RLP.Decode(innerList[1].RLPData);
             RLPCollection innerTopicList = (RLPCollection)topicList[0];
             IList<byte[]> topics = innerTopicList.Select(x => x.RLPData).ToList();
 

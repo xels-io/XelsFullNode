@@ -1,11 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+
 using FluentAssertions;
+
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
+
 using Moq;
+
 using NBitcoin;
+
 using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Base;
 using Xels.Bitcoin.Configuration;
@@ -15,6 +19,7 @@ using Xels.Bitcoin.P2P.Peer;
 using Xels.Bitcoin.Signals;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Utilities;
+
 using Xunit;
 
 namespace Xels.Bitcoin.Features.Dns.Tests
@@ -257,7 +262,10 @@ namespace Xels.Bitcoin.Features.Dns.Tests
 
             var logger = new Mock<ILogger>();
             bool serverError = false;
-            logger.Setup(l => l.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>())).Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((level, id, state, e, f) => serverError = state.ToString().StartsWith("Failed whilst running the DNS server"));
+            logger.Setup(l => l.Log(LogLevel.Error, It.IsAny<EventId>(),
+                It.IsAny<object>(), //FormattedLogValues
+                It.IsAny<Exception>(),
+                It.IsAny<Func<object, Exception, string>>())).Callback<LogLevel, EventId, object, Exception, Func<object, Exception, string>>((level, id, state, e, f) => serverError = state.ToString().StartsWith("Failed whilst running the DNS server"));
             this.defaultConstructorParameters.loggerFactory.Setup<ILogger>(f => f.CreateLogger(It.IsAny<string>())).Returns(logger.Object);
 
             // Act.

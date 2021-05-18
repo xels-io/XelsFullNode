@@ -34,8 +34,9 @@ namespace Xels.Features.FederatedPeg.Controllers
     /// Controller providing operations on a wallet.
     /// </summary>
     [ApiVersion("1")]
+    [ApiController]
     [Route("api/[controller]")]
-    public class FederationWalletController : Controller
+    public class FederationWalletController : ControllerBase
     {
         private readonly IFederationWalletManager federationWalletManager;
 
@@ -95,7 +96,7 @@ namespace Xels.Features.FederatedPeg.Controllers
                     IsDecrypted = true
                 };
 
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {
@@ -128,7 +129,7 @@ namespace Xels.Features.FederatedPeg.Controllers
                 var model = new WalletBalanceModel();
                 model.AccountsBalances.Add(balance);
 
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {
@@ -151,7 +152,7 @@ namespace Xels.Features.FederatedPeg.Controllers
 
                 List<WithdrawalModel> result = this.withdrawalHistoryProvider.GetHistory(maxEntriesToReturn);
 
-                return this.Json(result);
+                return this.Ok(result);
             }
             catch (Exception e)
             {
@@ -270,7 +271,7 @@ namespace Xels.Features.FederatedPeg.Controllers
                     CreationTime = r.creationTime
                 });
 
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {

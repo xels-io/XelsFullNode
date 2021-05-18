@@ -12,8 +12,9 @@ using Xels.Bitcoin.Utilities.ModelStateErrors;
 namespace Xels.Features.FederatedPeg.Controllers
 {
     [ApiVersion("1")]
+    [ApiController]
     [Route("api/[controller]")]
-    public class CollateralVotingController : Controller
+    public class CollateralVotingController : ControllerBase
     {
         protected readonly IFederationManager fedManager;
 

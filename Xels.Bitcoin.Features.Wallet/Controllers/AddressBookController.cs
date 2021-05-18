@@ -17,7 +17,8 @@ namespace Xels.Bitcoin.Features.Wallet.Controllers
     /// </summary>
     [ApiVersion("1")]
     [Route("api/[controller]")]
-    public class AddressBookController : Controller
+    [ApiController]
+    public class AddressBookController : ControllerBase
     {
         /// <summary>An instance of the address book manager.</summary>
         private readonly IAddressBookManager addressBookManager;
@@ -57,7 +58,7 @@ namespace Xels.Bitcoin.Features.Wallet.Controllers
             {
                 AddressBookEntry item = this.addressBookManager.AddNewAddress(request.Label, request.Address);
 
-                return this.Json(new AddressBookEntryModel { Label = item.Label, Address = item.Address });
+                return this.Ok(new AddressBookEntryModel { Label = item.Label, Address = item.Address });
             }
             catch (AddressBookException e)
             {
@@ -91,7 +92,7 @@ namespace Xels.Bitcoin.Features.Wallet.Controllers
                     return ErrorHelpers.BuildErrorResponse(HttpStatusCode.NotFound, $"No item with label '{label}' was found in the address book.", string.Empty);
                 }
 
-                return this.Json(new AddressBookEntryModel { Label = removedEntry.Label, Address = removedEntry.Address });
+                return this.Ok(new AddressBookEntryModel { Label = removedEntry.Label, Address = removedEntry.Address });
             }
             catch (Exception e)
             {
@@ -132,7 +133,7 @@ namespace Xels.Bitcoin.Features.Wallet.Controllers
                     Addresses = filteredAddressBook.Select(res => new AddressBookEntryModel { Label = res.Label, Address = res.Address })
                 };
 
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {

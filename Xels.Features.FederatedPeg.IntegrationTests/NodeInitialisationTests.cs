@@ -193,13 +193,13 @@ namespace Xels.Features.FederatedPeg.IntegrationTests
                 {
                     Password = "password",
                     Mnemonic = this.sidechainNetwork.FederationMnemonics[0].ToString()
-                }).Result.StatusCode.Should().Be(HttpStatusCode.OK);
+                }).Result.StatusCode.Should().Be((int)HttpStatusCode.OK);
 
                 $"http://localhost:{main.ApiPort}/api".AppendPathSegment("FederationWallet/enable-federation").PostJsonAsync(new EnableFederationRequest
                 {
                     Password = "password",
                     Mnemonic = this.sidechainNetwork.FederationMnemonics[0].ToString()
-                }).Result.StatusCode.Should().Be(HttpStatusCode.OK);
+                }).Result.StatusCode.Should().Be((int)HttpStatusCode.OK);
 
                 // If one node progresses far enough that the other can advance it's NextMatureDepositHeight, they're talking!
                 TestHelper.MineBlocks(main, DepositConfirmations + 1);

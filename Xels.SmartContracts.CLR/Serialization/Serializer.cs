@@ -226,7 +226,7 @@ namespace Xels.SmartContracts.CLR.Serialization
 
         private T DeserializeStruct<T>(byte[] bytes) where T : struct
         {
-            RLPCollection collection = (RLPCollection)RLP.Decode(bytes)[0];
+            RLPCollection collection = (RLPCollection)RLP.Decode(bytes); //[0]
 
             Type type = typeof(T);
 

@@ -35,7 +35,7 @@ namespace Xels.SmartContracts.Core.State
 
         public AccountState(byte[] bytes) : this()
         {
-            RLPCollection list = RLP.Decode(bytes);
+            RLPCollection list = (RLPCollection)RLP.Decode(bytes);
             RLPCollection innerList = (RLPCollection)list[0];
             this.CodeHash = innerList[0].RLPData;
             this.StateRoot = innerList[1].RLPData;

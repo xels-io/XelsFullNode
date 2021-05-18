@@ -86,7 +86,7 @@ namespace Xels.SmartContracts.CLR
 
         protected static IList<byte[]> RLPDecode(byte[] remaining)
         {
-            RLPCollection list = RLP.Decode(remaining);
+            RLPCollection list = (RLPCollection)RLP.Decode(remaining);
 
             RLPCollection innerList = (RLPCollection) list[0];
 

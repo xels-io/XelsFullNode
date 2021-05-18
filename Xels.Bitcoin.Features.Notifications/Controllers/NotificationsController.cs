@@ -11,7 +11,8 @@ namespace Xels.Bitcoin.Features.Notifications.Controllers
     /// </summary>
     [ApiVersion("1")]
     [Route("api/[controller]")]
-    public class NotificationsController : Controller
+    [ApiController]
+    public class NotificationsController : ControllerBase
     {
         private readonly IBlockNotification blockNotification;
 

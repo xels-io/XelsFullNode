@@ -35,7 +35,8 @@ namespace Xels.Bitcoin.Controllers
     /// </summary>
     [ApiVersion("1")]
     [Route("api/[controller]")]
-    public class NodeController : Controller
+    [ApiController]
+    public class NodeController : ControllerBase
     {
         /// <summary>Full Node.</summary>
         private readonly IFullNode fullNode;
@@ -136,6 +137,7 @@ namespace Xels.Bitcoin.Controllers
         [Route("status")]
         public IActionResult Status()
         {
+             //System.Diagnostics.Debugger.Break(); 
             // Output has been merged with RPC's GetInfo() since they provided similar functionality.
             var model = new StatusModel
             {
@@ -193,7 +195,7 @@ namespace Xels.Bitcoin.Controllers
                 }
             }
 
-            return this.Json(model);
+            return this.Ok(model);
         }
 
         /// <summary>
@@ -228,7 +230,7 @@ namespace Xels.Bitcoin.Controllers
                     model = new BlockHeaderModel(blockHeader);
                 }
 
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {
@@ -270,17 +272,17 @@ namespace Xels.Bitcoin.Controllers
 
                 if (trx == null)
                 {
-                    return this.Json(null);
+                    return this.Ok(null);
                 }
 
                 if (verbose)
                 {
                     ChainedHeader block = this.GetTransactionBlock(txid, this.fullNode, this.chainIndexer);
-                    return this.Json(new TransactionVerboseModel(trx, this.network, block, this.chainState?.ConsensusTip));
+                    return this.Ok(new TransactionVerboseModel(trx, this.network, block, this.chainState?.ConsensusTip));
                 }
                 else
                 {
-                    return this.Json(new TransactionBriefModel(trx));
+                    return this.Ok(new TransactionBriefModel(trx));
                 }
             }
             catch (Exception e)
@@ -306,7 +308,7 @@ namespace Xels.Bitcoin.Controllers
                     return ModelStateErrors.BuildErrorResponse(this.ModelState);
                 }
 
-                return this.Json(new TransactionVerboseModel(this.network.CreateTransaction(request.RawHex), this.network));
+                return this.Ok(new TransactionVerboseModel(this.network.CreateTransaction(request.RawHex), this.network));
             }
             catch (Exception e)
             {
@@ -358,7 +360,7 @@ namespace Xels.Bitcoin.Controllers
                     res.IsValid = true;
                 }
 
-                return this.Json(res);
+                return this.Ok(res);
             }
             catch (Exception e)
             {
@@ -403,10 +405,10 @@ namespace Xels.Bitcoin.Controllers
 
                 if (unspentOutputs == null)
                 {
-                    return this.Json(null);
+                    return this.Ok(null);
                 }
 
-                return this.Json(new GetTxOutModel(unspentOutputs, vout, this.network, this.chainIndexer.Tip));
+                return this.Ok(new GetTxOutModel(unspentOutputs, vout, this.network, this.chainIndexer.Tip));
             }
             catch (Exception e)
             {
@@ -542,7 +544,7 @@ namespace Xels.Bitcoin.Controllers
                     });
                 }
 
-                return this.Json(rules);
+                return this.Ok(rules);
             }
             catch (Exception e)
             {
@@ -574,7 +576,7 @@ namespace Xels.Bitcoin.Controllers
                     loops.Add(new AsyncLoopModel() { LoopName = loopName, Status = Enum.GetName(typeof(TaskStatus), status) });
                 }
 
-                return this.Json(loops);
+                return this.Ok(loops);
             }
             catch (Exception e)
             {

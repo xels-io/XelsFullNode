@@ -76,10 +76,10 @@ namespace Xels.Bitcoin.IntegrationTests
                 var exception = act.Should().Throw<FlurlHttpException>().Which;
                 var response = exception.Call.Response;
 
-                ErrorResponse errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(await response.Content.ReadAsStringAsync());
+                ErrorResponse errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(await response.GetStringAsync()); //Content.ReadAsStringAsync
                 List<ErrorModel> errors = errorResponse.Errors;
 
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
                 errors.Should().ContainSingle();
                 errors.First().Message.Should().Be($"Logger name `{ruleName}` doesn't exist.");
             }
@@ -109,10 +109,10 @@ namespace Xels.Bitcoin.IntegrationTests
                 var exception = act.Should().Throw<FlurlHttpException>().Which;
                 var response = exception.Call.Response;
 
-                ErrorResponse errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(await response.Content.ReadAsStringAsync());
+                ErrorResponse errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(await response.GetStringAsync()); //Content.ReadAsStringAsync
                 List<ErrorModel> errors = errorResponse.Errors;
 
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
                 errors.Should().ContainSingle();
                 errors.First().Message.Should().Be($"Failed converting {logLevel} to a member of NLog.LogLevel.");
             }
@@ -133,7 +133,7 @@ namespace Xels.Bitcoin.IntegrationTests
                 // Act.
                 var request = new LogRulesRequest { LogRules = new List<LogRuleRequest> { new LogRuleRequest { RuleName = ruleName, LogLevel = logLevel } } };
 
-                HttpResponseMessage result = await $"http://localhost:{node.ApiPort}/api"
+                HttpResponseMessage result = (HttpResponseMessage)await $"http://localhost:{node.ApiPort}/api"
                     .AppendPathSegment("node/loglevels")
                     .PutJsonAsync(request);
 
@@ -159,7 +159,7 @@ namespace Xels.Bitcoin.IntegrationTests
                 // Act.
                 var request = new LogRulesRequest { LogRules = new List<LogRuleRequest> { new LogRuleRequest { RuleName = ruleName, LogLevel = logLevel } } };
 
-                HttpResponseMessage result = await $"http://localhost:{node.ApiPort}/api"
+                HttpResponseMessage result = (HttpResponseMessage)await $"http://localhost:{node.ApiPort}/api"
                     .AppendPathSegment("node/loglevels")
                     .PutJsonAsync(request);
 
@@ -199,7 +199,7 @@ namespace Xels.Bitcoin.IntegrationTests
                 }
                 };
 
-                HttpResponseMessage result = await $"http://localhost:{node1.ApiPort}/api"
+                HttpResponseMessage result = (HttpResponseMessage)await $"http://localhost:{node1.ApiPort}/api"
                     .AppendPathSegment("node/loglevels")
                     .PutJsonAsync(request);
 

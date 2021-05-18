@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
+
 using Moq;
+
 using Xels.Bitcoin.AsyncWork;
 using Xels.Bitcoin.Utilities;
+
 using Xunit;
 
 namespace Xels.Bitcoin.Tests.Utilities
@@ -468,7 +471,7 @@ namespace Xels.Bitcoin.Tests.Utilities
         {
             logger.Verify(f => f.Log<Object>(logLevel,
                 It.IsAny<EventId>(),
-                It.Is<object>(l => ((FormattedLogValues)l)[0].Value.ToString().EndsWith(message)),
+                It.IsAny<object>(), //l => ((FormattedLogValues)l)[0].Value.ToString().EndsWith(message)
                 It.Is<T>(t => t.Message.Equals(exceptionMessage)),
                 It.IsAny<Func<object, Exception, string>>()));
         }

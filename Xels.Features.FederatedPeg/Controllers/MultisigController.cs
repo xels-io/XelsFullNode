@@ -16,8 +16,9 @@ namespace Xels.Features.FederatedPeg.Controllers
     /// Controller providing operations on a wallet.
     /// </summary>
     [ApiVersion("1")]
+    [ApiController]
     [Route("api/[controller]")]
-    public class MultisigController : Controller
+    public class MultisigController : ControllerBase
     {
         private readonly FedMultiSigManualWithdrawalTransactionBuilder fedMultiSigManualWithdrawalTransactionBuilder;
 
@@ -76,7 +77,7 @@ namespace Xels.Features.FederatedPeg.Controllers
                     TransactionId = transactionResult.GetHash()
                 };
 
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {

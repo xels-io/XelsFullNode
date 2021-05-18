@@ -11,7 +11,8 @@ namespace Xels.Bitcoin.Features.SignalR.Controllers
     /// Controller for connecting to SignalR.
     /// </summary>
     [Route("api/[controller]")]
-    public class SignalRController : Controller
+    [ApiController]
+    public class SignalRController : ControllerBase
     {
         private readonly SignalRSettings signalRSettings;
         private readonly ILogger logger;
@@ -35,7 +36,7 @@ namespace Xels.Bitcoin.Features.SignalR.Controllers
         {
             try
             {
-                return this.Json(new
+                return this.Ok(new
                 {
                     this.signalRSettings.SignalRUri,
                     this.signalRSettings.SignalPort
