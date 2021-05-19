@@ -22,18 +22,23 @@ namespace XelsDesktopWalletApp.Views
     public partial class Restore : Window
     {
 
-        private readonly IWalletManager _walletManager;
-        //static HttpClient client = new HttpClient();
-        //string baseURL = "http://localhost:37221/api/wallet";
+        //private readonly IWalletManager _walletManager;
+        static HttpClient client = new HttpClient();
+        string baseURL = "http://localhost:37221/api/wallet";
 
 
 
-        public Restore(IWalletManager walletManager)
+        public Restore()
         {
-            this._walletManager = walletManager;
-
             InitializeComponent();
         }
+
+        //public Restore(IWalletManager walletManager)
+        //{
+        //    this._walletManager = walletManager;
+
+        //    InitializeComponent();
+        //}
 
 
         public bool isValid()
@@ -79,29 +84,30 @@ namespace XelsDesktopWalletApp.Views
         {
             if (isValid())
             {
-                //string postUrl = baseURL + "/recover";
+                string postUrl = baseURL + "/recover";
 
                 WalletRecovery recovery = new WalletRecovery();
                 recovery.name = name.Text;
-                recovery.creationDate = creationDate.SelectedDate.Value;
+                //recovery.creationDate = creationDate.SelectedDate.Value;
+                recovery.creationDate = creationDate.Text;
                 recovery.mnemonic = mnemonic.Text;
                 recovery.passphrase = passphrase.Text;
                 recovery.password = password.Text;
 
-                this._walletManager.RecoverWallet(recovery.password, recovery.name, recovery.mnemonic,
-                        recovery.creationDate, passphrase: recovery.passphrase);
+                //this._walletManager.RecoverWallet(recovery.password, recovery.name, recovery.mnemonic,
+                //        recovery.creationDate, passphrase: recovery.passphrase);
 
 
-                //HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(recovery), Encoding.UTF8, "application/json"));
+                HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(recovery), Encoding.UTF8, "application/json"));
 
-                //if (response.IsSuccessStatusCode)
-                //{
-                //    MessageBox.Show("Successfully saved data with Name: " + recovery.name);
-                //}
-                //else
-                //{
-                //    MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
-                //}
+                if (response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Successfully saved data with Name: " + recovery.name);
+                }
+                else
+                {
+                    MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+                }
             }
 
         }

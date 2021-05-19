@@ -9,20 +9,42 @@
     <Border Padding="10">
         <StackPanel>
             <Grid Background="LimeGreen">
-                <TextBlock  Margin="0 10 10 0" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <Hyperlink NavigateUri="http://www.google.com"  >
-                Dashboard
-            </Hyperlink>
+
+                <TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" Height="18" Width="53" >
+                        <Hyperlink  NavigateUri="http://www.google.com" TextDecorations="">
+                            <Hyperlink.Style>
+                            <Style TargetType="{x:Type Hyperlink}"
+                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                            </Hyperlink.Style><Run Text="Dashboard"/>
+                        </Hyperlink>
                 </TextBlock>
-                <TextBlock  Margin="80 10 10 0" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <Hyperlink NavigateUri="http://www.google.com"  >
-                History
-            </Hyperlink>
+                <TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="70,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" Height="18" Width="36" >
+                        <Hyperlink  NavigateUri="http://www.google.com" TextDecorations="">
+                            <Hyperlink.Style>
+                            <Style TargetType="{x:Type Hyperlink}"
+                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                            </Hyperlink.Style><Run Text="History"/>
+                        </Hyperlink>
+                </TextBlock>
+                <TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="111,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" Height="18" Width="48" >
+                        <Hyperlink  NavigateUri="http://www.google.com" TextDecorations="">
+                            <Hyperlink.Style>
+                            <Style TargetType="{x:Type Hyperlink}"
+                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                            </Hyperlink.Style><Run Text="Exchange"/>
+                        </Hyperlink>
                 </TextBlock>
 
-                <Image Width="100" Source="/Images/home-xels-logo-01.png" />
+                <Image Height="50" Source="/Assets/Images/home-xels-logo-01.png"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" />
 
             </Grid>
+
 
             <TextBlock Margin="0,10,0,0" Width="179" Height="30" Text="AVAILABLE BALANCE"  FontSize="18" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light"/>
             <TextBlock Width="302" Height="50" FontSize="24" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light">

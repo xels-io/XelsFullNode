@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Xels.Bitcoin.Features.Wallet.Interfaces;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -25,16 +26,15 @@ namespace XelsDesktopWalletApp.Views
 
         private void restoreButton_Click(object sender, RoutedEventArgs e)
         {
-            //Restore restore = new Restore();
-            //restore.Show();
-            //this.Close();
+            Restore restore = new Restore();
+            restore.Show();
+            this.Close();
         }
         private void createButton_Click(object sender, RoutedEventArgs e)
         {
-            //Restore restore = new Restore();
-            //Create create = new Create();
-            //create.Show();
-            //this.Close();
+            Create create = new Create();
+            create.Show();
+            this.Close();
         }
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)

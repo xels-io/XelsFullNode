@@ -15,12 +15,37 @@
 
             </Grid>
 
-            <TextBlock Width="100" Height="75" Text="Welcome" FontWeight="Normal"  FontSize="22" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light"/>
-            <ComboBox  Width="531" Background="White" BorderBrush="LimeGreen"  SelectedIndex="0" Padding="5,5,5,5" FontFamily="Microsoft YaHei Light" Margin="0,0,10,0">
+            <TextBlock Width="100" Height="71" Text="Welcome" FontWeight="Normal"  FontSize="22" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light"/>
+
+            <!--<ComboBox x:Name="BusinessComboBox" DisplayMemberPath="IdNumber"  ItemsSource="{Binding _walletnames}"  Width="531" Background="White" BorderBrush="LimeGreen"  SelectedIndex="0" Padding="5,5,5,5" FontFamily="Microsoft YaHei Light" Margin="0,0,10,0">
                 <ComboBoxItem Content="Choose a wallet"/>
                 <ComboBoxItem Content="Wallet1"/>
-            </ComboBox>
+            </ComboBox>-->
+            
+            <!--<ComboBox x:Name="cmbWalletList"  Width="531" Background="White" BorderBrush="LimeGreen"  Padding="5,5,5,5" FontFamily="Microsoft YaHei Light" Margin="0,0,10,0" />
+            
+            <ComboBox  ItemsSource="{Binding walletLoadRequestModel.walletNames}" SelectedItem="{Binding walletLoadRequestModel.walletname, Mode=TwoWay}" Text="Select Option" Width="531" Background="White" BorderBrush="LimeGreen"  Padding="5,5,5,5" FontFamily="Microsoft YaHei Light" Margin="0,0,10,0" />-->
+            
+            
+            <!--<ComboBox ItemsSource="{Binding Name}"  
+                      Width="531" Background="White" BorderBrush="LimeGreen"  
+                      Padding="5,5,5,5" FontFamily="Microsoft YaHei Light" 
+                      Margin="0,0,10,0" >
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Names}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>-->
+
+            <ComboBox ItemsSource="{Binding Path=walletLoadRequestModel.walletNames}"
+                  DisplayMemberPath="{Binding Path=walletLoadRequestModel.walletname}"
+                  SelectedValuePath="{Binding Path=walletLoadRequestModel.walletname}"
+                  SelectedValue="{Binding Path=walletLoadRequestModel.walletname}" />
+
+
             <TextBox Margin="0 10 10 0" Width="531" Text="Enter your password " Padding="2" RenderTransformOrigin="0.792,0.552" FontFamily="Microsoft YaHei Light" Height="26" BorderBrush="LimeGreen" />
+            
             <Button Background="#FF53E253" Width="531" x:Name="decryptButton" Click="decryptButton_Click" Margin="0 10 10 0" Grid.Column="0" Content="Decrypt" FontFamily="Microsoft YaHei Light" FontWeight="Normal" Foreground="White" BorderThickness="0,0,0,0" Height="24" FontStyle="Normal" >
                 <Button.Resources>
                     <Style TargetType="Border">
@@ -29,12 +54,15 @@
                 </Button.Resources>
             </Button>
 
-            <TextBlock Background="White" Margin="0 10 10 0" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light" TextDecorations="" FontSize="10" Width="107" Height="17"><Hyperlink  NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_RequestNavigate" TextDecorations=""><Hyperlink.Style>
+            <TextBlock Background="White" Margin="0 10 10 0" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light" TextDecorations="" FontSize="10" Width="116" Height="17">
+                <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="http://www.google.com"  TextDecorations="">
+                    <Hyperlink.Style>
                     <Style TargetType="{x:Type Hyperlink}"
                             BasedOn="{StaticResource {x:Type Hyperlink}}">
                         <Setter Property="Foreground" Value="Black"/>
                     </Style>
-                </Hyperlink.Style><Run Text="Create or Restore a wallet"/></Hyperlink></TextBlock>
+                </Hyperlink.Style><Run Text="Create or Restore a wallet"/>
+                </Hyperlink></TextBlock>
         </StackPanel>
     </Border>
 

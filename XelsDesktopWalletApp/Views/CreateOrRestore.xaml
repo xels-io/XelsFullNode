@@ -9,7 +9,7 @@
     <Border Padding="10">
         <StackPanel>
             <Grid Background="LimeGreen">
-                <Image Width="100" Source="/Images/home-xels-logo-01.png" />
+                <Image Width="100" Source="/Assets/Images/home-xels-logo-01.png" />
 
             </Grid>
 
