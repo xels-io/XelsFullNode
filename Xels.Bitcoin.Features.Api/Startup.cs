@@ -123,10 +123,10 @@ namespace Xels.Bitcoin.Features.Api
                 logging.AddConsole();
                 logging.AddDebug();
                 logging.SetMinimumLevel(LogLevel.Trace);
-                logging.AddNLog();
+
             });
 
-            services.AddSingleton(typeof(ILogger), typeof(Logger<Startup>));
+            services.AddScoped(typeof(ILogger), typeof(Logger<Startup>));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

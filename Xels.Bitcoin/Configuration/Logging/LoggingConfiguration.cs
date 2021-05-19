@@ -227,7 +227,7 @@ namespace Xels.Bitcoin.Configuration.Logging
         /// Configure the console logger and set it to filter logs not related to the fullnode.
         /// </summary>
         /// <param name="loggerFactory">The logger factory to add the console logger.</param>
-        public static void AddConsoleWithFilters(this ILoggerFactory loggerFactory/*, ILoggingBuilder loggingBuilder*/)
+        public static void AddConsoleWithFilters(this ILoggerFactory loggerFactory)
         {
             //var consoleLoggerSettings = new ConsoleLoggerSettings
             //{
@@ -250,35 +250,39 @@ namespace Xels.Bitcoin.Configuration.Logging
             //extendedLoggerFactory.ConsoleLoggerProvider = consoleLoggerProvider;
             //extendedLoggerFactory.ConsoleSettings = consoleLoggerSettings;
 
+            //var ll = new LoggerFilterOptions()
+            //{
+            //    MinLevel = Microsoft.Extensions.Logging.LogLevel.Information
+            //};
+
+
             using (var loggerFactoryy = LoggerFactory.Create(builder =>
              {
                  builder
                  .AddFilter("default", Microsoft.Extensions.Logging.LogLevel.Information)
                  .AddFilter("Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning)
                  .AddFilter("System", Microsoft.Extensions.Logging.LogLevel.Warning)
-                 .AddFilter("Microsoft.AspNetCore", Microsoft.Extensions.Logging.LogLevel.Error).AddConsole();
+                 .AddFilter("Microsoft.AspNetCore", Microsoft.Extensions.Logging.LogLevel.Error);
 
              }))
             {
-                //loggingBuilder.AddFilter("default", Microsoft.Extensions.Logging.LogLevel.Information);
-                //loggingBuilder.AddFilter("Microsoft", Microsoft.Extensions.Logging.LogLevel.Warning);
-                //loggingBuilder.AddFilter("System", Microsoft.Extensions.Logging.LogLevel.Warning);
-                //loggingBuilder.AddFilter("Microsoft.AspNetCore", Microsoft.Extensions.Logging.LogLevel.Error);
 
-                //var consoleLoggerProvder = new ConsoleLoggerProvider((IOptionsMonitor<ConsoleLoggerOptions>)loggingBuilder);
-                //loggerFactory.AddProvider(consoleLoggerProvder);
+                try
+                {
 
+                    var consoleLoggerProvder = new ConsoleLoggerProvider((IOptionsMonitor<ConsoleLoggerOptions>)loggerFactoryy);
+                    loggerFactory.AddProvider(consoleLoggerProvder);
 
+                    var extendedLoggerFactory = loggerFactory as ExtendedLoggerFactory;
+                    Guard.NotNull(extendedLoggerFactory, nameof(extendedLoggerFactory));
+                    extendedLoggerFactory.ConsoleLoggerProvider = consoleLoggerProvder;
+                    //extendedLoggerFactory.ConsoleSettings = consoleLoggerSettings;
+                }
+                catch (Exception e)
+                {
 
-                //var consoleLoggerProvder = new ConsoleLoggerProvider((IOptionsMonitor<ConsoleLoggerOptions>)loggerFactoryy);
-                //loggerFactory.AddProvider(consoleLoggerProvder);
-
-                var extendedLoggerFactory = loggerFactory as ExtendedLoggerFactory;
-                Guard.NotNull(extendedLoggerFactory, nameof(extendedLoggerFactory));
-                //extendedLoggerFactory.ConsoleLoggerProvider = consoleLoggerProvder;
+                }
             }
-
-            //extendedLoggerFactory.ConsoleSettings = consoleLoggerSettings;
 
         }
 
