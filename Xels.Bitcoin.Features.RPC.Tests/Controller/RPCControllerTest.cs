@@ -4,24 +4,29 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
+
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Primitives;
+
 using Moq;
+
 using NBitcoin;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Features.RPC.Controllers;
 using Xels.Bitcoin.Features.RPC.Models;
 using Xels.Bitcoin.Tests.Common;
 using Xels.Bitcoin.Tests.Common.Logging;
 using Xels.Bitcoin.Utilities.JsonErrors;
+
 using Xunit;
 
 namespace Xels.Bitcoin.Features.RPC.Tests.Controller

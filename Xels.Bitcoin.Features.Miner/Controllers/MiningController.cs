@@ -22,7 +22,8 @@ namespace Xels.Bitcoin.Features.Miner.Controllers
     /// </summary>
     [ApiVersion("1")]
     [Route("api/[controller]")]
-    public class MiningController : Controller
+    [ApiController]
+    public class MiningController : ControllerBase
     {
         private const string ExceptionOccurredMessage = "Exception occurred: {0}";
         public const string LastPowBlockExceededMessage = "This is a POS node and mining is not allowed past block {0}";
@@ -127,7 +128,7 @@ namespace Xels.Bitcoin.Features.Miner.Controllers
 
                 this.logger.LogTrace("(-):*.{0}={1}", "Generated block count", generateBlocksModel.Blocks.Count);
 
-                return this.Json(generateBlocksModel);
+                return this.Ok(generateBlocksModel);
             }
             catch (Exception e)
             {

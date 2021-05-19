@@ -19,7 +19,8 @@ namespace Xels.Bitcoin.Features.Miner.Controllers
     /// </summary>
     [ApiVersion("1")]
     [Route("api/[controller]")]
-    public class StakingController : Controller
+    [ApiController]
+    public class StakingController : ControllerBase
     {
         /// <summary>Instance logger.</summary>
         private readonly ILogger logger;
@@ -67,7 +68,7 @@ namespace Xels.Bitcoin.Features.Miner.Controllers
 
                 GetStakingInfoModel model = this.posMinting != null ? this.posMinting.GetGetStakingInfoModel() : new GetStakingInfoModel();
 
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.OpenApi.Models;
+
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -54,15 +56,16 @@ namespace Xels.Bitcoin.Features.Api
             {
                 options.IncludeXmlComments(walletXmlPath);
             }
+            options.UseInlineDefinitionsForEnums();
 
-            options.DescribeAllEnumsAsStrings();
+            //options.DescribeAllEnumsAsStrings();
             
             //options.ResolveConflictingActions(ApiD)
         }
 
-        static Info CreateInfoForApiVersion(ApiVersionDescription description)
+        static OpenApiInfo CreateInfoForApiVersion(ApiVersionDescription description)
         {
-            var info = new Info()
+            var info = new OpenApiInfo()
             {
                 Title = "Xels Node API",
                 Version = description.ApiVersion.ToString(),

@@ -14,7 +14,8 @@ namespace Xels.Bitcoin.Features.WatchOnlyWallet.Controllers
     /// </summary>
     [ApiVersion("1")]
     [Route("api/[controller]")]
-    public class WatchOnlyWalletController : Controller
+    [ApiController]
+    public class WatchOnlyWalletController : ControllerBase
     {
         /// <summary> The watch-only wallet manager. </summary>
         private readonly IWatchOnlyWalletManager watchOnlyWalletManager;
@@ -100,7 +101,7 @@ namespace Xels.Bitcoin.Features.WatchOnlyWallet.Controllers
                     model.WatchedTransactions.Add(watchedTransactionModel);
                 }
 
-                return this.Json(model);
+                return this.Ok(model);
             }
             catch (Exception e)
             {

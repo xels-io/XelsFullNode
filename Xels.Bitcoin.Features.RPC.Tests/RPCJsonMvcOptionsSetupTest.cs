@@ -15,7 +15,7 @@ namespace Xels.Bitcoin.Features.RPC.Tests
             ArrayPool<char> charpool = ArrayPool<char>.Create();
             var options = new MvcOptions();
             options.OutputFormatters.Clear();
-            options.OutputFormatters.Add(new JsonOutputFormatter(settings, charpool));
+            options.OutputFormatters.Add(new NewtonsoftJsonOutputFormatter(settings, charpool,null)); //JsonOutputFormatter
 
             RPCJsonMvcOptionsSetup.ConfigureMvc(options, settings, null, charpool, null);
 

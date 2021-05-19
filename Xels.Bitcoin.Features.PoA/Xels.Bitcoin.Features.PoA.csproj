@@ -3,7 +3,8 @@
   <PropertyGroup>
     <Description>Xels Bitcoin Features PoA</Description>
     <AssemblyTitle>Xels.Bitcoin.Features.PoA</AssemblyTitle>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RuntimeFrameworkVersion>3.1.13</RuntimeFrameworkVersion>
     <AssemblyName>Xels.Bitcoin.Features.PoA</AssemblyName>
     <PackageId>Xels.Bitcoin.Features.PoA</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -20,10 +21,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog.Config" Version="4.7.9" />
     <PackageReference Include="Tracer.Fody" Version="3.3.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>

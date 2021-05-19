@@ -102,9 +102,9 @@ namespace Xels.Bitcoin
             }
 
             if (failWithDefault)
-                return default(T);
+                return default;
 
-            throw new InvalidOperationException($"The {typeof(T).ToString()} service is not supported");
+            throw new InvalidOperationException($"The {typeof(T)} service is not supported");
         }
 
         public T NodeFeature<T>(bool failWithError = false)
@@ -117,9 +117,9 @@ namespace Xels.Bitcoin
             }
 
             if (!failWithError)
-                return default(T);
+                return default;
 
-            throw new InvalidOperationException($"The {typeof(T).ToString()} feature is not supported");
+            throw new InvalidOperationException($"The {typeof(T)} feature is not supported");
         }
 
         /// <inheritdoc />

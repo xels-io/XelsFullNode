@@ -7,7 +7,8 @@ using Xels.Bitcoin.Features.BlockStore;
 namespace Xels.Bitcoin.Features.BlockExplorer
 {
     [Route("api/[controller]")]
-    public class BlockExplorerController : Controller
+    [ApiController]
+    public class BlockExplorerController : ControllerBase
     {
         private readonly ChainIndexer chain;
         private readonly IBlockRepository blockStoreCache;
@@ -56,7 +57,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
             blockInfo.Confirmations = this.chain.Tip.Height - chainedBlock.Height + 1;
             blockInfo.Height = chainedBlock.Height;
 
-            return this.Json(blockInfo);
+            return this.Ok(blockInfo);
         }
 
         [Route("GetAllBlockInfo")]
@@ -87,7 +88,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
                 blockInfo.Height = chainedBlock.Height;
                 lstBlockInformation.Add(blockInfo);
             }
-            return this.Json(lstBlockInformation);
+            return this.Ok(lstBlockInformation);
         }
 
         [Route("RestblockAppend")]
@@ -121,7 +122,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
                 lstBlockInformation.Add(blockInfo);
             }
 
-            return this.Json(lstBlockInformation);
+            return this.Ok(lstBlockInformation);
         }
       
         [Route("GetLastNBlockInfo")]
@@ -162,7 +163,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
                 blockInfo.Height = chainedBlock.Height;
                 lstBlockInformation.Add(blockInfo);
             }
-            return this.Json(lstBlockInformation);
+            return this.Ok(lstBlockInformation);
         }
 
         //[Route("GetTransaction")]
@@ -172,7 +173,7 @@ namespace Xels.Bitcoin.Features.BlockExplorer
         //    RPCClient rpcClient = GetRPC();
         //    Transaction tx = rpcClient.GetRawTransaction(uint256.Parse(strTxId), false);
 
-        //    return this.Json(tx);
+        //    return this.Ok(tx);
         //}
 
         //public static RPCClient GetRPC()

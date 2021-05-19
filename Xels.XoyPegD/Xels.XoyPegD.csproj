@@ -2,9 +2,17 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <RuntimeFrameworkVersion>2.1.1</RuntimeFrameworkVersion>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <!--<RuntimeFrameworkVersion>3.1.13</RuntimeFrameworkVersion>-->
   </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLog.Config" Version="4.7.9" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Xels.Bitcoin.Features.Notifications\Xels.Bitcoin.Features.Notifications.csproj" />

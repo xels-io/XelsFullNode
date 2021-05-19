@@ -100,7 +100,7 @@ namespace Xels.Features.FederatedPeg.IntegrationTests
             ulong gasPrice = SmartContractMempoolValidator.MinGasPrice,
             double feeAmount = 0.01)
         {
-            HttpResponseMessage createContractResponse = await $"http://localhost:{node.ApiPort}/api"
+            HttpResponseMessage createContractResponse = (HttpResponseMessage)await $"http://localhost:{node.ApiPort}/api"
                 .AppendPathSegment("SmartContracts/build-and-send-create")
                 .PostJsonAsync(new
                 {

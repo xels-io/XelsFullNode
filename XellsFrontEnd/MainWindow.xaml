@@ -1,0 +1,23 @@
+﻿<Window x:Class="XellsFrontEnd.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XellsFrontEnd"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <WrapPanel>
+
+            <TextBlock Text="Version : " FontSize="25"/>
+            <TextBox  Name="Version" Text="{Binding Path = Version}" Grid.Column = "1" Grid.Row = "1" Margin = "2" />
+        </WrapPanel>
+ 
+        
+        
+        <!--<Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="311,378,0,0" VerticalAlignment="Top" Height="30" Width="130" FontSize="20" Click="button_Click"/>-->
+
+
+
+    </Grid>
+</Window>

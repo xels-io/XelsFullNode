@@ -19,7 +19,7 @@ namespace Xels.SmartContracts.CLR.Decompilation
                 try
                 {
                     ModuleDefinition modDefinition = ModuleDefinition.ReadModule(memStream);
-                    var decompiler = new CSharpDecompiler(modDefinition, new DecompilerSettings { });
+                    var decompiler = new CSharpDecompiler(modDefinition.ToString(), new DecompilerSettings { });
                     string cSharp = decompiler.DecompileWholeModuleAsString();
                     return Result.Ok(cSharp);
                 }

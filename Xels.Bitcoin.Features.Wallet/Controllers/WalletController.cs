@@ -20,6 +20,7 @@ namespace Xels.Bitcoin.Features.Wallet.Controllers
     /// </summary>
     [ApiVersion("1")]
     [Route("api/[controller]")]
+    [ApiController]
     public class WalletController : FeatureControllerBase
     {
         private readonly IWalletService walletService;

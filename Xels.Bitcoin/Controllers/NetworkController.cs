@@ -19,7 +19,8 @@ namespace Xels.Bitcoin.Controllers
     /// </summary>
     [ApiVersion("1")]
     [Route("api/[controller]")]
-    public sealed class NetworkController : Controller
+    [ApiController]
+    public sealed class NetworkController : ControllerBase
     {
         /// <summary>The connection manager.</summary>
         private readonly IConnectionManager connectionManager;
@@ -125,7 +126,7 @@ namespace Xels.Bitcoin.Controllers
             {
                 List<PeerAddress> allBannedPeers = this.peerBanning.GetAllBanned();
 
-                return this.Json(allBannedPeers.Select(p => new BannedPeerModel() { EndPoint = p.Endpoint.ToString(), BanUntil = p.BanUntil, BanReason = p.BanReason }));
+                return this.Ok(allBannedPeers.Select(p => new BannedPeerModel() { EndPoint = p.Endpoint.ToString(), BanUntil = p.BanUntil, BanReason = p.BanReason }));
             }
             catch (Exception e)
             {

@@ -1,0 +1,70 @@
+﻿<Window x:Class="XelsDesktopWalletApp.Views.Restore"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XelsDesktopWalletApp.Views"
+        mc:Ignorable="d"
+        Title="Restore" Height="450" Width="800">
+    <Border Padding="10">
+        <StackPanel>
+            <Grid Background="LimeGreen">
+                <Image Width="100" Source="/Images/home-xels-logo-01.png" />
+
+            </Grid>
+            <TextBlock Background="White" Margin="0 10 10 0" HorizontalAlignment="Center">
+
+            </TextBlock>
+            <TextBlock Margin="0,10,0,0" Width="152" Height="32" Text="Restore a wallet" HorizontalAlignment="Center"  FontSize="20" FontFamily="Microsoft YaHei Light" />
+            <TextBlock Text="Name" FontFamily="Microsoft YaHei Light" Width="445" Padding="1,1,1,1" />
+            <TextBox Name="name" Width="450" Text="Enter a wallet name." Padding="5,5,5,5" AutomationProperties.HelpText="Enter a wallet name." TextBlock.FontFamily="Microsoft YaHei Light" BorderBrush="#FFAAAAAA" />
+
+            <TextBlock Margin="160,10,0,0" Text="Earliest Possible Creation Date" FontFamily="Microsoft YaHei Light" Width="608" Padding="1,1,1,1" />
+            <DatePicker Width="450" Name="creationDate" DisplayDate="2019-01-01" TextBlock.FontFamily="Microsoft YaHei Light" >
+                <DatePicker.BorderBrush>
+                    <LinearGradientBrush EndPoint="0.5,0" StartPoint="0.5,1">
+                        <GradientStop Color="#FFA3AEB9"/>
+                        <GradientStop Color="#FF8399A9" Offset="0"/>
+                        <GradientStop Color="#FF718597" Offset="0"/>
+                        <GradientStop Color="#FFAAAAAA" Offset="0"/>
+                    </LinearGradientBrush>
+                </DatePicker.BorderBrush>
+            </DatePicker>
+
+            <TextBlock Margin="160,10,0,0" Text="Secret Words" FontFamily="Microsoft YaHei Light" Width="607" Padding="1,1,1,1" />
+            <TextBox Name="mnemonic" Width="450" Padding="5,5,5,5" Text="Enter your secret words." TextBlock.FontFamily="Microsoft YaHei Light" BorderBrush="#FFAAAAAA" />
+            
+            <TextBlock Margin="160,10,0,0" Text="Password" FontFamily="Microsoft YaHei Light" Width="607" Padding="1,1,1,1" />
+            <TextBox Name="password" Width="450" Padding="5,5,5,5" Text="Enter a password." TextBlock.FontFamily="Microsoft YaHei Light" BorderBrush="#FFAAAAAA" />
+            
+            <TextBlock Margin="160,10,0,0" Text="Passphrase (optional)" FontFamily="Microsoft YaHei Light" Width="607" Padding="1,1,1,1" />
+            <TextBox Name="passphrase" Width="450" Padding="5,5,5,5" Text="Enter an optional Passphrase." TextBlock.FontFamily="Microsoft YaHei Light" BorderBrush="#FFAAAAAA" />
+
+            <Grid Width="420" Margin="0,20,0,0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="6*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Width="67" HorizontalAlignment="Left" x:Name="cancelButton" Click="cancelButton_Click" Margin="-17,0,0,0" Grid.Column="0" Content="Cancel" Height="28" VerticalAlignment="Center" Padding="5,5,5,5" TextBlock.FontFamily="Microsoft YaHei Light" Background="White" Foreground="#FF53E253" BorderThickness="1,1,1,1" BorderBrush="#FF53E253" FontSize="14">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button x:Name="restoreButton" Click="restoreButton_Click" Content="Restore" Padding="5,5,5,5" TextBlock.FontFamily="Microsoft YaHei Light" Background="#FF53E253" Foreground="White" BorderThickness="0,0,0,0" Margin="0,0,-15,0" Grid.Column="1" FontSize="14">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+            </Grid>
+
+        </StackPanel>
+    </Border>
+</Window>

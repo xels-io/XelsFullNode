@@ -36,7 +36,7 @@ namespace Xels.Bitcoin.Controllers
 
         public const int TimeoutMs = 60_000;
 
-        private readonly RetryPolicy policy;
+        private readonly AsyncRetryPolicy policy;
 
         /// <inheritdoc />
         public string EndpointUrl => this.endpointUrl;

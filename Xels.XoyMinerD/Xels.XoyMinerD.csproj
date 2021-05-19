@@ -2,10 +2,31 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <RuntimeFrameworkVersion>2.1.1</RuntimeFrameworkVersion>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageIcon>icon.ico</PackageIcon>
+    <Copyright>xels.io</Copyright>
+    <SignAssembly>true</SignAssembly>
+    <!--<RuntimeFrameworkVersion>3.1.13</RuntimeFrameworkVersion>-->
   </PropertyGroup>
 
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>f935dc20-1cf0-11d0-adb9-00c04fd58a0b</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Xels.Bitcoin.Features.Api\Xels.Bitcoin.Features.Api.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.Notifications\Xels.Bitcoin.Features.Notifications.csproj" />
@@ -13,6 +34,17 @@
     <ProjectReference Include="..\Xels.Features.Collateral\Xels.Features.Collateral.csproj" />
     <ProjectReference Include="..\Xels.Features.SQLiteWalletRepository\Xels.Features.SQLiteWalletRepository.csproj" />
     <ProjectReference Include="..\Xels.Sidechains.Networks\Xels.Sidechains.Networks.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="..\icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="NLog.Config" Version="4.7.9" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,57 @@
+﻿<Window x:Class="XelsDesktopWalletApp.Views.CreateShowMnemonic"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XelsDesktopWalletApp.Views"
+        mc:Ignorable="d"
+        Title="CreateShowMnemonic" Height="627" Width="829">
+    <Border Padding="10" Margin="0,0,10,43">
+        <StackPanel Margin="0,0,-10,0" Height="587" VerticalAlignment="Top">
+            <Grid Background="LimeGreen">
+                <Image Width="100" Source="/Assets/Images/home-xels-logo-01.png" />
+
+            </Grid>
+            <TextBlock Background="White" Margin="0 10 10 0" HorizontalAlignment="Center">
+
+            </TextBlock>
+            <TextBlock Margin="0,10,0,0" Width="173" Height="78" Text="Secret Words" HorizontalAlignment="Center"  FontSize="28" FontFamily="Microsoft YaHei Light" />
+
+            <TextBlock  x:Name="textBoxTextToMnemonic" TextWrapping="Wrap" Height="76" Width="416" FontFamily="Microsoft YaHei Light" FontSize="14"/>
+            <Button x:Name="copyClipboardButton" Width="414" Click="copyClipboardButton_Click" Content="Copy" Padding="5,5,5,5" TextBlock.FontFamily="Microsoft YaHei Light" Background="#FF53E253" Foreground="White" BorderThickness="0,0,0,0" FontSize="14">
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+
+            <Grid Width="420" Margin="0,20,0,0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="6*" />
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="cancelButton" Click="cancelButton_Click" Margin="-14,0,10,0" Grid.Column="0" Content="Cancel" Height="29" VerticalAlignment="Center" Padding="5,5,5,5" TextBlock.FontFamily="Microsoft YaHei Light" Background="White" Foreground="#FF53E253" BorderThickness="1,1,1,1" BorderBrush="#FF53E253" FontSize="14" RenderTransformOrigin="0.331,0.533">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Width="370" HorizontalAlignment="Left" x:Name="continueButton" Click="continueButton_Click" Grid.Column="1" Content="Continue" Padding="5,5,5,5" TextBlock.FontFamily="Microsoft YaHei Light" Background="#FF53E253" Foreground="White" BorderThickness="0,0,0,0" Margin="0,0,-15,0" FontSize="14">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+            </Grid>
+
+        </StackPanel>
+    </Border>
+</Window>

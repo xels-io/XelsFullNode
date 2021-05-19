@@ -1,11 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <RuntimeFrameworkVersion>2.1.1</RuntimeFrameworkVersion>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RuntimeFrameworkVersion>3.1.3</RuntimeFrameworkVersion>
     <Version>3.0.8.0</Version>
     <Authors>Xels Group Ltd.</Authors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLog.Config" Version="4.7.9" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Xels.Bitcoin.Features.SmartContracts\Xels.Bitcoin.Features.SmartContracts.csproj" />
