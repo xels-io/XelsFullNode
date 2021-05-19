@@ -43,6 +43,22 @@
 
                 <Image Height="50" Source="/Assets/Images/home-xels-logo-01.png"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" />
 
+                <!--<TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="702,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" Height="18" Width="58" >
+                        <Hyperlink  NavigateUri="http://www.google.com" TextDecorations="">
+                            <Hyperlink.Style>
+                            <Style TargetType="{x:Type Hyperlink}"
+                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                            </Hyperlink.Style><Run Text="Account"/>
+                        </Hyperlink>
+                </TextBlock>-->
+
+                <ComboBox x:Name="AccountComboBox" DisplayMemberPath="IdNumber" Background="ForestGreen" Padding="2 2 2 2" Margin="702,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="9" Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" Height="18" Width="58" >
+                    <ComboBoxItem Content="Address Book"/>
+                    <ComboBoxItem Content="Advanced"/>
+                    <ComboBoxItem Content="Logout"/>
+                </ComboBox>
             </Grid>
 
 

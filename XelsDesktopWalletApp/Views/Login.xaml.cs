@@ -28,55 +28,48 @@ namespace XelsDesktopWalletApp.Views
         static HttpClient client = new HttpClient();
         string baseURL = "http://localhost:37221/api/wallet";
         List<string> listData;
-        WalletLoadRequest walletLoadRequestModel = new WalletLoadRequest();
 
-        public class ComboData
+
+        public List<WalletLoadRequest> _myList { get; set; }
+        private List<WalletLoadRequest> myList = new List<WalletLoadRequest>();
+        private WalletLoadRequest selectedWallet = new WalletLoadRequest();
+
+        public List<WalletLoadRequest> MyList
         {
-            public ComboData()
+            get
             {
-                this.Name = "Empty Name";
-                this.Names = null;
+                return this.myList;
             }
-            public string Name { get; set; }
-            public List<string> Names { get; set; }
-
+            set
+            {
+                this.myList = value;
+            }
         }
-        ComboData comboData = new ComboData();
+        public WalletLoadRequest SelectedWallet
+        {
+            get
+            {
+                return this.selectedWallet;
+            }
+            set
+            {
+                this.selectedWallet = value;
+            }
+        }
 
-        //public class ComboData
-        //{
-        //    public int Id { get; set; }
-        //    public string Value { get; set; }
-        //}
 
         public Login()
         {
             InitializeComponent();
+
+            this.DataContext = this;
+
             LoadLogin();
-            //ItemsSource = this.walletLoadRequestModel.walletNames;
-            this.walletLoadRequestModel.walletname = "--select wallet--";
-            comboLoad();
-            //this.comboData.Name = this.walletLoadRequestModel.walletname;
-            //this.comboData.Names = this.walletLoadRequestModel.walletNames;
         }
 
-        private void comboLoad()
-        {
-            //this.cmbWalletList.DisplayMemberPath = this.walletLoadRequestModel.walletname;
-            //this.cmbWalletList.SelectedValuePath = this.walletLoadRequestModel.walletname;
-            //this.cmbWalletList.ItemsSource = this.walletLoadRequestModel.walletNames;
-            //this.cmbWalletList.Text = "Choose Wallet";
-            //this.cmbWalletList.SelectedIndex = 0;
-
-            //ItemsSource = "{Binding Path=walletLoadRequestModel.walletNames}"
-            //  DisplayMemberPath = "walletLoadRequestModel.walletname"
-            //  SelectedValuePath = "walletLoadRequestModel.walletname"
-            //  SelectedValue = "{Binding Path=walletLoadRequestModel.walletname}" />
-        }
 
         public async void LoadLogin()
         {
-            //this.walletLoadRequestModel = await GetAPIAsync(this.baseURL);
             await GetAPIAsync(this.baseURL);
         }
 
@@ -85,33 +78,16 @@ namespace XelsDesktopWalletApp.Views
         {
             string getUrl = path + "/list-wallets";
             var content = "";
-            List<WalletLoadRequest> model = null ;
 
             HttpResponseMessage response = await client.GetAsync(getUrl);
             if (response.IsSuccessStatusCode)
             {
                 content = await response.Content.ReadAsStringAsync();
-                //model = JsonConvert.DeserializeObject<List<WalletLoadRequest>>(content);
             }
             else
             {
                 MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
             }
-
-            //return model;
-
-            // var jsonData = content;
-
-            //// name deserializedName = JsonConvert.DeserializeObject<name>(jsonData);
-
-            // //JavaScriptSerializer ser = new JavaScriptSerializer();
-
-            // nameList myNames = JavaScriptSerializer.ser.Deserialize<nameList>(jsonData);
-
-            // return ser.Serialize(myNames);
-
-
-
             converted(content);
         }
 
@@ -121,23 +97,17 @@ namespace XelsDesktopWalletApp.Views
             string[] rowData = data.Split(':');
             string[] rowDataMain = rowData[1].Split('\"');
             this.listData = rowDataMain.ToList();
-            //this.walletLoadRequestModel.walletNames = rowDataMain.ToList();
 
-            foreach (var i in rowDataMain)
+            foreach (var d in rowDataMain)
             {
-                this.walletLoadRequestModel.walletNames.Add(i);
-            }
-
-            for (int i = 0; i < rowDataMain.Length; i++)
-            {
-
-                if (i % 2 == 0)
+                WalletLoadRequest wlr = new WalletLoadRequest();
+                wlr.name = d;
+                if (!( d.Contains("[") || d.Contains(",") || d.Contains("]") ))
                 {
-                    this.walletLoadRequestModel.walletNames.Remove(this.listData[i]);
+                    this.myList.Add(wlr);
+
                 }
-
             }
-
         }
 
 
@@ -147,12 +117,39 @@ namespace XelsDesktopWalletApp.Views
             cr.Show();
             this.Close();
         }
-        private void decryptButton_Click(object sender, RoutedEventArgs e)
+
+
+
+        private async void decryptButton_Click(object sender, RoutedEventArgs e)
         {
-            Dashboard db = new Dashboard();
-            db.Show();
-            this.Close();
+
+            if (this.SelectedWallet.name != null)
+            {
+                this.selectedWallet.password = this.password.Password;
+
+                string postUrl = this.baseURL + "/load/";
+
+                HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.SelectedWallet), Encoding.UTF8, "application/json"));
+
+                if (response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Successfully logged in by " + this.SelectedWallet.name);
+
+                    Dashboard db = new Dashboard();
+                    db.Show();
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+                }
+
+            }
+
+
         }
+
+
 
     }
 }
