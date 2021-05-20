@@ -33,11 +33,11 @@ namespace XelsDesktopWalletApp
 
         private void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<MainWindow>();
+            //services.AddSingleton<MainWindow>();
             //services.AddSingleton<IFullNode, FullNode>();
             //services.AddSingleton<IChainState, ChainState>();
             //services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-            services.AddSingleton<IWalletManager, WalletManager>();
+            //services.AddSingleton<IWalletManager, WalletManager>();
 
         }
 
@@ -48,9 +48,9 @@ namespace XelsDesktopWalletApp
 
             await this._host.StartAsync();
 
-            var mainWindow = this._host.Services.GetRequiredService<MainWindow>();
-            mainWindow.Show();
-            base.OnStartup(e);
+            //var mainWindow = this._host.Services.GetRequiredService<MainWindow>();
+            //mainWindow.Show();
+            //base.OnStartup(e);
 
         }
 

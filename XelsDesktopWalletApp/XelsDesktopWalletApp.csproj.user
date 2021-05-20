@@ -12,6 +12,15 @@
     <Compile Update="UserControls\logo.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\AddressBook.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\AddressBookAddNew.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Advanced.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\Create.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -30,10 +39,16 @@
     <Compile Update="Views\Detail.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\Exchange.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\History.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\Login.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\LogoutConfirm.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\Receive.xaml.cs">
@@ -56,6 +71,15 @@
     <Page Update="UserControls\logo.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\AddressBook.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\AddressBookAddNew.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Advanced.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\Create.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -74,10 +98,16 @@
     <Page Update="Views\Detail.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\Exchange.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\History.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Login.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\LogoutConfirm.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Receive.xaml">

@@ -1,11 +1,11 @@
-﻿<Window x:Class="XelsDesktopWalletApp.Views.Dashboard"
+﻿<Window x:Class="XelsDesktopWalletApp.Views.AddressBookAddNew"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XelsDesktopWalletApp.Views"
         mc:Ignorable="d"
-        Title="Dashboard" Height="450" Width="800">
+        Title="AddressBookAddNew" Height="450" Width="800">
     <Border Padding="10">
         <StackPanel>
             <Grid Background="LimeGreen">
@@ -70,23 +70,9 @@
                         </Hyperlink>
                         </TextBlock>
                     </ComboBoxItem>
-                    
                     <ComboBoxItem Content="Advanced"/>
-                    
-                    <ComboBoxItem >
-                        <TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="111,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="9" Foreground="#FF434943" Height="18" Width="48" >
-                        <Hyperlink  RequestNavigate="Hyperlink_NavigateLogout" NavigateUri="http://www.google.com" >
-                            <Hyperlink.Style>
-                            <Style TargetType="{x:Type Hyperlink}"
-                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
-                                <Setter Property="Foreground" Value="White"/>
-                            </Style>
-                            </Hyperlink.Style><Run Text="Logout"/>
-                        </Hyperlink>
-                        </TextBlock>
-                    </ComboBoxItem>
+                    <ComboBoxItem Content="Logout"/>
                 </ComboBox>
-                
                 <Label Content="{Binding Path=WalletName}" Background="ForestGreen" Padding="2 2 2 2" Margin="618,0,0,0" 
                        HorizontalAlignment="Left" VerticalAlignment="Center"
                            FontFamily="Microsoft YaHei"  FontWeight="Normal" FontSize="9" Foreground="White"

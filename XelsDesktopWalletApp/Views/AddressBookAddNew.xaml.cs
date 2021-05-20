@@ -10,17 +10,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using XelsDesktopWalletApp.Models;
 
 namespace XelsDesktopWalletApp.Views
 {
     /// <summary>
-    /// Interaction logic for Dashboard.xaml
+    /// Interaction logic for AddressBookAddNew.xaml
     /// </summary>
-    public partial class Dashboard : Window
+    public partial class AddressBookAddNew : Window
     {
-
-
         private string walletName;
         public string WalletName
         {
@@ -35,17 +32,16 @@ namespace XelsDesktopWalletApp.Views
         }
 
 
-        public Dashboard()
+        public AddressBookAddNew()
         {
             InitializeComponent();
 
             this.DataContext = this;
         }
-        public Dashboard(string walletname)
+        public AddressBookAddNew(string walletname)
         {
             InitializeComponent();
 
-            //this.AccountComboBox.SelectedItem = this.walletName;
             this.DataContext = this;
 
 

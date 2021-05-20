@@ -8,15 +8,14 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace XelsDesktopWalletApp.Views
 {
     /// <summary>
-    /// Interaction logic for History.xaml
+    /// Interaction logic for LogoutConfirm.xaml
     /// </summary>
-    public partial class History : Window
+    public partial class LogoutConfirm : Window
     {
         private string walletName;
         public string WalletName
@@ -30,35 +29,27 @@ namespace XelsDesktopWalletApp.Views
                 this.walletName = value;
             }
         }
-        public History()
+        public LogoutConfirm()
         {
             InitializeComponent();
         }
-        public History(string walletname)
+        public LogoutConfirm(string walletname)
         {
             InitializeComponent();
-            this.DataContext = this;
-
-
             this.walletName = walletname;
         }
 
-        private void Hyperlink_NavigateDashboard(object sender, RequestNavigateEventArgs e)
+        private void cancelButton_Click(object sender, RoutedEventArgs e)
         {
             Dashboard ds = new Dashboard(this.walletName);
             ds.Show();
             this.Close();
         }
-        private void Hyperlink_NavigateHistory(object sender, RequestNavigateEventArgs e)
+
+        private void logoutButton_Click(object sender, RoutedEventArgs e)
         {
-            History hs = new History(this.walletName);
-            hs.Show();
-            this.Close();
-        }
-        private void Hyperlink_NavigateExchange(object sender, RequestNavigateEventArgs e)
-        {
-            Exchange ex = new Exchange(this.walletName);
-            ex.Show();
+            Create cr = new Create();
+            cr.Show();
             this.Close();
         }
     }

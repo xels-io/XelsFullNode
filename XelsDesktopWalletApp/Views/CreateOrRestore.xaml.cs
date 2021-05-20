@@ -39,8 +39,8 @@ namespace XelsDesktopWalletApp.Views
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            Login lg = new Login();
-            lg.Show();
+            MainWindow mw = new MainWindow();
+            mw.Show();
             this.Close();
         }
     }
