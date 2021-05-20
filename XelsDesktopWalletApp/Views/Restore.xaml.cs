@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Xels.Bitcoin.Features.Wallet.Interfaces;
 using XelsDesktopWalletApp.Models;
 
 namespace XelsDesktopWalletApp.Views
@@ -21,6 +22,7 @@ namespace XelsDesktopWalletApp.Views
     public partial class Restore : Window
     {
 
+        //private readonly IWalletManager _walletManager;
         static HttpClient client = new HttpClient();
         string baseURL = "http://localhost:37221/api/wallet";
 
@@ -30,6 +32,13 @@ namespace XelsDesktopWalletApp.Views
         {
             InitializeComponent();
         }
+
+        //public Restore(IWalletManager walletManager)
+        //{
+        //    this._walletManager = walletManager;
+
+        //    InitializeComponent();
+        //}
 
 
         public bool isValid()
@@ -79,10 +88,15 @@ namespace XelsDesktopWalletApp.Views
 
                 WalletRecovery recovery = new WalletRecovery();
                 recovery.name = name.Text;
+                //recovery.creationDate = creationDate.SelectedDate.Value;
                 recovery.creationDate = creationDate.Text;
                 recovery.mnemonic = mnemonic.Text;
                 recovery.passphrase = passphrase.Text;
                 recovery.password = password.Text;
+
+                //this._walletManager.RecoverWallet(recovery.password, recovery.name, recovery.mnemonic,
+                //        recovery.creationDate, passphrase: recovery.passphrase);
+
 
                 HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(recovery), Encoding.UTF8, "application/json"));
 

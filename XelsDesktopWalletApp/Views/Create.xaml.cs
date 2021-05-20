@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,7 +37,7 @@ namespace XelsDesktopWalletApp.Views
 
         public async void LoadCreate()
         {
-            _mnemonic = await GetAPIAsync(baseURL);
+            this._mnemonic = await GetAPIAsync(this.baseURL);
         }
 
         public bool isValid()
