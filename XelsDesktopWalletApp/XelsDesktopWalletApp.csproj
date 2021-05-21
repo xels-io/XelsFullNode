@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <StartupObject>XelsDesktopWalletApp.Program</StartupObject>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,7 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="QRCoder" Version="1.4.1" />
   </ItemGroup>
 
@@ -43,7 +43,15 @@
     <ProjectReference Include="..\Xels.Bitcoin.Networks\Xels.Bitcoin.Networks.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin\Xels.Bitcoin.csproj" />
     <ProjectReference Include="..\Xels.Features.Diagnostic\Xels.Features.Diagnostic.csproj" />
+    <ProjectReference Include="..\Xels.Features.FederatedPeg\Xels.Features.FederatedPeg.csproj" />
     <ProjectReference Include="..\Xels.Features.SQLiteWalletRepository\Xels.Features.SQLiteWalletRepository.csproj" />
+    <ProjectReference Include="..\Xels.Sidechains.Networks\Xels.Sidechains.Networks.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Interop.IWshRuntimeLibrary">
+      <HintPath>..\Xels.XoyMinerD\obj\Debug\netcoreapp3.1\Interop.IWshRuntimeLibrary.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

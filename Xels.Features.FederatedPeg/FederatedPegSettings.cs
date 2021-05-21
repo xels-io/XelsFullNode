@@ -27,7 +27,7 @@ namespace Xels.Features.FederatedPeg
             this.WalletSyncFromHeight = walletSyncFromHeight;
         }
     }
-
+     
     /// <inheritdoc />
     public sealed class FederatedPegSettings : IFederatedPegSettings
     {
