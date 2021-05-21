@@ -133,7 +133,7 @@ namespace XelsDesktopWalletApp
         [STAThread]
         private static void Main(string[] args)
         {
-            args = new string[] { "-mainchain" };
+            //args = new string[] { "-mainchain" };
             App application = new App();
             RunFederationGatewayAsync(args).Wait();
             CreateShortCut();
