@@ -58,7 +58,7 @@
                         <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
                                    VerticalAlignment="Center" FontFamily="Microsoft YaHei"  FontWeight="Normal" FontSize="10" 
                                    Foreground="#FF434943" Height="18" Width="70" >
-                        <Hyperlink  RequestNavigate="Hyperlink_NavigateAddressBook" NavigateUri="http://www.google.com">
+                        <Hyperlink  RequestNavigate="Hyperlink_NavigateAddressBook" NavigateUri="http://www.google.com" TextDecorations="">
                             <Hyperlink.Style>
                             <Style TargetType="{x:Type Hyperlink}"
                                     BasedOn="{StaticResource {x:Type Hyperlink}}">
@@ -73,7 +73,7 @@
                         <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
                                    VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="10" 
                                    Foreground="#FF434943" Height="18" Width="70" >
-                        <Hyperlink  RequestNavigate="Hyperlink_NavigateAdvanced" NavigateUri="http://www.google.com">
+                        <Hyperlink  RequestNavigate="Hyperlink_NavigateAdvanced" NavigateUri="http://www.google.com" TextDecorations="">
                             <Hyperlink.Style>
                             <Style TargetType="{x:Type Hyperlink}"
                                     BasedOn="{StaticResource {x:Type Hyperlink}}">
@@ -88,7 +88,7 @@
                         <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
                                    VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="10" 
                                    Foreground="#FF434943" Height="18" Width="70" >
-                        <Hyperlink  RequestNavigate="Hyperlink_NavigateLogout" NavigateUri="http://www.google.com" >
+                        <Hyperlink  RequestNavigate="Hyperlink_NavigateLogout" NavigateUri="http://www.google.com"  TextDecorations="">
                             <Hyperlink.Style>
                             <Style TargetType="{x:Type Hyperlink}"
                                     BasedOn="{StaticResource {x:Type Hyperlink}}">

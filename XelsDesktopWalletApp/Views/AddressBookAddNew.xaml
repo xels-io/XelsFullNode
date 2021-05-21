@@ -57,7 +57,7 @@
                         <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
                                    VerticalAlignment="Center" FontFamily="Microsoft YaHei"  FontWeight="Normal" FontSize="10" 
                                    Foreground="#FF434943" Height="18" Width="70" >
-                        <Hyperlink  RequestNavigate="Hyperlink_NavigateAddressBook" NavigateUri="http://www.google.com">
+                        <Hyperlink  RequestNavigate="Hyperlink_NavigateAddressBook" NavigateUri="http://www.google.com" TextDecorations="">
                             <Hyperlink.Style>
                             <Style TargetType="{x:Type Hyperlink}"
                                     BasedOn="{StaticResource {x:Type Hyperlink}}">
@@ -72,7 +72,7 @@
                         <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
                                    VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="10" 
                                    Foreground="#FF434943" Height="18" Width="70" >
-                        <Hyperlink  RequestNavigate="Hyperlink_NavigateAdvanced" NavigateUri="http://www.google.com">
+                        <Hyperlink  RequestNavigate="Hyperlink_NavigateAdvanced" NavigateUri="http://www.google.com" TextDecorations="">
                             <Hyperlink.Style>
                             <Style TargetType="{x:Type Hyperlink}"
                                     BasedOn="{StaticResource {x:Type Hyperlink}}">
@@ -87,7 +87,7 @@
                         <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
                                    VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="10" 
                                    Foreground="#FF434943" Height="18" Width="70" >
-                        <Hyperlink  RequestNavigate="Hyperlink_NavigateLogout" NavigateUri="http://www.google.com" >
+                        <Hyperlink  RequestNavigate="Hyperlink_NavigateLogout" NavigateUri="http://www.google.com"  TextDecorations="">
                             <Hyperlink.Style>
                             <Style TargetType="{x:Type Hyperlink}"
                                     BasedOn="{StaticResource {x:Type Hyperlink}}">
@@ -101,52 +101,9 @@
             </Grid>
 
 
-            <TextBlock Margin="0,10,0,0" Width="179" Height="30" Text="AVAILABLE BALANCE"  FontSize="18" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light"/>
-            <TextBlock Width="302" Height="50" FontSize="24" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light">
-                1871551750.00000000 XELS</TextBlock>
+            <Grid Height="358">
+                <Label Content="You are in add address book window. This window is under construction.." FontFamily="Microsoft YaHei Light" FontSize="9" Margin="230,0,230,0"/>
 
-            <Grid Width="379" Margin="0,20,0,0">
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <Button x:Name="receiveButton" Click="receiveButton_Click"  Content="RECEIVE" Grid.Column="0" Padding="2" Background="#FF53E253" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" Height="35" Foreground="White" FontWeight="Normal" >
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="5"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
-
-
-                <Button x:Name="createButton" Click="Show_Click"  Content="SEND" Grid.Column="1" Padding="2" Background="#FF53E253" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" Height="35" Foreground="White" FontWeight="Normal" Margin="10,0,0,0" >
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="5"/>
-                        </Style>
-                    </Button.Resources>
-                </Button>
-                <Popup Name="sendPopup"
-
-               Placement="Mouse"
-
-               HorizontalOffset="-100"
-
-               VerticalOffset="-100"
-
-               AllowsTransparency="True">
-
-                    <Grid>
-
-                        <Ellipse Width="200" Height="200" Fill="Aquamarine"/>
-
-                        <Button Click="Hide_Click" Margin="80">Hide</Button>
-
-                    </Grid>
-
-                </Popup>
             </Grid>
 
         </StackPanel>
