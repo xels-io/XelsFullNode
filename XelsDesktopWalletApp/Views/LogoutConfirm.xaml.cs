@@ -48,8 +48,8 @@ namespace XelsDesktopWalletApp.Views
 
         private void logoutButton_Click(object sender, RoutedEventArgs e)
         {
-            Create cr = new Create();
-            cr.Show();
+            MainWindow mw = new MainWindow();
+            mw.Show();
             this.Close();
         }
     }

@@ -98,5 +98,19 @@ namespace XelsDesktopWalletApp.Views
             this.Close();
         }
 
+        private void Hyperlink_NavigateAddressBook(object sender, RequestNavigateEventArgs e)
+        {
+            AddressBook ex = new AddressBook(this.walletName);
+            ex.Show();
+            this.Close();
+        }
+
+
+        private void Hyperlink_NavigateAdvanced(object sender, RequestNavigateEventArgs e)
+        {
+            Advanced adv = new Advanced(this.walletName);
+            adv.Show();
+            this.Close();
+        }
     }
 }

@@ -20,8 +20,10 @@
                             </Hyperlink.Style><Run Text="Dashboard"/>
                         </Hyperlink>
                 </TextBlock>
-                <TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="70,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" Height="18" Width="36" >
-                        <Hyperlink  RequestNavigate="Hyperlink_NavigateHistory" NavigateUri="http://www.google.com" TextDecorations="">
+                <TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="70,0,0,0" HorizontalAlignment="Left" 
+                           VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" 
+                           FontSize="9" Foreground="#FF434943" Height="18" Width="36" >
+                        <Hyperlink  RequestNavigate="Hyperlink_NavigateHistory" NavigateUri="http://www.google.com">
                             <Hyperlink.Style>
                             <Style TargetType="{x:Type Hyperlink}"
                                     BasedOn="{StaticResource {x:Type Hyperlink}}">
@@ -30,8 +32,10 @@
                             </Hyperlink.Style><Run Text="History"/>
                         </Hyperlink>
                 </TextBlock>
-                <TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="111,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" Height="18" Width="48" >
-                        <Hyperlink  RequestNavigate="Hyperlink_NavigateExchange" NavigateUri="http://www.google.com" TextDecorations="">
+                <TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="111,0,0,0" HorizontalAlignment="Left" 
+                           VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" 
+                           FontSize="9" Foreground="#FF434943" Height="18" Width="48" >
+                        <Hyperlink  RequestNavigate="Hyperlink_NavigateExchange" NavigateUri="http://www.google.com">
                             <Hyperlink.Style>
                             <Style TargetType="{x:Type Hyperlink}"
                                     BasedOn="{StaticResource {x:Type Hyperlink}}">
@@ -40,41 +44,58 @@
                             </Hyperlink.Style><Run Text="Exchange"/>
                         </Hyperlink>
                 </TextBlock>
+                
+                
 
-                <Image Height="50" Source="/Assets/Images/home-xels-logo-01.png"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" />
+                <Image Height="50" Source="/Assets/Images/home-xels-logo-01.png"   
+                       HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" />
 
-                <!--<TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="702,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" Height="18" Width="58" >
-                        <Hyperlink  NavigateUri="http://www.google.com" TextDecorations="">
-                            <Hyperlink.Style>
-                            <Style TargetType="{x:Type Hyperlink}"
-                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
-                                <Setter Property="Foreground" Value="White"/>
-                            </Style>
-                            </Hyperlink.Style><Run Text="Account"/>
-                        </Hyperlink>
-                </TextBlock>-->
+                
+                
+                <Label Content="{Binding Path=WalletName}" Background="ForestGreen" Padding="2 2 2 2" Margin="0,0,30,0" 
+                       HorizontalAlignment="Right" VerticalAlignment="Center"
+                           FontFamily="Microsoft YaHei"  FontWeight="Normal" FontSize="9" Foreground="White"
+                           RenderTransformOrigin="0.477,0.222" Height="20" Width="123" >
+                </Label>
 
                 <ComboBox x:Name="AccountComboBox" 
-                          Background="ForestGreen" Padding="2 2 2 2" Margin="741,0,0,0" HorizontalAlignment="Left"
+                          Background="ForestGreen" Padding="2 2 2 2" Margin="0,0,30,0" HorizontalAlignment="Right"
                           VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="9" 
                           Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" Height="18" Width="19" >
                     <ComboBoxItem >
-                        <TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="111,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" Height="18" Width="48" >
-                        <Hyperlink  RequestNavigate="Hyperlink_NavigateExchange" NavigateUri="http://www.google.com" TextDecorations="">
+                        <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
+                                   VerticalAlignment="Center" FontFamily="Microsoft YaHei"  FontWeight="Normal" FontSize="10" 
+                                   Foreground="#FF434943" Height="18" Width="70" >
+                        <Hyperlink  RequestNavigate="Hyperlink_NavigateAddressBook" NavigateUri="http://www.google.com">
                             <Hyperlink.Style>
                             <Style TargetType="{x:Type Hyperlink}"
                                     BasedOn="{StaticResource {x:Type Hyperlink}}">
                                 <Setter Property="Foreground" Value="White"/>
                             </Style>
-                            </Hyperlink.Style><Run Text="Exchange"/>
+                            </Hyperlink.Style><Run Text="Address Book"/>
                         </Hyperlink>
                         </TextBlock>
                     </ComboBoxItem>
-                    
-                    <ComboBoxItem Content="Advanced"/>
-                    
+
+                    <ComboBoxItem>
+                        <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
+                                   VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="10" 
+                                   Foreground="#FF434943" Height="18" Width="70" >
+                        <Hyperlink  RequestNavigate="Hyperlink_NavigateAdvanced" NavigateUri="http://www.google.com">
+                            <Hyperlink.Style>
+                            <Style TargetType="{x:Type Hyperlink}"
+                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                            </Hyperlink.Style><Run Text="Advanced"/>
+                        </Hyperlink>
+                        </TextBlock>
+                    </ComboBoxItem>
+
                     <ComboBoxItem >
-                        <TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="111,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="9" Foreground="#FF434943" Height="18" Width="48" >
+                        <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
+                                   VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="10" 
+                                   Foreground="#FF434943" Height="18" Width="70" >
                         <Hyperlink  RequestNavigate="Hyperlink_NavigateLogout" NavigateUri="http://www.google.com" >
                             <Hyperlink.Style>
                             <Style TargetType="{x:Type Hyperlink}"
@@ -87,17 +108,16 @@
                     </ComboBoxItem>
                 </ComboBox>
                 
-                <Label Content="{Binding Path=WalletName}" Background="ForestGreen" Padding="2 2 2 2" Margin="618,0,0,0" 
-                       HorizontalAlignment="Left" VerticalAlignment="Center"
-                           FontFamily="Microsoft YaHei"  FontWeight="Normal" FontSize="9" Foreground="White"
-                           RenderTransformOrigin="0.477,0.222" Height="20" Width="123" >
-                </Label>
             </Grid>
 
 
-            <TextBlock Margin="0,10,0,0" Width="179" Height="30" Text="AVAILABLE BALANCE"  FontSize="18" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light"/>
-            <TextBlock Width="302" Height="50" FontSize="24" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light">
-                1871551750.00000000 XELS</TextBlock>
+            <TextBlock Margin="0,10,0,0" Width="185" Height="40" Text="AVAILABLE BALANCE" FontSize="18" HorizontalAlignment="Center" FontFamily="Microsoft YaHei"/>
+            <TextBlock Width="302" Height="40" FontSize="24" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light">
+                1765457430.00000000 XELS</TextBlock>
+            <TextBlock Width="130" Height="30" FontSize="15" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light">
+                00.00000000 SELS</TextBlock>
+            <TextBlock Width="130" Height="30" FontSize="15" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light">
+                00.00000000 BELS</TextBlock>
 
             <Grid Width="379" Margin="0,20,0,0">
 
