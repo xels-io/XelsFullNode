@@ -35,10 +35,10 @@ namespace Xels.Sidechains.Networks
             this.NetworkType = NetworkType.Mainnet;
             this.CoinTicker = "XOY";
             this.Magic = 0x522357AC;
-            this.DefaultPort = 17976;
+            this.DefaultPort = 27771;
             this.DefaultMaxOutboundConnections = 16;
             this.DefaultMaxInboundConnections = 109;
-            this.DefaultRPCPort = 16175;
+            this.DefaultRPCPort = 17775;
             this.DefaultAPIPort = 37223;
             this.DefaultSignalRPort = 38823;
             this.MaxTipAge = 768; // 20% of the fastest time it takes for one MaxReorgLength of blocks to be mined.
@@ -53,8 +53,8 @@ namespace Xels.Sidechains.Networks
             var consensusFactory = new SmartContractCollateralPoAConsensusFactory();
 
             // Create the genesis block.
-            this.GenesisTime = 1614003185;
-            this.GenesisNonce = 1290896;
+            this.GenesisTime = 1619690989;
+            this.GenesisNonce = 977662;
             this.GenesisBits = new Target(new uint256("00000fffff000000000000000000000000000000000000000000000000000000"));
             this.GenesisVersion = 1;
             this.GenesisReward = Money.Zero;
@@ -69,9 +69,13 @@ namespace Xels.Sidechains.Networks
             // and should be the same for all nodes operating on this network.
             var genesisFederationMembers = new List<IFederationMember>()
             {
-                new CollateralFederationMember(new PubKey("033762e3baa6628ba1e523e0d3a4b0112f3704467aba0f0fd5788ddf308cd23a43"), new Money(7000000_00000000),"XKQ7qbHnmuCWryhfE7HRnb7cPMdAZtp8QQ"),
-                new CollateralFederationMember(new PubKey("02b7b1b8802a5155dbf7ba0fdfca028e995c77da179972a8cf1e99d93462f91d01"), new Money(7000000_00000000),"XXnSQGRrj4D873ySF4m4mucuGQUFGyKpiz"),
-                new CollateralFederationMember(new PubKey("02e2a8ee8197604a86131b54e18273f9ccb43f58b9de8c4a611cf27c5e715aea2e"), new Money(7000000_00000000),"XDCJ5fCvjbGY9Tbq9arpeJwCa4Y86EUXoq")
+                new CollateralFederationMember(new PubKey("033762e3baa6628ba1e523e0d3a4b0112f3704467aba0f0fd5788ddf308cd23a43"), new Money(7000000_00000000),"XME93DJogF1HH9iSvo1127oKRaHBxEoQfS"),
+                new CollateralFederationMember(new PubKey("02b7b1b8802a5155dbf7ba0fdfca028e995c77da179972a8cf1e99d93462f91d01"), new Money(7000000_00000000),"XSy63BJycFb4QP1qDiU13hxKD5H3U2yhYJ"),
+                new CollateralFederationMember(new PubKey("02e2a8ee8197604a86131b54e18273f9ccb43f58b9de8c4a611cf27c5e715aea2e"), new Money(7000000_00000000),"XYMzq6E3MHfgcWQi1DfjNt4YQmEpKPeA1B"),
+                new CollateralFederationMember(new PubKey("03e54650fb2242613ce0b508df0650c3d7cbcb4b82c748c7b69157927c47b19642"), new Money(7000000_00000000),"CK7j3zkc1TbZVug289eq7UpKBy7dRWxox2"),
+                new CollateralFederationMember(new PubKey("0394788094df4ddde7eb3eacdd61245eef3d03b103f566406aa43cb18c36a1e64b"), new Money(7000000_00000000),"CZ9gAuEHX9oQiCV9EfwDinRQ96UQfB1CDq"),
+                new CollateralFederationMember(new PubKey("02fd05bd7398e3e36d93c31a91b603418f9e4e1b251490b790eabb9cc302927be8"), new Money(7000000_00000000),"Cev8YBzpFZFmfMQLeKSNYgAa57CmyqwhUT")
+
             };
 
             var consensusOptions = new PoAConsensusOptions(
@@ -169,7 +173,7 @@ namespace Xels.Sidechains.Networks
 
             // 16 below should be changed to TargetSpacingSeconds when we move that field.
             Assert(this.DefaultBanTimeSeconds <= this.Consensus.MaxReorgLength * 16 / 2);
-            Assert(this.Consensus.HashGenesisBlock == uint256.Parse("000009bf683fdadd315b807e29cd1a26996946d1bf36a09b9f05e55eacfb7c34"));
+            Assert(this.Consensus.HashGenesisBlock == uint256.Parse("000008228a22c4c115670bda744bab759e70f897e80ebb56a51438641191057f"));
             Assert(this.Genesis.Header.HashMerkleRoot == uint256.Parse("64637abf3dd01134a4c7038916396f5cabe26c64c14a41ddd633389a7f4c28c2"));
 
             this.RegisterRules(this.Consensus);
