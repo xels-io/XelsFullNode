@@ -42,10 +42,10 @@ namespace Xels.Bitcoin.Networks
             this.Name = "XelsMain";
             this.NetworkType = NetworkType.Mainnet;
             this.Magic = magic;
-            this.DefaultPort = 27976;
+            this.DefaultPort = 27770;
             this.DefaultMaxOutboundConnections = 16;
             this.DefaultMaxInboundConnections = 109;
-            this.DefaultRPCPort = 27975;
+            this.DefaultRPCPort = 27775;
             this.DefaultAPIPort = 37221;
             this.DefaultSignalRPort = 38824;
             this.MaxTipAge = 2 * 60 * 60;
@@ -61,8 +61,8 @@ namespace Xels.Bitcoin.Networks
             var consensusFactory = new PosConsensusFactory();
 
             // Create the genesis block.
-            this.GenesisTime = Utils.DateTimeToUnixTime(new DateTimeOffset(2020, 12, 16, 0, 0, 0, TimeSpan.Zero)); //1609459200;
-            this.GenesisNonce = 471955; // 0;// 1676861;// 1831645;
+            this.GenesisTime = Utils.DateTimeToUnixTime(new DateTimeOffset(2021, 04, 14, 0, 0, 0, TimeSpan.Zero)); //1609459200;
+            this.GenesisNonce = 2553536; // 0;// 1676861;// 1831645;
             this.GenesisBits = 0x1e0fffff;
             this.GenesisVersion = 1;
             this.GenesisReward = Money.Zero;
@@ -109,7 +109,7 @@ namespace Xels.Bitcoin.Networks
                 bip34Hash: new uint256("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8"),
                 minerConfirmationWindow: 2016, // nPowTargetTimespan / nPowTargetSpacing
                 maxReorgLength: 500,
-                defaultAssumeValid: new uint256("0x00000a1f1a078943309f2465bea7807b6f4d288c52b2c2b5f1a7ed13655817d7"), // 1213518
+                defaultAssumeValid: new uint256("0x000000367112f710a0400b4b5d1ff42c376b3dffe753abcf0f0363571ebb8a65"), // 1213518
                 maxMoney: long.MaxValue,
                 coinbaseMaturity: 1,
                 premineHeight: 1,
@@ -150,7 +150,7 @@ namespace Xels.Bitcoin.Networks
 
             this.Checkpoints = new Dictionary<int, CheckpointInfo>
             {
-                { 0, new CheckpointInfo(new uint256("0x00000a1f1a078943309f2465bea7807b6f4d288c52b2c2b5f1a7ed13655817d7"), new uint256("0x0000000000000000000000000000000000000000000000000000000000000000")) }
+                { 0, new CheckpointInfo(new uint256("0x000000367112f710a0400b4b5d1ff42c376b3dffe753abcf0f0363571ebb8a65"), new uint256("0x0000000000000000000000000000000000000000000000000000000000000000")) }
             };
 
             this.Bech32Encoders = new Bech32Encoder[2];
@@ -177,11 +177,11 @@ namespace Xels.Bitcoin.Networks
             {
 
                 new NetworkAddress(IPAddress.Parse("52.68.239.4"), this.DefaultPort ), // public node with DNS Server Enabled
-                new NetworkAddress(IPAddress.Parse("54.64.43.45"), this.DefaultPort ) // public node with DNS Server Enabled
-                //new NetworkAddress(IPAddress.Parse("54.238.248.117"), this.DefaultPort), // public node
-                //new NetworkAddress(IPAddress.Parse("13.114.52.87"), this.DefaultPort), // public node
-                //new NetworkAddress(IPAddress.Parse("52.192.229.45"), this.DefaultPort), // public node
-                //new NetworkAddress(IPAddress.Parse("52.199.121.139"), this.DefaultPort ) // public node
+                new NetworkAddress(IPAddress.Parse("54.64.43.45"), this.DefaultPort ), // public node with DNS Server Enabled
+                new NetworkAddress(IPAddress.Parse("54.238.248.117"), this.DefaultPort), // public node
+                new NetworkAddress(IPAddress.Parse("13.114.52.87"), this.DefaultPort), // public node
+                new NetworkAddress(IPAddress.Parse("52.192.229.45"), this.DefaultPort), // public node
+                new NetworkAddress(IPAddress.Parse("52.199.121.139"), this.DefaultPort ) // public node
                 //new NetworkAddress(IPAddress.Parse("54.250.146.43"), this.DefaultPort ) // public node
 
                 //new NetworkAddress(IPAddress.Parse("137.116.46.151"), 37221), // public node
@@ -194,8 +194,8 @@ namespace Xels.Bitcoin.Networks
 
             // 64 below should be changed to TargetSpacingSeconds when we move that field.
             Assert(this.DefaultBanTimeSeconds <= this.Consensus.MaxReorgLength * 64 / 2);
-            Assert(this.Consensus.HashGenesisBlock == uint256.Parse("0x00000a1f1a078943309f2465bea7807b6f4d288c52b2c2b5f1a7ed13655817d7"));
-            Assert(this.Genesis.Header.HashMerkleRoot == uint256.Parse("0x4438bf0c97c1a574e3fa3a26f14f36c4d14c9724e5171b400f0474f265c76b2b"));
+            Assert(this.Consensus.HashGenesisBlock == uint256.Parse("0x000000367112f710a0400b4b5d1ff42c376b3dffe753abcf0f0363571ebb8a65"));
+            Assert(this.Genesis.Header.HashMerkleRoot == uint256.Parse("0x2968f52b8aa07c77b6dea863397b743b0925ea8bc1bbdacd4739d3aafcd7be61"));
 
 
             this.RegisterRules(this.Consensus);
