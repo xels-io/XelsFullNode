@@ -18,15 +18,37 @@ namespace XelsDesktopWalletApp.Views
     /// </summary>
     public partial class ReceiveShowall : Window
     {
+        private string walletName;
+        public string WalletName
+        {
+            get
+            {
+                return this.walletName;
+            }
+            set
+            {
+                this.walletName = value;
+            }
+        }
+
         public ReceiveShowall()
         {
             InitializeComponent();
         }
 
-
-        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        public ReceiveShowall(string walletname)
         {
-            Receive receive = new Receive();
+            InitializeComponent();
+            this.DataContext = this;
+
+            this.walletName = walletname;
+        }
+
+
+
+        private void Hyperlink_NavigateReceive(object sender, RequestNavigateEventArgs e)
+        {
+            Receive receive = new Receive(this.walletName);
             receive.Show();
             this.Close();
         }
@@ -34,7 +56,7 @@ namespace XelsDesktopWalletApp.Views
 
         private void okButton_Click(object sender, RoutedEventArgs e)
         {
-            Dashboard dashboard = new Dashboard();
+            Dashboard dashboard = new Dashboard(this.walletName);
             dashboard.Show();
             this.Close();
         }

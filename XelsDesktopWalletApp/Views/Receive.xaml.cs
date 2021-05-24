@@ -1,9 +1,12 @@
-﻿using QRCoder;
+﻿using Newtonsoft.Json;
+using QRCoder;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -21,21 +24,54 @@ namespace XelsDesktopWalletApp.Views
     /// </summary>
     public partial class Receive : Window
     {
+
+        static HttpClient client = new HttpClient();
+        string baseURL = "http://localhost:37221/api";
+
+
+        private string walletName;
+        public string WalletName
+        {
+            get
+            {
+                return this.walletName;
+            }
+            set
+            {
+                this.walletName = value;
+            }
+        }
+
         public Receive()
         {
             InitializeComponent();
             generateQRCode();
         }
 
+        public Receive(string walletname)
+        {
+            InitializeComponent();
+            this.DataContext = this;
+
+            this.walletName = walletname;
+            generateQRCode();
+            LoadCreate();
+        }
+
+        public async void LoadCreate()
+        {
+             await GetAPIAsync(this.baseURL);
+        }
+
         private void generateQRCode()
         {
             QRCodeGenerator qRCodeGenerator = new QRCodeGenerator();
             //QRCodeData qRCodeData = qRCodeGenerator.CreateQrCode("The text which should be encoded.", QRCodeGenerator.ECCLevel.Q);
-            QRCodeData qRCodeData = qRCodeGenerator.CreateQrCode(textBoxTextToQr.Text, QRCodeGenerator.ECCLevel.H);
+            QRCodeData qRCodeData = qRCodeGenerator.CreateQrCode(this.textBoxTextToQr.Text, QRCodeGenerator.ECCLevel.H);
             QRCode qrCode = new QRCode(qRCodeData);
             Bitmap qrCodeImage = qrCode.GetGraphic(20);
 
-            image.Source = BitmapToImageSource(qrCodeImage);
+            this.image.Source = BitmapToImageSource(qrCodeImage);
         }
 
         private void restoreButton_Click(object sender, RoutedEventArgs e)
@@ -63,7 +99,7 @@ namespace XelsDesktopWalletApp.Views
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            ReceiveShowall rsa = new ReceiveShowall();
+            ReceiveShowall rsa = new ReceiveShowall(this.walletName);
             rsa.Show();
             this.Close();
         }
@@ -75,7 +111,34 @@ namespace XelsDesktopWalletApp.Views
 
         private void copyButton_Click(object sender, RoutedEventArgs e)
         {
-            Clipboard.SetText(textBoxTextToQr.Text);
+            Clipboard.SetText(this.textBoxTextToQr.Text);
         }
+
+        private void backButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            Dashboard ds = new Dashboard(this.walletName);
+            ds.Show();
+            this.Close();
+        }
+
+        private async Task<string> GetAPIAsync(string path)
+        {
+            string getUrl = path + "/wallet/unusedaddresses";
+            var content = "";
+
+            HttpResponseMessage response = await client.PostAsync(getUrl, new StringContent(JsonConvert.SerializeObject(this.walletName), Encoding.UTF8, "application/json"));
+
+            if (response.IsSuccessStatusCode)
+            {
+                content = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+            }
+            return content;
+        }
+
     }
 }

@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Newtonsoft.Json.Linq;
 using XelsDesktopWalletApp.Models;
 
 namespace XelsDesktopWalletApp.Views
@@ -84,6 +85,12 @@ namespace XelsDesktopWalletApp.Views
 
         public List<AddressLabel> ProcessAddresses(string _content)
         {
+            JObject json = JObject.Parse(_content);
+
+            AddressLabel addresslist = new AddressLabel();
+
+            //addresslist.label = json.addresses.label;
+
             return null ;
         }
 

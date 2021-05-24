@@ -62,7 +62,7 @@ namespace XelsDesktopWalletApp.Views
 
         private void receiveButton_Click(object sender, RoutedEventArgs e)
         {
-            Receive receive = new Receive();
+            Receive receive = new Receive(this.walletName);
             receive.Show();
             this.Close();
         }
