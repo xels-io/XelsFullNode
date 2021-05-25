@@ -24,11 +24,6 @@ namespace XelsDesktopWalletApp.Views
     /// </summary>
     public partial class Receive : Window
     {
-
-        static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api";
-
-
         private string walletName;
         public string WalletName
         {
@@ -55,13 +50,8 @@ namespace XelsDesktopWalletApp.Views
 
             this.walletName = walletname;
             generateQRCode();
-            LoadCreate();
         }
 
-        public async void LoadCreate()
-        {
-             await GetAPIAsync(this.baseURL);
-        }
 
         private void generateQRCode()
         {
@@ -72,6 +62,8 @@ namespace XelsDesktopWalletApp.Views
             Bitmap qrCodeImage = qrCode.GetGraphic(20);
 
             this.image.Source = BitmapToImageSource(qrCodeImage);
+
+            //this.textBoxTextToQr.Text
         }
 
         private void restoreButton_Click(object sender, RoutedEventArgs e)
@@ -122,23 +114,6 @@ namespace XelsDesktopWalletApp.Views
             this.Close();
         }
 
-        private async Task<string> GetAPIAsync(string path)
-        {
-            string getUrl = path + "/wallet/unusedaddresses";
-            var content = "";
-
-            HttpResponseMessage response = await client.PostAsync(getUrl, new StringContent(JsonConvert.SerializeObject(this.walletName), Encoding.UTF8, "application/json"));
-
-            if (response.IsSuccessStatusCode)
-            {
-                content = await response.Content.ReadAsStringAsync();
-            }
-            else
-            {
-                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
-            }
-            return content;
-        }
 
     }
 }
