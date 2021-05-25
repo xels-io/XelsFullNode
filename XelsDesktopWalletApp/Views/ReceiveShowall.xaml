@@ -23,7 +23,7 @@
 
                 <Button Content="XELS" HorizontalAlignment="Left"  Margin="322,76,0,0" VerticalAlignment="Top" Background="#FF53E253" 
                         Width="40" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" Padding="5,5,5,5" Foreground="White" 
-                        RenderTransformOrigin="0.174,0.571" FontSize="13">
+                        RenderTransformOrigin="0.174,0.571" FontSize="13" Click="XELS_Button_Click">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -31,7 +31,7 @@
                     </Button.Resources>
                 </Button>
                 <Button Content="SELS" HorizontalAlignment="Center" Margin="0,76,0,0" VerticalAlignment="Top" Background="#FF53E253"  FontSize="13"
-                        Width="40" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" Padding="5,5,5,5" Foreground="White">
+                        Width="40" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" Padding="5,5,5,5" Foreground="White" Click="SELS_Button_Click">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -40,7 +40,7 @@
                 </Button>
                 <Button Content="BELS" HorizontalAlignment="Left"  Margin="412,76,0,0" VerticalAlignment="Top" 
                         RenderTransformOrigin="2.423,0.568" Width="42" Background="#FF53E253" FontFamily="Microsoft YaHei Light" 
-                        BorderThickness="0,0,0,0" Padding="5,5,5,5" Foreground="White"  FontSize="13">
+                        BorderThickness="0,0,0,0" Padding="5,5,5,5" Foreground="White"  FontSize="13" Click="BELS_Button_Click">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -66,7 +66,7 @@
 
                 <Button Content="Unused Addressess" HorizontalAlignment="Left"  Margin="168,134,0,0" VerticalAlignment="Top" 
                         Background="#FFE4EAE1" Width="148" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" 
-                        Padding="5,5,5,5" Height="28" Foreground="#FF53E253" FontSize="13">
+                        Padding="5,5,5,5" Height="28" Foreground="#FF53E253" FontSize="13" Click="UnusedAddr_Button_Click">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -75,7 +75,7 @@
                 </Button>
                 <Button Content="Change Addressess" HorizontalAlignment="Left"  Margin="458,134,0,0" VerticalAlignment="Top" 
                         RenderTransformOrigin="2.423,0.568" Width="142" Background="#FFE4EAE1" FontFamily="Microsoft YaHei Light" 
-                        BorderThickness="0,0,0,0" Padding="5,5,5,5" Height="28" Foreground="#FF53E253" FontSize="13">
+                        BorderThickness="0,0,0,0" Padding="5,5,5,5" Height="28" Foreground="#FF53E253" FontSize="13" Click="ChangeAddr_Button_Click">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -84,7 +84,7 @@
                 </Button>
                 <Button Content="Used Addressess" HorizontalAlignment="Center" Margin="0,134,0,0" VerticalAlignment="Top" 
                         Background="#FFE4EAE1" Width="132" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" 
-                        Padding="5,5,5,5" Height="28" Foreground="#FF53E253" FontSize="13">
+                        Padding="5,5,5,5" Height="28" Foreground="#FF53E253" FontSize="13" Click="UsedAddr_Button_Click">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -92,6 +92,54 @@
                     </Button.Resources>
                 </Button>
 
+
+
+
+                <!--<Grid Margin="168,167,175,98">
+                    <ListView Margin="10" Name="lvDataBinding">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <WrapPanel>
+                                    <TextBlock Text="Address: " />
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                    <TextBlock Text="Copy " />
+                                    <TextBlock Text="Age: " />
+                                    <TextBlock Text="{Binding Age}" FontWeight="Bold" />
+                                    <TextBlock Text=" (" />
+                                    <TextBlock Text="{Binding Mail}" TextDecorations="Underline" Foreground="Blue" Cursor="Hand" />
+                                    <TextBlock Text=")" />
+                                </WrapPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>-->
+
+                <Grid Margin="168,167,175,98">
+                    <ListView Margin="10" Name="lvDataBinding">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <WrapPanel>
+                                    <TextBlock x:Name="addr" Text="{Binding Path=address, Mode=TwoWay}" FontWeight="Bold" 
+                                               FontFamily="Microsoft YaHei Light" />
+
+                                    <TextBlock FontFamily="Microsoft YaHei" TextDecorations="" FontSize="10" Width="86" Margin="10,0,0,0">
+                                        <Hyperlink  NavigateUri="http://www.google.com" RequestNavigate="copyButton_Click" 
+                                                    TextDecorations="" >
+                                            <Hyperlink.Style>
+                                            <Style TargetType="{x:Type Hyperlink}"
+                                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
+                                                <Setter Property="Foreground" Value="Black"/>
+                                            </Style>
+                                            </Hyperlink.Style><Run Text="(Copy)"/>
+                                        </Hyperlink>
+                                    </TextBlock>
+
+
+                                </WrapPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
 
 
 

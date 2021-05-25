@@ -131,7 +131,7 @@ namespace XelsDesktopWalletApp
 
                 if (response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show("Successfully logged in by " + this.SelectedWallet.name);
+                    // MessageBox.Show("Successfully logged in by " + this.SelectedWallet.name);
 
                     Dashboard db = new Dashboard(this.SelectedWallet.name);
                     db.Show();

@@ -49,6 +49,58 @@ namespace XelsDesktopWalletApp.Views
             }
         }
 
+        private string addr;
+        public string Addr
+        {
+            get
+            {
+                return this.addr;
+            }
+            set
+            {
+                this.addr = value;
+                //OnPropertyChanged("Addr");
+            }
+        }
+
+        #region Lists
+        public List<UsedAddresses> UsedAddressesList
+        {
+            get
+            {
+                return this.usedAddressesList;
+            }
+            set
+            {
+                this.usedAddressesList = value;
+            }
+        }
+
+        public List<UnusedAddresses> UnusedAddressesList
+        {
+            get
+            {
+                return this.unusedAddressesList;
+            }
+            set
+            {
+                this.unusedAddressesList = value;
+            }
+        }
+
+        public List<ChangeAddresses> ChangeAddressesList
+        {
+            get
+            {
+                return this.changeAddressesList;
+            }
+            set
+            {
+                this.changeAddressesList = value;
+            }
+        }
+        #endregion
+
         public ReceiveShowall()
         {
             InitializeComponent();
@@ -63,6 +115,8 @@ namespace XelsDesktopWalletApp.Views
             this.walletInfo.walletName = this.walletName;
 
             LoadCreate();
+
+            this.lvDataBinding.ItemsSource = this.UnusedAddressesList;
         }
 
         public async void LoadCreate()
@@ -86,6 +140,7 @@ namespace XelsDesktopWalletApp.Views
             dashboard.Show();
             this.Close();
         }
+
         private async Task GetAPIAsync(string path)
         {
             string getUrl = path + $"/wallet/addresses?WalletName={this.walletInfo.walletName}&AccountName=account 0";
@@ -98,7 +153,7 @@ namespace XelsDesktopWalletApp.Views
             {
                 content = await response.Content.ReadAsStringAsync();
 
-                this.addresses =  JsonConvert.DeserializeObject<ReceiveWalletArray>(content);
+                this.addresses = JsonConvert.DeserializeObject<ReceiveWalletArray>(content);
             }
             else
             {
@@ -116,27 +171,26 @@ namespace XelsDesktopWalletApp.Views
 
             this.rcvWalletListsArray.addresses = _content.addresses;
             var mylist = this.rcvWalletListsArray.addresses;
-
             AllAddresses allAddresses = new AllAddresses();
-            UsedAddresses usedAddresses = new UsedAddresses();
-            UnusedAddresses unusedAddresses = new UnusedAddresses();
-            ChangeAddresses changeAddresses = new ChangeAddresses();
 
 
             foreach (ReceiveWalletStatus address in mylist)
             {
                 if (address.IsUsed)
                 {
+                    UsedAddresses usedAddresses = new UsedAddresses();
                     usedAddresses.address = address.Address;
                     this.usedAddressesList.Add(usedAddresses);
                 }
                 else if (address.IsChange)
                 {
+                    ChangeAddresses changeAddresses = new ChangeAddresses();
                     changeAddresses.address = address.Address;
                     this.changeAddressesList.Add(changeAddresses);
                 }
                 else
                 {
+                    UnusedAddresses unusedAddresses = new UnusedAddresses();
                     unusedAddresses.address = address.Address;
                     this.unusedAddressesList.Add(unusedAddresses);
                 }
@@ -144,8 +198,40 @@ namespace XelsDesktopWalletApp.Views
 
         }
 
+        private void copyButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Clipboard.SetText(this.addr);
+        }
 
+        private void XELS_Button_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
+
+        private void SELS_Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BELS_Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void UnusedAddr_Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.lvDataBinding.ItemsSource = this.UnusedAddressesList;
+        }
+
+        private void ChangeAddr_Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.lvDataBinding.ItemsSource = this.changeAddressesList;
+        }
+
+        private void UsedAddr_Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.lvDataBinding.ItemsSource = this.usedAddressesList;
+        }
 
     }
 }
