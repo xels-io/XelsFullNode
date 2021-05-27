@@ -19,7 +19,7 @@
 
                 <Button Content="XELS" HorizontalAlignment="Left"  Margin="313,68,0,0" VerticalAlignment="Top" 
                         Background="#FF53E253" Width="50" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" 
-                        Padding="0,0,0,0" Foreground="White" RenderTransformOrigin="0.174,0.571" FontSize="13" 
+                        Padding="0,0,0,0" Foreground="White" RenderTransformOrigin="0.174,0.571" 
                         FontWeight="Normal" Height="25">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
@@ -29,7 +29,7 @@
                 </Button>
                 <Button Content="SELS" HorizontalAlignment="Left" Margin="368,68,0,0" VerticalAlignment="Top" 
                         Background="#FF53E253" Width="45" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" 
-                        Padding="0,0,0,0" Foreground="White" FontSize="13" FontWeight="Normal" Height="25">
+                        Padding="0,0,0,0" Foreground="White" FontWeight="Normal" Height="25">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -39,7 +39,7 @@
                 <Button Content="BELS" HorizontalAlignment="Left"  Margin="418,68,0,0" VerticalAlignment="Top" 
                         RenderTransformOrigin="2.423,0.568" Width="50" Background="#FF53E253" 
                         FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" Padding="0,0,0,0" 
-                        Foreground="White"  FontSize="13" FontWeight="Normal" Height="25">
+                        Foreground="White" FontWeight="Normal" Height="25">
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -53,11 +53,11 @@
                        VerticalAlignment="Top" Width="100"/>
 
                 <TextBox  x:Name="textBoxTextToQr" HorizontalAlignment="Center" Margin="0,238,0,0" Text="" 
-                          TextWrapping="Wrap" VerticalAlignment="Top" Width="345" BorderBrush="#FF53E253" 
+                          TextWrapping="Wrap" VerticalAlignment="Top" Width="345" BorderBrush="#FF53E253" BorderThickness="2"
                           TextChanged="textBoxTextToQr_TextChanged"/>
-                <Button Content="Copy" Click="copyButton_Click" HorizontalAlignment="Left"  Margin="568,236,0,0" 
+                <Button Content="Copy" Click="copyButton_Click" HorizontalAlignment="Left"  Margin="565,238,0,0" 
                         VerticalAlignment="Top" RenderTransformOrigin="2.423,0.568" Width="42" 
-                        FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" Padding="0,0,0,0" Height="20"  >
+                        FontFamily="Microsoft YaHei Light" BorderThickness="1" BorderBrush="#FF53E253" Padding="0,0,0,0" Height="20" Background="#FFF9F2F2" Foreground="#FF1FB607"  >
                     <Button.Resources>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="CornerRadius" Value="5"/>
@@ -92,7 +92,7 @@
                         </Style>
                     </Button.Resources>
                 </Button>
-                
+
                 <Button x:Name="restoreButton" Click="restoreButton_Click"  Content="OK" Padding="2" 
                         Background="#FF53E253" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" 
                         Foreground="White" Margin="308,298,195,92">

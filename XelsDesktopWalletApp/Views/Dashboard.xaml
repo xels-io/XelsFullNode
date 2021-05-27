@@ -134,33 +134,15 @@
                     </Button.Resources>
                 </Button>
 
-
-                <Button x:Name="createButton" Click="Show_Click"  Content="SEND" Grid.Column="1" Padding="2" Background="#FF53E253" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" Height="35" Foreground="White" FontWeight="Normal" Margin="10,0,0,0" >
+                <Button x:Name="sendButton" Click="sendButton_Click"  Content="SEND" Grid.Column="1" Padding="2" Background="#FF53E253" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" Height="35" Foreground="White" FontWeight="Normal" Margin="10,0,0,0"  >
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>
                         </Style>
                     </Button.Resources>
                 </Button>
-                <Popup Name="sendPopup"
 
-               Placement="Mouse"
-
-               HorizontalOffset="-100"
-
-               VerticalOffset="-100"
-
-               AllowsTransparency="True">
-
-                    <Grid>
-
-                        <Ellipse Width="200" Height="200" Fill="Aquamarine"/>
-
-                        <Button Click="Hide_Click" Margin="80">Hide</Button>
-
-                    </Grid>
-
-                </Popup>
+                
             </Grid>
 
         </StackPanel>

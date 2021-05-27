@@ -200,6 +200,7 @@ namespace XelsDesktopWalletApp.Views
 
         private void copyButton_Click(object sender, RoutedEventArgs e)
         {
+
             // Clipboard.SetText(this.addr);
         }
 

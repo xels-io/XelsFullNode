@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using XelsDesktopWalletApp.Models;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -24,6 +25,12 @@ namespace XelsDesktopWalletApp.Views
     /// </summary>
     public partial class Receive : Window
     {
+
+        static HttpClient client = new HttpClient();
+        string baseURL = "http://localhost:37221/api";
+
+        private readonly WalletInfo walletInfo = new WalletInfo();
+
         private string walletName;
         public string WalletName
         {
@@ -49,7 +56,9 @@ namespace XelsDesktopWalletApp.Views
             this.DataContext = this;
 
             this.walletName = walletname;
+            this.walletInfo.walletName = this.walletName;
             generateQRCode();
+            LoadCreate();
         }
 
 
@@ -64,6 +73,22 @@ namespace XelsDesktopWalletApp.Views
             this.image.Source = BitmapToImageSource(qrCodeImage);
 
             //this.textBoxTextToQr.Text
+        }
+
+
+        public async void LoadCreate()
+        {
+            string addr = await GetAPIAsync(this.baseURL);
+            addr = FreshAddress(addr);
+
+            this.textBoxTextToQr.Text = addr;
+        }
+
+
+        private string FreshAddress(string adr)
+        {
+            adr = adr.Trim(new Char[] { '"' });
+            return adr;
         }
 
         private void restoreButton_Click(object sender, RoutedEventArgs e)
@@ -113,6 +138,28 @@ namespace XelsDesktopWalletApp.Views
             ds.Show();
             this.Close();
         }
+
+        private async Task<string> GetAPIAsync(string path)
+        {
+            string getUrl = path + $"/wallet/unusedaddress?WalletName={this.walletInfo.walletName}&AccountName=account 0";
+            var content = "";
+
+            HttpResponseMessage response = await client.GetAsync(getUrl);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                content = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+            }
+
+            return content;
+
+        }
+
 
 
     }

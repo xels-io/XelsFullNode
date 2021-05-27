@@ -52,13 +52,6 @@ namespace XelsDesktopWalletApp.Views
             this.walletName = walletname;
         }
 
-        private void Show_Click(object sender, RoutedEventArgs e)
-        {
-            Send send = new Send();
-            send.Show();
-            this.Close();
-            //MyPopup.IsOpen = true;
-        }
 
         private void receiveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -66,9 +59,11 @@ namespace XelsDesktopWalletApp.Views
             receive.Show();
             this.Close();
         }
-        private void createButton_Click(object sender, RoutedEventArgs e)
+        private void sendButton_Click(object sender, RoutedEventArgs e)
         {
-
+            Send send = new Send(this.walletName);
+            send.Show();
+            this.Close();
         }
         private void Hide_Click(object sender, RoutedEventArgs e)
         {

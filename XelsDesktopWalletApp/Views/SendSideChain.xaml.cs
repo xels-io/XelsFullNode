@@ -14,13 +14,13 @@ using System.Windows.Shapes;
 namespace XelsDesktopWalletApp.Views
 {
     /// <summary>
-    /// Interaction logic for Send.xaml
+    /// Interaction logic for SendSideChain.xaml
     /// </summary>
-    public partial class Send : Window
+    public partial class SendSideChain : Window
     {
 
         static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api";
+        readonly string baseURL = "http://localhost:37221/api";
 
 
         private string walletName;
@@ -37,12 +37,12 @@ namespace XelsDesktopWalletApp.Views
         }
 
 
-        public Send()
+        public SendSideChain()
         {
             InitializeComponent();
         }
 
-        public Send(string walletname)
+        public SendSideChain(string walletname)
         {
             InitializeComponent();
             this.DataContext = this;
@@ -89,13 +89,14 @@ namespace XelsDesktopWalletApp.Views
             SendSideChain sendSC = new SendSideChain(this.walletName);
             sendSC.Show();
             this.Close();
-        }
 
+        }
 
         private void sendButton_Click(object sender, RoutedEventArgs e)
         {
 
         }
+
 
     }
 }
