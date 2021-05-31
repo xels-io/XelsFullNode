@@ -22,11 +22,15 @@ namespace XelsDesktopWalletApp.Views
     /// </summary>
     public partial class ReceiveShowall : Window
     {
-
+        #region Base
         static HttpClient client = new HttpClient();
         string baseURL = "http://localhost:37221/api";
+        #endregion
 
         private readonly WalletInfo walletInfo = new WalletInfo();
+        private UsedAddresses selectedUsedWalletInfo = new UsedAddresses();
+        private UnusedAddresses selectedUnusedWalletInfo = new UnusedAddresses();
+        private ChangeAddresses selectedChangeWalletInfo = new ChangeAddresses();
         private ReceiveWalletArray addresses = new ReceiveWalletArray();
         private ReceiveWalletArray rcvWalletListsArray = new ReceiveWalletArray();
 
@@ -35,6 +39,7 @@ namespace XelsDesktopWalletApp.Views
         private List<UnusedAddresses> unusedAddressesList = new List<UnusedAddresses>();
         private List<ChangeAddresses> changeAddressesList = new List<ChangeAddresses>();
 
+        #region Needed property
 
         private string walletName;
         public string WalletName
@@ -48,20 +53,54 @@ namespace XelsDesktopWalletApp.Views
                 this.walletName = value;
             }
         }
-
-        private string addr;
-        public string Addr
+        public UsedAddresses SelectedUsedWalletInfo
         {
             get
             {
-                return this.addr;
+                return this.selectedUsedWalletInfo;
             }
             set
             {
-                this.addr = value;
+                this.selectedUsedWalletInfo = value;
+            }
+        }
+        public UnusedAddresses SelectedUnusedWalletInfo
+        {
+            get
+            {
+                return this.selectedUnusedWalletInfo;
+            }
+            set
+            {
+                this.selectedUnusedWalletInfo = value;
+            }
+        }
+        public ChangeAddresses SelectedChangeWalletInfo
+        {
+            get
+            {
+                return this.selectedChangeWalletInfo;
+            }
+            set
+            {
+                this.selectedChangeWalletInfo = value;
+            }
+        }
+
+        private string address;
+        public string Address
+        {
+            get
+            {
+                return this.address;
+            }
+            set
+            {
+                this.address = value;
                 //OnPropertyChanged("Addr");
             }
         }
+        #endregion
 
         #region Lists
         public List<UsedAddresses> UsedAddressesList
@@ -198,10 +237,44 @@ namespace XelsDesktopWalletApp.Views
 
         }
 
-        private void copyButton_Click(object sender, RoutedEventArgs e)
-        {
 
-            // Clipboard.SetText(this.addr);
+        private void copy_Click(object sender, RoutedEventArgs e)
+        {
+            // need to click on selected address textblock
+
+            if (this.lvDataBinding.SelectedItem != null)
+             {
+
+                var theAddress = this.lvDataBinding.SelectedItem;
+                if (theAddress.GetType() == typeof(UnusedAddresses))
+                {
+                    this.selectedUnusedWalletInfo = (UnusedAddresses)theAddress;
+
+                    if (this.selectedUnusedWalletInfo.address != null)
+                    {
+                        Clipboard.SetText(this.selectedUnusedWalletInfo.address);
+                    }
+                }
+                else if (theAddress.GetType() == typeof(UsedAddresses))
+                {
+                    this.selectedUsedWalletInfo = (UsedAddresses)theAddress;
+
+                    if (this.selectedUsedWalletInfo.address != null)
+                    {
+                        Clipboard.SetText(this.selectedUsedWalletInfo.address);
+                    }
+                }
+                else if (theAddress.GetType() == typeof(ChangeAddresses))
+                {
+                    this.selectedChangeWalletInfo = (ChangeAddresses)theAddress;
+
+                    if (this.selectedChangeWalletInfo.address != null)
+                    {
+                        Clipboard.SetText(this.selectedChangeWalletInfo.address);
+                    }
+                }
+            }
+
         }
 
         private void XELS_Button_Click(object sender, RoutedEventArgs e)

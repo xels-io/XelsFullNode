@@ -94,15 +94,17 @@
 
 
                 <Grid Margin="168,167,175,98">
-                    <ListView Margin="10" Name="lvDataBinding">
+                    <ListView Margin="10" Name="lvDataBinding" 
+                              SelectedItem="{Binding Path=address, Mode=TwoWay}" IsSynchronizedWithCurrentItem="True">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <WrapPanel>
-                                    <TextBlock x:Name="addr" Text="{Binding Path=address, Mode=TwoWay}" FontWeight="Bold" 
-                                               FontFamily="Microsoft YaHei Light" />
+                                    <TextBlock x:Name="Adr" Text="{Binding Path=address, Mode=TwoWay}" 
+                                               FontWeight="Bold"  FontFamily="Microsoft YaHei Light" />
 
                                     <TextBlock FontFamily="Microsoft YaHei" TextDecorations="" FontSize="10" Width="86" Margin="10,0,0,0">
-                                        <Hyperlink  NavigateUri="http://www.google.com" RequestNavigate="copyButton_Click" 
+                                        
+                                        <Hyperlink  NavigateUri="http://www.google.com" RequestNavigate="copy_Click" 
                                                     TextDecorations="" >
                                             <Hyperlink.Style>
                                             <Style TargetType="{x:Type Hyperlink}"
@@ -113,15 +115,9 @@
                                         </Hyperlink>
                                     </TextBlock>
 
-
                                 </WrapPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="IsSelected" Value="{Binding addr}"/>
-                            </Style>
-                        </ListView.ItemContainerStyle>
                     </ListView>
                 </Grid>
 
