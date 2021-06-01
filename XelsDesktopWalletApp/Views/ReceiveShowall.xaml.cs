@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -87,6 +88,18 @@ namespace XelsDesktopWalletApp.Views
             }
         }
 
+        //public SelectedAddress Address
+        //{
+        //    get
+        //    {
+        //        return this.address;
+        //    }
+        //    set
+        //    {
+        //        this.address = value;
+        //        //OnPropertyChanged("Addr");
+        //    }
+        //}
         private string address;
         public string Address
         {
@@ -155,7 +168,7 @@ namespace XelsDesktopWalletApp.Views
 
             LoadCreate();
 
-            this.lvDataBinding.ItemsSource = this.UnusedAddressesList;
+            this.lvDataBinding.ItemsSource = this.unusedAddressesList;
         }
 
         public async void LoadCreate()
@@ -237,15 +250,14 @@ namespace XelsDesktopWalletApp.Views
 
         }
 
-
-        private void copy_Click(object sender, RoutedEventArgs e)
+        private void btn_copy_Click(object sender, RoutedEventArgs e)
         {
-            // need to click on selected address textblock
+            var item = ((sender as Button)?.Tag as ListViewItem)?.DataContext;
 
-            if (this.lvDataBinding.SelectedItem != null)
-             {
+            if (item != null)
+            {
 
-                var theAddress = this.lvDataBinding.SelectedItem;
+                var theAddress = item;
                 if (theAddress.GetType() == typeof(UnusedAddresses))
                 {
                     this.selectedUnusedWalletInfo = (UnusedAddresses)theAddress;
@@ -253,6 +265,7 @@ namespace XelsDesktopWalletApp.Views
                     if (this.selectedUnusedWalletInfo.address != null)
                     {
                         Clipboard.SetText(this.selectedUnusedWalletInfo.address);
+                        this.lvDataBinding.ItemsSource = this.UnusedAddressesList;
                     }
                 }
                 else if (theAddress.GetType() == typeof(UsedAddresses))
@@ -262,6 +275,7 @@ namespace XelsDesktopWalletApp.Views
                     if (this.selectedUsedWalletInfo.address != null)
                     {
                         Clipboard.SetText(this.selectedUsedWalletInfo.address);
+                        this.lvDataBinding.ItemsSource = this.usedAddressesList;
                     }
                 }
                 else if (theAddress.GetType() == typeof(ChangeAddresses))
@@ -271,9 +285,11 @@ namespace XelsDesktopWalletApp.Views
                     if (this.selectedChangeWalletInfo.address != null)
                     {
                         Clipboard.SetText(this.selectedChangeWalletInfo.address);
+                        this.lvDataBinding.ItemsSource = this.changeAddressesList;
                     }
                 }
             }
+
 
         }
 
@@ -294,7 +310,7 @@ namespace XelsDesktopWalletApp.Views
 
         private void UnusedAddr_Button_Click(object sender, RoutedEventArgs e)
         {
-            this.lvDataBinding.ItemsSource = this.UnusedAddressesList;
+            this.lvDataBinding.ItemsSource = this.unusedAddressesList;
         }
 
         private void ChangeAddr_Button_Click(object sender, RoutedEventArgs e)

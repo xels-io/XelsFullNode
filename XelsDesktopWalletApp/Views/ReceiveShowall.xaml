@@ -92,37 +92,27 @@
                     </Button.Resources>
                 </Button>
 
-
                 <Grid Margin="168,167,175,98">
-                    <ListView Margin="10" Name="lvDataBinding" 
-                              SelectedItem="{Binding Path=address, Mode=TwoWay}" IsSynchronizedWithCurrentItem="True">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <WrapPanel>
-                                    <TextBlock x:Name="Adr" Text="{Binding Path=address, Mode=TwoWay}" 
-                                               FontWeight="Bold"  FontFamily="Microsoft YaHei Light" />
-
-                                    <TextBlock FontFamily="Microsoft YaHei" TextDecorations="" FontSize="10" Width="86" Margin="10,0,0,0">
-                                        
-                                        <Hyperlink  NavigateUri="http://www.google.com" RequestNavigate="copy_Click" 
-                                                    TextDecorations="" >
-                                            <Hyperlink.Style>
-                                            <Style TargetType="{x:Type Hyperlink}"
-                                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
-                                                <Setter Property="Foreground" Value="LightSeaGreen"/>
-                                            </Style>
-                                            </Hyperlink.Style><Run Text="(Copy)"/>
-                                        </Hyperlink>
-                                    </TextBlock>
-
-                                </WrapPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
+                    <ListView Margin="10" Name="lvDataBinding" >
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Addresses" Width="300" DisplayMemberBinding="{Binding Path=address, Mode=TwoWay}"  />
+                                <GridViewColumn Width="100" >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock FontWeight="Bold"  FontFamily="Microsoft YaHei Light" >
+                                                <Button x:Name="btndil" 
+                                                         Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}}"  
+                                                         Content="Copy" Click="btn_copy_Click" />
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
                     </ListView>
                 </Grid>
-
-
-
+                
                 <Button x:Name="restoreButton" Click="okButton_Click"  Content="OK" HorizontalAlignment="Center" Margin="0,332,0,0" 
                         VerticalAlignment="Top" Width="472" Height="35" FontFamily="Microsoft YaHei Light" Padding="2" 
                         Background="#FF53E253"  BorderThickness="0,0,0,0" Foreground="White">

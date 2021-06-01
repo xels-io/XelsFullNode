@@ -27,6 +27,11 @@ namespace XelsDesktopWalletApp.Models
         public ReceiveWalletStatus[] addresses { get; set; }
     }
 
+    public class SelectedAddress
+    {
+        public string address { get; set; }
+    }
+
     public class AllAddresses
     {
         public string address { get; set; }
