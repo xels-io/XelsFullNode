@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using IWshRuntimeLibrary;
+//using IWshRuntimeLibrary;
 
 using Microsoft.Extensions.Hosting;
 
@@ -16,15 +16,11 @@ using Xels.Bitcoin.Builder;
 using Xels.Bitcoin.Configuration;
 using Xels.Bitcoin.Features.Api;
 using Xels.Bitcoin.Features.BlockStore;
-using Xels.Bitcoin.Features.ColdStaking;
 using Xels.Bitcoin.Features.Consensus;
 using Xels.Bitcoin.Features.MemoryPool;
 using Xels.Bitcoin.Features.Miner;
 using Xels.Bitcoin.Features.Notifications;
 using Xels.Bitcoin.Features.RPC;
-using Xels.Bitcoin.Features.SignalR;
-using Xels.Bitcoin.Features.SignalR.Broadcasters;
-using Xels.Bitcoin.Features.SignalR.Events;
 using Xels.Bitcoin.Features.SmartContracts;
 using Xels.Bitcoin.Features.SmartContracts.PoA;
 using Xels.Bitcoin.Features.SmartContracts.Wallet;
@@ -243,17 +239,17 @@ namespace XelsDesktopWalletApp
             string distinationPath = Directory.GetCurrentDirectory();
             //Console.WriteLine(distinationPath);
             //Console.ReadLine();
-            foreach (var arg in argumentList)
-            {
-                object shDesktop = (object)"Desktop";
-                WshShell shell = new WshShell();
-                string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\XelsDesktopWalletApp" + arg + ".lnk";
-                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
+            //foreach (var arg in argumentList)
+            //{
+            //    object shDesktop = (object)"Desktop";
+            //    WshShell shell = new WshShell();
+            //    string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\XelsDesktopWalletApp" + arg + ".lnk";
+            //    IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
 
-                shortcut.Arguments = arg;
-                shortcut.TargetPath = distinationPath + @"\XelsDesktopWalletApp.exe";
-                shortcut.Save();
-            }
+            //    shortcut.Arguments = arg;
+            //    shortcut.TargetPath = distinationPath + @"\XelsDesktopWalletApp.exe";
+            //    shortcut.Save();
+            //}
         }
 
 
