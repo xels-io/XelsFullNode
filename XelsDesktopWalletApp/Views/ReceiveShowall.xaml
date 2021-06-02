@@ -96,13 +96,12 @@
                     <ListView Margin="10" Name="lvDataBinding" >
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="Addresses" Width="300" DisplayMemberBinding="{Binding Path=address, Mode=TwoWay}"  />
+                                <GridViewColumn Header="Addresses" Width="300" DisplayMemberBinding="{Binding}"  />
                                 <GridViewColumn Width="100" >
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock FontWeight="Bold"  FontFamily="Microsoft YaHei Light" >
-                                                <Button x:Name="btndil" 
-                                                         Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}}"  
+                                                <Button Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}}"  
                                                          Content="Copy" Click="btn_copy_Click" />
                                             </TextBlock>
                                         </DataTemplate>

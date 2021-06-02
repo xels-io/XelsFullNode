@@ -32,25 +32,6 @@ namespace XelsDesktopWalletApp.Models
         public string address { get; set; }
     }
 
-    public class AllAddresses
-    {
-        public string address { get; set; }
-    }
-
-    public class UsedAddresses
-    {
-        public string address { get; set; }
-    }
-    public class UnusedAddresses
-    {
-        public string address { get; set; }
-    }
-    public class ChangeAddresses
-    {
-        public string address { get; set; }
-    }
-
-
     public class ReceiveWalletList
     {
         public Dictionary<string, ReceiveWalletStatus> Wallets { get; set; }
