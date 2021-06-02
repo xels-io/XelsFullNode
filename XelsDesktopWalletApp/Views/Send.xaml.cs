@@ -72,24 +72,25 @@ namespace XelsDesktopWalletApp.Views
             this.Close();
         }
 
-        private void createButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void XELS_Button_Click(object sender, RoutedEventArgs e)
         {
-
+            Send send = new Send(this.walletName);
+            send.Show();
+            this.Close();
         }
 
         private void SELS_Button_Click(object sender, RoutedEventArgs e)
         {
-
+            SendSelsBels sendsb = new SendSelsBels(this.walletName);
+            sendsb.Show();
+            this.Close();
         }
 
         private void BELS_Button_Click(object sender, RoutedEventArgs e)
         {
-
+            SendSelsBels sendsb = new SendSelsBels(this.walletName);
+            sendsb.Show();
+            this.Close();
         }
 
         private void Mainchain_Button_Click(object sender, RoutedEventArgs e)

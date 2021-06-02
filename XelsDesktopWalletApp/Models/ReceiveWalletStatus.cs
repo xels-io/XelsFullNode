@@ -27,15 +27,4 @@ namespace XelsDesktopWalletApp.Models
         public ReceiveWalletStatus[] addresses { get; set; }
     }
 
-    public class SelectedAddress
-    {
-        public string address { get; set; }
-    }
-
-    public class ReceiveWalletList
-    {
-        public Dictionary<string, ReceiveWalletStatus> Wallets { get; set; }
-
-    }
-
 }
