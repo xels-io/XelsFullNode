@@ -23,11 +23,13 @@ namespace XelsDesktopWalletApp.Views
     public partial class SendSideChain : Window
     {
 
-        static HttpClient client = new HttpClient();
-        readonly string baseURL = "http://localhost:37221/api";
+        private static HttpClient client = new HttpClient();
+        private readonly string baseURL = "http://localhost:37221/api";
 
         private readonly WalletInfo walletInfo = new WalletInfo();
         private TransactionSending transactionSending = new TransactionSending();
+
+        private double estimatedSidechainFee = 0;
 
 
         private string walletName;
@@ -56,6 +58,7 @@ namespace XelsDesktopWalletApp.Views
 
             this.walletName = walletname;
             this.walletInfo.walletName = this.walletName;
+            EstimateFeeSideChainAsync();
             LoadCreateAsync();
         }
 
@@ -184,10 +187,127 @@ namespace XelsDesktopWalletApp.Views
 
         private void sendButton_Click(object sender, RoutedEventArgs e)
         {
-            BuildSidechainTransaction();
+            BuildTransactionSideChainAsync();
         }
 
 
+        private async Task GetMaxBalanceAsync()
+        {
+
+            string postUrl = this.baseURL + $"/wallet/send-transaction";
+            var content = "";
+
+            MaximumBalance maximumBalance = new MaximumBalance();
+            maximumBalance.WalletName = this.walletInfo.walletName;
+            maximumBalance.AccountName = "account 0";
+            maximumBalance.FeeType = "medium";
+            maximumBalance.AllowUnconfirmed = true;
+
+            HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(maximumBalance), Encoding.UTF8, "application/json"));
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                content = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+            }
+            this.estimatedSidechainFee = double.Parse(content);
+
+        }
+
+
+        private async void EstimateFeeSideChainAsync()
+        {
+
+            string postUrl = this.baseURL + $"/wallet/estimate-txfee";
+            var content = "";
+
+            FeeEstimationSideChain feeEstimation = new FeeEstimationSideChain();
+            feeEstimation.walletName = this.walletInfo.walletName;
+            feeEstimation.accountName = "account 0"; 
+            feeEstimation.federationAddress = this.textMainchainFederationAddress.Text.Trim();
+            feeEstimation.destinationAddress = this.textSidechainDestinationAddress.Text.Trim();
+            feeEstimation.amount = this.textAmount.Text;
+            feeEstimation.feeType = "medium"; // it should be set from view page, not here
+            feeEstimation.allowUnconfirmed = true;
+
+
+            // need to convert to array - recipient 
+            // make and send proper structure of object to call api - feeEstimation
+            // api service - in angular project
+            HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(feeEstimation), Encoding.UTF8, "application/json"));
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                content = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+            }
+            this.estimatedSidechainFee = double.Parse(content);
+        }
+
+        private async void BuildTransactionSideChainAsync()
+        {
+            string postUrl = this.baseURL + $"/wallet/build-transaction";
+            var content = "";
+
+            TransactionBuilding transactionBuilding = new TransactionBuilding();
+            transactionBuilding.walletName = this.walletInfo.walletName;
+            transactionBuilding.accountName = "account 0";
+            transactionBuilding.password = this.password.Password;
+            transactionBuilding.destinationAddress = this.textMainchainFederationAddress.Text.Trim();
+            transactionBuilding.amount = this.textAmount.Text;
+            transactionBuilding.feeAmount = this.estimatedSidechainFee / 100000000;
+            transactionBuilding.allowUnconfirmed = true;
+            transactionBuilding.shuffleOutputs = false;
+
+
+            HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(transactionBuilding), Encoding.UTF8, "application/json"));
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                content = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+            }
+
+            // this.estimatedSidechainFee = response.fee;
+            // this.transactionSending.hex = response.hex;
+
+            _ = SendTransactionAsync(this.transactionSending);
+        }
+
+
+        private async Task SendTransactionAsync(TransactionSending tranSending)
+        {
+            if (isValid())
+            {
+                string postUrl = this.baseURL + $"/wallet/send-transaction";
+                // var content = "";
+
+                HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(tranSending), Encoding.UTF8, "application/json"));
+
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // content = await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+                }
+            }
+
+        }
 
         private async Task GetWalletBalanceAsync(string path)
         {
@@ -212,33 +332,6 @@ namespace XelsDesktopWalletApp.Views
 
         }
 
-        private void BuildSidechainTransaction()
-        {
-            _ = SendTransactionSidechainAsync(this.baseURL);
-        }
-
-        private async Task SendTransactionSidechainAsync(string path)
-        {
-            if (isValid())
-            {
-
-                string postUrl = path + $"/wallet/send-transaction";
-                // var content = "";
-
-                HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.transactionSending.hex), Encoding.UTF8, "application/json"));
-
-
-                if (response.IsSuccessStatusCode)
-                {
-                    // content = await response.Content.ReadAsStringAsync();
-                }
-                else
-                {
-                    MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
-                }
-            }
-
-        }
 
 
     }

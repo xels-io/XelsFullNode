@@ -25,12 +25,26 @@ namespace XelsDesktopWalletApp.Models
         public string walletName { get; set; }
         public string accountName { get; set; }
         public string password { get; set; }
+
         //public Recipient[] recipients { get; set; }
-        public List<Recipient> recipients { get; set; }
+        //public List<Recipient> recipients { get; set; }
+        public string destinationAddress { get; set; }
+        public string amount { get; set; }
+        
         public double feeAmount { get; set; }
         public bool allowUnconfirmed { get; set; }
         public bool shuffleOutputs { get; set; }
-        public string opReturnData { get; set; }
-        public string opReturnAmount { get; set; }
+
+        //public string opReturnData { get; set; }
+        //public string opReturnAmount { get; set; }
     }
+
+    public class MaximumBalance
+    {
+        public string WalletName { get; set; }
+        public string AccountName { get; set; }
+        public string FeeType { get; set; }
+        public bool AllowUnconfirmed { get; set; }
+    }
+
 }

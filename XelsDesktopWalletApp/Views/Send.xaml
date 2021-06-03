@@ -100,13 +100,9 @@
                           TextWrapping="Wrap" VerticalAlignment="Top" Width="403" BorderBrush="#FFC9D6C9" 
                           BorderThickness="2" FontFamily="Microsoft YaHei Light" FontSize="11" Height="23" />
 
-                <Label Content="Mainchain federation address" HorizontalAlignment="Center" Margin="0,185,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="403" Height="23" FontFamily="Microsoft YaHei Light" FontSize="9"/>
-                <TextBox  x:Name="textMainchainFederationAddress" HorizontalAlignment="Left" 
-                    Margin="189,208,0,0" Text="" 
-                    TextWrapping="Wrap" VerticalAlignment="Top" Width="403" BorderBrush="#FFC9D6C9" 
-                    BorderThickness="2" FontFamily="Microsoft YaHei Light" FontSize="11" Height="25" />
-
+                
                 <!--Address-->
+                
                 <Label Content="Sidechain destination address" HorizontalAlignment="Center" Margin="0,233,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="403" Height="23" FontFamily="Microsoft YaHei Light" FontSize="9"/>
                 <TextBlock Name="textSidechainDestinationAddress" HorizontalAlignment="Left" Margin="189,304,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="403" FontFamily="Microsoft YaHei Light" FontSize="11" Height="25"/>
 
