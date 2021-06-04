@@ -91,37 +91,63 @@
 
 
 
+
+
+
                 <Label Content="Amount" HorizontalAlignment="Left" Margin="186,139,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="48" Height="23" FontFamily="Microsoft YaHei Light" FontSize="9"/>
                 <Label Content="Available:" HorizontalAlignment="Left" Margin="429,139,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="49" Height="23" FontFamily="Microsoft YaHei Light" FontSize="9"/>
-                <Label Content="0.00000000 XELS" HorizontalAlignment="Left" Margin="470,139,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="120" Height="23" FontFamily="Microsoft YaHei Light" FontSize="9"/>
 
+                <Label  x:Name="textAvailableCoin" 
+                          HorizontalAlignment="Left" Margin="478,139,0,0" 
+                           VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="83" 
+                           Height="23" FontFamily="Microsoft YaHei Light" FontSize="9" />
 
-                <TextBox  x:Name="textAmount" HorizontalAlignment="Left" 
-                          Margin="189,162,0,0" Text="" 
+                <Label  x:Name="textCoinType" 
+                          HorizontalAlignment="Left" Margin="566,139,0,0" 
+                           VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="37" 
+                           Height="23" FontFamily="Microsoft YaHei Light" FontSize="9" />
+                <!--Amount-->
+                <TextBox  x:Name="textAmount"
+                          IsReadOnly="False" Focusable="True" FocusManager.LostFocus="TxtAmount_LostFocus"
+                          HorizontalAlignment="Left" Margin="189,162,0,0" Text="" 
                           TextWrapping="Wrap" VerticalAlignment="Top" Width="403" BorderBrush="#FFC9D6C9" 
                           BorderThickness="2" FontFamily="Microsoft YaHei Light" FontSize="11" Height="23" />
 
+
+                <!--Address-->
                 <Label Content="Mainchain federation address" HorizontalAlignment="Center" Margin="0,185,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="403" Height="23" FontFamily="Microsoft YaHei Light" FontSize="9"/>
                 <TextBox  x:Name="textMainchainFederationAddress" HorizontalAlignment="Left" 
                     Margin="189,208,0,0" Text="" 
                     TextWrapping="Wrap" VerticalAlignment="Top" Width="403" BorderBrush="#FFC9D6C9" 
                     BorderThickness="2" FontFamily="Microsoft YaHei Light" FontSize="11" Height="25" />
 
-                <Label Content="Sidechain destination address" HorizontalAlignment="Center" Margin="0,233,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="403" Height="23" FontFamily="Microsoft YaHei Light" FontSize="9"/>
-                <TextBlock Name="textSidechainDestinationAddress" HorizontalAlignment="Left" Margin="189,304,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="403" FontFamily="Microsoft YaHei Light" FontSize="11" Height="25"/>
 
-                <Label Content="Transaction fee" HorizontalAlignment="Center" Margin="0,281,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="403" Height="23" FontFamily="Microsoft YaHei Light" FontSize="9"/>
-                <TextBox  x:Name="textTransactionFee" HorizontalAlignment="Left" 
-                    Margin="189,256,0,0" Text="" 
-                    TextWrapping="Wrap" VerticalAlignment="Top" Width="403" BorderBrush="#FFC9D6C9" 
+
+                <Label Content="Sidechain destination address" HorizontalAlignment="Center" 
+                       Margin="0,236,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="403" 
+                       Height="23" FontFamily="Microsoft YaHei Light" FontSize="9"/>
+
+                <TextBox x:Name="textSidechainDestinationAddress" 
+                          IsReadOnly="False" Focusable="True" FocusManager.LostFocus="TxtAddress_LostFocus"
+                           HorizontalAlignment="Center" Margin="0,259,0,0" TextWrapping="Wrap" VerticalAlignment="Top" 
+                           Width="402" FontFamily="Microsoft YaHei Light" FontSize="11" Height="25"/>
+
+                <Label Content="Transaction fee" HorizontalAlignment="Center" Margin="0,284,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="403" Height="23" FontFamily="Microsoft YaHei Light" FontSize="9"/>
+                <TextBox  x:Name="textTransactionFee" HorizontalAlignment="Center" 
+                    Margin="0,307,0,0" Text="" 
+                    TextWrapping="Wrap" VerticalAlignment="Top" Width="402" BorderBrush="#FFC9D6C9" 
                     BorderThickness="2" FontFamily="Microsoft YaHei Light" FontSize="11" Height="25" />
 
-                <Label Content="Wallet Password" HorizontalAlignment="Center" Margin="0,329,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="403" Height="21" FontFamily="Microsoft YaHei Light" FontSize="9"/>
-                <PasswordBox Name="password" PasswordChar="*" Width="403" Padding="2" 
+                <!--password-->
+                <Label Content="Wallet Password" HorizontalAlignment="Center" Margin="0,332,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="403" Height="21" FontFamily="Microsoft YaHei Light" FontSize="9"/>
+                <PasswordBox x:Name="password" PasswordChar="*" Width="402" Padding="2" 
                              RenderTransformOrigin="0.792,0.552" FontFamily="Microsoft YaHei Light" 
                              BorderBrush="#FFC9D6C9" HorizontalAlignment="Left" 
-                             Margin="189,350,0,0" VerticalAlignment="Top"  
+                             Margin="190,353,0,0" VerticalAlignment="Top"  
                              BorderThickness="2"  FontSize="11" Height="25"/>
+
+
+
 
             </Grid>
 
