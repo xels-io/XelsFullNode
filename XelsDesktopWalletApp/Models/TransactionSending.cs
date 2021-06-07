@@ -56,8 +56,8 @@ namespace XelsDesktopWalletApp.Models
         public bool allowUnconfirmed { get; set; }
         public bool shuffleOutputs { get; set; }
 
-        //public string opReturnData { get; set; }
-        //public string opReturnAmount { get; set; }
+        public string opReturnData { get; set; }
+        public string opReturnAmount { get; set; }
     }
 
     public class MaximumBalance

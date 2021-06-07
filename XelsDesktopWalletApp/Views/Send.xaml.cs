@@ -29,6 +29,7 @@ namespace XelsDesktopWalletApp.Views
 
         private readonly WalletInfo walletInfo = new WalletInfo();
         private TransactionSending transactionSending = new TransactionSending();
+        private TransactionBuilding transactionBuilding = new TransactionBuilding();
 
         private WalletBalanceArray balances = new WalletBalanceArray();
         private BuildTransaction buildTransaction = new BuildTransaction();
@@ -40,6 +41,8 @@ namespace XelsDesktopWalletApp.Views
         private Money estimatedFee = 0;
         private bool isSending = false;
 
+        private Money opReturnAmount = 1;
+        
         private string walletName;
         public string WalletName
         {
@@ -327,17 +330,16 @@ namespace XelsDesktopWalletApp.Views
             string postUrl = this.baseURL + $"/wallet/build-transaction";
             var content = "";
 
-            TransactionBuilding transactionBuilding = new TransactionBuilding();
-            transactionBuilding.walletName = this.walletInfo.walletName;
-            transactionBuilding.accountName = "account 0";
-            transactionBuilding.password = this.password.Password;
-            transactionBuilding.recipients = recipients;
-            transactionBuilding.feeAmount = this.estimatedFee / 100000000;
-            transactionBuilding.allowUnconfirmed = true;
-            transactionBuilding.shuffleOutputs = false;
+            this.transactionBuilding.walletName = this.walletInfo.walletName;
+            this.transactionBuilding.accountName = "account 0";
+            this.transactionBuilding.password = this.password.Password;
+            this.transactionBuilding.recipients = recipients;
+            this.transactionBuilding.feeAmount = this.estimatedFee / 100000000;
+            this.transactionBuilding.allowUnconfirmed = true;
+            this.transactionBuilding.shuffleOutputs = false;
 
 
-            HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(transactionBuilding), Encoding.UTF8, "application/json"));
+            HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.transactionBuilding), Encoding.UTF8, "application/json"));
 
 
             if (response.IsSuccessStatusCode)
@@ -350,7 +352,7 @@ namespace XelsDesktopWalletApp.Views
 
                 if (this.isSending)
                 {
-                _ = SendTransactionAsync(this.transactionSending);
+                    _ = SendTransactionAsync(this.transactionSending);
                 }
 
             }
@@ -376,6 +378,16 @@ namespace XelsDesktopWalletApp.Views
                 if (response.IsSuccessStatusCode)
                 {
                     // content = await response.Content.ReadAsStringAsync();
+
+                    SendConfirmation sendConfirmation = new SendConfirmation();
+                    sendConfirmation.transaction = this.transactionBuilding;
+                    sendConfirmation.transactionFee = this.estimatedFee;
+                    sendConfirmation.cointype = this.cointype;
+
+                    SendConfirmationMainChain sendConf = new SendConfirmationMainChain(sendConfirmation, this.walletName);
+                    sendConf.Show();
+                    this.Close();
+
                 }
                 else
                 {
