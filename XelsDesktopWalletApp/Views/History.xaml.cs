@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,6 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using NBitcoin;
+using Newtonsoft.Json;
+using XelsDesktopWalletApp.Models;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -18,6 +23,14 @@ namespace XelsDesktopWalletApp.Views
     /// </summary>
     public partial class History : Window
     {
+        #region Base
+        static HttpClient client = new HttpClient();
+        string baseURL = "http://localhost:37221/api";
+        #endregion
+
+        private readonly WalletInfo walletInfo = new WalletInfo();
+        private HistoryModelArray historyModelArray = new HistoryModelArray();
+        private List<TransactionInfo> transactions = new List<TransactionInfo>();
         private string walletName;
         public string WalletName
         {
@@ -39,8 +52,9 @@ namespace XelsDesktopWalletApp.Views
             InitializeComponent();
             this.DataContext = this;
 
-
             this.walletName = walletname;
+            this.walletInfo.walletName = this.walletName;
+            _ = GetWalletHistoryAsync(this.baseURL);
         }
 
         private void Hyperlink_NavigateDashboard(object sender, RequestNavigateEventArgs e)
@@ -82,6 +96,78 @@ namespace XelsDesktopWalletApp.Views
             adv.Show();
             this.Close();
         }
+
+
+        private async Task GetWalletHistoryAsync(string path)
+        {
+            string getUrl = path + $"/wallet/history?WalletName={this.walletInfo.walletName}&AccountName=account 0";
+            var content = "";
+
+            HttpResponseMessage response = await client.GetAsync(getUrl);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                content = await response.Content.ReadAsStringAsync();
+
+                this.historyModelArray = JsonConvert.DeserializeObject<HistoryModelArray>(content);
+
+                if (this.historyModelArray.history != null && this.historyModelArray.history[0].transactionsHistory.transactionsItem.Length > 0)
+                {
+                    TransactionItemModelArray historyResponse = new TransactionItemModelArray();
+                    historyResponse.transactionsItem = this.historyModelArray.history[0].transactionsHistory.transactionsItem;
+                    GetTransactionInfo(historyResponse);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+            }
+
+        }
+
+
+        private void GetTransactionInfo(TransactionItemModelArray transactions)
+        {
+            TransactionItemModelArray transactionArray = new TransactionItemModelArray();
+
+            foreach (TransactionItemModel transaction in transactions.transactionsItem)
+            {
+                TransactionInfo transactionInfo = new TransactionInfo();
+                if (transaction.type == TransactionItemType.Send)
+                {
+                    transactionInfo.transactionType = "sent";
+                }
+                else if (transaction.type == TransactionItemType.Received)
+                {
+                    transactionInfo.transactionType = "received";
+                }
+                else if (transaction.type == TransactionItemType.Staked)
+                {
+                    transactionInfo.transactionType = "hybrid reward";
+                }
+                else if (transaction.type == TransactionItemType.Mined)
+                {
+                    transactionInfo.transactionType = "pow reward";
+                }
+                transactionInfo.transactionId = transaction.id;
+                transactionInfo.transactionAmount = transaction.amount;
+                if (transaction.fee != null)
+                {
+                    transactionInfo.transactionFee = transaction.fee;
+                }
+                else
+                {
+                    transactionInfo.transactionFee = 0;
+                }
+                transactionInfo.transactionConfirmedInBlock = transaction.confirmedInBlock;
+                transactionInfo.transactionTimestamp = transaction.timestamp;
+                //var transactionConfirmed;
+
+                this.transactions.Add(transactionInfo);
+            }
+        }
+
 
     }
 }

@@ -105,6 +105,7 @@
                 <Label Content="Looks like you haven't made any transactions yet." FontFamily="Microsoft YaHei Light" Margin="252,0,241,0"/>
 
             </Grid>
+            <DataGrid Height="307"/>
 
 
         </StackPanel>

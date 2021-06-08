@@ -69,6 +69,9 @@
     <Compile Update="Views\SendConfirmationMainChain.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\SendConfirmationSideChain.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\SendSelsBels.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -138,6 +141,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\SendConfirmationMainChain.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SendConfirmationSideChain.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\SendSelsBels.xaml">
