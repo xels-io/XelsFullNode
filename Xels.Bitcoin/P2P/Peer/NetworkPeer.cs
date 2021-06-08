@@ -436,7 +436,8 @@ namespace Xels.Bitcoin.P2P.Peer
 
                 this.logger.LogDebug("Outbound connection to '{0}' established.", this.PeerEndPoint);
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex
+            )
             {
                 this.logger.LogDebug("Connection to '{0}' cancelled.", this.PeerEndPoint);
 
@@ -812,7 +813,7 @@ namespace Xels.Bitcoin.P2P.Peer
                 // Ask the just-handshaked peer for the peers they know about to aid in our own peer discovery.
                 await this.SendMessageAsync(new GetAddrPayload(), cancellationToken).ConfigureAwait(false);
             }
-            catch
+            catch(Exception ex)
             {
                 throw;
             }

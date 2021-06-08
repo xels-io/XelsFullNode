@@ -204,7 +204,7 @@ namespace Xels.Bitcoin.P2P.Peer
                 await peer.ConnectAsync(peer.ConnectionParameters.ConnectCancellation).ConfigureAwait(false);
                 networkPeerDisposer?.AddPeer(peer);
             }
-            catch
+            catch (Exception ex)
             {
                 peer.Dispose();
                 throw;
