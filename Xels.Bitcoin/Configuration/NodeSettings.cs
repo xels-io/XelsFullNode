@@ -108,7 +108,7 @@ namespace Xels.Bitcoin.Configuration
         /// is met. For this reason, the minimum relay transaction fee is usually lower than the minimum fee.
         /// </summary>
         public FeeRate MinRelayTxFeeRate { get; private set; }
-        
+
         /// <summary>
         /// If true then the node will add and start the SignalR feature.
         /// </summary>
@@ -136,7 +136,6 @@ namespace Xels.Bitcoin.Configuration
         {
             // Create the default logger factory and logger.
             var loggerFactory = new ExtendedLoggerFactory();
-            
             this.LoggerFactory = loggerFactory;
             this.LoggerFactory.AddConsoleWithFilters();
             this.LoggerFactory.AddNLog();
@@ -232,7 +231,7 @@ namespace Xels.Bitcoin.Configuration
                     this.ReadConfigurationFile();
             }
 
-            this.EnableSignalR = this.ConfigReader.GetOrDefault<bool>("enableSignalR",  false, this.Logger);
+            this.EnableSignalR = this.ConfigReader.GetOrDefault<bool>("enableSignalR", false, this.Logger);
 
             // Create the custom logger factory.
             this.Log = new LogSettings();
@@ -409,41 +408,37 @@ namespace Xels.Bitcoin.Configuration
         /// <param name="network">The network to base the defaults off.</param>
         public static void BuildDefaultConfigurationFile(StringBuilder builder, Network network)
         {
-            builder.AppendLine("forcelisten=1");
-            builder.AppendLine("connect=52.68.239.4");
-            builder.AppendLine("connect=54.64.43.45");
-            builder.AppendLine("connect=54.238.248.117");
-            builder.AppendLine("connect=13.114.52.87");
-            builder.AppendLine("connect=52.192.229.45");
-            builder.AppendLine("connect=52.199.121.139");
-            builder.AppendLine("whitelist=52.68.239.4");
-            builder.AppendLine("whitelist=54.64.43.45");
-            builder.AppendLine("whitelist=54.238.248.117");
-            builder.AppendLine("whitelist=13.114.52.87");
-            builder.AppendLine("whitelist=52.192.229.45");
-            builder.AppendLine("whitelist=52.199.121.139");
-            //builder.AppendLine("forcelisten=1");
-            //builder.AppendLine("connect=52.68.239.4:27976");
-            //builder.AppendLine("connect=54.64.43.45:27976");
-            //builder.AppendLine("connect=54.238.248.117:27976");
-            //builder.AppendLine("connect=13.114.52.87:27976");
-            //builder.AppendLine("connect=52.192.229.45:27976");
-            //builder.AppendLine("connect=52.199.121.139:27976");
+            builder.AppendLine($"whitelist=52.68.239.4:{ network.DefaultPort }");
+            builder.AppendLine($"whitelist=54.64.43.45:{ network.DefaultPort }");
+            builder.AppendLine($"whitelist=54.238.248.117:{ network.DefaultPort }");
+            builder.AppendLine($"whitelist=13.114.52.87:{ network.DefaultPort }");
+            builder.AppendLine($"whitelist=52.192.229.45:{ network.DefaultPort }");
+            builder.AppendLine($"whitelist=52.199.121.139:{ network.DefaultPort }");
 
 
-            //builder.AppendLine("addnode=52.68.239.4:27976");
-            //builder.AppendLine("addnode=54.64.43.45:27976");
-            //builder.AppendLine("addnode=54.238.248.117:27976");
-            //builder.AppendLine("addnode=13.114.52.87:27976");
-            //builder.AppendLine("addnode=52.192.229.45:27976");
-            //builder.AppendLine("addnode=52.199.121.139:27976");
+            builder.AppendLine($"forcelisten=1");
 
-            //builder.AppendLine("whitelist=52.68.239.4:27976");
-            //builder.AppendLine("whitelist=54.64.43.45:27976");
-            //builder.AppendLine("whitelist=54.238.248.117:27976");
-            //builder.AppendLine("whitelist=13.114.52.87:27976");
-            //builder.AppendLine("whitelist=52.192.229.45:27976");
-            //builder.AppendLine("whitelist=52.199.121.139:27976");
+            builder.AppendLine($"connect=52.68.239.4:{ network.DefaultPort }");
+            builder.AppendLine($"connect=54.64.43.45:{ network.DefaultPort }");
+            builder.AppendLine($"connect=54.238.248.117:{ network.DefaultPort }");
+            builder.AppendLine($"connect=13.114.52.87:{ network.DefaultPort }");
+            builder.AppendLine($"connect=52.192.229.45:{ network.DefaultPort }");
+            builder.AppendLine($"connect=52.199.121.139:{ network.DefaultPort }");
+
+            //builder.AppendLine($"addnode=52.68.239.4:{ network.DefaultPort }");
+            //builder.AppendLine($"addnode=54.64.43.45:{ network.DefaultPort }");
+            //builder.AppendLine($"addnode=54.238.248.117:{ network.DefaultPort }");
+            //builder.AppendLine($"addnode=13.114.52.87:{ network.DefaultPort }");
+            //builder.AppendLine($"addnode=52.192.229.45:{ network.DefaultPort }");
+            //builder.AppendLine($"addnode=52.199.121.139:{ network.DefaultPort }");
+            //builder.AppendLine($"whitebind=52.68.239.4");
+            //builder.AppendLine($"whitebind=54.64.43.45");
+            //builder.AppendLine($"whitebind=54.238.248.117");
+            //builder.AppendLine($"whitebind=13.114.52.87");
+            //builder.AppendLine($"whitebind=52.192.229.45");
+            //builder.AppendLine($"whitebind=52.199.121.139");
+
+            //builder.AppendLine($"listen=1");
 
             builder.AppendLine("####Node Settings####");
             builder.AppendLine($"#Test network. Defaults to 0.");
