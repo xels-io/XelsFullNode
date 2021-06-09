@@ -23,14 +23,35 @@ namespace XelsDesktopWalletApp.Views
     /// </summary>
     public partial class History : Window
     {
+
+        #region Transaction Info
+        public class TransactionInfo
+        {
+            public string transactionType { get; set; }
+            public TransactionItemTypeName transactionTypeName { get; set; }
+            public uint256 transactionId { get; set; }
+            public string transactionFinalAmount { get; set; }
+            public Money transactionAmount { get; set; }
+            public Money transactionFee { get; set; }
+            public int? transactionConfirmedInBlock { get; set; }
+            public DateTimeOffset transactionTimestamp { get; set; }
+
+        }
+
+        public enum TransactionItemTypeName
+        {
+            Confirmed,
+            Unconfirmed
+        }
+        #endregion
+
         #region Base
         static HttpClient client = new HttpClient();
         string baseURL = "http://localhost:37221/api";
         #endregion
-
+        #region Wallet Info
         private readonly WalletInfo walletInfo = new WalletInfo();
-        private HistoryModelArray historyModelArray = new HistoryModelArray();
-        private List<TransactionInfo> transactions = new List<TransactionInfo>();
+
         private string walletName;
         public string WalletName
         {
@@ -43,6 +64,10 @@ namespace XelsDesktopWalletApp.Views
                 this.walletName = value;
             }
         }
+        #endregion
+
+        private HistoryModelArray historyModelArray = new HistoryModelArray();
+        private List<TransactionInfo> transactions = new List<TransactionInfo>();
         public History()
         {
             InitializeComponent();
@@ -109,14 +134,24 @@ namespace XelsDesktopWalletApp.Views
             if (response.IsSuccessStatusCode)
             {
                 content = await response.Content.ReadAsStringAsync();
-
+                
                 this.historyModelArray = JsonConvert.DeserializeObject<HistoryModelArray>(content);
 
-                if (this.historyModelArray.history != null && this.historyModelArray.history[0].transactionsHistory.transactionsItem.Length > 0)
+                if (this.historyModelArray.history != null && this.historyModelArray.history[0].transactionsHistory.Length > 0)
                 {
-                    TransactionItemModelArray historyResponse = new TransactionItemModelArray();
-                    historyResponse.transactionsItem = this.historyModelArray.history[0].transactionsHistory.transactionsItem;
+                    int transactionsLen = this.historyModelArray.history[0].transactionsHistory.Length;
+                    this.NoData.Visibility = Visibility.Hidden;
+                    this.HistoryListBinding.Visibility = Visibility.Visible;
+
+                    TransactionItemModel[] historyResponse = new TransactionItemModel[transactionsLen];
+                    historyResponse = this.historyModelArray.history[0].transactionsHistory;
+
                     GetTransactionInfo(historyResponse);
+                }
+                else
+                {
+                    this.HistoryListBinding.Visibility = Visibility.Hidden;
+                    this.NoData.Visibility = Visibility.Visible;
                 }
             }
             else
@@ -127,13 +162,14 @@ namespace XelsDesktopWalletApp.Views
         }
 
 
-        private void GetTransactionInfo(TransactionItemModelArray transactions)
+        private void GetTransactionInfo(TransactionItemModel[] transactions)
         {
-            TransactionItemModelArray transactionArray = new TransactionItemModelArray();
 
-            foreach (TransactionItemModel transaction in transactions.transactionsItem)
+            foreach (TransactionItemModel transaction in transactions)
             {
                 TransactionInfo transactionInfo = new TransactionInfo();
+
+                //Type
                 if (transaction.type == TransactionItemType.Send)
                 {
                     transactionInfo.transactionType = "sent";
@@ -150,8 +186,14 @@ namespace XelsDesktopWalletApp.Views
                 {
                     transactionInfo.transactionType = "pow reward";
                 }
+
+                //Id
                 transactionInfo.transactionId = transaction.id;
-                transactionInfo.transactionAmount = transaction.amount;
+
+                //Amount
+                transactionInfo.transactionAmount = transaction.amount ?? 0;
+
+                //Fee
                 if (transaction.fee != null)
                 {
                     transactionInfo.transactionFee = transaction.fee;
@@ -160,13 +202,52 @@ namespace XelsDesktopWalletApp.Views
                 {
                     transactionInfo.transactionFee = 0;
                 }
-                transactionInfo.transactionConfirmedInBlock = transaction.confirmedInBlock;
-                transactionInfo.transactionTimestamp = transaction.timestamp;
-                //var transactionConfirmed;
 
+                //FinalAmount
+                if (transactionInfo.transactionType != null)
+                {
+                    if (transactionInfo.transactionType == "sent")
+                    {
+                        Money finalAmt = transactionInfo.transactionAmount + transactionInfo.transactionFee;
+                        transactionInfo.transactionFinalAmount = $" - {finalAmt}";
+                    }
+                    else if (transactionInfo.transactionType == "received")
+                    {
+                        Money finalAmt = transactionInfo.transactionAmount + transactionInfo.transactionFee;
+                        transactionInfo.transactionFinalAmount = $" + {finalAmt}";
+                    }
+                    else if (transactionInfo.transactionType == "hybrid reward")
+                    {
+                        Money finalAmt = transactionInfo.transactionAmount + transactionInfo.transactionFee;
+                        transactionInfo.transactionFinalAmount = $" + {finalAmt}";
+                    }
+                    else if (transactionInfo.transactionType == "pow reward")
+                    {
+                        Money finalAmt = transactionInfo.transactionAmount + transactionInfo.transactionFee;
+                        transactionInfo.transactionFinalAmount = $" + {finalAmt}";
+                    }
+                }
+                //ConfirmedInBlock
+                transactionInfo.transactionConfirmedInBlock = transaction.confirmedInBlock;
+                if (transactionInfo.transactionConfirmedInBlock != 0 || transactionInfo.transactionConfirmedInBlock != null)
+                {
+                    transactionInfo.transactionTypeName = TransactionItemTypeName.Confirmed;
+                }
+                else
+                {
+                    transactionInfo.transactionTypeName = TransactionItemTypeName.Unconfirmed;
+                }
+
+                //Timestamp
+                transactionInfo.transactionTimestamp = transaction.timestamp;
+
+                transactionInfo.transactionType = transactionInfo.transactionType.ToUpper();
                 this.transactions.Add(transactionInfo);
             }
+
+            this.HistoryListBinding.ItemsSource = this.transactions;
         }
+
 
 
     }

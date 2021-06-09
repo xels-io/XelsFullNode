@@ -102,11 +102,26 @@
             </Grid>
 
             <Grid>
-                <Label Content="Looks like you haven't made any transactions yet." FontFamily="Microsoft YaHei Light" Margin="252,0,241,0"/>
+                <Label Name="NoData" Content="Looks like you haven't made any transactions yet." 
+                       FontFamily="Microsoft YaHei" Margin="232,0,222,0" FontSize="12" FontWeight="Bold"/>
 
             </Grid>
-            <DataGrid Height="307"/>
-
+            <Grid Height="334">
+                <ListView Margin="10" x:Name="HistoryListBinding" >
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Confirmation in block" Width="200" 
+                                            DisplayMemberBinding="{Binding Path=transactionTypeName}"  />
+                            <GridViewColumn Header="Type" Width="150"
+                                            DisplayMemberBinding="{Binding Path=transactionType}" />
+                            <GridViewColumn Header="Amount" Width="150" 
+                                            DisplayMemberBinding="{Binding Path=transactionFinalAmount}"  />
+                            <GridViewColumn Header="Time stamp" Width="150" 
+                                            DisplayMemberBinding="{Binding Path=transactionTimestamp}"  />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Grid>
 
         </StackPanel>
     </Border>
