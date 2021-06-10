@@ -38,7 +38,7 @@ namespace Xels.Sidechains.Networks
             this.DefaultPort = 27771;
             this.DefaultMaxOutboundConnections = 16;
             this.DefaultMaxInboundConnections = 109;
-            this.DefaultRPCPort = 17775;
+            this.DefaultRPCPort = 27776;
             this.DefaultAPIPort = 37223;
             this.DefaultSignalRPort = 38823;
             this.MaxTipAge = 768; // 20% of the fastest time it takes for one MaxReorgLength of blocks to be mined.
@@ -166,7 +166,12 @@ namespace Xels.Sidechains.Networks
 
             this.SeedNodes = new List<NetworkAddress>
             {
-                new NetworkAddress(IPAddress.Parse("54.64.43.45"), 17976)
+                new NetworkAddress(IPAddress.Parse("52.68.239.4"), this.DefaultPort ), // public node with DNS Server Enabled
+                new NetworkAddress(IPAddress.Parse("54.64.43.45"), this.DefaultPort ), // public node with DNS Server Enabled
+                new NetworkAddress(IPAddress.Parse("54.238.248.117"), this.DefaultPort), // public node
+                new NetworkAddress(IPAddress.Parse("13.114.52.87"), this.DefaultPort), // public node
+                new NetworkAddress(IPAddress.Parse("52.192.229.45"), this.DefaultPort), // public node
+                new NetworkAddress(IPAddress.Parse("52.199.121.139"), this.DefaultPort )
             };
 
             this.StandardScriptsRegistry = new SmartContractsStandardScriptsRegistry();

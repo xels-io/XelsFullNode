@@ -55,11 +55,12 @@ namespace Xels.XoyPegD
         private static void Main(string[] args)
         {
             RunFederationGatewayAsync(args).Wait();
-            //CreateShortCut();
+            CreateShortCut();
         }
 
         private static async Task RunFederationGatewayAsync(string[] args)
         {
+            //args = new string[] { "-mainchain" };
             try
             {
                 bool isMainchainNode = args.FirstOrDefault(a => a.ToLower() == MainchainArgument) != null;
@@ -161,8 +162,9 @@ namespace Xels.XoyPegD
             foreach (var arg in argumentList)
             {
                 object shDesktop = (object)"Desktop";
-                WshShell shell = new WshShell();
-                string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-miner-d" + arg + ".lnk";
+                WshShell shell = new WshShell(); 
+                // add reference for com --- Windows Script Host Object Model
+                string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-xoy-peg" + arg + ".lnk";
                 IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
 
                 shortcut.Arguments = arg;
