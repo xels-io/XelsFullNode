@@ -82,46 +82,6 @@ namespace XelsDesktopWalletApp.Views
             _ = GetWalletHistoryAsync(this.baseURL);
         }
 
-        private void Hyperlink_NavigateDashboard(object sender, RequestNavigateEventArgs e)
-        {
-            Dashboard ds = new Dashboard(this.walletName);
-            ds.Show();
-            this.Close();
-        }
-        private void Hyperlink_NavigateHistory(object sender, RequestNavigateEventArgs e)
-        {
-            History hs = new History(this.walletName);
-            hs.Show();
-            this.Close();
-        }
-        private void Hyperlink_NavigateExchange(object sender, RequestNavigateEventArgs e)
-        {
-            Exchange ex = new Exchange(this.walletName);
-            ex.Show();
-            this.Close();
-        }
-
-        private void Hyperlink_NavigateAddressBook(object sender, RequestNavigateEventArgs e)
-        {
-            AddressBook ex = new AddressBook(this.walletName);
-            ex.Show();
-            this.Close();
-        }
-        private void Hyperlink_NavigateLogout(object sender, RequestNavigateEventArgs e)
-        {
-            LogoutConfirm lc = new LogoutConfirm(this.walletName);
-            lc.Show();
-            this.Close();
-        }
-
-
-        private void Hyperlink_NavigateAdvanced(object sender, RequestNavigateEventArgs e)
-        {
-            Advanced adv = new Advanced(this.walletName);
-            adv.Show();
-            this.Close();
-        }
-
 
         private async Task GetWalletHistoryAsync(string path)
         {
@@ -248,6 +208,46 @@ namespace XelsDesktopWalletApp.Views
             this.HistoryListBinding.ItemsSource = this.transactions;
         }
 
+
+        private void Hyperlink_NavigateDashboard(object sender, RequestNavigateEventArgs e)
+        {
+            Dashboard ds = new Dashboard(this.walletName);
+            ds.Show();
+            this.Close();
+        }
+        private void Hyperlink_NavigateHistory(object sender, RequestNavigateEventArgs e)
+        {
+            History hs = new History(this.walletName);
+            hs.Show();
+            this.Close();
+        }
+        private void Hyperlink_NavigateExchange(object sender, RequestNavigateEventArgs e)
+        {
+            Exchange ex = new Exchange(this.walletName);
+            ex.Show();
+            this.Close();
+        }
+
+        private void Hyperlink_NavigateAddressBook(object sender, RequestNavigateEventArgs e)
+        {
+            AddressBook ex = new AddressBook(this.walletName);
+            ex.Show();
+            this.Close();
+        }
+        private void Hyperlink_NavigateLogout(object sender, RequestNavigateEventArgs e)
+        {
+            LogoutConfirm lc = new LogoutConfirm(this.walletName);
+            lc.Show();
+            this.Close();
+        }
+
+
+        private void Hyperlink_NavigateAdvanced(object sender, RequestNavigateEventArgs e)
+        {
+            Advanced adv = new Advanced(this.walletName);
+            adv.Show();
+            this.Close();
+        }
 
 
     }

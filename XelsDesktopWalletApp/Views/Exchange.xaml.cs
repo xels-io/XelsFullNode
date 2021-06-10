@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using XelsDesktopWalletApp.Models;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -18,6 +21,13 @@ namespace XelsDesktopWalletApp.Views
     /// </summary>
     public partial class Exchange : Window
     {
+
+        #region Base
+        static HttpClient client = new HttpClient();
+        string baseURL = "http://localhost:37221/api";
+        #endregion
+        #region Wallet Info
+        private readonly WalletInfo walletInfo = new WalletInfo();
 
         private string walletName;
         public string WalletName
@@ -31,6 +41,8 @@ namespace XelsDesktopWalletApp.Views
                 this.walletName = value;
             }
         }
+        #endregion
+
         public Exchange()
         {
             InitializeComponent();
@@ -40,9 +52,49 @@ namespace XelsDesktopWalletApp.Views
             InitializeComponent();
             this.DataContext = this;
 
-
             this.walletName = walletname;
+            this.walletInfo.walletName = this.walletName;
+
+            LoadCreate();
         }
+
+
+        public async void LoadCreate()
+        {
+            string addr = await GetUnusedReceiveAddressesAsync(this.baseURL);
+            addr = FreshAddress(addr);
+        }
+
+
+        private string FreshAddress(string adr)
+        {
+            adr = adr.Trim(new char[] { '"' });
+            return adr;
+        }
+
+        private async Task<string> GetUnusedReceiveAddressesAsync(string path)
+        {
+            string getUrl = path + $"/wallet/unusedaddress?WalletName={this.walletInfo.walletName}&AccountName=account 0";
+            var content = "";
+
+            HttpResponseMessage response = await client.GetAsync(getUrl);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                content = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+            }
+
+            return content;
+        }
+
+
+
+
 
 
         private void Hyperlink_NavigateDashboard(object sender, RequestNavigateEventArgs e)
@@ -84,5 +136,6 @@ namespace XelsDesktopWalletApp.Views
             adv.Show();
             this.Close();
         }
+
     }
 }

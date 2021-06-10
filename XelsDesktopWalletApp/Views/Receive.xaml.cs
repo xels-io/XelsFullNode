@@ -73,7 +73,7 @@ namespace XelsDesktopWalletApp.Views
 
         private string FreshAddress(string adr)
         {
-            adr = adr.Trim(new Char[] { '"' });
+            adr = adr.Trim(new char[] { '"' });
             return adr;
         }
 
