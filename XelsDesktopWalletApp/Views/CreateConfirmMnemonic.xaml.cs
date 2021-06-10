@@ -157,6 +157,10 @@ namespace XelsDesktopWalletApp.Views
                 if (response.IsSuccessStatusCode)
                 {
                     MessageBox.Show("Successfully created wallet with Name: " + this._walletcreateconfirm.name);
+
+                    MainWindow mw = new MainWindow();
+                    mw.Show();
+                    this.Close();
                 }
                 else
                 {

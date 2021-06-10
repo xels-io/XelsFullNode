@@ -10,17 +10,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using XelsDesktopWalletApp.Models;
 
 namespace XelsDesktopWalletApp.Views
 {
     /// <summary>
-    /// Interaction logic for Dashboard.xaml
+    /// Interaction logic for AddressBookAddNew.xaml
     /// </summary>
-    public partial class Dashboard : Window
+    public partial class AddressBookAddNew : Window
     {
-
-
         private string walletName;
         public string WalletName
         {
@@ -35,35 +32,39 @@ namespace XelsDesktopWalletApp.Views
         }
 
 
-        public Dashboard()
+        public AddressBookAddNew()
         {
             InitializeComponent();
 
             this.DataContext = this;
         }
-        public Dashboard(string walletname)
+        public AddressBookAddNew(string walletname)
         {
             InitializeComponent();
 
-            //this.AccountComboBox.SelectedItem = this.walletName;
             this.DataContext = this;
 
 
             this.walletName = walletname;
         }
 
+        private void Show_Click(object sender, RoutedEventArgs e)
+        {
+            Send send = new Send();
+            send.Show();
+            this.Close();
+            //MyPopup.IsOpen = true;
+        }
 
         private void receiveButton_Click(object sender, RoutedEventArgs e)
         {
-            Receive receive = new Receive(this.walletName);
+            Receive receive = new Receive();
             receive.Show();
             this.Close();
         }
-        private void sendButton_Click(object sender, RoutedEventArgs e)
+        private void createButton_Click(object sender, RoutedEventArgs e)
         {
-            Send send = new Send(this.walletName);
-            send.Show();
-            this.Close();
+
         }
         private void Hide_Click(object sender, RoutedEventArgs e)
         {
@@ -89,20 +90,20 @@ namespace XelsDesktopWalletApp.Views
             ex.Show();
             this.Close();
         }
-        
-        private void Hyperlink_NavigateAddressBook(object sender, RequestNavigateEventArgs e)
-        {
-            AddressBook ex = new AddressBook(this.walletName);
-            ex.Show();
-            this.Close();
-        }
         private void Hyperlink_NavigateLogout(object sender, RequestNavigateEventArgs e)
         {
             LogoutConfirm lc = new LogoutConfirm(this.walletName);
             lc.Show();
             this.Close();
         }
-        
+
+        private void Hyperlink_NavigateAddressBook(object sender, RequestNavigateEventArgs e)
+        {
+            AddressBook ex = new AddressBook(this.walletName);
+            ex.Show();
+            this.Close();
+        }
+
 
         private void Hyperlink_NavigateAdvanced(object sender, RequestNavigateEventArgs e)
         {
@@ -110,6 +111,5 @@ namespace XelsDesktopWalletApp.Views
             adv.Show();
             this.Close();
         }
-
     }
 }

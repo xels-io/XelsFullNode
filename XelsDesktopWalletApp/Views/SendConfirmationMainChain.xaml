@@ -1,0 +1,47 @@
+﻿<Window x:Class="XelsDesktopWalletApp.Views.SendConfirmationMainChain"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XelsDesktopWalletApp.Views"
+        mc:Ignorable="d"
+        Title="SendConfirmationMainChain" Height="450" Width="800">
+    <StackPanel>
+        <TextBlock Margin="0,1" Width="342" Height="109" FontSize="24" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light" Opacity="0.7"><Run/><LineBreak/><Run/><LineBreak/><Run Text="Sent"/></TextBlock>
+
+        <StackPanel Orientation="Horizontal" Width="353">
+            <Label Content="Amount sent:" Width="119" FontFamily="Microsoft YaHei Light" FontSize="14"/>
+            <Label Name="AmountSent" Width="173" FontFamily="Microsoft YaHei Light" FontSize="12"/>
+            <Label Name="AmountSentType"  Width="51" FontFamily="Microsoft YaHei Light" FontSize="14"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Width="352">
+            <Label Content="Fee:" Width="120" FontFamily="Microsoft YaHei Light" FontSize="14"/>
+            <Label Name="Fee" Width="172" FontFamily="Microsoft YaHei Light" FontSize="12"/>
+            <Label x:Name="FeeType"  Width="51" FontFamily="Microsoft YaHei Light" FontSize="14"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Width="352">
+            <Label Content="Total:" Width="120" FontFamily="Microsoft YaHei Light" FontSize="14"/>
+            <Label x:Name="Total" Width="172" FontFamily="Microsoft YaHei Light" FontSize="12"/>
+            <Label x:Name="TotalType"  Width="51" FontFamily="Microsoft YaHei Light" FontSize="14"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Width="352">
+            <Label Content="Destination:" Width="120" FontFamily="Microsoft YaHei Light" FontSize="14"/>
+            <Label Name="Destination" Width="224" FontFamily="Microsoft YaHei Light" FontSize="14"/>
+        </StackPanel>
+        <Grid Width="206" Margin="0,20,0,0" RenderTransformOrigin="1.008,0.501">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="cancelButton" Click="cancelButton_Click" Margin="0,99,0,0" Content="Close" Height="28" VerticalAlignment="Top" TextBlock.FontFamily="Microsoft YaHei Light" Background="White" Foreground="Black" BorderThickness="1,1,1,1" BorderBrush="Black" FontSize="14" Padding="5,5,5,5" HorizontalAlignment="Center" Width="200" >
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+        </Grid>
+    </StackPanel>
+</Window>

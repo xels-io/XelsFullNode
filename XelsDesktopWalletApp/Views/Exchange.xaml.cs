@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -15,11 +17,17 @@ using XelsDesktopWalletApp.Models;
 namespace XelsDesktopWalletApp.Views
 {
     /// <summary>
-    /// Interaction logic for Dashboard.xaml
+    /// Interaction logic for Exchange.xaml
     /// </summary>
-    public partial class Dashboard : Window
+    public partial class Exchange : Window
     {
 
+        #region Base
+        static HttpClient client = new HttpClient();
+        string baseURL = "http://localhost:37221/api";
+        #endregion
+        #region Wallet Info
+        private readonly WalletInfo walletInfo = new WalletInfo();
 
         private string walletName;
         public string WalletName
@@ -33,42 +41,60 @@ namespace XelsDesktopWalletApp.Views
                 this.walletName = value;
             }
         }
+        #endregion
 
-
-        public Dashboard()
+        public Exchange()
         {
             InitializeComponent();
-
-            this.DataContext = this;
         }
-        public Dashboard(string walletname)
+        public Exchange(string walletname)
         {
             InitializeComponent();
-
-            //this.AccountComboBox.SelectedItem = this.walletName;
             this.DataContext = this;
-
 
             this.walletName = walletname;
+            this.walletInfo.walletName = this.walletName;
+
+            LoadCreate();
         }
 
 
-        private void receiveButton_Click(object sender, RoutedEventArgs e)
+        public async void LoadCreate()
         {
-            Receive receive = new Receive(this.walletName);
-            receive.Show();
-            this.Close();
+            string addr = await GetUnusedReceiveAddressesAsync(this.baseURL);
+            addr = FreshAddress(addr);
         }
-        private void sendButton_Click(object sender, RoutedEventArgs e)
+
+
+        private string FreshAddress(string adr)
         {
-            Send send = new Send(this.walletName);
-            send.Show();
-            this.Close();
+            adr = adr.Trim(new char[] { '"' });
+            return adr;
         }
-        private void Hide_Click(object sender, RoutedEventArgs e)
+
+        private async Task<string> GetUnusedReceiveAddressesAsync(string path)
         {
-            //MyPopup.IsOpen = false;
+            string getUrl = path + $"/wallet/unusedaddress?WalletName={this.walletInfo.walletName}&AccountName=account 0";
+            var content = "";
+
+            HttpResponseMessage response = await client.GetAsync(getUrl);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                content = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+            }
+
+            return content;
         }
+
+
+
+
 
 
         private void Hyperlink_NavigateDashboard(object sender, RequestNavigateEventArgs e)
@@ -89,7 +115,7 @@ namespace XelsDesktopWalletApp.Views
             ex.Show();
             this.Close();
         }
-        
+
         private void Hyperlink_NavigateAddressBook(object sender, RequestNavigateEventArgs e)
         {
             AddressBook ex = new AddressBook(this.walletName);
@@ -102,7 +128,7 @@ namespace XelsDesktopWalletApp.Views
             lc.Show();
             this.Close();
         }
-        
+
 
         private void Hyperlink_NavigateAdvanced(object sender, RequestNavigateEventArgs e)
         {

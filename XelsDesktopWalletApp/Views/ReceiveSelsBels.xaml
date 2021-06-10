@@ -1,13 +1,11 @@
-﻿<Window x:Class="XelsDesktopWalletApp.Views.Receive"
+﻿<Window x:Class="XelsDesktopWalletApp.Views.ReceiveSelsBels"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XelsDesktopWalletApp.Views"
         mc:Ignorable="d"
-        Title="Receive" Height="450" Width="800">
-
-
+        Title="ReceiveSelsBels" Height="450" Width="800">
     <Border Padding="10" Margin="0,0,0,4">
         <StackPanel x:Name="spnael" Margin="0,0,0,0">
 
@@ -66,21 +64,6 @@
                 </Button>
 
 
-                <TextBlock x:Name="showall" Background="White" Margin="0,274,0,118" HorizontalAlignment="Center" 
-                           FontFamily="Microsoft YaHei Light" TextDecorations="" FontSize="10" Width="86" 
-                           RenderTransformOrigin="0.51,0.144">
-                    <Hyperlink  NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_RequestNavigate" 
-                                TextDecorations="">
-                        <Hyperlink.Style>
-                        <Style TargetType="{x:Type Hyperlink}"
-                                BasedOn="{StaticResource {x:Type Hyperlink}}">
-                            <Setter Property="Foreground" Value="Black"/>
-                        </Style>
-                        </Hyperlink.Style><Run Text="show all addresses"/>
-                    </Hyperlink>
-                </TextBlock>
-
-
 
                 <Button  x:Name="backButton" Click="backButton_Click" Padding="2" 
                          Background="White" BorderThickness="1,1,1,1" Foreground="#FF53E253" 
@@ -109,5 +92,4 @@
 
         </StackPanel>
     </Border>
-
 </Window>

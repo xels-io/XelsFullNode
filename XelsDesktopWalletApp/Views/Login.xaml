@@ -16,12 +16,13 @@
             </Grid>
 
             <TextBlock Width="100" Height="71" Text="Welcome" FontWeight="Normal"  FontSize="22" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light"/>
+            <Label Content="Select Wallet" Width="548" FontFamily="Microsoft YaHei Light" Height="34" FontSize="10"/>
 
             <!--<ComboBox x:Name="BusinessComboBox" DisplayMemberPath="IdNumber"  ItemsSource="{Binding _walletnames}"  Width="531" Background="White" BorderBrush="LimeGreen"  SelectedIndex="0" Padding="5,5,5,5" FontFamily="Microsoft YaHei Light" Margin="0,0,10,0">
                 <ComboBoxItem Content="Choose a wallet"/>
                 <ComboBoxItem Content="Wallet1"/>
             </ComboBox>-->
-            
+
             <!--<ComboBox x:Name="cmbWalletList"  Width="531" Background="White" BorderBrush="LimeGreen"  Padding="5,5,5,5" FontFamily="Microsoft YaHei Light" Margin="0,0,10,0" />
             
             <ComboBox  ItemsSource="{Binding walletLoadRequestModel.walletNames}" SelectedItem="{Binding walletLoadRequestModel.walletname, Mode=TwoWay}" Text="Select Option" Width="531" Background="White" BorderBrush="LimeGreen"  Padding="5,5,5,5" FontFamily="Microsoft YaHei Light" Margin="0,0,10,0" />-->
@@ -38,6 +39,7 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
+            <Label Content="&#xD;&#xA;Password" Width="548" FontFamily="Microsoft YaHei Light" Height="36" FontSize="10"/>
 
             <!--<ComboBox ItemsSource="{Binding Path=walletLoadRequestModel.walletNames}"
                   DisplayMemberPath="{Binding Path=walletLoadRequestModel.walletname}"

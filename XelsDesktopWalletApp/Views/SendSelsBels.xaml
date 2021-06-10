@@ -1,0 +1,94 @@
+﻿<Window x:Class="XelsDesktopWalletApp.Views.SendSelsBels"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XelsDesktopWalletApp.Views"
+        mc:Ignorable="d"
+        Title="SendSelsBels" Height="450" Width="800">
+
+    <Border Padding="10" Margin="0,0,0,4">
+        <StackPanel Margin="0,0,0,0">
+            <Grid Height="489" Width="776">
+
+
+                <Label Content="Send" HorizontalAlignment="Center"  FontSize="20" FontFamily="Microsoft YaHei Light"  
+                       Margin="0,16,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.515,-0.184" Width="60"/>
+
+                <Button Content="XELS" Click="XELS_Button_Click" HorizontalAlignment="Left"  Margin="313,68,0,0" VerticalAlignment="Top" 
+                        Background="#FF53E253" Width="50" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" 
+                        Padding="0,0,0,0" Foreground="White" RenderTransformOrigin="0.174,0.571" 
+                        FontWeight="Normal" Height="25">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+                <Button Content="SELS" Click="SELS_Button_Click" HorizontalAlignment="Left" Margin="368,68,0,0" VerticalAlignment="Top" 
+                        Background="#FF53E253" Width="45" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" 
+                        Padding="0,0,0,0" Foreground="White" FontWeight="Normal" Height="25">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+                <Button Content="BELS" Click="BELS_Button_Click" HorizontalAlignment="Left"  Margin="418,68,0,0" VerticalAlignment="Top" 
+                        RenderTransformOrigin="2.423,0.568" Width="50" Background="#FF53E253" 
+                        FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" Padding="0,0,0,0" 
+                        Foreground="White" FontWeight="Normal" Height="25">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+
+                <Button  x:Name="backButton" Click="backButton_Click" Padding="2" 
+                         Background="White" BorderThickness="1,1,1,1" Foreground="#FF53E253" 
+                    Content="Back" HorizontalAlignment="Right" Margin="0,276,496,0" VerticalAlignment="Top" 
+                    Height="26" Width="91" FontFamily="Microsoft YaHei Light" BorderBrush="#FF53E253" >
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button x:Name="sendButton" Click="sendButton_Click"  Content="Send" Padding="2" 
+                        Background="#FF53E253" FontFamily="Microsoft YaHei Light" BorderThickness="0,0,0,0" 
+                        Foreground="White" Margin="284,276,184,187">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Label Content="To Address" HorizontalAlignment="Left" Margin="186,127,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="58" Height="23" FontFamily="Microsoft YaHei Light" FontSize="9"/>
+                <!--Address-->
+                <TextBox  x:Name="textToAddress" HorizontalAlignment="Left" 
+                    Margin="189,150,0,0" Text="" 
+                    TextWrapping="Wrap" VerticalAlignment="Top" Width="403" BorderBrush="#FFC9D6C9" 
+                    BorderThickness="2" FontFamily="Microsoft YaHei Light" FontSize="11" Height="23" />
+
+                <Label Content="Amount" HorizontalAlignment="Left" Margin="186,173,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.158,-0.076" Width="48" Height="23" FontFamily="Microsoft YaHei Light" FontSize="9"/>
+
+                <!--Amount-->
+                <TextBox  x:Name="textAmount" HorizontalAlignment="Left" 
+                          Margin="189,196,0,0" Text="" 
+                          TextWrapping="Wrap" VerticalAlignment="Top" Width="403" BorderBrush="#FFC9D6C9" 
+                          BorderThickness="2" FontFamily="Microsoft YaHei Light" FontSize="11" Height="23" />
+
+                
+            </Grid>
+
+
+
+        </StackPanel>
+    </Border>
+
+
+</Window>
