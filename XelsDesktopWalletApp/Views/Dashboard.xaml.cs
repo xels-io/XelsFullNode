@@ -47,10 +47,30 @@ namespace XelsDesktopWalletApp.Views
 
         #region Own Property
 
+        public bool sidechainEnabled = false;
+
         private bool hasBalance = false;
-        public Money confirmedBalance;
-        public Money unconfirmedBalance;
-        public Money spendableBalance;
+        private Money confirmedBalance;
+        private Money unconfirmedBalance;
+        private Money spendableBalance;
+
+
+        private string percentSynced;
+
+        // general info
+        private WalletGeneralInfoModel walletGeneralInfoModel = new WalletGeneralInfoModel();
+        private string processedText;
+        private string blockChainStatus;
+        private string connectedNodesStatus;
+        private double percentSyncedNumber = 0;
+
+
+        // Staking  Info
+        public bool isStarting = false;
+        public bool isStopping = false;
+
+        private StakingInfoModel stakingInfo = new StakingInfoModel();
+        public Money awaitingMaturity = 0;
 
         #endregion
 
@@ -71,8 +91,14 @@ namespace XelsDesktopWalletApp.Views
 
             this.walletName = walletname;
             this.walletInfo.walletName = this.walletName;
+            GetGeneralInfoAsync();
             LoadLoginAsync();
             GetHistoryAsync();
+
+            if (!this.sidechainEnabled)
+            {
+                _ = GetStakingInfoAsync(this.baseURL);
+            }
         }
 
 
@@ -234,6 +260,104 @@ namespace XelsDesktopWalletApp.Views
                 this.transactions.Add(transactionInfo);
             }
 
+        }
+
+        public async void GetGeneralInfoAsync()
+        {
+            await GetGeneralWalletInfoAsync(this.baseURL);
+        }
+
+        private async Task GetGeneralWalletInfoAsync(string path)
+        {
+            string getUrl = path + $"/wallet/general-info?Name={this.walletInfo.walletName}";
+            var content = "";
+
+            HttpResponseMessage response = await client.GetAsync(getUrl);
+
+            if (response.IsSuccessStatusCode)
+            {
+                WalletGeneralInfoModel walletGeneralInfo = new WalletGeneralInfoModel();
+
+                content = await response.Content.ReadAsStringAsync();
+                walletGeneralInfo = JsonConvert.DeserializeObject<WalletGeneralInfoModel>(content);
+
+                this.walletGeneralInfoModel.lastBlockSyncedHeight = walletGeneralInfo.lastBlockSyncedHeight;
+                this.walletGeneralInfoModel.chainTip = walletGeneralInfo.chainTip;
+                this.walletGeneralInfoModel.isChainSynced = walletGeneralInfo.isChainSynced;
+                this.walletGeneralInfoModel.connectedNodes = walletGeneralInfo.connectedNodes;
+
+                this.processedText = $"Processed { this.walletGeneralInfoModel.lastBlockSyncedHeight ?? 0} out of { this.walletGeneralInfoModel.chainTip} blocks.";
+                this.blockChainStatus = $"Synchronizing.  { this.processedText}";
+
+                if (this.walletGeneralInfoModel.connectedNodes == 1)
+                {
+                    this.connectedNodesStatus = "1 connection";
+                }
+                else if (this.walletGeneralInfoModel.connectedNodes >= 0)
+                {
+                    this.connectedNodesStatus = $"{ this.walletGeneralInfoModel.connectedNodes} connections";
+                }
+
+                if (!this.walletGeneralInfoModel.isChainSynced)
+                {
+                    this.percentSynced = "syncing...";
+                }
+                else
+                {
+                    this.percentSyncedNumber = ((this.walletGeneralInfoModel.lastBlockSyncedHeight / this.walletGeneralInfoModel.chainTip) * 100) ?? 0;
+                    if (Math.Round(this.percentSyncedNumber) == 100 && this.walletGeneralInfoModel.lastBlockSyncedHeight != this.walletGeneralInfoModel.chainTip)
+                    {
+                        this.percentSyncedNumber = 99;
+                    }
+
+                    this.percentSynced = $"{ Math.Round(this.percentSyncedNumber)} %";
+
+                    if (this.percentSynced == "100%")
+                    {
+                        this.blockChainStatus = $"Up to date.  { this.processedText}";
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+            }
+        }
+
+
+        private async Task GetStakingInfoAsync(string path)
+        {
+            string getUrl = path + $"/staking/getstakinginfo";
+            var content = "";
+
+            HttpResponseMessage response = await client.GetAsync(getUrl);
+
+            if (response.IsSuccessStatusCode)
+            {
+                StakingInfoModel stakingInfoModel = new StakingInfoModel();
+                content = await response.Content.ReadAsStringAsync();
+
+                stakingInfoModel = JsonConvert.DeserializeObject<StakingInfoModel>(content);
+
+                this.stakingInfo.enabled = stakingInfoModel.enabled; //stakingEnabled
+                this.stakingInfo.staking = stakingInfoModel.staking; //stakingActive
+                this.stakingInfo.weight = stakingInfoModel.weight; //stakingWeight
+                this.stakingInfo.netStakeWeight = stakingInfoModel.netStakeWeight; //netStakingWeight
+                this.awaitingMaturity = (this.unconfirmedBalance + this.confirmedBalance) - this.spendableBalance; //
+                this.stakingInfo.expectedTime = stakingInfoModel.expectedTime; //expectedTime
+                if (this.stakingInfo.staking)
+                {
+                    this.isStarting = false;
+                }
+                else
+                {
+                    this.isStopping = false;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+            }
         }
 
         private void receiveButton_Click(object sender, RoutedEventArgs e)
