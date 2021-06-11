@@ -25,6 +25,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>f935dc20-1cf0-11d0-adb9-00c04fd58a0b</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="QRCoder" Version="1.4.1" />
   </ItemGroup>
 
@@ -46,13 +58,7 @@
     <ProjectReference Include="..\Xels.Features.FederatedPeg\Xels.Features.FederatedPeg.csproj" />
     <ProjectReference Include="..\Xels.Features.SQLiteWalletRepository\Xels.Features.SQLiteWalletRepository.csproj" />
     <ProjectReference Include="..\Xels.Sidechains.Networks\Xels.Sidechains.Networks.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Interop.IWshRuntimeLibrary">
-      <HintPath>..\Xels.XoyMinerD\obj\Debug\netcoreapp3.1\Interop.IWshRuntimeLibrary.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+  </ItemGroup>  
 
   <ItemGroup>
     <Resource Include="Assets\Images\home-xels-logo-01.png" />

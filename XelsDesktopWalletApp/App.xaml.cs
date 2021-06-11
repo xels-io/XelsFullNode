@@ -1,11 +1,5 @@
 ﻿using System.Windows;
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
-using Xels.Bitcoin.Features.Wallet;
-using Xels.Bitcoin.Features.Wallet.Interfaces;
-
 namespace XelsDesktopWalletApp
 {
     /// <summary>
@@ -13,7 +7,7 @@ namespace XelsDesktopWalletApp
     /// </summary>
     public partial class App : Application
     {
-        private readonly IHost _host;
+        //private readonly IHost _host;
         public App()
         {
             //_host = Host.CreateDefaultBuilder()
