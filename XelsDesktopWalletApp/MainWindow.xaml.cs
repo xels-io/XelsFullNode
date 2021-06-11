@@ -29,7 +29,7 @@ namespace XelsDesktopWalletApp
         string baseURL = "http://localhost:37221/api/wallet";
 
 
-        public List<WalletLoadRequest> _myList { get; set; }
+        //public List<WalletLoadRequest> _myList { get; set; }
         private List<WalletLoadRequest> myList = new List<WalletLoadRequest>();
         private WalletLoadRequest selectedWallet = new WalletLoadRequest();
 
@@ -63,11 +63,11 @@ namespace XelsDesktopWalletApp
 
             this.DataContext = this;
 
-            LoadLogin();
+            LoadLoginAsync();
         }
 
 
-        public async void LoadLogin()
+        public async void LoadLoginAsync()
         {
             await GetAPIAsync(this.baseURL);
         }
@@ -118,7 +118,7 @@ namespace XelsDesktopWalletApp
 
 
 
-        private async void decryptButton_Click(object sender, RoutedEventArgs e)
+        private async void DecryptButton_ClickAsync(object sender, RoutedEventArgs e)
         {
 
             if (this.SelectedWallet.name != null)
