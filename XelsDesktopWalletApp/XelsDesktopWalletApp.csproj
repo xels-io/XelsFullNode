@@ -49,11 +49,14 @@
     <ProjectReference Include="..\Xels.Bitcoin.Features.Dns\Xels.Bitcoin.Features.Dns.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.MemoryPool\Xels.Bitcoin.Features.MemoryPool.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.Miner\Xels.Bitcoin.Features.Miner.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.Notifications\Xels.Bitcoin.Features.Notifications.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.RPC\Xels.Bitcoin.Features.RPC.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.SignalR\Xels.Bitcoin.Features.SignalR.csproj" />
+    <ProjectReference Include="..\Xels.Bitcoin.Features.SmartContracts\Xels.Bitcoin.Features.SmartContracts.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.Wallet\Xels.Bitcoin.Features.Wallet.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Networks\Xels.Bitcoin.Networks.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin\Xels.Bitcoin.csproj" />
+    <ProjectReference Include="..\Xels.Features.Collateral\Xels.Features.Collateral.csproj" />
     <ProjectReference Include="..\Xels.Features.Diagnostic\Xels.Features.Diagnostic.csproj" />
     <ProjectReference Include="..\Xels.Features.FederatedPeg\Xels.Features.FederatedPeg.csproj" />
     <ProjectReference Include="..\Xels.Features.SQLiteWalletRepository\Xels.Features.SQLiteWalletRepository.csproj" />

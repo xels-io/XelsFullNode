@@ -31,7 +31,6 @@ using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Utilities;
 using Xels.Features.Collateral;
 using Xels.Features.Collateral.CounterChain;
-using Xels.Features.FederatedPeg;
 using Xels.Features.SQLiteWalletRepository;
 using Xels.Sidechains.Networks;
 
@@ -202,13 +201,13 @@ namespace XelsDesktopWalletApp
         public static void Main(string[] args)
         {
             args = new string[] { "-mainchain" };
-            App application = new App();
+            App app = new App();
             MainAsync(args).Wait();
 
-            CreateShortCut();
+            app.InitializeComponent();
+            app.Run();
 
-            application.InitializeComponent();
-            application.Run();
+            CreateShortCut();
 
         }
 
@@ -315,6 +314,7 @@ namespace XelsDesktopWalletApp
                 shortcut.Save();
             }
         }
+
 
         // miner d end
 
