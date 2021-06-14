@@ -5,13 +5,13 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Xels.Bitcoin;
-using Xels.Bitcoin.Base;
-using Xels.Bitcoin.Features.Wallet;
-using Xels.Bitcoin.Features.Wallet.Interfaces;
-using Xels.Bitcoin.Utilities;
+//using Microsoft.Extensions.DependencyInjection;
+//using Microsoft.Extensions.Hosting;
+//using Xels.Bitcoin;
+//using Xels.Bitcoin.Base;
+//using Xels.Bitcoin.Features.Wallet;
+//using Xels.Bitcoin.Features.Wallet.Interfaces;
+//using Xels.Bitcoin.Utilities;
 
 namespace XelsDesktopWalletApp
 {
@@ -20,7 +20,7 @@ namespace XelsDesktopWalletApp
     /// </summary>
     public partial class App : Application
     {
-        private readonly IHost _host;
+        //private readonly IHost _host;
         public App()
         {
             //_host = Host.CreateDefaultBuilder()

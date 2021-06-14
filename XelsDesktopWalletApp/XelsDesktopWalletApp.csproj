@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
-    <StartupObject>XelsDesktopWalletApp.Program</StartupObject>
+    <!--<StartupObject>XelsDesktopWalletApp.Program</StartupObject>-->
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="QRCoder" Version="1.4.1" />
   </ItemGroup>
 
@@ -46,9 +47,7 @@
     <ProjectReference Include="..\Xels.Bitcoin.Features.SmartContracts\Xels.Bitcoin.Features.SmartContracts.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Features.Wallet\Xels.Bitcoin.Features.Wallet.csproj" />
     <ProjectReference Include="..\Xels.Bitcoin.Networks\Xels.Bitcoin.Networks.csproj" />
-    <ProjectReference Include="..\Xels.Features.Collateral\Xels.Features.Collateral.csproj" />
     <ProjectReference Include="..\Xels.Features.SQLiteWalletRepository\Xels.Features.SQLiteWalletRepository.csproj" />
-    <ProjectReference Include="..\Xels.Sidechains.Networks\Xels.Sidechains.Networks.csproj" />
   </ItemGroup>
 
   <ItemGroup>

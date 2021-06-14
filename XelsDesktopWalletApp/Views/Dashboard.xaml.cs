@@ -279,12 +279,7 @@ namespace XelsDesktopWalletApp.Views
                 WalletGeneralInfoModel walletGeneralInfo = new WalletGeneralInfoModel();
 
                 content = await response.Content.ReadAsStringAsync();
-                walletGeneralInfo = JsonConvert.DeserializeObject<WalletGeneralInfoModel>(content);
-
-                this.walletGeneralInfoModel.lastBlockSyncedHeight = walletGeneralInfo.lastBlockSyncedHeight;
-                this.walletGeneralInfoModel.chainTip = walletGeneralInfo.chainTip;
-                this.walletGeneralInfoModel.isChainSynced = walletGeneralInfo.isChainSynced;
-                this.walletGeneralInfoModel.connectedNodes = walletGeneralInfo.connectedNodes;
+                this.walletGeneralInfoModel = JsonConvert.DeserializeObject<WalletGeneralInfoModel> (content);
 
                 this.processedText = $"Processed { this.walletGeneralInfoModel.lastBlockSyncedHeight ?? 0} out of { this.walletGeneralInfoModel.chainTip} blocks.";
                 this.blockChainStatus = $"Synchronizing.  { this.processedText}";
