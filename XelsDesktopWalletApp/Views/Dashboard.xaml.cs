@@ -48,6 +48,7 @@ namespace XelsDesktopWalletApp.Views
         #region Own Property
 
         public bool sidechainEnabled = false;
+        public bool stakingEnabled = false;
 
         private bool hasBalance = false;
         private Money confirmedBalance;
@@ -276,8 +277,6 @@ namespace XelsDesktopWalletApp.Views
 
             if (response.IsSuccessStatusCode)
             {
-                WalletGeneralInfoModel walletGeneralInfo = new WalletGeneralInfoModel();
-
                 content = await response.Content.ReadAsStringAsync();
                 this.walletGeneralInfoModel = JsonConvert.DeserializeObject<WalletGeneralInfoModel> (content);
 
@@ -312,11 +311,44 @@ namespace XelsDesktopWalletApp.Views
                         this.blockChainStatus = $"Up to date.  { this.processedText}";
                     }
                 }
+                PopulateTxt();
             }
             else
             {
                 MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
             }
+        }
+
+
+        private void PopulateTxt()
+        {
+            // Connection info
+            this.ConnectionStatusTxt.Text = this.connectedNodesStatus;
+            this.walletGeneralInfoModel.lastBlockSyncedHeight = this.walletGeneralInfoModel.lastBlockSyncedHeight ?? 0;
+            this.LastBlockSyncedHeightTxt.Text = this.walletGeneralInfoModel.lastBlockSyncedHeight.ToString();
+            this.ChainTipTxt.Text = this.walletGeneralInfoModel.chainTip.ToString();
+            this.ParentSyncedTxt.Text = this.percentSynced;
+
+            this.ConnectionPercentTxt.Text = this.percentSynced;
+            this.ConnectedCountTxt.Text = this.connectedNodesStatus;
+
+            if( !this.stakingEnabled && !this.sidechainEnabled)
+            {
+                this.ConnectionNotifyTxt.Text = "Not Ok";
+            }
+            else if (this.stakingEnabled && !this.sidechainEnabled)
+            {
+                 this.ConnectionNotifyTxt.Text = "Not Ok";
+            }
+
+
+            // Hybrid pow mining info
+            //this.HybridWeightTxt.Text = 
+            //this.CoinsAwaitingMaturityTxt.Text =
+            //this.NetworkWeightTxt.Text = 
+            //this.ExpectedRewardTimmeTxt.Text = 
+
+
         }
 
 
@@ -413,5 +445,14 @@ namespace XelsDesktopWalletApp.Views
             this.Close();
         }
 
+        private void ImportAddrButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void StopPOWMiningButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
