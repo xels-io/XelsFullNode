@@ -187,16 +187,19 @@
                 <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0" Margin="10,10,10,10">
                     <TextBlock Margin="0,10,0,0" Width="94" Height="13" Text="AVAILABLE BALANCE" HorizontalAlignment="Center" FontFamily="Microsoft YaHei" Foreground="#FFBDBDBD" FontSize="9"/>
                     <Grid>
-                        <TextBlock Width="271" Height="33" FontSize="20" HorizontalAlignment="Center" FontFamily="Microsoft YaHei" Foreground="LimeGreen" Text="3000000000.00000000 XELS"/>
+                        <TextBlock Name="ConfirmedBalanceTxt" Width="171" Height="33" FontSize="20" HorizontalAlignment="Center" 
+                                   FontFamily="Microsoft YaHei" Foreground="LimeGreen"/>
                         <Grid.Resources>
                             <Style TargetType="Border">
                                 <Setter Property="CornerRadius" Value="2"/>
                             </Style>
                         </Grid.Resources>
                     </Grid>
+                    <TextBlock x:Name="UnconfirmedBalanceTxt" Width="130" Height="22" FontFamily="Microsoft YaHei Light" Foreground="#FF898989" 
+                               FontSize="10" />
                     <TextBlock Width="84" Height="22" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light" Foreground="#FF898989" FontSize="10">
                 00.00000000 SELS</TextBlock>
-                    <TextBlock Width="85" Height="41" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light" Foreground="#FF898989" FontSize="10">
+                    <TextBlock Width="86" Height="24" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light" Foreground="#FF898989" FontSize="10">
                 00.00000000 BELS</TextBlock>
                     <Button Content="Import XELS &amp; BELS Address" Width="190" Click="ImportAddrButton_Click" FontFamily="Microsoft YaHei Light" Foreground="#FF0FD421" Background="White" BorderBrush="#FF30CD3E" FontSize="10" Height="24">
                         <Button.Resources>
