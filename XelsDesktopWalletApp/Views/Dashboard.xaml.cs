@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -169,11 +170,18 @@ namespace XelsDesktopWalletApp.Views
                 if (this.historyModelArray.history != null && this.historyModelArray.history[0].transactionsHistory.Length > 0)
                 {
                     int transactionsLen = this.historyModelArray.history[0].transactionsHistory.Length;
+                    this.NoData.Visibility = Visibility.Hidden;
+                    this.HistoryListBinding.Visibility = Visibility.Visible;
 
                     TransactionItemModel[] historyResponse = new TransactionItemModel[transactionsLen];
                     historyResponse = this.historyModelArray.history[0].transactionsHistory;
 
                     GetTransactionInfo(historyResponse);
+                }
+                else
+                {
+                    this.HistoryListBinding.Visibility = Visibility.Hidden;
+                    this.NoData.Visibility = Visibility.Visible;
                 }
             }
             else
@@ -263,7 +271,10 @@ namespace XelsDesktopWalletApp.Views
 
                 transactionInfo.transactionType = transactionInfo.transactionType.ToUpper();
                 this.transactions.Add(transactionInfo);
+                //this.transactions.Take(5);
             }
+
+            this.HistoryListBinding.ItemsSource = this.transactions.Take(5);
 
         }
 
@@ -456,6 +467,13 @@ namespace XelsDesktopWalletApp.Views
         private void StopPOWMiningButton_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void GotoHistoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            History history = new History(this.walletName);
+            history.Show();
+            this.Close();
         }
     }
 }
