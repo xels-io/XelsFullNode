@@ -17,11 +17,10 @@ using XelsDesktopWalletApp.Models;
 namespace XelsDesktopWalletApp.Views
 {
     /// <summary>
-    /// Interaction logic for Exchange.xaml
+    /// Interaction logic for SmartContract.xaml
     /// </summary>
-    public partial class Exchange : Window
+    public partial class SmartContract : Window
     {
-
         #region Base
         static HttpClient client = new HttpClient();
         string baseURL = "http://localhost:37221/api";
@@ -43,11 +42,12 @@ namespace XelsDesktopWalletApp.Views
         }
         #endregion
 
-        public Exchange()
+        public SmartContract()
         {
             InitializeComponent();
         }
-        public Exchange(string walletname)
+
+        public SmartContract(string walletname)
         {
             InitializeComponent();
             this.DataContext = this;
@@ -57,7 +57,6 @@ namespace XelsDesktopWalletApp.Views
 
             LoadCreate();
         }
-
 
         public async void LoadCreate()
         {
@@ -91,9 +90,6 @@ namespace XelsDesktopWalletApp.Views
 
             return content;
         }
-
-
-
         private void Hyperlink_NavigateDashboard(object sender, RequestNavigateEventArgs e)
         {
             Dashboard ds = new Dashboard(this.walletName);
@@ -114,6 +110,9 @@ namespace XelsDesktopWalletApp.Views
         }
         private void Hyperlink_NavigateSmartContract(object sender, RequestNavigateEventArgs e)
         {
+            SmartContract ex = new SmartContract(this.walletName);
+            ex.Show();
+            this.Close();
         }
 
         private void Hyperlink_NavigateAddressBook(object sender, RequestNavigateEventArgs e)

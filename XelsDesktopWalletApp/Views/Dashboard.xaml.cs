@@ -439,7 +439,9 @@ namespace XelsDesktopWalletApp.Views
         }
         private void Hyperlink_NavigateSmartContract(object sender, RequestNavigateEventArgs e)
         {
-
+            SmartContract sc = new SmartContract(this.walletName);
+            sc.Show();
+            this.Close();
         }
 
         private void Hyperlink_NavigateAddressBook(object sender, RequestNavigateEventArgs e)
