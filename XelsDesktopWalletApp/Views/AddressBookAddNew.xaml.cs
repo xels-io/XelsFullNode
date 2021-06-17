@@ -90,6 +90,9 @@ namespace XelsDesktopWalletApp.Views
             ex.Show();
             this.Close();
         }
+        private void Hyperlink_NavigateSmartContract(object sender, RequestNavigateEventArgs e)
+        {
+        }
         private void Hyperlink_NavigateLogout(object sender, RequestNavigateEventArgs e)
         {
             LogoutConfirm lc = new LogoutConfirm(this.walletName);

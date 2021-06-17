@@ -44,6 +44,18 @@
                             </Hyperlink.Style><Run Text="Exchange"/>
                         </Hyperlink>
                 </TextBlock>
+                <TextBlock Background="ForestGreen" Padding="2 2 2 2" Margin="164,0,0,0" HorizontalAlignment="Left" 
+                           VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" 
+                           FontSize="9" Foreground="#FF434943" Height="18" Width="74" RenderTransformOrigin="1.25,0.78" >
+                        <Hyperlink  RequestNavigate="Hyperlink_NavigateSmartContract" NavigateUri="http://www.google.com" TextDecorations="">
+                            <Hyperlink.Style>
+                            <Style TargetType="{x:Type Hyperlink}"
+                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                            </Hyperlink.Style><Run Text="Smart Contract"/>
+                        </Hyperlink>
+                </TextBlock>
 
 
 
@@ -314,7 +326,7 @@
 
 
                         <Grid>
-                            <Label Name="NoData" Content="Looks like you haven't made any transactions yet." 
+                            <Label Name="NoData" Content="Looks like you haven't made any transactions yet."  HorizontalAlignment="Center"
                        FontFamily="Microsoft YaHei Light" Margin="233,10,213,80" FontSize="12" FontWeight="Bold" Foreground="#FFCF5959"/>
 
                         </Grid>
