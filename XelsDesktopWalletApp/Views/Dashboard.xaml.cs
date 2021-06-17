@@ -171,7 +171,7 @@ namespace XelsDesktopWalletApp.Views
                 {
                     int transactionsLen = this.historyModelArray.history[0].transactionsHistory.Length;
                     this.NoData.Visibility = Visibility.Hidden;
-                    this.HistoryListBinding.Visibility = Visibility.Visible;
+                    this.HistoryList.Visibility = Visibility.Visible;
 
                     TransactionItemModel[] historyResponse = new TransactionItemModel[transactionsLen];
                     historyResponse = this.historyModelArray.history[0].transactionsHistory;
@@ -180,7 +180,7 @@ namespace XelsDesktopWalletApp.Views
                 }
                 else
                 {
-                    this.HistoryListBinding.Visibility = Visibility.Hidden;
+                    this.HistoryList.Visibility = Visibility.Hidden;
                     this.NoData.Visibility = Visibility.Visible;
                 }
             }
@@ -274,7 +274,7 @@ namespace XelsDesktopWalletApp.Views
                 //this.transactions.Take(5);
             }
 
-            this.HistoryListBinding.ItemsSource = this.transactions.Take(5);
+            this.HistoryList.ItemsSource = this.transactions.Take(5);
 
         }
 
@@ -472,6 +472,16 @@ namespace XelsDesktopWalletApp.Views
         {
 
         }
+
+        private void DetailButton_Click(object sender, RoutedEventArgs e)
+        {
+            TransactionInfo item = ((sender as Button)?.Tag as ListViewItem)?.DataContext.ToString();
+
+            TransactionDetail td = new TransactionDetail(this.walletName, item);
+            td.Show();
+            this.Close();
+        }
+
 
         private void GotoHistoryButton_Click(object sender, RoutedEventArgs e)
         {
