@@ -183,6 +183,8 @@ namespace XelsDesktopWalletApp.Views
                     this.HistoryList.Visibility = Visibility.Hidden;
                     this.NoData.Visibility = Visibility.Visible;
                 }
+
+
             }
             else
             {
@@ -293,7 +295,7 @@ namespace XelsDesktopWalletApp.Views
             if (response.IsSuccessStatusCode)
             {
                 content = await response.Content.ReadAsStringAsync();
-                this.walletGeneralInfoModel = JsonConvert.DeserializeObject<WalletGeneralInfoModel> (content);
+                this.walletGeneralInfoModel = JsonConvert.DeserializeObject<WalletGeneralInfoModel>(content);
 
                 this.processedText = $"Processed { this.walletGeneralInfoModel.lastBlockSyncedHeight ?? 0} out of { this.walletGeneralInfoModel.chainTip} blocks.";
                 this.blockChainStatus = $"Synchronizing.  { this.processedText}";
@@ -475,7 +477,7 @@ namespace XelsDesktopWalletApp.Views
 
         private void DetailButton_Click(object sender, RoutedEventArgs e)
         {
-            TransactionInfo item = ((sender as Button)?.Tag as ListViewItem)?.DataContext.ToString();
+            TransactionInfo item = (TransactionInfo)((sender as Button)?.Tag as ListViewItem)?.DataContext;
 
             TransactionDetail td = new TransactionDetail(this.walletName, item);
             td.Show();

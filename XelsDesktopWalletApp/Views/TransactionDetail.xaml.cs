@@ -58,7 +58,7 @@ namespace XelsDesktopWalletApp.Views
             this.walletInfo.walletName = this.walletName;
             GetTransaction(transaction);
             _ = GetGeneralWalletInfoAsync(this.baseURL);
-
+            PopulateView();
         }
 
         private void GetTransaction(TransactionInfo transaction)
@@ -70,7 +70,7 @@ namespace XelsDesktopWalletApp.Views
             this._transaction.transactionTimestamp = transaction.transactionTimestamp;
             this._transaction.transactionType = transaction.transactionType;
             this._transaction.transactionTypeName = transaction.transactionTypeName;
-    }
+        }
 
 
         private async Task GetGeneralWalletInfoAsync(string path)
@@ -107,6 +107,57 @@ namespace XelsDesktopWalletApp.Views
             {
                 this.confirmations = 0;
             }
+        }
+
+        private void PopulateView()
+        {
+            this.TransactionIDTxt_Copyed.Visibility = Visibility.Hidden; 
+            this.AmountSentLabel.Visibility = Visibility.Hidden;
+            this.AmountSentTxt.Visibility = Visibility.Hidden;
+            this.FeeLabel.Visibility = Visibility.Hidden;
+            this.FeeTxt.Visibility = Visibility.Hidden;
+
+            this.TypeTxt.Text = this._transaction.transactionType;
+            if(this._transaction.transactionType == "rewarded" || this._transaction.transactionType == "received")
+            {
+                this.TotalAmountRedTxt.Content = Visibility.Hidden;
+                this.TotalAmountTxt.Content = Visibility.Visible;
+                this.TotalAmountTxt.Content = this._transaction.transactionAmount;
+                
+            }
+            else if (this._transaction.transactionType == "sent" )
+            {
+                this.TotalAmountRedTxt.Content = Visibility.Visible;
+                this.TotalAmountTxt.Content = Visibility.Hidden;
+                this.TotalAmountRedTxt.Content = this._transaction.transactionAmount + this._transaction.transactionFee;
+                this.AmountSentLabel.Content = Visibility.Visible;
+                this.AmountSentTxt.Visibility = Visibility.Visible;
+                this.AmountSentTxt.Content = this._transaction.transactionAmount;
+                this.FeeLabel.Content = Visibility.Visible;
+                this.FeeTxt.Content = Visibility.Visible;
+                this.FeeTxt.Content = this._transaction.transactionFee;
+            }
+
+            this.DateTxt.Text = this._transaction.transactionTimestamp.ToString(); 
+            this.BlockTxt.Text = "#" + this._transaction.transactionConfirmedInBlock.ToString();
+
+            if (this._transaction.transactionConfirmedInBlock < 1)
+            {
+                this.ConfirmationsTxt.Text = "Unconfirmed!" ;
+            }
+            else if (this._transaction.transactionConfirmedInBlock >= 1)
+            {
+                this.ConfirmationsTxt.Text = this.confirmations.ToString();
+            }
+            
+            this.TransactionIDTxt.Text = this._transaction.transactionId.ToString();
+
+        }
+
+        private void TransactionIDCopyButton_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText(this.TransactionIDTxt.Text);
+            this.TransactionIDTxt_Copyed.Visibility = Visibility.Visible;
         }
 
 

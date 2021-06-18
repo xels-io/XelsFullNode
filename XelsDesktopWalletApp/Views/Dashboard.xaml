@@ -343,7 +343,7 @@
                                         <GridViewColumn Header="Time stamp" Width="150" 
                                             DisplayMemberBinding="{Binding Path=transactionTimestamp}"  />
                                         <GridViewColumn Header="" Width="150" 
-                                            DisplayMemberBinding="{Binding Path=transactionTimestamp}" >
+                                            >
                                             <GridViewColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <TextBlock FontWeight="Bold"  FontFamily="Microsoft YaHei Light" >
