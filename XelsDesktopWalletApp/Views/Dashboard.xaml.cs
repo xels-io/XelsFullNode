@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,6 +49,7 @@ namespace XelsDesktopWalletApp.Views
         #region Own Property
 
         public bool sidechainEnabled = false;
+        public bool stakingEnabled = false;
 
         private bool hasBalance = false;
         private Money confirmedBalance;
@@ -99,6 +101,7 @@ namespace XelsDesktopWalletApp.Views
             {
                 _ = GetStakingInfoAsync(this.baseURL);
             }
+            PopulateTxt();
         }
 
 
@@ -133,6 +136,9 @@ namespace XelsDesktopWalletApp.Views
                 {
                     this.hasBalance = false;
                 }
+                // Balance info
+                this.ConfirmedBalanceTxt.Text = $"{this.confirmedBalance} XELS";
+                this.UnconfirmedBalanceTxt.Text = $"{this.unconfirmedBalance} (unconfirmed)";
             }
             else
             {
@@ -164,12 +170,21 @@ namespace XelsDesktopWalletApp.Views
                 if (this.historyModelArray.history != null && this.historyModelArray.history[0].transactionsHistory.Length > 0)
                 {
                     int transactionsLen = this.historyModelArray.history[0].transactionsHistory.Length;
+                    this.NoData.Visibility = Visibility.Hidden;
+                    this.HistoryList.Visibility = Visibility.Visible;
 
                     TransactionItemModel[] historyResponse = new TransactionItemModel[transactionsLen];
                     historyResponse = this.historyModelArray.history[0].transactionsHistory;
 
                     GetTransactionInfo(historyResponse);
                 }
+                else
+                {
+                    this.HistoryList.Visibility = Visibility.Hidden;
+                    this.NoData.Visibility = Visibility.Visible;
+                }
+
+
             }
             else
             {
@@ -258,7 +273,10 @@ namespace XelsDesktopWalletApp.Views
 
                 transactionInfo.transactionType = transactionInfo.transactionType.ToUpper();
                 this.transactions.Add(transactionInfo);
+                //this.transactions.Take(5);
             }
+
+            this.HistoryList.ItemsSource = this.transactions.Take(5);
 
         }
 
@@ -276,15 +294,8 @@ namespace XelsDesktopWalletApp.Views
 
             if (response.IsSuccessStatusCode)
             {
-                WalletGeneralInfoModel walletGeneralInfo = new WalletGeneralInfoModel();
-
                 content = await response.Content.ReadAsStringAsync();
-                walletGeneralInfo = JsonConvert.DeserializeObject<WalletGeneralInfoModel>(content);
-
-                this.walletGeneralInfoModel.lastBlockSyncedHeight = walletGeneralInfo.lastBlockSyncedHeight;
-                this.walletGeneralInfoModel.chainTip = walletGeneralInfo.chainTip;
-                this.walletGeneralInfoModel.isChainSynced = walletGeneralInfo.isChainSynced;
-                this.walletGeneralInfoModel.connectedNodes = walletGeneralInfo.connectedNodes;
+                this.walletGeneralInfoModel = JsonConvert.DeserializeObject<WalletGeneralInfoModel>(content);
 
                 this.processedText = $"Processed { this.walletGeneralInfoModel.lastBlockSyncedHeight ?? 0} out of { this.walletGeneralInfoModel.chainTip} blocks.";
                 this.blockChainStatus = $"Synchronizing.  { this.processedText}";
@@ -360,6 +371,38 @@ namespace XelsDesktopWalletApp.Views
             }
         }
 
+
+        private void PopulateTxt()
+        {
+
+            // Connection info
+            this.ConnectionStatusTxt.Text = this.connectedNodesStatus;
+            this.walletGeneralInfoModel.lastBlockSyncedHeight = this.walletGeneralInfoModel.lastBlockSyncedHeight ?? 0;
+            this.LastBlockSyncedHeightTxt.Text = this.walletGeneralInfoModel.lastBlockSyncedHeight.ToString();
+            this.ChainTipTxt.Text = this.walletGeneralInfoModel.chainTip.ToString();
+            this.ParentSyncedTxt.Text = this.percentSynced;
+
+            this.ConnectionPercentTxt.Text = this.percentSynced;
+            this.ConnectedCountTxt.Text = this.connectedNodesStatus;
+
+            if (!this.stakingEnabled && !this.sidechainEnabled)
+            {
+                this.ConnectionNotifyTxt.Text = "Not Ok";
+            }
+            else if (this.stakingEnabled && !this.sidechainEnabled)
+            {
+                this.ConnectionNotifyTxt.Text = "Not Ok";
+            }
+
+            // Hybrid pow mining info
+            this.HybridWeightTxt.Text = $"{this.stakingInfo.weight} XELS";
+            this.CoinsAwaitingMaturityTxt.Text = $"{this.awaitingMaturity} XELS";
+            this.NetworkWeightTxt.Text = $"{this.stakingInfo.netStakeWeight} XELS";
+            this.ExpectedRewardTimmeTxt.Text = this.stakingInfo.expectedTime.ToString();
+
+
+        }
+
         private void receiveButton_Click(object sender, RoutedEventArgs e)
         {
             Receive receive = new Receive(this.walletName);
@@ -396,6 +439,10 @@ namespace XelsDesktopWalletApp.Views
             ex.Show();
             this.Close();
         }
+        private void Hyperlink_NavigateSmartContract(object sender, RequestNavigateEventArgs e)
+        {
+
+        }
 
         private void Hyperlink_NavigateAddressBook(object sender, RequestNavigateEventArgs e)
         {
@@ -418,5 +465,31 @@ namespace XelsDesktopWalletApp.Views
             this.Close();
         }
 
+        private void ImportAddrButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void StopPOWMiningButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void DetailButton_Click(object sender, RoutedEventArgs e)
+        {
+            TransactionInfo item = (TransactionInfo)((sender as Button)?.Tag as ListViewItem)?.DataContext;
+
+            TransactionDetail td = new TransactionDetail(this.walletName, item);
+            td.Show();
+            this.Close();
+        }
+
+
+        private void GotoHistoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            History history = new History(this.walletName);
+            history.Show();
+            this.Close();
+        }
     }
 }
