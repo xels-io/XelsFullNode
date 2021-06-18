@@ -24,27 +24,6 @@ namespace XelsDesktopWalletApp.Views
     public partial class History : Window
     {
 
-        #region Transaction Info
-        public class TransactionInfo
-        {
-            public string transactionType { get; set; }
-            public TransactionItemTypeName transactionTypeName { get; set; }
-            public uint256 transactionId { get; set; }
-            public string transactionFinalAmount { get; set; }
-            public Money transactionAmount { get; set; }
-            public Money transactionFee { get; set; }
-            public int? transactionConfirmedInBlock { get; set; }
-            public DateTimeOffset transactionTimestamp { get; set; }
-
-        }
-
-        public enum TransactionItemTypeName
-        {
-            Confirmed,
-            Unconfirmed
-        }
-        #endregion
-
         #region Base
         static HttpClient client = new HttpClient();
         string baseURL = "http://localhost:37221/api";
