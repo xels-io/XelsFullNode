@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using NBitcoin;
 using Newtonsoft.Json;
 using XelsDesktopWalletApp.Models;
 
@@ -118,24 +119,25 @@ namespace XelsDesktopWalletApp.Views
             this.FeeTxt.Visibility = Visibility.Hidden;
 
             this.TypeTxt.Text = this._transaction.transactionType;
-            if(this._transaction.transactionType == "rewarded" || this._transaction.transactionType == "received")
+            if(this._transaction.transactionType.ToLower() == "rewarded" || this._transaction.transactionType.ToLower() == "received")
             {
                 this.TotalAmountRedTxt.Content = Visibility.Hidden;
                 this.TotalAmountTxt.Content = Visibility.Visible;
-                this.TotalAmountTxt.Content = this._transaction.transactionAmount;
+                this.TotalAmountTxt.Content = $"{ this._transaction.transactionAmount} XELS";
                 
             }
-            else if (this._transaction.transactionType == "sent" )
+            else if (this._transaction.transactionType.ToLower() == "sent" )
             {
                 this.TotalAmountRedTxt.Content = Visibility.Visible;
                 this.TotalAmountTxt.Content = Visibility.Hidden;
-                this.TotalAmountRedTxt.Content = this._transaction.transactionAmount + this._transaction.transactionFee;
+                Money calculated = this._transaction.transactionAmount + this._transaction.transactionFee;
+                this.TotalAmountRedTxt.Content =  $"{ calculated } XELS";
                 this.AmountSentLabel.Content = Visibility.Visible;
                 this.AmountSentTxt.Visibility = Visibility.Visible;
-                this.AmountSentTxt.Content = this._transaction.transactionAmount;
+                this.AmountSentTxt.Content = $"{ this._transaction.transactionAmount } XELS";
                 this.FeeLabel.Content = Visibility.Visible;
                 this.FeeTxt.Content = Visibility.Visible;
-                this.FeeTxt.Content = this._transaction.transactionFee;
+                this.FeeTxt.Content = $"{ this._transaction.transactionFee} XELS";
             }
 
             this.DateTxt.Text = this._transaction.transactionTimestamp.ToString(); 
