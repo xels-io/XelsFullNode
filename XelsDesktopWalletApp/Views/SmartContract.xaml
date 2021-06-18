@@ -135,11 +135,9 @@
                                 Grid.Column="0" Grid.Row="0"
                                />
 
-                    <Label Content="00000000.00 TCRS" HorizontalAlignment="Left" Margin="10,73,0,0" VerticalAlignment="Top"  Foreground="Black" 
+                    <Label x:Name="lab_addBalance" Content="" HorizontalAlignment="Left" Margin="10,73,0,0" VerticalAlignment="Top"  Foreground="Black" 
                     FontSize="12" Height="24"
                     Grid.Column="0" Grid.Row="0" FontWeight="Bold"/>
-
-
 
                     <Label Content="ACTIVE ADDRESS" Grid.Column="1" HorizontalAlignment="Left" Margin="20,23,0,0" VerticalAlignment="Top" FontWeight="Bold"  FontSize="12" Height="24" Width="143" />
                     <Label Content="sdd343nb483b87sdb9b88s7dsdfb7" Grid.Column="1" HorizontalAlignment="Left" Margin="20,66,0,0" VerticalAlignment="Top" Width="250"/>

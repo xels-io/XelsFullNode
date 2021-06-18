@@ -26,6 +26,7 @@ namespace Xels.Bitcoin.Features.SmartContracts.Wallet
     [ApiVersion("1")]
     [Route("api/[controller]")]
     [ApiController]
+   // sealed
     public sealed class SmartContractWalletController : Controller
     {
         private readonly IBroadcasterManager broadcasterManager;

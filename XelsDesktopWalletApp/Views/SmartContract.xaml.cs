@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
 using XelsDesktopWalletApp.Models;
 
 namespace XelsDesktopWalletApp.Views
@@ -19,11 +20,18 @@ namespace XelsDesktopWalletApp.Views
     /// <summary>
     /// Interaction logic for SmartContract.xaml
     /// </summary>
+    /// 
+    public static class GLOBALS
+    {
+        public static string Address { get; set; }
+        public static string AddressBalance { get; set; }
+    }
     public partial class SmartContract : Window
     {
         #region Base
         static HttpClient client = new HttpClient();
         string baseURL = "http://localhost:37221/api";
+    
         #endregion
         #region Wallet Info
         private readonly WalletInfo walletInfo = new WalletInfo();
@@ -40,28 +48,38 @@ namespace XelsDesktopWalletApp.Views
                 this.walletName = value;
             }
         }
+
+      
         #endregion
+
 
         public SmartContract()
         {
+            
             InitializeComponent();
+          
         }
 
         public SmartContract(string walletname)
         {
             InitializeComponent();
+          
             this.DataContext = this;
-
             this.walletName = walletname;
             this.walletInfo.walletName = this.walletName;
-
-            LoadCreate();
+            LoadCreateAsync();
+            //this.addressBalance = walletname;
+            // string address = 
+            //this.lab_addBalance.Content = GetAddressBalanceAsync(this.baseURL, address);
+            this.lab_addBalance.Content = GLOBALS.AddressBalance;
         }
 
-        public async void LoadCreate()
+        public async void LoadCreateAsync()
         {
             string addr = await GetUnusedReceiveAddressesAsync(this.baseURL);
             addr = FreshAddress(addr);
+            GLOBALS.Address = addr;
+           await GetAddressBalanceAsync(this.baseURL, addr);
         }
 
 
@@ -90,6 +108,31 @@ namespace XelsDesktopWalletApp.Views
 
             return content;
         }
+
+        private async Task<string> GetAddressBalanceAsync(string path, string address)
+        {
+            string getUrl = path + $"/SmartContractWallet/address-balance?address={address}";
+            var content = "";
+
+            HttpResponseMessage response = await client.GetAsync(getUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                content = await response.Content.ReadAsStringAsync();
+                GLOBALS.AddressBalance = content;
+            }
+            else
+            {
+                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+                GLOBALS.AddressBalance = "000000000000";
+            
+                
+            }
+
+            return content;
+        }
+
+   
+
         private void Hyperlink_NavigateDashboard(object sender, RequestNavigateEventArgs e)
         {
             Dashboard ds = new Dashboard(this.walletName);
