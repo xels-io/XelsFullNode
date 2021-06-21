@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
 using XelsDesktopWalletApp.Views;
 
 namespace XelsDesktopWalletApp
@@ -26,8 +27,7 @@ namespace XelsDesktopWalletApp
     {
 
         static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api/wallet";
-
+        string baseURL = URLConfiguration.BaseURL;
 
         //public List<WalletLoadRequest> _myList { get; set; }
         private List<WalletLoadRequest> myList = new List<WalletLoadRequest>();
@@ -69,25 +69,43 @@ namespace XelsDesktopWalletApp
 
         public async void LoadLoginAsync()
         {
-            await GetAPIAsync(this.baseURL);
+            try
+            {
+                await GetAPIAsync(this.baseURL);
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+           
         }
 
 
         private async Task GetAPIAsync(string path)
         {
-            string getUrl = path + "/list-wallets";
-            var content = "";
+            try
+            {
+                string getUrl = path + "/wallet/list-wallets";
+                var content = "";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
-            if (response.IsSuccessStatusCode)
-            {
-                content = await response.Content.ReadAsStringAsync();
+                HttpResponseMessage response = await client.GetAsync(getUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    content = await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+                }
+                converted(content);
             }
-            else
+            catch (Exception e)
             {
-                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+
+                throw;
             }
-            converted(content);
+            
         }
 
 
@@ -125,7 +143,7 @@ namespace XelsDesktopWalletApp
             {
                 this.selectedWallet.password = this.password.Password;
 
-                string postUrl = this.baseURL + "/load/";
+                string postUrl = this.baseURL + "/wallet/load/";
 
                 HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.SelectedWallet), Encoding.UTF8, "application/json"));
 

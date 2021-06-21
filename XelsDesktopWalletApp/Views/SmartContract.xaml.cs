@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -30,8 +31,8 @@ namespace XelsDesktopWalletApp.Views
     {
         #region Base
         static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api";
-    
+        // string baseURL = "http://localhost:37223/api";
+        string baseURL = URLConfiguration.BaseURL;// Common Url
         #endregion
         #region Wallet Info
         private readonly WalletInfo walletInfo = new WalletInfo();
