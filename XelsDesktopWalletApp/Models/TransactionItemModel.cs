@@ -17,6 +17,11 @@ namespace XelsDesktopWalletApp.Models
         public Money fee { get; set; }
     }
 
+    public  class TransactionItemModelArray  
+    {
+        public TransactionItemModel[] Transactions { get; set; }
+    }
+
     public enum TransactionItemType
     {
         Received,

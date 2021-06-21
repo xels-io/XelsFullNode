@@ -138,6 +138,8 @@ namespace Xels.Bitcoin.Features.SmartContracts.Wallet
                     services.AddSingleton<IWalletService, WalletService>();
 
                     services.AddTransient<WalletRPCController>();
+                    services.AddTransient<SmartContractWalletController>();
+
                 });
             });
 

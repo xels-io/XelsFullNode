@@ -166,26 +166,6 @@ namespace XelsDesktopWalletApp
         //    return node;
         //}
 
-        //public static void CreateShortCut()
-        //{
-
-        //    string[] argumentList = { "-mainchain", "-sidechain" };
-
-        //    string distinationPath = Directory.GetCurrentDirectory();
-        //    Console.WriteLine(distinationPath);
-        //    Console.ReadLine();
-        //    foreach (var arg in argumentList)
-        //    {
-        //        object shDesktop = (object)"Desktop";
-        //        WshShell shell = new WshShell();
-        //        string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\XelsDesktopWalletApp" + arg + ".lnk";
-        //        IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
-
-        //        shortcut.Arguments = arg;
-        //        shortcut.TargetPath = distinationPath + @"\XelsDesktopWalletApp.exe";
-        //        shortcut.Save();
-        //    }
-        //}
 
 
         // xels.xoyminerd start up 
@@ -205,9 +185,12 @@ namespace XelsDesktopWalletApp
         public static void Main(string[] args)
         {
             args = new string[] { "-mainchain" };
+
             App app = new App();
             //CreateShortCut();
-            MainAsync(args);
+
+            MainAsync(args).Wait(5);
+
             app.InitializeComponent();
             app.Run();
 
@@ -296,31 +279,10 @@ namespace XelsDesktopWalletApp
             return node;
         }
 
-        public static void CreateShortCut()
-        {
-
-            string[] argumentList = { "-mainchain", "-sidechain" };
-
-            string destinationPath = Directory.GetCurrentDirectory();
-            //Console.WriteLine(distinationPath);
-            //Console.ReadLine();
-            foreach (var arg in argumentList)
-            {
-                object shDesktop = (object)"Desktop";
-                WshShell shell = new WshShell();
-                string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-app" + arg + ".lnk";
-                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
-
-                shortcut.Arguments = arg;
-                shortcut.TargetPath = destinationPath + @"\XelsDesktopWalletApp.exe";
-                shortcut.Save();
-            }
-        }
-
 
         // miner d end
 
-        //New from Rabbi Vai
+
         //[STAThread]
         //static void Main(string[] args)
         //{
@@ -337,17 +299,19 @@ namespace XelsDesktopWalletApp
 
         //        IFullNodeBuilder nodeBuilder = new FullNodeBuilder()
         //            .UseNodeSettings(nodeSettings)
-        //            .UseBlockStore()
-        //            .UseSmartContractWallet()
+        //            .UseBlockStore()                    
+        //            //.UseWallet()
+        //            //.UseBlockExplorer()
         //            .UsePosConsensus()
         //            .UseMempool()
         //            .UseColdStakingWallet()
         //            .AddSQLiteWalletRepository()
         //            .AddPowPosMining()
-        //            //.UseSmartContractWallet()
         //            .UseApi()
-        //            .AddRPC();
 
+        //            .AddRPC().UseSmartContractWallet();
+        //        //.UseDns()
+        //        //.UseDiagnosticFeature();
 
         //        if (nodeSettings.EnableSignalR)
         //        {
@@ -388,94 +352,26 @@ namespace XelsDesktopWalletApp
         //    application.Run();
         //}
 
-        //End
-        //----------------------------------------------------------------------------------------------------------------------
 
+        public static void CreateShortCut()
+        {
 
-        //Update for smartContract by Noyon
+            string[] argumentList = { "-mainchain", "-sidechain" };
 
-        //[STAThread]
-        //public static void Main(string[] args)
-        //{
-        //    MainAsync(args).Wait();
-        //}
-        //public static async Task MainAsync(string[] args)
-        //{
-        //    App application = new App();
-        //    try
-        //    {
-        //        // set the console window title to identify this as a Cirrus full node (for clarity when running Strax and Cirrus on the same machine)
-        //        var nodeSettings = new NodeSettings(networksSelector: XoyNetwork.NetworksSelector, protocolVersion: ProtocolVersion.CIRRUS_VERSION, args: args)
-        //        {
-        //            MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
-        //        };
+            string destinationPath = Directory.GetCurrentDirectory();
+            //Console.WriteLine(distinationPath);
+            //Console.ReadLine();
+            foreach (var arg in argumentList)
+            {
+                object shDesktop = (object)"Desktop";
+                WshShell shell = new WshShell();
+                string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-app" + arg + ".lnk";
+                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
 
-        //        Console.Title = $"Cirrus Full Node {nodeSettings.Network.NetworkType}";
-
-        //        IFullNode node = GetFullNode(nodeSettings);
-
-        //        if (node != null)
-        //            await node.RunAsync();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine("There was a problem initializing the node. Details: '{0}'", ex.Message);
-        //    }
-        //    application.InitializeComponent();
-        //    application.Run();
-        //}
-
-
-        //private static IFullNode GetFullNode(NodeSettings nodeSettings)
-        //{
-        //    // DbType dbType = nodeSettings.GetDbType();
-
-        //    IFullNodeBuilder nodeBuilder = new FullNodeBuilder()
-        //    .UseNodeSettings(nodeSettings)
-        //    .UseBlockStore()
-        //    .UseMempool()
-        //    .AddSmartContracts(options =>
-        //    {
-        //        options.UseReflectionExecutor();
-        //        options.UsePoAWhitelistedContracts();
-        //    })
-        //    //.AddPoAFeature()
-        //    //.UsePoAConsensus()
-        //    //.CheckCollateralCommitment()
-
-        //    // This needs to be set so that we can check the magic bytes during the Strat to Strax changeover.
-        //    // Perhaps we can introduce a block height check rather?
-
-        //    //.SetCounterChainNetwork(StraxNetwork.MainChainNetworks[nodeSettings.Network.NetworkType]())
-
-        //    .UseSmartContractWallet()
-        //    .AddSQLiteWalletRepository()
-        //    .UseApi()
-        //    .AddRPC()
-        //    .AddSignalR(options =>
-        //    {
-        //        options.EventsToHandle = new[]
-        //        {
-        //            (IClientEvent) new BlockConnectedClientEvent(),
-        //           // new FullNodeClientEvent(),
-        //           // new ReconstructFederationClientEvent(),
-        //            new TransactionReceivedClientEvent(),
-        //        };
-        //        options.ClientEventBroadcasters = new[]
-        //        {
-        //            (Broadcaster: typeof(WalletInfoBroadcaster),
-        //            ClientEventBroadcasterSettings: new ClientEventBroadcasterSettings
-        //            {
-        //                BroadcastFrequencySeconds = 5
-        //            })
-        //        };
-        //    })
-        //    .UseDiagnosticFeature();
-
-        //    return nodeBuilder.Build();
-        //}
-
-        //End
-        //----------------------------------------------------------------------------------------------------------------------------
+                shortcut.Arguments = arg;
+                shortcut.TargetPath = destinationPath + @"\XelsDesktopWalletApp.exe";
+                shortcut.Save();
+            }
+        }
     }
 }
