@@ -153,5 +153,8 @@
     <Page Update="Views\SendSideChain.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\SmartContract.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 </Project>

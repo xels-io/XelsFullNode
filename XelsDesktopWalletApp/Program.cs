@@ -338,7 +338,8 @@ namespace XelsDesktopWalletApp
                 IFullNodeBuilder nodeBuilder = new FullNodeBuilder()
                     .UseNodeSettings(nodeSettings)
                     .UseBlockStore()
-                    //.UseWallet()
+                    // .UseWallet()
+
                     //.UseBlockExplorer()
                     .UsePosConsensus()
                     .UseMempool()
