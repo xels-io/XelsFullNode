@@ -26,7 +26,7 @@ namespace XelsDesktopWalletApp
     {
 
         static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api/wallet";
+        string baseURL = "http://localhost:37221/api";
 
 
         //public List<WalletLoadRequest> _myList { get; set; }
@@ -75,7 +75,7 @@ namespace XelsDesktopWalletApp
 
         private async Task GetAPIAsync(string path)
         {
-            string getUrl = path + "/list-wallets";
+            string getUrl = path + "/wallet/list-wallets";
             var content = "";
 
             HttpResponseMessage response = await client.GetAsync(getUrl);
@@ -125,7 +125,7 @@ namespace XelsDesktopWalletApp
             {
                 this.selectedWallet.password = this.password.Password;
 
-                string postUrl = this.baseURL + "/load/";
+                string postUrl = this.baseURL + "/wallet/load/";
 
                 HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.SelectedWallet), Encoding.UTF8, "application/json"));
 

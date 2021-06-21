@@ -166,227 +166,212 @@ namespace XelsDesktopWalletApp
         //    return node;
         //}
 
-        //public static void CreateShortCut()
-        //{
-
-        //    string[] argumentList = { "-mainchain", "-sidechain" };
-
-        //    string distinationPath = Directory.GetCurrentDirectory();
-        //    Console.WriteLine(distinationPath);
-        //    Console.ReadLine();
-        //    foreach (var arg in argumentList)
-        //    {
-        //        object shDesktop = (object)"Desktop";
-        //        WshShell shell = new WshShell();
-        //        string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\XelsDesktopWalletApp" + arg + ".lnk";
-        //        IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
-
-        //        shortcut.Arguments = arg;
-        //        shortcut.TargetPath = distinationPath + @"\XelsDesktopWalletApp.exe";
-        //        shortcut.Save();
-        //    }
-        //}
 
 
         // xels.xoyminerd start up 
 
 
-        //private const string MainchainArgument = "-mainchain";
-        //private const string SidechainArgument = "-sidechain";
+        private const string MainchainArgument = "-mainchain";
+        private const string SidechainArgument = "-sidechain";
 
-        //private static readonly Dictionary<NetworkType, Func<Network>> MainChainNetworks = new Dictionary<NetworkType, Func<Network>>
-        //{
-        //    { NetworkType.Mainnet, Networks.Xels.Mainnet },
-        //    { NetworkType.Testnet, Networks.Xels.Testnet },
-        //    { NetworkType.Regtest, Networks.Xels.Regtest }
-        //};
+        private static readonly Dictionary<NetworkType, Func<Network>> MainChainNetworks = new Dictionary<NetworkType, Func<Network>>
+        {
+            { NetworkType.Mainnet, Networks.Xels.Mainnet },
+            { NetworkType.Testnet, Networks.Xels.Testnet },
+            { NetworkType.Regtest, Networks.Xels.Regtest }
+        };
 
-        //[STAThread]
-        //public static void Main(string[] args)
-        //{
-        //    args = new string[] { "-mainchain" };
-        //    App app = new App();
-        //    CreateShortCut();
-        //    MainAsync(args).Wait();
-        //    app.InitializeComponent();
-        //    app.Run();
+        [STAThread]
+        public static void Main(string[] args)
+        {
+            args = new string[] { "-mainchain" };
 
-        //}
+            App app = new App();
+            //CreateShortCut();
 
-        //public static async Task MainAsync(string[] args)
-        //{
-        //    try
-        //    {
-        //        bool isMainchainNode = args.FirstOrDefault(a => a.ToLower() == MainchainArgument) != null;
-        //        bool isSidechainNode = args.FirstOrDefault(a => a.ToLower() == SidechainArgument) != null;
+            MainAsync(args).Wait(5);
 
-        //        if (isSidechainNode == isMainchainNode)
-        //        {
-        //            throw new ArgumentException($"Gateway node needs to be started specifying either a {SidechainArgument} or a {MainchainArgument} argument");
-        //        }
+            app.InitializeComponent();
+            app.Run();
 
-        //        IFullNode node = isMainchainNode ? GetXelsNode(args) : GetXoyMiningNode(args);
+        }
 
-        //        if (node != null)
-        //            await node.RunAsync();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine("There was a problem initializing the node. Details: '{0}'", ex.Message);
-        //    }
-        //}
+        public static async Task MainAsync(string[] args)
+        {
+            try
+            {
+                bool isMainchainNode = args.FirstOrDefault(a => a.ToLower() == MainchainArgument) != null;
+                bool isSidechainNode = args.FirstOrDefault(a => a.ToLower() == SidechainArgument) != null;
 
-        //private static IFullNode GetXoyMiningNode(string[] args)
-        //{
-        //    var nodeSettings = new NodeSettings(networksSelector: XoyNetwork.NetworksSelector, protocolVersion: ProtocolVersion.CIRRUS_VERSION, args: args)
-        //    {
-        //        MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
-        //    };
+                if (isSidechainNode == isMainchainNode)
+                {
+                    throw new ArgumentException($"Gateway node needs to be started specifying either a {SidechainArgument} or a {MainchainArgument} argument");
+                }
 
-        //    IFullNode node = new FullNodeBuilder()
-        //        .UseNodeSettings(nodeSettings)
-        //        .UseBlockStore()
-        //        .SetCounterChainNetwork(MainChainNetworks[nodeSettings.Network.NetworkType]())
-        //        .UseSmartContractPoAConsensus()
-        //        .UseSmartContractCollateralPoAMining()
-        //        .CheckForPoAMembersCollateral(true) // This is a mining node so we will check the commitment height data as well as the full set of collateral checks.
-        //        .UseTransactionNotification()
-        //        .UseBlockNotification()
-        //        .UseApi()
-        //        .UseMempool()
-        //        .AddRPC()
-        //        .AddSmartContracts(options =>
-        //        {
-        //            options.UseReflectionExecutor();
-        //            options.UsePoAWhitelistedContracts();
-        //        })
-        //        .UseSmartContractWallet()
-        //        .AddSQLiteWalletRepository()
-        //        .Build();
+                IFullNode node = isMainchainNode ? GetXelsNode(args) : GetXoyMiningNode(args);
 
-        //    return node;
-        //}
+                if (node != null)
+                    await node.RunAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("There was a problem initializing the node. Details: '{0}'", ex.Message);
+            }
+        }
 
-        ///// <summary>
-        ///// Returns a standard Xels node. Just like XelsD.
-        ///// </summary>
-        //private static IFullNode GetXelsNode(string[] args)
-        //{
-        //    // TODO: Hardcode -addressindex for better user experience
+        private static IFullNode GetXoyMiningNode(string[] args)
+        {
+            var nodeSettings = new NodeSettings(networksSelector: XoyNetwork.NetworksSelector, protocolVersion: ProtocolVersion.CIRRUS_VERSION, args: args)
+            {
+                MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
+            };
 
-        //    var nodeSettings = new NodeSettings(networksSelector: Networks.Xels, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
-        //    {
-        //        MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
-        //    };
+            IFullNode node = new FullNodeBuilder()
+                .UseNodeSettings(nodeSettings)
+                .UseBlockStore()
+                .SetCounterChainNetwork(MainChainNetworks[nodeSettings.Network.NetworkType]())
+                .UseSmartContractPoAConsensus()
+                .UseSmartContractCollateralPoAMining()
+                .CheckForPoAMembersCollateral(true) // This is a mining node so we will check the commitment height data as well as the full set of collateral checks.
+                .UseTransactionNotification()
+                .UseBlockNotification()
+                .UseApi()
+                .UseMempool()
+                .AddRPC()
+                .AddSmartContracts(options =>
+                {
+                    options.UseReflectionExecutor();
+                    options.UsePoAWhitelistedContracts();
+                })
+                .UseSmartContractWallet()
+                .AddSQLiteWalletRepository()
+                .Build();
 
-        //    IFullNode node = new FullNodeBuilder()
-        //        .UseNodeSettings(nodeSettings)
-        //        .UseBlockStore()
-        //        .UseTransactionNotification()
-        //        .UseBlockNotification()
-        //        .UseApi()
-        //        .UseMempool()
-        //        .AddRPC()
-        //        .UsePosConsensus()
-        //        .UseWallet()
-        //        .AddSQLiteWalletRepository()
-        //        .AddPowPosMining()
-        //        .Build();
+            return node;
+        }
 
-        //    return node;
-        //}
+        /// <summary>
+        /// Returns a standard Xels node. Just like XelsD.
+        /// </summary>
+        private static IFullNode GetXelsNode(string[] args)
+        {
+            // TODO: Hardcode -addressindex for better user experience
 
-        //public static void CreateShortCut()
-        //{
+            var nodeSettings = new NodeSettings(networksSelector: Networks.Xels, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
+            {
+                MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
+            };
 
-        //    string[] argumentList = { "-mainchain", "-sidechain" };
+            IFullNode node = new FullNodeBuilder()
+                .UseNodeSettings(nodeSettings)
+                .UseBlockStore()
+                .UseTransactionNotification()
+                .UseBlockNotification()
+                .UseApi()
+                .UseMempool()
+                .AddRPC()
+                .UsePosConsensus()
+                .UseWallet()
+                .AddSQLiteWalletRepository()
+                .AddPowPosMining()
+                .Build();
 
-        //    string destinationPath = Directory.GetCurrentDirectory();
-        //    //Console.WriteLine(distinationPath);
-        //    //Console.ReadLine();
-        //    foreach (var arg in argumentList)
-        //    {
-        //        object shDesktop = (object)"Desktop";
-        //        WshShell shell = new WshShell();
-        //        string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-app" + arg + ".lnk";
-        //        IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
-
-        //        shortcut.Arguments = arg;
-        //        shortcut.TargetPath = destinationPath + @"\XelsDesktopWalletApp.exe";
-        //        shortcut.Save();
-        //    }
-        //}
+            return node;
+        }
 
 
         // miner d end
 
 
-        [STAThread]
-        static void Main(string[] args)
+        //[STAThread]
+        //static void Main(string[] args)
+        //{
+        //    App application = new App();
+
+        //    try
+        //    {
+        //        //FreeConsole();
+        //        var nodeSettings = new NodeSettings(networksSelector: Networks.Xels,
+        //            protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
+        //        {
+        //            MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
+        //        };
+
+        //        IFullNodeBuilder nodeBuilder = new FullNodeBuilder()
+        //            .UseNodeSettings(nodeSettings)
+        //            .UseBlockStore()                    
+        //            //.UseWallet()
+        //            //.UseBlockExplorer()
+        //            .UsePosConsensus()
+        //            .UseMempool()
+        //            .UseColdStakingWallet()
+        //            .AddSQLiteWalletRepository()
+        //            .AddPowPosMining()
+        //            .UseApi()
+
+        //            .AddRPC().UseSmartContractWallet();
+        //        //.UseDns()
+        //        //.UseDiagnosticFeature();
+
+        //        if (nodeSettings.EnableSignalR)
+        //        {
+        //            nodeBuilder.AddSignalR(options =>
+        //            {
+        //                options.EventsToHandle = new[]
+        //                {
+        //                    (IClientEvent) new BlockConnectedClientEvent(),
+        //                    new TransactionReceivedClientEvent()
+        //                };
+
+        //                options.ClientEventBroadcasters = new[]
+        //                {
+        //                    (Broadcaster: typeof(StakingBroadcaster), ClientEventBroadcasterSettings: new ClientEventBroadcasterSettings
+        //                        {
+        //                            BroadcastFrequencySeconds = 5
+        //                        }),
+        //                    (Broadcaster: typeof(WalletInfoBroadcaster), ClientEventBroadcasterSettings: new ClientEventBroadcasterSettings
+        //                        {
+        //                            BroadcastFrequencySeconds = 5
+        //                        })
+        //                };
+        //            });
+        //        }
+
+        //        IFullNode node = nodeBuilder.Build();
+
+        //        if (node != null)
+        //            _ = node.RunAsync();
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("There was a problem initializing the node. Details: '{0}'", ex.ToString());
+        //    }
+
+        //    application.InitializeComponent();
+        //    application.Run();
+        //}
+
+
+        public static void CreateShortCut()
         {
-            App application = new App();
 
-            try
+            string[] argumentList = { "-mainchain", "-sidechain" };
+
+            string destinationPath = Directory.GetCurrentDirectory();
+            //Console.WriteLine(distinationPath);
+            //Console.ReadLine();
+            foreach (var arg in argumentList)
             {
-                //FreeConsole();
-                var nodeSettings = new NodeSettings(networksSelector: Networks.Xels,
-                    protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
-                {
-                    MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
-                };
+                object shDesktop = (object)"Desktop";
+                WshShell shell = new WshShell();
+                string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-app" + arg + ".lnk";
+                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
 
-                IFullNodeBuilder nodeBuilder = new FullNodeBuilder()
-                    .UseNodeSettings(nodeSettings)
-                    .UseBlockStore()
-                    //.UseWallet()
-                    //.UseBlockExplorer()
-                    .UsePosConsensus()
-                    .UseMempool()
-                    .UseColdStakingWallet()
-                    .AddSQLiteWalletRepository()
-                    .AddPowPosMining()
-                    .UseApi()
-                    .AddRPC();
-                //.UseDns()
-                //.UseDiagnosticFeature();
-
-                if (nodeSettings.EnableSignalR)
-                {
-                    nodeBuilder.AddSignalR(options =>
-                    {
-                        options.EventsToHandle = new[]
-                        {
-                            (IClientEvent) new BlockConnectedClientEvent(),
-                            new TransactionReceivedClientEvent()
-                        };
-
-                        options.ClientEventBroadcasters = new[]
-                        {
-                            (Broadcaster: typeof(StakingBroadcaster), ClientEventBroadcasterSettings: new ClientEventBroadcasterSettings
-                                {
-                                    BroadcastFrequencySeconds = 5
-                                }),
-                            (Broadcaster: typeof(WalletInfoBroadcaster), ClientEventBroadcasterSettings: new ClientEventBroadcasterSettings
-                                {
-                                    BroadcastFrequencySeconds = 5
-                                })
-                        };
-                    });
-                }
-
-                IFullNode node = nodeBuilder.Build();
-
-                if (node != null)
-                    _ = node.RunAsync();
-
+                shortcut.Arguments = arg;
+                shortcut.TargetPath = destinationPath + @"\XelsDesktopWalletApp.exe";
+                shortcut.Save();
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("There was a problem initializing the node. Details: '{0}'", ex.ToString());
-            }
-
-            application.InitializeComponent();
-            application.Run();
         }
     }
 }

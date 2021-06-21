@@ -29,6 +29,8 @@ namespace XelsDesktopWalletApp.Views
 
         private WalletBalanceArray walletBalanceArray = new WalletBalanceArray();
         private HistoryModelArray historyModelArray = new HistoryModelArray();
+
+        TransactionItemModelArray transactionItem = new TransactionItemModelArray();
         private List<TransactionInfo> transactions = new List<TransactionInfo>();
 
         private readonly WalletInfo walletInfo = new WalletInfo();
@@ -172,12 +174,24 @@ namespace XelsDesktopWalletApp.Views
             {
                 content = await response.Content.ReadAsStringAsync();
 
-                this.historyModelArray = JsonConvert.DeserializeObject<HistoryModelArray>(content);
+                this.transactionItem = JsonConvert.DeserializeObject<TransactionItemModelArray>(content);
 
 
-                if (this.historyModelArray.history != null && this.historyModelArray.history[0].transactionsHistory.Length > 0)
+                //if (this.historyModelArray.history != null && this.historyModelArray.history[0].transactionsHistory.Length > 0)
+                //{
+                //    int transactionsLen = this.historyModelArray.history[0].transactionsHistory.Length;
+                //    this.NoData.Visibility = Visibility.Hidden;
+                //    this.HistoryList.Visibility = Visibility.Visible;
+
+                //    TransactionItemModel[] historyResponse = new TransactionItemModel[transactionsLen];
+                //    historyResponse = this.historyModelArray.history[0].transactionsHistory;
+
+                //    GetTransactionInfo(historyResponse);
+
+
+                if (this.transactionItem.Transactions != null && this.transactionItem.Transactions.Length > 0)
                 {
-                    int transactionsLen = this.historyModelArray.history[0].transactionsHistory.Length;
+                    int transactionsLen = this.transactionItem.Transactions.Length;
                     this.NoData.Visibility = Visibility.Hidden;
                     this.HistoryList.Visibility = Visibility.Visible;
 
