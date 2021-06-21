@@ -32,7 +32,7 @@ namespace XelsDesktopWalletApp.Views
         #region Base
         static HttpClient client = new HttpClient();
         // string baseURL = "http://localhost:37223/api";
-        string baseURL = URLConfiguration.BaseURL;// Common Url
+        string baseURL = URLConfiguration.BaseURLSideChain;// Common Url
         #endregion
         #region Wallet Info
         private readonly WalletInfo walletInfo = new WalletInfo();
@@ -109,7 +109,7 @@ namespace XelsDesktopWalletApp.Views
 
         private async Task<string> GetAddressBalanceAsync(string path, string address)
         {
-            string getUrl = path + $"/SmartContractWallet/address-balance?address={address}";
+            string getUrl = path + $"/smartContractWallet/address-balance?address={address}";
             var content = "";
            
             try

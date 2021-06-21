@@ -184,7 +184,7 @@ namespace XelsDesktopWalletApp
         [STAThread]
         public static void Main(string[] args)
         {
-            args = new string[] { "-mainchain" };
+            args = new string[] { "-sidechain" };
 
             App app = new App();
             //CreateShortCut();
