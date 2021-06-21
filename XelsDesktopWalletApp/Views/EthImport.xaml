@@ -15,7 +15,7 @@
             <Label Content="Your Wallet(Xels) Mnemonic:" Width="447" FontFamily="Microsoft YaHei" FontSize="13"/>
         </StackPanel>
         <StackPanel Orientation="Vertical" Margin="0,85,0,322" >
-            <TextBox TextWrapping="Wrap" Width="436" Height="26" FontFamily="Microsoft YaHei Light" FontSize="13" BorderBrush="#FF717274"/>
+            <TextBox Name="MnemonicTxt" TextWrapping="Wrap" Width="436" Height="26" FontFamily="Microsoft YaHei Light" FontSize="13" BorderBrush="#FF717274"/>
         </StackPanel>
 
         <StackPanel Orientation="Vertical" Margin="0,292,0,108" >
@@ -37,18 +37,20 @@
                 </Button.RenderTransform>
             </Button>
         </StackPanel>
-        <CheckBox Content="Token address generate from the Mnemonics" HorizontalAlignment="Left" Margin="182,126,0,0" VerticalAlignment="Top" Width="429" FontSize="13" FontFamily="Microsoft YaHei"/>
-        <StackPanel Orientation="Vertical" Margin="0,148,0,264" >
+        <CheckBox Content="Token address generate from the Mnemonics" 
+                  HorizontalAlignment="Left" Margin="182,126,0,0" VerticalAlignment="Top" Width="429" 
+                  FontSize="13" FontFamily="Microsoft YaHei" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
+        <StackPanel Name="SPSELS" Orientation="Vertical" Margin="0,148,0,264" >
             <Label Content="SELS Private Key:" Width="447" FontFamily="Microsoft YaHei" FontSize="13"/>
         </StackPanel>
-        <StackPanel Orientation="Vertical" Margin="0,172,0,234" >
-            <TextBox TextWrapping="Wrap" Width="436" Height="25" FontFamily="Microsoft YaHei Light" FontSize="13" BorderBrush="#FF717274"/>
+        <StackPanel Name="SPSELSTxt" Orientation="Vertical" Margin="0,172,0,234" >
+            <TextBox Name="SELSPrivateKeyTxt" TextWrapping="Wrap" Width="436" Height="25" FontFamily="Microsoft YaHei Light" FontSize="13" BorderBrush="#FF717274"/>
         </StackPanel>
-        <StackPanel Orientation="Vertical" Margin="0,201,0,211" >
+        <StackPanel Name="SPBELS" Orientation="Vertical" Margin="0,201,0,211" >
             <Label Content="BELS Private Key:" Width="447" FontFamily="Microsoft YaHei" FontSize="13"/>
         </StackPanel>
-        <StackPanel Orientation="Vertical" Margin="0,225,0,177" >
-            <TextBox TextWrapping="Wrap" Width="436" Height="28" FontFamily="Microsoft YaHei Light" FontSize="13" BorderBrush="#FF717274"/>
+        <StackPanel Name="SPBELSTxt" Orientation="Vertical" Margin="0,225,0,177" >
+            <TextBox Name="BELSPrivateKeyTxt" TextWrapping="Wrap" Width="436" Height="28" FontFamily="Microsoft YaHei Light" FontSize="13" BorderBrush="#FF717274"/>
         </StackPanel>
 
     </Grid>

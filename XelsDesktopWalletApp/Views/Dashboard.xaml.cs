@@ -476,6 +476,9 @@ namespace XelsDesktopWalletApp.Views
         private void ImportAddrButton_Click(object sender, RoutedEventArgs e)
         {
 
+            EthImport eImp = new EthImport(this.walletName);
+            eImp.Show();
+            this.Close();
         }
 
         private void StopPOWMiningButton_Click(object sender, RoutedEventArgs e)
