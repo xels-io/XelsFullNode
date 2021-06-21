@@ -112,37 +112,45 @@ namespace XelsDesktopWalletApp.Views
 
         private async Task GetWalletBalanceAsync(string path)
         {
-            string getUrl = path + $"/wallet/balance?WalletName={this.walletInfo.walletName}&AccountName=account 0";
-            var content = "";
-
-            HttpResponseMessage response = await client.GetAsync(getUrl);
-
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                content = await response.Content.ReadAsStringAsync();
+                string getUrl = path + $"/wallet/balance?WalletName={this.walletInfo.walletName}&AccountName=account 0";
+                var content = "";
 
-                this.walletBalanceArray = JsonConvert.DeserializeObject<WalletBalanceArray>(content);
+                HttpResponseMessage response = await client.GetAsync(getUrl);
 
-                this.confirmedBalance = this.walletBalanceArray.balances[0].amountConfirmed;
-                this.unconfirmedBalance = this.walletBalanceArray.balances[0].amountUnconfirmed;
-                this.spendableBalance = this.walletBalanceArray.balances[0].spendableAmount;
 
-                if ((this.confirmedBalance + this.unconfirmedBalance) > 0)
+                if (response.IsSuccessStatusCode)
                 {
-                    this.hasBalance = true;
+                    content = await response.Content.ReadAsStringAsync();
+
+                    this.walletBalanceArray = JsonConvert.DeserializeObject<WalletBalanceArray>(content);
+
+                    this.confirmedBalance = this.walletBalanceArray.balances[0].amountConfirmed;
+                    this.unconfirmedBalance = this.walletBalanceArray.balances[0].amountUnconfirmed;
+                    this.spendableBalance = this.walletBalanceArray.balances[0].spendableAmount;
+
+                    if ((this.confirmedBalance + this.unconfirmedBalance) > 0)
+                    {
+                        this.hasBalance = true;
+                    }
+                    else
+                    {
+                        this.hasBalance = false;
+                    }
+                    // Balance info
+                    this.ConfirmedBalanceTxt.Text = $"{this.confirmedBalance} XELS";
+                    this.UnconfirmedBalanceTxt.Text = $"{this.unconfirmedBalance} (unconfirmed)";
                 }
                 else
                 {
-                    this.hasBalance = false;
+                    MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
                 }
-                // Balance info
-                this.ConfirmedBalanceTxt.Text = $"{this.confirmedBalance} XELS";
-                this.UnconfirmedBalanceTxt.Text = $"{this.unconfirmedBalance} (unconfirmed)";
             }
-            else
+            catch (Exception r)
             {
-                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+
+                throw;
             }
 
         }
