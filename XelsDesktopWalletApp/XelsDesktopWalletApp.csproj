@@ -65,6 +65,10 @@
 
   <ItemGroup>
     <Resource Include="Assets\Images\home-xels-logo-01.png" />
+  </ItemGroup>  
+
+  <ItemGroup>
+    <Folder Include="Views\SmartContract\" />
   </ItemGroup>
 
 </Project>
