@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using NBitcoin;
 using Newtonsoft.Json;
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Views.SmartContractView;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -464,7 +465,7 @@ namespace XelsDesktopWalletApp.Views
         private void Hyperlink_NavigateSmartContract(object sender, RequestNavigateEventArgs e)
         {
 
-            SmartContract sc = new SmartContract(this.walletName);
+            SmartContractMain sc = new SmartContractMain(this.walletName);
             sc.Show();
             this.Close();
         }

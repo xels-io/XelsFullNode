@@ -22,5 +22,17 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         {
             InitializeComponent();
         }
+        private void useAddressBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var smtdash = new SmartContractDashboard();
+            this.Content = smtdash;
+        }
+        //private void dashboardBtn_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Dashboard mw = new Dashboard();
+        //    this.Hide();
+        //    mw.ShowDialog();
+        //    this.Close();
+        //}
     }
 }
