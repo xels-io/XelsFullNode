@@ -184,7 +184,7 @@ namespace XelsDesktopWalletApp
         [STAThread]
         public static void Main(string[] args)
         {
-            args = new string[] { "-sidechain" };
+            args = new string[] { "-mainchain" };
 
             App app = new App();
             //CreateShortCut();
@@ -353,25 +353,25 @@ namespace XelsDesktopWalletApp
         //}
 
 
-        public static void CreateShortCut()
-        {
+        //public static void CreateShortCut()
+        //{
 
-            string[] argumentList = { "-mainchain", "-sidechain" };
+        //    string[] argumentList = { "-mainchain", "-sidechain" };
 
-            string destinationPath = Directory.GetCurrentDirectory();
-            //Console.WriteLine(distinationPath);
-            //Console.ReadLine();
-            foreach (var arg in argumentList)
-            {
-                object shDesktop = (object)"Desktop";
-                WshShell shell = new WshShell();
-                string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-app" + arg + ".lnk";
-                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
+        //    string destinationPath = Directory.GetCurrentDirectory();
+        //    //Console.WriteLine(distinationPath);
+        //    //Console.ReadLine();
+        //    foreach (var arg in argumentList)
+        //    {
+        //        object shDesktop = (object)"Desktop";
+        //        WshShell shell = new WshShell();
+        //        string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-app" + arg + ".lnk";
+        //        IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
 
-                shortcut.Arguments = arg;
-                shortcut.TargetPath = destinationPath + @"\XelsDesktopWalletApp.exe";
-                shortcut.Save();
-            }
-        }
+        //        shortcut.Arguments = arg;
+        //        shortcut.TargetPath = destinationPath + @"\XelsDesktopWalletApp.exe";
+        //        shortcut.Save();
+        //    }
+        //}
     }
 }

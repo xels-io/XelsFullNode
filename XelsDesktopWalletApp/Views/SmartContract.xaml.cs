@@ -31,8 +31,7 @@ namespace XelsDesktopWalletApp.Views
     {
         #region Base
         static HttpClient client = new HttpClient();
-        // string baseURL = "http://localhost:37223/api";
-        string baseURL = URLConfiguration.BaseURLSideChain;// Common Url
+        string baseURL = URLConfiguration.BaseURLMain;// Common Url
         #endregion
         #region Wallet Info
         private readonly WalletInfo walletInfo = new WalletInfo();
@@ -52,14 +51,6 @@ namespace XelsDesktopWalletApp.Views
 
       
         #endregion
-
-
-        public SmartContract()
-        {
-            
-            InitializeComponent();
-          
-        }
 
         public SmartContract(string walletname)
         {
@@ -124,8 +115,6 @@ namespace XelsDesktopWalletApp.Views
                 {
                     MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
                     GLOBALS.AddressBalance = "000000000000";
-
-
                 }
             }
             catch (Exception e)
@@ -137,24 +126,22 @@ namespace XelsDesktopWalletApp.Views
 
             return content;
         }
-        private async Task<string> GetHistoryAsync(string path, string address)
+        private async Task<string> GetAccountAddressesAsync(string walletName)
         {
 
-            string getUrl = path + $"/smartContractWallet/history";
+            string getUrl = this.baseURL + $"/SmartContractWallet/account-addresses?walletName={walletName}";
             var content = "";
 
             HttpResponseMessage response = await client.GetAsync(getUrl);
+
             if (response.IsSuccessStatusCode)
             {
-                content = await response.Content.ReadAsStringAsync();
-                GLOBALS.AddressBalance = content;
+                var jsonString = await response.Content.ReadAsStringAsync();
+                IEnumerable<string> address = JsonConvert.DeserializeObject<IEnumerable<string>>(jsonString);
             }
             else
             {
                 MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
-                GLOBALS.AddressBalance = "000000000000";
-
-
             }
 
             return content;
@@ -179,13 +166,7 @@ namespace XelsDesktopWalletApp.Views
             ex.Show();
             this.Close();
         }
-        private void Hyperlink_NavigateSmartContract(object sender, RequestNavigateEventArgs e)
-        {
-            SmartContract ex = new SmartContract(this.walletName);
-            ex.Show();
-            this.Close();
-        }
-
+        
         private void Hyperlink_NavigateAddressBook(object sender, RequestNavigateEventArgs e)
         {
             AddressBook ex = new AddressBook(this.walletName);
