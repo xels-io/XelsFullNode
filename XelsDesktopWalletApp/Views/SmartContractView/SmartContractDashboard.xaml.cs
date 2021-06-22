@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,15 +14,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
+using Xels.Bitcoin.Features.SmartContracts.Models.SmartContract;
 using XelsDesktopWalletApp.Models;
 using XelsDesktopWalletApp.Models.CommonModels;
+using XelsDesktopWalletApp.Models.SmartContractModels;
 
 namespace XelsDesktopWalletApp.Views.SmartContractView
 {
-    /// <summary>
-    /// Interaction logic for SmartContractDashboard.xaml
-    /// </summary>
-    /// 
     public static class GLOBALS
     {
         public static string Address { get; set; }
@@ -57,7 +56,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             InitializeComponent();
         }
 
-        public SmartContractDashboard(string walletname,string selectedAddress)
+        public SmartContractDashboard(string walletname, string selectedAddress)
         {
             InitializeComponent();
             this.DataContext = this;
@@ -74,7 +73,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         }
         private async Task<string> GetAddressBalanceAsync(string path, string address)
         {
-            string getUrl = path + $"/smartContractWallet/address-balance?address={address}";
+            string getUrl = path + $"/SmartContractWallet/address-balance?address={address}";
             var content = "";
             try
             {
@@ -100,14 +99,53 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
             return content;
         }
+
+
+        private async Task GetTrasactionHistoryAsync(string walletName, string address)
+        {
+            try
+            {
+                client.BaseAddress = new Uri(this.baseURL);
+                client.DefaultRequestHeaders.Accept.Add(
+                   new MediaTypeWithQualityHeaderValue("application/json"));
+
+                var reuestModel = new GetHistoryRequest();
+                reuestModel.WalletName = walletName;
+                reuestModel.Address = address;
+                reuestModel.Skip = null;
+                reuestModel.Take = null;
+
+                HttpResponseMessage response = client.GetAsync("/SmartContractWallet/history").Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string data = await response.Content.ReadAsStringAsync();
+                    var finalData = JsonConvert.DeserializeObject<IEnumerable<Models.SmartContractModels.SmartContractTransactionItem>>(data);
+
+                    // grdEmployee.ItemsSource = data;
+                }
+                else
+                {
+                    MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+
+                }
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+
+
+            // return content;
+        }
+
         private void dashboardBtn_Click(object sender, RoutedEventArgs e)
         {
             Dashboard mw = new Dashboard(this.walletName);
             mw.ShowDialog();
-            //Dashboard mainWindow = Application.Current.Da as Dashboard;
-            //mainWindow.Visibility = Visibility.Visible;
-            //Window win = (Window)this.Parent;
-            //win.Close();
+
         }
     }
+
 }
