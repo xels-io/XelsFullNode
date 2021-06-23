@@ -46,14 +46,9 @@
                             </TextBox.Resources>
                         </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="1" Text="BALANCE" Margin="24,0,24,0" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" />
-                        <TextBox   Grid.Column="1"  Grid.Row="1" FontFamily="Microsoft YaHei Light" Margin="0,0,-150,5">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                        <TextBlock Grid.Column="1" Grid.Row="1" Text="0.00crs" Margin="0,11,-150,2" VerticalAlignment="Center" FontSize="11" FontFamily="Bahnschrift" HorizontalAlignment="Right" Width="74" />
+                        <TextBlock Grid.Column="1" Grid.Row="1" Text="Balance:" Margin="0,11,-71,4" VerticalAlignment="Center" FontSize="11" FontFamily="Bahnschrift" HorizontalAlignment="Right" Width="47" />
+
 
                         <TextBlock Grid.Column="0" Grid.Row="2" Text="AMOUNT" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" Margin="24,0,24,0"/>
                         <TextBox   Grid.Column="1"  Grid.Row="2" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
@@ -141,7 +136,7 @@
                                 </Style>
                             </Button.Resources>
                         </Button>
-                        
+
 
                     </Grid>
 

@@ -155,6 +155,12 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             this.SmartContract_Dashboard.Children.Add(new CreateContract());
         }
 
+        private void Btn_AddressCopy_Click(object sender, RoutedEventArgs e)
+        {
+            string activeAddress = this.lab_ActiveAddress.Content.ToString();
+            Clipboard.SetText(activeAddress);
+        }
+
         //private void Button_Click(object sender, RoutedEventArgs e)
         //{
         //    this.SmartContract_Dashboard.Children.Add(new CallContract());

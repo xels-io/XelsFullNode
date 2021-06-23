@@ -9,27 +9,35 @@
       Title="SmartContractDashboard">
 
     <Grid x:Name="SmartContract_Dashboard">
-        <Border Padding="10">
+        <Border Padding="5" BorderBrush="Black">
             <StackPanel>
-                <Grid Background="LimeGreen">
-                    <TextBlock Background="Green" Padding="2 2 2 2" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" MinHeight="25" MinWidth="100" >
-                        <Button Content="Main Dashboard" Click="dashboardBtn_Click" MinWidth="100" MinHeight="25" />
-                    </TextBlock>
+                <Border Padding="10" Background="LimeGreen" BorderBrush="Black" BorderThickness="1,1,1,1" CornerRadius="10,10,10,10">
+                    <Grid Background="LimeGreen">
 
-                    <Image Height="50" Source="/Assets/Images/home-xels-logo-01.png"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" />
+                        <TextBlock Background="Green" Padding="2 2 2 2" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" MinHeight="25" MinWidth="100" >
+                        <Button Content="Main Dashboard" Click="dashboardBtn_Click" MinWidth="100" MinHeight="25" >
+                             <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="7"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        </TextBlock>
 
-                    <Label Content="{Binding Path=WalletName}" Background="ForestGreen" Padding="2 2 2 2" Margin="0,0,30,0" 
+                        <Image Height="50" Source="/Assets/Images/home-xels-logo-01.png"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" />
+
+                        <Label Content="{Binding Path=WalletName}" Background="ForestGreen" Padding="2 2 2 2" Margin="0,0,30,0" 
                        HorizontalAlignment="Right" VerticalAlignment="Center"
                            FontFamily="Microsoft YaHei"  FontWeight="Normal" FontSize="9" Foreground="White"
                            RenderTransformOrigin="0.477,0.222" Height="20" Width="123" >
-                    </Label>
+                        </Label>
 
-                    <ComboBox x:Name="AccountComboBox" 
+                        <ComboBox x:Name="AccountComboBox" 
                           Background="ForestGreen" Padding="2 2 2 2" Margin="0,0,30,0" HorizontalAlignment="Right"
                           VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="9" 
                           Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" Height="18" Width="19" >
-                        <ComboBoxItem >
-                            <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
+                            <ComboBoxItem >
+                                <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
                                    VerticalAlignment="Center" FontFamily="Microsoft YaHei"  FontWeight="Normal" FontSize="10" 
                                    Foreground="#FF434943" Height="18" Width="70" >
                         <Hyperlink  TextDecorations="">
@@ -40,11 +48,11 @@
                             </Style>
                             </Hyperlink.Style><Run Text="Address Book"/>
                         </Hyperlink>
-                            </TextBlock>
-                        </ComboBoxItem>
+                                </TextBlock>
+                            </ComboBoxItem>
 
-                        <ComboBoxItem>
-                            <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
+                            <ComboBoxItem>
+                                <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
                                    VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="10" 
                                    Foreground="#FF434943" Height="18" Width="70" >
                         <Hyperlink TextDecorations="">
@@ -55,11 +63,11 @@
                             </Style>
                             </Hyperlink.Style><Run Text="Advanced"/>
                         </Hyperlink>
-                            </TextBlock>
-                        </ComboBoxItem>
+                                </TextBlock>
+                            </ComboBoxItem>
 
-                        <ComboBoxItem >
-                            <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
+                            <ComboBoxItem >
+                                <TextBlock Background="ForestGreen" Padding="1 1 1 1" Margin="0,0,0,0" HorizontalAlignment="Left" 
                                    VerticalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Normal" FontSize="10" 
                                    Foreground="#FF434943" Height="18" Width="70" >
                         <Hyperlink  TextDecorations="">
@@ -70,10 +78,14 @@
                             </Style>
                             </Hyperlink.Style><Run Text="Logout"/>
                         </Hyperlink>
-                            </TextBlock>
-                        </ComboBoxItem>
-                    </ComboBox>
-                </Grid>
+                                </TextBlock>
+                            </ComboBoxItem>
+                        </ComboBox>
+                    </Grid>
+                </Border>
+
+
+
                 <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0" Margin="10,10,10,10">
 
                     <Grid>
@@ -104,10 +116,28 @@
 
                         <Label Content="ACTIVE ADDRESS" Grid.Column="1" HorizontalAlignment="Left" Margin="20,23,0,0" VerticalAlignment="Top" FontWeight="Bold"  FontSize="12" Height="24" Width="143" />
                         <Label x:Name="lab_ActiveAddress" Grid.Column="1" HorizontalAlignment="Left" Margin="20,66,0,0" VerticalAlignment="Top" Width="250"/>
-                        <Button Content="BTN" Grid.Column="1" HorizontalAlignment="Left" Margin="316,66,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.101,0.754"/>
+                        <Button Content="COPY" Click="Btn_AddressCopy_Click" Grid.Column="1" HorizontalAlignment="Left" Margin="316,66,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.101,0.754">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="15"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
 
-                        <Button x:Name="Btn_CallContract" Content="CALL CONTRACT" Grid.Column="2" HorizontalAlignment="Center" Margin="0,23,0,0" VerticalAlignment="Top" Width="169" FontWeight="Bold" Height="42" Click="Btn_CallContract_Click"/>
-                        <Button Content="CREATE CONTRACT" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.151,-0.148" Width="169" FontWeight="Bold" Height="42" Margin="0,75,0,0" Click="Btn_CreateContract_Click"/>
+                        <Button x:Name="Btn_CallContract" Content="CALL CONTRACT" Grid.Column="2" HorizontalAlignment="Center" Margin="0,23,0,0" VerticalAlignment="Top" Width="169" FontWeight="Bold" Height="42" Click="Btn_CallContract_Click">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="15"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        <Button Content="CREATE CONTRACT" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.151,-0.148" Width="169" FontWeight="Bold" Height="42" Margin="0,75,0,0" Click="Btn_CreateContract_Click">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="15"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
 
 
                     </Grid>
