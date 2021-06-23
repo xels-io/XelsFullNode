@@ -50,6 +50,8 @@ namespace XelsDesktopWalletApp.Views
         {
             InitializeComponent();
             this.DataContext = this;
+
+            this.CheckboxPkey.IsChecked = true;
             HidePrivateKeyTxt();
 
             this.walletName = walletname;
@@ -118,7 +120,7 @@ namespace XelsDesktopWalletApp.Views
             this.walletHash = MnemonicToHash(this.MnemonicTxt.Text);
 
 
-            if (this.isCheckBoxChecked == false)
+            if (this.isCheckBoxChecked == true)
             {
                 this.wallet = this.createWallet.WalletCreation(this.MnemonicTxt.Text);
                 //this.wallet.PrivateKey = this.encryption.encrypt(this.wallet.PrivateKey);
@@ -139,16 +141,12 @@ namespace XelsDesktopWalletApp.Views
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             this.isCheckBoxChecked = true;
-
-            this.SPSELS.Visibility = Visibility.Visible;
-            this.SPSELSTxt.Visibility = Visibility.Visible;
-            this.SPBELS.Visibility = Visibility.Visible;
-            this.SPBELSTxt.Visibility = Visibility.Visible;
+            HidePrivateKeyTxt();
         }
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             this.isCheckBoxChecked = false;
-            HidePrivateKeyTxt();
+            VisiblePrivateKeyTxt();
         }
 
         private void HidePrivateKeyTxt()
@@ -157,6 +155,14 @@ namespace XelsDesktopWalletApp.Views
             this.SPSELSTxt.Visibility = Visibility.Hidden;
             this.SPBELS.Visibility = Visibility.Hidden;
             this.SPBELSTxt.Visibility = Visibility.Hidden;
+        }
+
+        private void VisiblePrivateKeyTxt()
+        {
+            this.SPSELS.Visibility = Visibility.Visible;
+            this.SPSELSTxt.Visibility = Visibility.Visible;
+            this.SPBELS.Visibility = Visibility.Visible;
+            this.SPBELSTxt.Visibility = Visibility.Visible;
         }
 
     }
