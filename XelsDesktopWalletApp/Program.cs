@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 using IWshRuntimeLibrary;
-
-//using IWshRuntimeLibrary;
 
 using Microsoft.Extensions.Hosting;
 
@@ -35,8 +34,10 @@ using Xels.Bitcoin.Networks;
 using Xels.Bitcoin.Utilities;
 using Xels.Features.Collateral;
 using Xels.Features.Collateral.CounterChain;
+using Xels.Features.Diagnostic;
 using Xels.Features.SQLiteWalletRepository;
 using Xels.Sidechains.Networks;
+using XelsDesktopWalletApp.Models.CommonModels;
 
 namespace XelsDesktopWalletApp
 {
@@ -225,6 +226,7 @@ namespace XelsDesktopWalletApp
 
         private static IFullNode GetXoyMiningNode(string[] args)
         {
+            URLConfiguration.BaseURL = "http://localhost:37223/api"; //Side Chain Url
             var nodeSettings = new NodeSettings(networksSelector: XoyNetwork.NetworksSelector, protocolVersion: ProtocolVersion.CIRRUS_VERSION, args: args)
             {
                 MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
@@ -260,6 +262,7 @@ namespace XelsDesktopWalletApp
         private static IFullNode GetXelsNode(string[] args)
         {
             // TODO: Hardcode -addressindex for better user experience
+            URLConfiguration.BaseURL = "http://localhost:37221/api";//Mian Chain Url
 
             var nodeSettings = new NodeSettings(networksSelector: Networks.Xels, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
             {
@@ -357,25 +360,25 @@ namespace XelsDesktopWalletApp
         //}
 
 
-        public static void CreateShortCut()
-        {
+        //public static void CreateShortCut()
+        //{
 
             string[] argumentList = {"-sidechain" };
 
-            string destinationPath = Directory.GetCurrentDirectory();
-            //Console.WriteLine(distinationPath);
-            //Console.ReadLine();
-            foreach (var arg in argumentList)
-            {
-                object shDesktop = (object)"Desktop";
-                WshShell shell = new WshShell();
-                string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-app" + arg + ".lnk";
-                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
+        //    string destinationPath = Directory.GetCurrentDirectory();
+        //    //Console.WriteLine(distinationPath);
+        //    //Console.ReadLine();
+        //    foreach (var arg in argumentList)
+        //    {
+        //        object shDesktop = (object)"Desktop";
+        //        WshShell shell = new WshShell();
+        //        string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-app" + arg + ".lnk";
+        //        IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
 
-                shortcut.Arguments = arg;
-                shortcut.TargetPath = destinationPath + @"\XelsDesktopWalletApp.exe";
-                shortcut.Save();
-            }
-        }
+        //        shortcut.Arguments = arg;
+        //        shortcut.TargetPath = destinationPath + @"\XelsDesktopWalletApp.exe";
+        //        shortcut.Save();
+        //    }
+        //}
     }
 }

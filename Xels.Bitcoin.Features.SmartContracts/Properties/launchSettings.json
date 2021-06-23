@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Xels.Bitcoin.Features.SmartContracts": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
