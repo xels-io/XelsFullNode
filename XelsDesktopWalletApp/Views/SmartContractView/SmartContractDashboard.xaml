@@ -8,7 +8,7 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="SmartContractDashboard">
 
-    <Grid>
+    <Grid x:Name="SmartContract_Dashboard">
         <Border Padding="10">
             <StackPanel>
                 <Grid Background="LimeGreen">
@@ -106,7 +106,7 @@
                         <Label x:Name="lab_ActiveAddress" Grid.Column="1" HorizontalAlignment="Left" Margin="20,66,0,0" VerticalAlignment="Top" Width="250"/>
                         <Button Content="BTN" Grid.Column="1" HorizontalAlignment="Left" Margin="316,66,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.101,0.754"/>
 
-                        <Button Content="CALL CONTRACT" Grid.Column="2" HorizontalAlignment="Center" Margin="0,23,0,0" VerticalAlignment="Top" Width="169" FontWeight="Bold" Height="42"/>
+                        <Button x:Name="Btn_CallContract" Content="CALL CONTRACT" Grid.Column="2" HorizontalAlignment="Center" Margin="0,23,0,0" VerticalAlignment="Top" Width="169" FontWeight="Bold" Height="42" Click="Button_Click"/>
                         <Button Content="CREATE CONTRACT" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.151,-0.148" Width="169" FontWeight="Bold" Height="42" Margin="0,75,0,0"/>
 
 

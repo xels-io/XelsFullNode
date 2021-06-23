@@ -115,7 +115,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
 
 
-                HttpResponseMessage response = client.GetAsync("/SmartContractWallet/history").Result;
+                HttpResponseMessage response = client.GetAsync("/SmartContractWallet/history").Result;//// Obj Pathaite hobehalka problem asa
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -143,6 +143,11 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             Dashboard mw = new Dashboard(this.walletName);
             mw.ShowDialog();
 
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.SmartContract_Dashboard.Children.Add(new CallContract());
         }
     }
 
