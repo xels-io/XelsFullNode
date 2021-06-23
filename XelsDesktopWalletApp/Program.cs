@@ -184,10 +184,10 @@ namespace XelsDesktopWalletApp
         [STAThread]
         public static void Main(string[] args)
         {
-            args = new string[] { "-mainchain" };
+            args = new string[] {"-sidechain" };
 
             App app = new App();
-            //CreateShortCut();
+            CreateShortCut();
 
             MainAsync(args).Wait(5);
 
@@ -198,6 +198,10 @@ namespace XelsDesktopWalletApp
 
         public static async Task MainAsync(string[] args)
         {
+            if(args.Length == 0)
+            {
+                args = new string[] {  "-mainchain" };
+            }
             try
             {
                 bool isMainchainNode = args.FirstOrDefault(a => a.ToLower() == MainchainArgument) != null;
@@ -356,7 +360,7 @@ namespace XelsDesktopWalletApp
         public static void CreateShortCut()
         {
 
-            string[] argumentList = { "-mainchain", "-sidechain" };
+            string[] argumentList = {"-sidechain" };
 
             string destinationPath = Directory.GetCurrentDirectory();
             //Console.WriteLine(distinationPath);
