@@ -5,20 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XelsDesktopWalletApp.Views.SmartContractView"
         mc:Ignorable="d"
-        Title="SmartContractMain" Height="700" Width="1080">
+        Title="Smart Contract" Height="700" Width="1080">
     <Grid>
 
-        <Border Padding="10">
+        <Border Padding="10" BorderBrush="LightGray" BorderThickness="1,1,1,1">
             <StackPanel>
+                <Border Padding="10" CornerRadius="7,7,7,7" Background="LimeGreen" BorderBrush="Black" BorderThickness="1,1,1,1">
+                    <Grid Background="LimeGreen">
+                        <Image Source="/Assets/Images/home-xels-logo-01.png" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100"/>
+                        <TextBlock Background="Green" Padding="2 2 2 2" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="11" Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" MinHeight="30" MinWidth="100" >
+                        <Button Content="Dashboard" Click="dashboardBtn_Click" MinWidth="100" MinHeight="30" />
+                        </TextBlock>
+                    </Grid>
+                </Border>
 
-                <Grid Background="LimeGreen">
-                    <Image Source="/Assets/Images/home-xels-logo-01.png" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100"/>
-                    <TextBlock Background="Green" Padding="2 2 2 2" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="11" Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" MinHeight="40" MinWidth="100" >
-                        <Button Content="Dashboard" Click="dashboardBtn_Click" MinWidth="100" MinHeight="40" />
-                    </TextBlock>
-                </Grid>
 
-                <TextBlock Width="205" Height="93" Text="SMART CONTRACT" FontWeight="Normal"  FontSize="22" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light"/>
+                <TextBlock Width="205" Height="93" Text="SMART CONTRACT" FontWeight="Normal"  FontSize="22" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light">
+                </TextBlock>
 
                 <!--<ComboBox ItemsSource="{Binding  Path=MyList, Mode=TwoWay}" 
                       SelectedItem="{Binding Path=SelectedWallet, Mode=TwoWay}"
@@ -43,7 +46,7 @@
                     <ComboBoxItem Content="dsnfiudvndifuhfdbiwe832984234n398ncds89"></ComboBoxItem>
                 </ComboBox>
 
-                <Button Background="#FF53E253" Width="531" x:Name="useAddressBtn" Click="useAddressBtn_Click"  Content="USE ADDRESS"  Margin="0 10 10 0" Grid.Column="0" FontFamily="Microsoft YaHei Light" FontWeight="Normal" Foreground="White" BorderThickness="0,0,0,0" Height="24" FontStyle="Normal" >
+                <Button Background="LimeGreen" Width="531" x:Name="useAddressBtn" Click="useAddressBtn_Click"  Content="USE ADDRESS"  Margin="0 10 10 0" Grid.Column="0" FontFamily="Microsoft YaHei Light" FontWeight="Normal" Foreground="White" BorderThickness="0,0,0,0" Height="24" FontStyle="Normal" >
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="5"/>

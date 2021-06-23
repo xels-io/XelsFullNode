@@ -11,7 +11,7 @@
     <Grid x:Name="SmartContract_Dashboard">
         <Border Padding="5" BorderBrush="Black">
             <StackPanel>
-                <Border Padding="10" Background="LimeGreen" BorderBrush="Black" BorderThickness="1,1,1,1" CornerRadius="10,10,10,10">
+                <Border Padding="10" Background="LimeGreen" BorderBrush="Black" BorderThickness="1,1,1,1" CornerRadius="7,7,7,7">
                     <Grid Background="LimeGreen">
 
                         <TextBlock Background="Green" Padding="2 2 2 2" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" MinHeight="25" MinWidth="100" >
@@ -98,16 +98,17 @@
                             <RowDefinition Height="1*" />
                             <RowDefinition Height="1*" />
                         </Grid.RowDefinitions>
-                        <Border Margin="3" Grid.Column="1" Grid.Row="0" BorderBrush="LightGray" 
-                        BorderThickness="1" Background="{x:Null}" Height="120" />
-                        <Border Grid.Column="0" Grid.Row="0" BorderBrush="LightGray" 
-                        BorderThickness="1" Background="{x:Null}" Height="120" />
+                        <Border Margin="3" Grid.Column="1" Grid.Row="0" BorderBrush="Black" 
+                        BorderThickness="1" Background="{x:Null}" Height="120" CornerRadius="7,7,7,7" />
+                        <Border Grid.Column="0" Grid.Row="0" BorderBrush="Black" 
+                        BorderThickness="1" Background="{x:Null}" Height="120" CornerRadius="7,7,7,7" />
+                        <Border Grid.Column="2" Grid.Row="0" BorderBrush="Black" 
+                        BorderThickness="1" Background="{x:Null}" Height="120" CornerRadius="7,7,7,7" />
 
-                        <Label Content="ADDRESS BALANCE" HorizontalAlignment="Center"
-                               Margin="0,23,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.599,0.121" 
-                               Width="169" FontFamily="Microsoft YaHei" Foreground="Black"   FontWeight="Bold"
-                               FontSize="12" Height="24"
-                                Grid.Column="0" Grid.Row="0"
+                        <Label Content="ADDRESS BALANCE" HorizontalAlignment="Left"
+                               Margin="10,25,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.599,0.121" 
+                               Width="137" FontFamily="Microsoft YaHei" Foreground="Black"   FontWeight="Bold"
+                               FontSize="12" Height="24" Grid.Row="0"
                                />
 
                         <Label x:Name="lab_addBalance" Content="" HorizontalAlignment="Left" Margin="10,73,0,0" VerticalAlignment="Top"  Foreground="Black" 
@@ -116,7 +117,7 @@
 
                         <Label Content="ACTIVE ADDRESS" Grid.Column="1" HorizontalAlignment="Left" Margin="20,23,0,0" VerticalAlignment="Top" FontWeight="Bold"  FontSize="12" Height="24" Width="143" />
                         <Label x:Name="lab_ActiveAddress" Grid.Column="1" HorizontalAlignment="Left" Margin="20,66,0,0" VerticalAlignment="Top" Width="250"/>
-                        <Button Content="COPY" Click="Btn_AddressCopy_Click" Grid.Column="1" HorizontalAlignment="Left" Margin="316,66,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.101,0.754">
+                        <Button Content="COPY" Click="Btn_AddressCopy_Click" Grid.Column="1" HorizontalAlignment="Left" Margin="316,66,0,0" VerticalAlignment="Top" MinWidth="80" RenderTransformOrigin="0.101,0.754">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="15"/>

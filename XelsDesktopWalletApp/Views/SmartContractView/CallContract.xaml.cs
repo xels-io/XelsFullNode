@@ -26,7 +26,6 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
         {
             this.Visibility = Visibility.Collapsed;
-
         }
     }
 }
