@@ -185,7 +185,7 @@ namespace XelsDesktopWalletApp
         [STAThread]
         public static void Main(string[] args)
         {
-            args = new string[] {"-sidechain" };
+            //args = new string[] {"-sidechain" };
 
             App app = new App();
             CreateShortCut();
@@ -290,95 +290,25 @@ namespace XelsDesktopWalletApp
         // miner d end
 
 
-        //[STAThread]
-        //static void Main(string[] args)
-        //{
-        //    App application = new App();
+        public static void CreateShortCut()
+        {
 
-        //    try
-        //    {
-        //        //FreeConsole();
-        //        var nodeSettings = new NodeSettings(networksSelector: Networks.Xels,
-        //            protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
-        //        {
-        //            MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
-        //        };
+            string[] argumentList = { "-sidechain" };
 
-        //        IFullNodeBuilder nodeBuilder = new FullNodeBuilder()
-        //            .UseNodeSettings(nodeSettings)
-        //            .UseBlockStore()                    
-        //            //.UseWallet()
-        //            //.UseBlockExplorer()
-        //            .UsePosConsensus()
-        //            .UseMempool()
-        //            .UseColdStakingWallet()
-        //            .AddSQLiteWalletRepository()
-        //            .AddPowPosMining()
-        //            .UseApi()
+            string destinationPath = Directory.GetCurrentDirectory();
+            //Console.WriteLine(distinationPath);
+            //Console.ReadLine();
+            foreach (var arg in argumentList)
+            {
+                object shDesktop = (object)"Desktop";
+                WshShell shell = new WshShell();
+                string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-app" + arg + ".lnk";
+                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
 
-        //            .AddRPC().UseSmartContractWallet();
-        //        //.UseDns()
-        //        //.UseDiagnosticFeature();
-
-        //        if (nodeSettings.EnableSignalR)
-        //        {
-        //            nodeBuilder.AddSignalR(options =>
-        //            {
-        //                options.EventsToHandle = new[]
-        //                {
-        //                    (IClientEvent) new BlockConnectedClientEvent(),
-        //                    new TransactionReceivedClientEvent()
-        //                };
-
-        //                options.ClientEventBroadcasters = new[]
-        //                {
-        //                    (Broadcaster: typeof(StakingBroadcaster), ClientEventBroadcasterSettings: new ClientEventBroadcasterSettings
-        //                        {
-        //                            BroadcastFrequencySeconds = 5
-        //                        }),
-        //                    (Broadcaster: typeof(WalletInfoBroadcaster), ClientEventBroadcasterSettings: new ClientEventBroadcasterSettings
-        //                        {
-        //                            BroadcastFrequencySeconds = 5
-        //                        })
-        //                };
-        //            });
-        //        }
-
-        //        IFullNode node = nodeBuilder.Build();
-
-        //        if (node != null)
-        //            _ = node.RunAsync();
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine("There was a problem initializing the node. Details: '{0}'", ex.ToString());
-        //    }
-
-        //    application.InitializeComponent();
-        //    application.Run();
-        //}
-
-
-        //public static void CreateShortCut()
-        //{
-
-            string[] argumentList = {"-sidechain" };
-
-        //    string destinationPath = Directory.GetCurrentDirectory();
-        //    //Console.WriteLine(distinationPath);
-        //    //Console.ReadLine();
-        //    foreach (var arg in argumentList)
-        //    {
-        //        object shDesktop = (object)"Desktop";
-        //        WshShell shell = new WshShell();
-        //        string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + @"\xels-app" + arg + ".lnk";
-        //        IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
-
-        //        shortcut.Arguments = arg;
-        //        shortcut.TargetPath = destinationPath + @"\XelsDesktopWalletApp.exe";
-        //        shortcut.Save();
-        //    }
-        //}
+                shortcut.Arguments = arg;
+                shortcut.TargetPath = destinationPath + @"\XelsDesktopWalletApp.exe";
+                shortcut.Save();
+            }
+        }
     }
 }
