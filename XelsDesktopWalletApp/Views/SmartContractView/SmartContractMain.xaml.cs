@@ -25,7 +25,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
     {
         #region Base
         static HttpClient client = new HttpClient();
-        string baseURL = URLConfiguration.BaseURLMain;// Common Url
+        string baseURL = URLConfiguration.BaseURL;// Common Url
         #endregion
         #region Wallet Info
         private readonly WalletInfo walletInfo = new WalletInfo();

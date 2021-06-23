@@ -37,6 +37,7 @@ using Xels.Features.Collateral.CounterChain;
 using Xels.Features.Diagnostic;
 using Xels.Features.SQLiteWalletRepository;
 using Xels.Sidechains.Networks;
+using XelsDesktopWalletApp.Models.CommonModels;
 
 namespace XelsDesktopWalletApp
 {
@@ -184,7 +185,7 @@ namespace XelsDesktopWalletApp
         [STAThread]
         public static void Main(string[] args)
         {
-            args = new string[] { "-mainchain" };
+            args = new string[] { "-sidechain" };
 
             App app = new App();
             //CreateShortCut();
@@ -221,6 +222,7 @@ namespace XelsDesktopWalletApp
 
         private static IFullNode GetXoyMiningNode(string[] args)
         {
+            URLConfiguration.BaseURL = "http://localhost:37223/api"; //Side Chain Url
             var nodeSettings = new NodeSettings(networksSelector: XoyNetwork.NetworksSelector, protocolVersion: ProtocolVersion.CIRRUS_VERSION, args: args)
             {
                 MinProtocolVersion = ProtocolVersion.ALT_PROTOCOL_VERSION
@@ -256,6 +258,7 @@ namespace XelsDesktopWalletApp
         private static IFullNode GetXelsNode(string[] args)
         {
             // TODO: Hardcode -addressindex for better user experience
+            URLConfiguration.BaseURL = "http://localhost:37221/api";//Mian Chain Url
 
             var nodeSettings = new NodeSettings(networksSelector: Networks.Xels, protocolVersion: ProtocolVersion.PROVEN_HEADER_VERSION, args: args)
             {

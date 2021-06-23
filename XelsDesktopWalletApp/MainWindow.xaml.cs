@@ -27,7 +27,7 @@ namespace XelsDesktopWalletApp
     {
 
         static HttpClient client = new HttpClient();
-        string baseURL = URLConfiguration.BaseURLMain;
+        string baseURL = URLConfiguration.BaseURL;
 
         //public List<WalletLoadRequest> _myList { get; set; }
         private List<WalletLoadRequest> myList = new List<WalletLoadRequest>();

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace XelsDesktopWalletApp.Models.SmartContractModels
 {
-    public class GetHistoryRequest
+    public class SmtGetHistoryRequest
     {
         public string WalletName { get; set; }
         public string Address { get; set; }

@@ -14,7 +14,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
-using Xels.Bitcoin.Features.SmartContracts.Models.SmartContract;
 using XelsDesktopWalletApp.Models;
 using XelsDesktopWalletApp.Models.CommonModels;
 using XelsDesktopWalletApp.Models.SmartContractModels;
@@ -31,7 +30,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         #region Base
         static HttpClient client = new HttpClient();
-        string baseURL = URLConfiguration.BaseURLMain;// Common Url
+        string baseURL = URLConfiguration.BaseURL;// Common Url
         #endregion
         #region Wallet Info
         private readonly WalletInfo walletInfo = new WalletInfo();
@@ -101,26 +100,27 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         }
 
 
-        private async Task GetTrasactionHistoryAsync(string walletName, string address)
+        private async Task<string> GetTrasactionHistoryAsync(string walletName, string address)
         {
             try
             {
+                string content = "";
                 client.BaseAddress = new Uri(this.baseURL);
                 client.DefaultRequestHeaders.Accept.Add(
                    new MediaTypeWithQualityHeaderValue("application/json"));
 
-                var reuestModel = new GetHistoryRequest();
+                var reuestModel = new SmtGetHistoryRequest();
                 reuestModel.WalletName = walletName;
                 reuestModel.Address = address;
-                reuestModel.Skip = null;
-                reuestModel.Take = null;
+
+
 
                 HttpResponseMessage response = client.GetAsync("/SmartContractWallet/history").Result;
 
                 if (response.IsSuccessStatusCode)
                 {
                     string data = await response.Content.ReadAsStringAsync();
-                    var finalData = JsonConvert.DeserializeObject<IEnumerable<Models.SmartContractModels.SmartContractTransactionItem>>(data);
+                    var finalData = JsonConvert.DeserializeObject<IEnumerable<SmartContractTransactionItem>>(data);
 
                     // grdEmployee.ItemsSource = data;
                 }
@@ -129,15 +129,13 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                     MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
 
                 }
+                return content;
             }
             catch (Exception e)
             {
 
                 throw;
             }
-
-
-            // return content;
         }
 
         private void dashboardBtn_Click(object sender, RoutedEventArgs e)
