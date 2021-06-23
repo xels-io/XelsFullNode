@@ -18,15 +18,9 @@ namespace XelsDesktopWalletApp.Common
         {
             Wallet wallet = new Wallet();
 
-
-            //// creates new mnemonic only
-            //Mnemonic mnemo = new Mnemonic(Wordlist.English, WordCount.Twelve);
-            //ExtKey hdRoot = mnemo.DeriveExtKey("my password");
-            //Console.WriteLine(mnemo);
-
-            Mnemonic mnemo = new Mnemonic("above turn genuine amused sister grocery fiscal draft wedding chat process prosper", 
-                Wordlist.English);
-            ExtKey hdRoot = mnemo.DeriveExtKey("Shuvo912#");
+            Mnemonic mnemo = new Mnemonic(Wordlist.English, WordCount.Twelve);
+            ExtKey hdRoot = mnemo.DeriveExtKey("my password");
+            Console.WriteLine(mnemo);
 
             return wallet;
         }
