@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XelsDesktopWalletApp.Views.SmartContractView"
         mc:Ignorable="d"
-        Title="SmartContractMain" Height="450" Width="800">
+        Title="SmartContractMain" Height="700" Width="1080">
     <Grid>
 
         <Border Padding="10">
