@@ -40,6 +40,9 @@
     <Compile Update="Views\Detail.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\EthImport.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\Exchange.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -121,6 +124,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Detail.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\EthImport.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Exchange.xaml">
