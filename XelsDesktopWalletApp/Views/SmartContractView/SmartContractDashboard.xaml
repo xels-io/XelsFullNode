@@ -106,8 +106,8 @@
                         <Label x:Name="lab_ActiveAddress" Grid.Column="1" HorizontalAlignment="Left" Margin="20,66,0,0" VerticalAlignment="Top" Width="250"/>
                         <Button Content="BTN" Grid.Column="1" HorizontalAlignment="Left" Margin="316,66,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.101,0.754"/>
 
-                        <Button x:Name="Btn_CallContract" Content="CALL CONTRACT" Grid.Column="2" HorizontalAlignment="Center" Margin="0,23,0,0" VerticalAlignment="Top" Width="169" FontWeight="Bold" Height="42" Click="Button_Click"/>
-                        <Button Content="CREATE CONTRACT" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.151,-0.148" Width="169" FontWeight="Bold" Height="42" Margin="0,75,0,0"/>
+                        <Button x:Name="Btn_CallContract" Content="CALL CONTRACT" Grid.Column="2" HorizontalAlignment="Center" Margin="0,23,0,0" VerticalAlignment="Top" Width="169" FontWeight="Bold" Height="42" Click="Btn_CallContract_Click"/>
+                        <Button Content="CREATE CONTRACT" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.151,-0.148" Width="169" FontWeight="Bold" Height="42" Margin="0,75,0,0" Click="Btn_CreateContract_Click"/>
 
 
                     </Grid>

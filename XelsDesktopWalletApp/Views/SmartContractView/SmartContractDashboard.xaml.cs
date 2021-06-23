@@ -145,10 +145,20 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Btn_CallContract_Click(object sender, RoutedEventArgs e)
         {
             this.SmartContract_Dashboard.Children.Add(new CallContract());
         }
+
+        private void Btn_CreateContract_Click(object sender, RoutedEventArgs e)
+        {
+            this.SmartContract_Dashboard.Children.Add(new CreateContract());
+        }
+
+        //private void Button_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.SmartContract_Dashboard.Children.Add(new CallContract());
+        //}
     }
 
 }
