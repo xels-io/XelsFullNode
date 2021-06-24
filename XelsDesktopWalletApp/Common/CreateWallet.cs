@@ -17,6 +17,14 @@ namespace XelsDesktopWalletApp.Common
         public string PrivateKey { get; set; }
     }
 
+    public class StoredWallet
+    {
+        public Wallet Wallet { get; set; }
+        public string Walletname { get; set; }
+        public string Coin { get; set; }
+        public string Wallethash { get; set; }
+    }
+
     public class CreateWallet
     {
         public Wallet WalletCreation(string mnemonic)
@@ -55,6 +63,18 @@ namespace XelsDesktopWalletApp.Common
 
             return wallet;
         }
+
+        public void StoreLocally(Wallet wallet, string walletname, string coin, string wallethash)
+        {
+            StoredWallet storedWallet = new StoredWallet();
+            storedWallet.Wallet.Address = wallet.Address;
+            storedWallet.Wallet.PrivateKey = wallet.PrivateKey;
+            storedWallet.Walletname = walletname;
+            storedWallet.Coin = coin;
+            storedWallet.Wallethash = wallethash;
+
+        }
+
 
     }
 
