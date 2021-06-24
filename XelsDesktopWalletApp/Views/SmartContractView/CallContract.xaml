@@ -38,7 +38,7 @@
                             <RowDefinition Height="30"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Column="0" Grid.Row="0" Text="SENDER" Margin="24,0,24,0" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" />
-                        <TextBox   Grid.Column="1"  Grid.Row="0" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
+                        <TextBox  x:Name="SenderAddress" IsReadOnly="True"  Grid.Column="1"  Grid.Row="0" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="7"/>
@@ -46,12 +46,12 @@
                             </TextBox.Resources>
                         </TextBox>
 
-                        <TextBlock Grid.Column="1" Grid.Row="1" Text="0.00crs" Margin="0,11,-150,2" VerticalAlignment="Center" FontSize="11" FontFamily="Bahnschrift" HorizontalAlignment="Right" Width="74" />
+                        <TextBlock x:Name="txtBalance" Grid.Column="1" Grid.Row="1"  Margin="0,11,-150,2" VerticalAlignment="Center" FontSize="11" FontFamily="Bahnschrift" HorizontalAlignment="Right" Width="74" />
                         <TextBlock Grid.Column="1" Grid.Row="1" Text="Balance:" Margin="0,11,-71,4" VerticalAlignment="Center" FontSize="11" FontFamily="Bahnschrift" HorizontalAlignment="Right" Width="47" />
 
 
                         <TextBlock Grid.Column="0" Grid.Row="2" Text="AMOUNT" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" Margin="24,0,24,0"/>
-                        <TextBox   Grid.Column="1"  Grid.Row="2" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
+                        <TextBox x:Name="txtAmount"  Grid.Column="1"  Grid.Row="2" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="7"/>
@@ -60,7 +60,7 @@
                         </TextBox>
 
                         <TextBlock Grid.Column="0" Grid.Row="3" Text="FEE" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" Margin="24,0,24,0" />
-                        <TextBox   Grid.Column="1"  Grid.Row="3" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
+                        <TextBox x:Name="txtFee"  Grid.Column="1"  Grid.Row="3" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="7"/>
@@ -69,7 +69,7 @@
                         </TextBox>
 
                         <TextBlock Grid.Column="0" Grid.Row="4" Text="GAS PRICE" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" Margin="24,0,24,0" />
-                        <TextBox   Grid.Column="1"  Grid.Row="4" FontFamily="Microsoft YaHei Light" Margin="0,0,-150,5">
+                        <TextBox  x:Name="txtGasPrice"  Grid.Column="1"  Grid.Row="4" FontFamily="Microsoft YaHei Light" Margin="0,0,-150,5">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="7"/>
@@ -78,24 +78,24 @@
                         </TextBox>
 
                         <TextBlock Grid.Column="0" Grid.Row="5" Text="GAS LIMIT" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  Margin="24,3,0,27" Grid.RowSpan="2" />
-                        <TextBox   Grid.Column="1"  Grid.Row="5" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
+                        <TextBox x:Name="txtGasLimit"  Grid.Column="1"  Grid.Row="5" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="7"/>
                                 </Style>
                             </TextBox.Resources>
                         </TextBox>
-                        <TextBlock Grid.Column="0" Grid.Row="6" Text="PARAMETERS" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  Margin="24,4,0,26" Width="86" Grid.RowSpan="2" />
+                        <!--<TextBlock Grid.Column="0" Grid.Row="6" Text="PARAMETERS" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  Margin="24,4,0,26" Width="86" Grid.RowSpan="2" />
                         <Button Grid.Column="1"  Grid.Row="6"   x:Name="btn_AddParameter" Content="ADD +" Background="Red"  Margin="0,0,-50,0">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="15"/>
                                 </Style>
                             </Button.Resources>
-                        </Button>
+                        </Button>-->
 
-                        <TextBlock Grid.Column="0" Grid.Row="7" Text="METHOD NAME" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  Margin="24,3,0,27" Grid.RowSpan="2" />
-                        <TextBox   Grid.Column="1"  Grid.Row="7" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
+                        <TextBlock Grid.Column="0" Grid.Row="6" Text="METHOD NAME" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  Margin="24,3,0,27" Grid.RowSpan="2" />
+                        <TextBox  x:Name="txtMethodName"  Grid.Column="1"  Grid.Row="6" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="7"/>
@@ -103,8 +103,8 @@
                             </TextBox.Resources>
                         </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="8" Text="CONTRACT ADDRESS" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  Margin="24,3,0,27" Grid.RowSpan="2" />
-                        <TextBox   Grid.Column="1"  Grid.Row="8" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
+                        <TextBlock Grid.Column="0" Grid.Row="7" Text="CONTRACT ADDRESS" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  Margin="24,3,0,27" Grid.RowSpan="2" />
+                        <TextBox x:Name="txtContractAddress"   Grid.Column="1"  Grid.Row="7" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,10" Grid.RowSpan="2">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="7"/>
@@ -112,24 +112,24 @@
                             </TextBox.Resources>
                         </TextBox>
                         <TextBlock Grid.Column="0" Grid.Row="9" Text="WALLET PASSWORD" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  Margin="24,3,0,27" Grid.RowSpan="2" />
-                        <TextBox   Grid.Column="1"  Grid.Row="9" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
-                            <TextBox.Resources>
+                        <PasswordBox x:Name="txtWalletPassword"  Grid.Column="1"  Grid.Row="9" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
+                            <PasswordBox.Resources>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="7"/>
                                 </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                            </PasswordBox.Resources>
+                        </PasswordBox>
 
 
 
-                        <Button Grid.Column="1"  Grid.Row="11"   x:Name="btn_CallSubmit"  FontWeight="Bold" Content="Call Contract" Background="#FF53E253"  Margin="0,0,-150,0">
+                        <Button Grid.Column="1"  Grid.Row="11"   x:Name="btn_CallSubmit" Click="btn_CallSubmit_Click"  FontWeight="Bold" Content="Call Contract" Background="#FF53E253"  Margin="0,0,-150,0">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="15"/>
                                 </Style>
                             </Button.Resources>
                         </Button>
-                        <Button x:Name="btn_Cancel" Grid.Column="0" Grid.Row="11" Content="CANCEL"  FontWeight="Bold" Background="BurlyWood">
+                        <Button x:Name="btn_Cancel" Grid.Column="0" Grid.Row="11" Content="CANCEL" Click="btn_Cancel_Click"  FontWeight="Bold" Background="BurlyWood">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="15"/>
