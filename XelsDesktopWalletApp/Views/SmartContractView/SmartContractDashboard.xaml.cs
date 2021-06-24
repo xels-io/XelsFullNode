@@ -154,7 +154,9 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         private void Btn_CreateContract_Click(object sender, RoutedEventArgs e)
         {
-            this.SmartContract_Dashboard.Children.Add(new CreateContract());
+            string activeAddress = this.lab_ActiveAddress.Content.ToString();
+            string balance = this.lab_addBalance.Content.ToString();
+            this.SmartContract_Dashboard.Children.Add(new CreateContract(this.walletName, activeAddress, balance));
         }
 
         private void Btn_AddressCopy_Click(object sender, RoutedEventArgs e)
