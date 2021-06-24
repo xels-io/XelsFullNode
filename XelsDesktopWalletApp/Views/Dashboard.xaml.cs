@@ -97,15 +97,20 @@ namespace XelsDesktopWalletApp.Views
             LoadLoginAsync();
             GetHistoryAsync();
 
-            if (!this.sidechainEnabled)
+            if(URLConfiguration.Chain != "-sidechain")// (!this.sidechainEnabled)
             {
-                _ = GetStakingInfoAsync(this.baseURL);
+                _ = GetStakingInfoAsync(this.baseURL);                 
+            }
+
+            if (URLConfiguration.Chain == "-sidechain")// (!this.sidechainEnabled)
+            {                 
+                this.buttonPowMining.Visibility = Visibility.Hidden;
             }
             PopulateTxt();
         }
 
 
-        public async void LoadLoginAsync()
+        public async Task LoadLoginAsync()
         {
             await GetWalletBalanceAsync(this.baseURL);
         }
@@ -156,7 +161,7 @@ namespace XelsDesktopWalletApp.Views
         }
 
 
-        public async void GetHistoryAsync()
+        public async Task GetHistoryAsync()
         {
             await GetWalletHistoryAsync(this.baseURL);
         }
@@ -212,7 +217,7 @@ namespace XelsDesktopWalletApp.Views
             }
         }
 
-        private void GetTransactionInfo(TransactionItemModel[] transactions)
+        private async Task GetTransactionInfo(TransactionItemModel[] transactions)
         {
 
             foreach (TransactionItemModel transaction in transactions)
@@ -300,7 +305,7 @@ namespace XelsDesktopWalletApp.Views
 
         }
 
-        public async void GetGeneralInfoAsync()
+        public async Task GetGeneralInfoAsync()
         {
             await GetGeneralWalletInfoAsync(this.baseURL);
         }
@@ -408,7 +413,7 @@ namespace XelsDesktopWalletApp.Views
         }
 
 
-        private void PopulateTxt()
+        private async Task PopulateTxt()
         {
 
             // Connection info

@@ -238,7 +238,7 @@ namespace XelsDesktopWalletApp.Views
                 this.spendableBalance = this.balances.balances[0].spendableAmount;
 
                 this.textAvailableCoin.Content = this.totalBalance.ToString();
-                this.textCoinType.Content = this.cointype;
+                this.textCoinType.Content = this.cointype.ToString();
 
             }
             else

@@ -185,7 +185,7 @@ namespace XelsDesktopWalletApp
         [STAThread]
         public static void Main(string[] args)
         {
-            args = new string[] {"-sidechain" };
+            //args = new string[] {"-sidechain" };
 
             App app = new App();
             CreateShortCut();
@@ -226,6 +226,7 @@ namespace XelsDesktopWalletApp
 
         private static IFullNode GetXoyMiningNode(string[] args)
         {
+            URLConfiguration.Chain = args[0];
             URLConfiguration.BaseURL = "http://localhost:37223/api"; //Side Chain Url
             var nodeSettings = new NodeSettings(networksSelector: XoyNetwork.NetworksSelector, protocolVersion: ProtocolVersion.CIRRUS_VERSION, args: args)
             {
@@ -261,6 +262,7 @@ namespace XelsDesktopWalletApp
         /// </summary>
         private static IFullNode GetXelsNode(string[] args)
         {
+            URLConfiguration.Chain = args[0];
             // TODO: Hardcode -addressindex for better user experience
             URLConfiguration.BaseURL = "http://localhost:37221/api";//Mian Chain Url
 

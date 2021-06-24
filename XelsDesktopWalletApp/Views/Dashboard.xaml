@@ -9,6 +9,9 @@
     <Border Padding="10">
         <StackPanel>
             <Grid Background="LimeGreen">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
 
                 <TextBlock Background="Green" Padding="2 2 2 2" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" Height="18" Width="53" >
                         <Hyperlink RequestNavigate="Hyperlink_NavigateDashboard" NavigateUri="http://www.google.com" TextDecorations="">
@@ -309,7 +312,7 @@
                                 </StackPanel>
                             </Grid>
                         </Border>
-                        <Button Content="Stop POW Mining" HorizontalAlignment="Left" Margin="15,185,0,0" VerticalAlignment="Top" Width="111"
+                        <Button x:Name="buttonPowMining" Content="Stop POW Mining" HorizontalAlignment="Left" Margin="15,185,0,0" VerticalAlignment="Top" Width="111"
                                 Click="StopPOWMiningButton_Click" FontFamily="Microsoft YaHei Light" Foreground="#FF9B9B9B" Background="White" BorderBrush="#FF9B9B9B" FontSize="9" Height="24">
                             <Button.Resources>
                                 <Style TargetType="{x:Type Border}">

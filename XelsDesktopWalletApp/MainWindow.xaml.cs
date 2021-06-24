@@ -67,7 +67,7 @@ namespace XelsDesktopWalletApp
         }
 
 
-        public async void LoadLoginAsync()
+        public async Task LoadLoginAsync()
         {
             try
             {
@@ -110,7 +110,7 @@ namespace XelsDesktopWalletApp
         }
 
 
-        private void converted(string data)
+        private async Task converted(string data)
         {
             string[] rowData = data.Split(':');
             string[] rowDataMain = rowData[1].Split('\"');
