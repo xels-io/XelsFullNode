@@ -185,7 +185,7 @@ namespace XelsDesktopWalletApp
         [STAThread]
         public static void Main(string[] args)
         {
-            //args = new string[] {"-sidechain" };
+            args = new string[] {"-sidechain" };
 
             App app = new App();
             CreateShortCut();
@@ -199,7 +199,7 @@ namespace XelsDesktopWalletApp
 
         public static async Task MainAsync(string[] args)
         {
-            if(args.Length == 0)
+            if (args.Length == 0)
             {
                 args = new string[] {  "-mainchain" };
             }

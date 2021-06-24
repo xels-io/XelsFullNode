@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using NBitcoin;
 using Newtonsoft.Json;
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -25,8 +26,8 @@ namespace XelsDesktopWalletApp.Views
     {
 
         #region Base
-        static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api";
+        //static HttpClient client = new HttpClient();
+        string baseURL = URLConfiguration.BaseURL;// "http://localhost:37221/api";
         #endregion
         #region Wallet Info
         private readonly WalletInfo walletInfo = new WalletInfo();
@@ -67,7 +68,7 @@ namespace XelsDesktopWalletApp.Views
             string getUrl = path + $"/wallet/history?WalletName={this.walletInfo.walletName}&AccountName=account 0";
             var content = "";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
+            HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
 
 
             if (response.IsSuccessStatusCode)
@@ -97,9 +98,7 @@ namespace XelsDesktopWalletApp.Views
             {
                 MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
             }
-
         }
-
 
         private void GetTransactionInfo(TransactionItemModel[] transactions)
         {

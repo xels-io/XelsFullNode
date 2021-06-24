@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 
 namespace XelsDesktopWalletApp.Models.CommonModels
@@ -12,5 +13,7 @@ namespace XelsDesktopWalletApp.Models.CommonModels
         public static string BaseURLSideChain = "http://localhost:37223/api";  //side chain
 
         public static string BaseURL;//value assagin from program.cs
+
+      public  static HttpClient Client = new HttpClient();
     }
 }

@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Newtonsoft.Json.Linq;
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -35,8 +36,9 @@ namespace XelsDesktopWalletApp.Views
                 this.walletName = value;
             }
         }
-        static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api";
+        //static HttpClient client = new HttpClient();
+        string baseURL = URLConfiguration.BaseURL;
+            /*"http://localhost:37221/api"*/
         //AddressLabel[] addresses = null;
         List<AddressLabel> addresses = new List<AddressLabel>();
 
@@ -68,7 +70,7 @@ namespace XelsDesktopWalletApp.Views
             string getUrl = path + "/AddressBook";
             var content = "";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
+            HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
             if (response.IsSuccessStatusCode)
             {
                 content = await response.Content.ReadAsStringAsync();

@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using NBitcoin;
 using Newtonsoft.Json;
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -24,8 +25,8 @@ namespace XelsDesktopWalletApp.Views
     public partial class SendSideChain : Window
     {
 
-        private static HttpClient client = new HttpClient();
-        private readonly string baseURL = "http://localhost:37221/api";
+        //private static HttpClient client = new HttpClient();
+        private readonly string baseURL = URLConfiguration.BaseURL; // "http://localhost:37221/api";
 
         private readonly WalletInfo walletInfo = new WalletInfo();
         private TransactionSending transactionSending = new TransactionSending();
@@ -233,7 +234,7 @@ namespace XelsDesktopWalletApp.Views
             string getUrl = path + $"/wallet/balance?WalletName={this.walletInfo.walletName}&AccountName=account 0";
             var content = "";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
+            HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
 
 
             if (response.IsSuccessStatusCode)
@@ -271,7 +272,7 @@ namespace XelsDesktopWalletApp.Views
             maximumBalance.FeeType = "medium";
             maximumBalance.AllowUnconfirmed = true;
 
-            HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(maximumBalance), Encoding.UTF8, "application/json"));
+            HttpResponseMessage response = await URLConfiguration.Client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(maximumBalance), Encoding.UTF8, "application/json"));
 
 
             if (response.IsSuccessStatusCode)
@@ -317,7 +318,7 @@ namespace XelsDesktopWalletApp.Views
                 feeEstimation.feeType = this.textTransactionFee.Text;
                 feeEstimation.allowUnconfirmed = true;
 
-                HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(feeEstimation), Encoding.UTF8, "application/json"));
+                HttpResponseMessage response = await URLConfiguration.Client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(feeEstimation), Encoding.UTF8, "application/json"));
 
 
                 if (response.IsSuccessStatusCode)
@@ -355,7 +356,7 @@ namespace XelsDesktopWalletApp.Views
             this.transactionBuilding.opReturnAmount = myAmt;
 
 
-            HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.transactionBuilding), Encoding.UTF8, "application/json"));
+            HttpResponseMessage response = await URLConfiguration.Client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.transactionBuilding), Encoding.UTF8, "application/json"));
 
 
             if (response.IsSuccessStatusCode)
@@ -388,7 +389,7 @@ namespace XelsDesktopWalletApp.Views
                 string postUrl = this.baseURL + $"/wallet/send-transaction";
                 // var content = "";
 
-                HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(tranSending), Encoding.UTF8, "application/json"));
+                HttpResponseMessage response = await URLConfiguration.Client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(tranSending), Encoding.UTF8, "application/json"));
 
 
                 if (response.IsSuccessStatusCode)

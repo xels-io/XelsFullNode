@@ -124,11 +124,11 @@
 
 
 
-            <Grid Height="363">
+            <Grid Height="auto">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="189*"></ColumnDefinition>
-                    <ColumnDefinition Width="410*"></ColumnDefinition>
-                    <ColumnDefinition Width="181*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="3*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="227*"></RowDefinition>
@@ -136,7 +136,7 @@
                 </Grid.RowDefinitions>
                 <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" Width="183">
 
-                    <Grid Height="222">
+                    <Grid Height="auto">
 
                         <Border BorderBrush="LightGray" BorderThickness="1" Height="202" VerticalAlignment="Top" Margin="0,17,0,0">
                             <Grid HorizontalAlignment="Center" Width="174" Height="219" VerticalAlignment="Bottom">
@@ -184,7 +184,7 @@
                             </Grid>
                         </Border>
 
-                        <Label Content="  HYBRID-POW-POS MININGN INFO" HorizontalAlignment="Center" Margin="0,23,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.599,0.121" Width="182" FontFamily="Microsoft YaHei" Foreground="#FF9B9B9B" FontSize="9" Height="24"/>
+                        <Label Content="  HYBRID-POW-POS MINING INFO" HorizontalAlignment="Center" Margin="0,23,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.599,0.121" Width="182" FontFamily="Microsoft YaHei" Foreground="#FF9B9B9B" FontSize="9" Height="24"/>
                         <Button Content="Stop HYBRID Mining" HorizontalAlignment="Left" Margin="10,166,0,0" VerticalAlignment="Top" Width="111"
                                 Click="StopPOWMiningButton_Click" FontFamily="Microsoft YaHei Light" Foreground="#FF9B9B9B" Background="White" BorderBrush="#FF9B9B9B" FontSize="9" Height="24">
                             <Button.Resources>
@@ -199,7 +199,7 @@
                 <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0" Margin="10,10,10,10">
                     <TextBlock Margin="0,10,0,0" Width="94" Height="13" Text="AVAILABLE BALANCE" HorizontalAlignment="Center" FontFamily="Microsoft YaHei" Foreground="#FF9B9B9B" FontSize="9"/>
                     <Grid>
-                        <TextBlock Name="ConfirmedBalanceTxt" Width="171" Height="33" FontSize="20" HorizontalAlignment="Center" 
+                        <TextBlock Name="ConfirmedBalanceTxt"  FontSize="20" HorizontalAlignment="Center" 
                                    FontFamily="Microsoft YaHei" Foreground="LimeGreen"/>
                         <Grid.Resources>
                             <Style TargetType="Border">

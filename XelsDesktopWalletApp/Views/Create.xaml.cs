@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -24,8 +25,8 @@ namespace XelsDesktopWalletApp.Views
     public partial class Create : Window
     {
 
-        static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api/wallet";
+        //static HttpClient client = new HttpClient();
+        string baseURL = URLConfiguration.BaseURL; //"http://localhost:37221/api/wallet";
         string _mnemonic;
         bool canProceedPass = false;
 
@@ -130,7 +131,7 @@ namespace XelsDesktopWalletApp.Views
             string getUrl = path + "/mnemonic?language=English&wordCount=12";
             var content ="";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
+            HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
             if (response.IsSuccessStatusCode)
             {
                 content = await response.Content.ReadAsStringAsync();

@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Xels.Bitcoin.Features.Wallet.Interfaces;
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -24,7 +25,7 @@ namespace XelsDesktopWalletApp.Views
 
         //private readonly IWalletManager _walletManager;
         static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api/wallet";
+        string baseURL = URLConfiguration.BaseURL;  // "http://localhost:37221/api/wallet";
 
 
 
@@ -84,7 +85,7 @@ namespace XelsDesktopWalletApp.Views
         {
             if (isValid())
             {
-                string postUrl = baseURL + "/recover";
+                string postUrl = baseURL + "/Wallet/recover";
 
                 WalletRecovery recovery = new WalletRecovery();
                 recovery.name = name.Text;

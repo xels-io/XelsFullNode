@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -23,8 +24,8 @@ namespace XelsDesktopWalletApp.Views
     /// </summary>
     public partial class CreateConfirmMnemonic : Window
     {
-        static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api/wallet";
+        //static HttpClient client = new HttpClient();
+        string baseURL = URLConfiguration.BaseURL;//"http://localhost:37221/api/wallet";
         WalletCreation _walletcreateconfirm = new WalletCreation();
         private bool canPassMnemonic = false;
         string[] words;
@@ -152,7 +153,7 @@ namespace XelsDesktopWalletApp.Views
 
                 string postUrl = this.baseURL + "/create";
 
-                HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this._walletcreateconfirm), Encoding.UTF8, "application/json"));
+                HttpResponseMessage response = await URLConfiguration.Client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this._walletcreateconfirm), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                 {

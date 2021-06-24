@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -22,8 +23,8 @@ namespace XelsDesktopWalletApp.Views
     public partial class SendSelsBels : Window
     {
 
-        static HttpClient client = new HttpClient();
-        private readonly string baseURL = "http://localhost:37221/api";
+        //static HttpClient client = new HttpClient();
+        private readonly string baseURL = URLConfiguration.BaseURL; // "http://localhost:37221/api";
 
         private readonly WalletInfo walletInfo = new WalletInfo();
         private TransactionSending transactionSending = new TransactionSending();
@@ -97,7 +98,7 @@ namespace XelsDesktopWalletApp.Views
         {
             string postUrl = this.baseURL + $"/wallet/send-transaction";
 
-            HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.transactionSending.hex), Encoding.UTF8, "application/json"));
+            HttpResponseMessage response = await URLConfiguration.Client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.transactionSending.hex), Encoding.UTF8, "application/json"));
 
 
             if (response.IsSuccessStatusCode)
