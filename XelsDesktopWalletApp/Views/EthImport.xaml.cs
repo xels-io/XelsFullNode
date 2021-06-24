@@ -130,9 +130,9 @@ namespace XelsDesktopWalletApp.Views
             //else
             //{
             this.sWallet = this.createWallet.WalletCreationFromPk(this.SELSPrivateKeyTxt.Text);
-            //this.sWallet.PrivateKey = this.encryption.encrypt(this.sWallet.PrivateKey);
+            this.sWallet.PrivateKey = Encryption.EncryptPrivateKey(this.sWallet.PrivateKey);
             this.bWallet = this.createWallet.WalletCreationFromPk(this.BELSPrivateKeyTxt.Text);
-            //this.bWallet.PrivateKey = this.encryption.encrypt(this.bWallet.PrivateKey);
+            this.bWallet.PrivateKey = Encryption.EncryptPrivateKey(this.bWallet.PrivateKey);
             //this.Token.storeLocally(this.sWallet, this.walletName, "SELS", this.walletHash);
             //this.Token.storeLocally(this.bWallet, this.walletName, "BELS", this.walletHash);
             //}

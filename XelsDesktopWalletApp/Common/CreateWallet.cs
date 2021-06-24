@@ -55,6 +55,7 @@ namespace XelsDesktopWalletApp.Common
 
             return wallet;
         }
+
     }
 
 
