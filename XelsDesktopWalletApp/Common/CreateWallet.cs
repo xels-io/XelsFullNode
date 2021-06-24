@@ -48,6 +48,10 @@ namespace XelsDesktopWalletApp.Common
         public Wallet WalletCreationFromPk(string pKey)
         {
             Wallet wallet = new Wallet();
+            var account = new Account(pKey);
+
+            wallet.PrivateKey = pKey;
+            wallet.Address = account.Address;
 
             return wallet;
         }
