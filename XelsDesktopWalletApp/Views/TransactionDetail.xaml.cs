@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
 using Newtonsoft.Json;
+
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -22,8 +15,8 @@ namespace XelsDesktopWalletApp.Views
     public partial class TransactionDetail : Window
     {
         #region Base
-        static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api";
+        //static HttpClient client = new HttpClient();
+        string baseURL = URLConfiguration.BaseURL;// "http://localhost:37221/api";
         #endregion
         #region Wallet Info
         private readonly WalletInfo walletInfo = new WalletInfo();
@@ -72,14 +65,12 @@ namespace XelsDesktopWalletApp.Views
             this._transaction.transactionTypeName = transaction.transactionTypeName;
         }
 
-
         private async Task GetGeneralWalletInfoAsync(string path)
         {
             string getUrl = path + $"/wallet/general-info?Name={this.walletInfo.walletName}";
             var content = "";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
-
+            HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
 
             if (response.IsSuccessStatusCode)
             {

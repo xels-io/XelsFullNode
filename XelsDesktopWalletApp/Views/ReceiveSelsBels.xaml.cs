@@ -17,6 +17,7 @@ using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
+using XelsDesktopWalletApp.Models.CommonModels;
 
 namespace XelsDesktopWalletApp.Views
 {
@@ -26,8 +27,8 @@ namespace XelsDesktopWalletApp.Views
     public partial class ReceiveSelsBels : Window
     {
 
-        static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api";
+        //static HttpClient client = new HttpClient();
+        string baseURL = URLConfiguration.BaseURL;  //"http://localhost:37221/api";
 
         private readonly WalletInfo walletInfo = new WalletInfo();
 
@@ -144,7 +145,7 @@ namespace XelsDesktopWalletApp.Views
             string getUrl = path + $"/wallet/unusedaddress?WalletName={this.walletInfo.walletName}&AccountName=account 0";
             var content = "";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
+            HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
 
 
             if (response.IsSuccessStatusCode)

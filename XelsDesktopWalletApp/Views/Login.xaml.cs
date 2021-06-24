@@ -9,6 +9,7 @@ using System.Windows.Navigation;
 using Newtonsoft.Json;
 
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
 //using System.Web.Script.Serialization;
 
 namespace XelsDesktopWalletApp.Views
@@ -19,8 +20,8 @@ namespace XelsDesktopWalletApp.Views
     public partial class Login : Window
     {
 
-        static HttpClient client = new HttpClient();
-        string baseURL = "http://localhost:37221/api/wallet";
+        //static HttpClient client = new HttpClient();
+        string baseURL = URLConfiguration.BaseURL;// "http://localhost:37221/api/wallet";
         List<string> listData;
 
 
@@ -73,7 +74,7 @@ namespace XelsDesktopWalletApp.Views
             string getUrl = path + "/list-wallets";
             var content = "";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
+            HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
             if (response.IsSuccessStatusCode)
             {
                 content = await response.Content.ReadAsStringAsync();
@@ -112,8 +113,6 @@ namespace XelsDesktopWalletApp.Views
             this.Close();
         }
 
-
-
         private async void decryptButton_Click(object sender, RoutedEventArgs e)
         {
 
@@ -123,7 +122,7 @@ namespace XelsDesktopWalletApp.Views
 
                 string postUrl = this.baseURL + "/load/";
 
-                HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.SelectedWallet), Encoding.UTF8, "application/json"));
+                HttpResponseMessage response = await URLConfiguration.Client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.SelectedWallet), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -137,13 +136,7 @@ namespace XelsDesktopWalletApp.Views
                 {
                     MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
                 }
-
             }
-
-
         }
-
-
-
     }
 }

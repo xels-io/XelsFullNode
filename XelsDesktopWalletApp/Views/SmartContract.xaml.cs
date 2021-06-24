@@ -30,8 +30,8 @@ namespace XelsDesktopWalletApp.Views
     public partial class SmartContract : Window
     {
         #region Base
-        static HttpClient client = new HttpClient();
-        string baseURL = URLConfiguration.BaseURL;// Common Url
+        //static HttpClient client = new HttpClient();
+        string baseURL =  URLConfiguration.BaseURL;// Common Url
         #endregion
         #region Wallet Info
         private readonly WalletInfo walletInfo = new WalletInfo();
@@ -83,7 +83,7 @@ namespace XelsDesktopWalletApp.Views
             string getUrl = path + $"/wallet/unusedaddress?WalletName={this.walletInfo.walletName}&AccountName=account 0";
             var content = "";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
+            HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
 
 
             if (response.IsSuccessStatusCode)
@@ -105,7 +105,7 @@ namespace XelsDesktopWalletApp.Views
            
             try
             {
-                HttpResponseMessage response = await client.GetAsync(getUrl);
+                HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
                 if (response.IsSuccessStatusCode)
                 {
                     content = await response.Content.ReadAsStringAsync();
@@ -132,7 +132,7 @@ namespace XelsDesktopWalletApp.Views
             string getUrl = this.baseURL + $"/SmartContractWallet/account-addresses?walletName={walletName}";
             var content = "";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
+            HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
 
             if (response.IsSuccessStatusCode)
             {

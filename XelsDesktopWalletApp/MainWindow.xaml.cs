@@ -26,7 +26,7 @@ namespace XelsDesktopWalletApp
     public partial class MainWindow : Window
     {
 
-        static HttpClient client = new HttpClient();
+       
         string baseURL = URLConfiguration.BaseURL;
 
         //public List<WalletLoadRequest> _myList { get; set; }
@@ -89,10 +89,11 @@ namespace XelsDesktopWalletApp
                 string getUrl = path + "/wallet/list-wallets";
                 var content = "";
 
-                HttpResponseMessage response = await client.GetAsync(getUrl);
+                HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
                 if (response.IsSuccessStatusCode)
                 {
                     content = await response.Content.ReadAsStringAsync();
+                    
                 }
                 else
                 {
@@ -145,7 +146,7 @@ namespace XelsDesktopWalletApp
 
                 string postUrl = this.baseURL + "/wallet/load/";
 
-                HttpResponseMessage response = await client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.SelectedWallet), Encoding.UTF8, "application/json"));
+                HttpResponseMessage response = await URLConfiguration.Client.PostAsync(postUrl, new StringContent(JsonConvert.SerializeObject(this.SelectedWallet), Encoding.UTF8, "application/json"));
 
                 if (response.IsSuccessStatusCode)
                 {

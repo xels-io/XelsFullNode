@@ -2,20 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 using NBitcoin;
+
 using Newtonsoft.Json;
+
 using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
 using XelsDesktopWalletApp.Views.SmartContractView;
 
 namespace XelsDesktopWalletApp.Views
@@ -25,8 +22,8 @@ namespace XelsDesktopWalletApp.Views
     /// </summary>
     public partial class Dashboard : Window
     {
-        private static HttpClient client = new HttpClient();
-        private string baseURL = "http://localhost:37221/api";
+        //private static HttpClient client = new HttpClient();
+        private string baseURL = URLConfiguration.BaseURL;// "http://localhost:37221/api";
 
         private WalletBalanceArray walletBalanceArray = new WalletBalanceArray();
         private HistoryModelArray historyModelArray = new HistoryModelArray();
@@ -120,7 +117,7 @@ namespace XelsDesktopWalletApp.Views
                 string getUrl = path + $"/wallet/balance?WalletName={this.walletInfo.walletName}&AccountName=account 0";
                 var content = "";
 
-                HttpResponseMessage response = await client.GetAsync(getUrl);
+                HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
 
 
                 if (response.IsSuccessStatusCode)
@@ -169,7 +166,7 @@ namespace XelsDesktopWalletApp.Views
             string getUrl = path + $"/wallet/history?WalletName={this.walletInfo.walletName}&AccountName=account 0";
             var content = "";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
+            HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
 
             if (response.IsSuccessStatusCode)
             {
@@ -313,7 +310,7 @@ namespace XelsDesktopWalletApp.Views
             string getUrl = path + $"/wallet/general-info?Name={this.walletInfo.walletName}";
             var content = "";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
+            HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
 
             if (response.IsSuccessStatusCode)
             {
@@ -327,21 +324,22 @@ namespace XelsDesktopWalletApp.Views
                 {
                     this.connectedNodesStatus = "1 connection";
                 }
-                else if (this.walletGeneralInfoModel.connectedNodes >= 0)
+                else
+                if (this.walletGeneralInfoModel.connectedNodes >= 0)
                 {
-                    this.connectedNodesStatus = $"{ this.walletGeneralInfoModel.connectedNodes} connections";
+                    this.ConnectionStatusTxt.Text = $"{ this.walletGeneralInfoModel.connectedNodes} connections";
                 }
 
                 if (!this.walletGeneralInfoModel.isChainSynced)
                 {
-                    this.percentSynced = "syncing...";
+                    this.ParentSyncedTxt.Text = "syncing...";
                 }
                 else
                 {
                     this.percentSyncedNumber = ((this.walletGeneralInfoModel.lastBlockSyncedHeight / this.walletGeneralInfoModel.chainTip) * 100) ?? 0;
                     if (Math.Round(this.percentSyncedNumber) == 100 && this.walletGeneralInfoModel.lastBlockSyncedHeight != this.walletGeneralInfoModel.chainTip)
                     {
-                        this.percentSyncedNumber = 99;
+                        this.ParentSyncedTxt.Text = "99";
                     }
 
                     this.percentSynced = $"{ Math.Round(this.percentSyncedNumber)} %";
@@ -349,8 +347,23 @@ namespace XelsDesktopWalletApp.Views
                     if (this.percentSynced == "100%")
                     {
                         this.blockChainStatus = $"Up to date.  { this.processedText}";
-                    }
+                    }                    
                 }
+
+                this.LastBlockSyncedHeightTxt.Text = this.walletGeneralInfoModel.lastBlockSyncedHeight.ToString();
+
+                this.ChainTipTxt.Text = this.walletGeneralInfoModel.chainTip.ToString();
+
+                if (!this.stakingEnabled && !this.sidechainEnabled)
+                {
+                    this.ConnectionNotifyTxt.Text = "Not Ok";
+                }
+                else if (this.stakingEnabled && !this.sidechainEnabled)
+                {
+                    this.ConnectionNotifyTxt.Text = "Not Ok";
+                }
+
+
             }
             else
             {
@@ -364,7 +377,7 @@ namespace XelsDesktopWalletApp.Views
             string getUrl = path + $"/staking/getstakinginfo";
             var content = "";
 
-            HttpResponseMessage response = await client.GetAsync(getUrl);
+            HttpResponseMessage response = await URLConfiguration.Client.GetAsync(getUrl);
 
             if (response.IsSuccessStatusCode)
             {
@@ -422,8 +435,6 @@ namespace XelsDesktopWalletApp.Views
             this.CoinsAwaitingMaturityTxt.Text = $"{this.awaitingMaturity} XELS";
             this.NetworkWeightTxt.Text = $"{this.stakingInfo.netStakeWeight} XELS";
             this.ExpectedRewardTimmeTxt.Text = this.stakingInfo.expectedTime.ToString();
-
-
         }
 
         private void receiveButton_Click(object sender, RoutedEventArgs e)
@@ -494,6 +505,9 @@ namespace XelsDesktopWalletApp.Views
         private void ImportAddrButton_Click(object sender, RoutedEventArgs e)
         {
 
+            EthImport eImp = new EthImport(this.walletName);
+            eImp.Show();
+            this.Close();
         }
 
         private void StopPOWMiningButton_Click(object sender, RoutedEventArgs e)
