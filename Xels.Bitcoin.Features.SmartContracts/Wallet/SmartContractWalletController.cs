@@ -261,6 +261,113 @@ namespace Xels.Bitcoin.Features.SmartContracts.Wallet
             }
         }
 
+
+        //Created by Noyon/ Not suppoorted object for httpGet from wpf
+        [Route("historyForWPF")]
+        [HttpGet]
+        public IActionResult GetHistoryForWPF(string walletName, string address,int? skip, int? take)
+        {
+            if (string.IsNullOrWhiteSpace(walletName))
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, "No wallet name", "No wallet name provided");
+
+            if (string.IsNullOrWhiteSpace(address))
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, "No address", "No address provided");
+
+            try
+            {
+                var transactionItems = new List<ContractTransactionItem>();
+
+                HdAccount account = this.walletManager.GetAccounts(walletName).First();
+
+                // Get a list of all the transactions found in an account (or in a wallet if no account is specified), with the addresses associated with them.
+                IEnumerable<AccountHistory> accountsHistory = this.walletManager.GetHistory(walletName, account.Name);
+
+                // Wallet manager returns only 1 when an account name is specified.
+                AccountHistory accountHistory = accountsHistory.First();
+
+                List<FlatHistory> items = accountHistory.History.Where(x => x.Address.Address == address).ToList();
+
+                // Represents a sublist of transactions associated with receive addresses + a sublist of already spent transactions associated with change addresses.
+                // In effect, we filter out 'change' transactions that are not spent, as we don't want to show these in the history.
+                List<FlatHistory> history = items.Where(t => !t.Address.IsChangeAddress() || (t.Address.IsChangeAddress() && t.Transaction.IsSpent())).ToList();
+
+                // TransactionData in history is confusingly named. A "TransactionData" actually represents an input, and the outputs that spend it are "SpendingDetails".
+                // There can be multiple "TransactionData" which have the same "SpendingDetails".
+                // For SCs we need to group spending details by their transaction ID, to get all the inputs related to the same outputs.
+                // Each group represents 1 SC transaction.
+                // Each item.Transaction in a group is an input.
+                // Each item.Transaction.SpendingDetails in the group represent the outputs, and they should all be the same so we can pick any one.
+                var scTransactions = history
+                    .Where(item => item.Transaction.SpendingDetails != null)
+                    .Where(item => item.Transaction.SpendingDetails.Payments.Any(x => x.DestinationScriptPubKey.IsSmartContractExec()))
+                    .GroupBy(item => item.Transaction.SpendingDetails.TransactionId)
+                    .Skip(skip ?? 0)
+                    .Take(take ?? history.Count)
+                    .Select(g => new
+                    {
+                        TransactionId = g.Key,
+                        InputAmount = g.Sum(i => i.Transaction.Amount), // Sum the inputs to the SC transaction.
+                        Outputs = g.First().Transaction.SpendingDetails.Payments, // Each item in the group will have the same outputs.
+                        OutputAmount = g.First().Transaction.SpendingDetails.Payments.Sum(o => o.Amount),
+                        BlockHeight = g.First().Transaction.SpendingDetails.BlockHeight // Each item in the group will have the same block height.
+                    })
+                    .ToList();
+
+                // Get all receipts in one transaction
+                IList<Receipt> receipts = this.receiptRepository.RetrieveMany(scTransactions.Select(x => x.TransactionId).ToList());
+
+                for (int i = 0; i < scTransactions.Count; i++)
+                {
+                    var scTransaction = scTransactions[i];
+                    Receipt receipt = receipts[i];
+
+                    // Consensus rules state that each transaction can have only one smart contract exec output.
+                    PaymentDetails scPayment = scTransaction.Outputs.First(x => x.DestinationScriptPubKey.IsSmartContractExec());
+
+                    // This will always give us a value - the transaction has to be serializable to get past consensus.
+                    Result<ContractTxData> txDataResult = this.callDataSerializer.Deserialize(scPayment.DestinationScriptPubKey.ToBytes());
+                    ContractTxData txData = txDataResult.Value;
+
+                    // If the receipt is not available yet, we don't know how much gas was consumed so use the full gas budget.
+                    ulong gasFee = receipt != null
+                        ? receipt.GasUsed * receipt.GasPrice
+                        : txData.GasCostBudget;
+
+                    long totalFees = scTransaction.InputAmount - scTransaction.OutputAmount;
+                    Money transactionFee = Money.FromUnit(totalFees, MoneyUnit.Satoshi) - Money.FromUnit(txData.GasCostBudget, MoneyUnit.Satoshi);
+
+                    var result = new ContractTransactionItem
+                    {
+                        Amount = scPayment.Amount.ToUnit(MoneyUnit.Satoshi),
+                        BlockHeight = scTransaction.BlockHeight,
+                        Hash = scTransaction.TransactionId,
+                        TransactionFee = transactionFee.ToUnit(MoneyUnit.Satoshi),
+                        GasFee = gasFee
+                    };
+
+                    if (scPayment.DestinationScriptPubKey.IsSmartContractCreate())
+                    {
+                        result.Type = ContractTransactionItemType.ContractCreate;
+                        result.To = receipt?.NewContractAddress?.ToBase58Address(this.network) ?? string.Empty;
+                    }
+                    else if (scPayment.DestinationScriptPubKey.IsSmartContractCall())
+                    {
+                        result.Type = ContractTransactionItemType.ContractCall;
+                        result.To = txData.ContractAddress.ToBase58Address(this.network);
+                    }
+
+                    transactionItems.Add(result);
+                }
+
+                return this.Json(transactionItems.OrderByDescending(x => x.BlockHeight ?? Int32.MaxValue));
+            }
+            catch (Exception e)
+            {
+                this.logger.LogError("Exception occurred: {0}", e.ToString());
+                return ErrorHelpers.BuildErrorResponse(HttpStatusCode.BadRequest, e.Message, e.ToString());
+            }
+        }
+
         /// <summary>
         /// Builds a transaction to create a smart contract and then broadcasts the transaction to the network.
         /// If the deployment is successful, methods on the smart contract can be subsequently called.

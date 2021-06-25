@@ -23,6 +23,9 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
     /// </summary>
     public partial class SmartContractMain : Window
     {
+
+        private List<string> addressList = new List<string>();
+
         #region Base
         static HttpClient client = new HttpClient();
         string baseURL = URLConfiguration.BaseURL;// Common Url
@@ -45,6 +48,19 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
 
         #endregion
+
+        public List<string> AddressList
+        {
+            get
+            {
+                return this.addressList;
+            }
+            set
+            {
+                this.addressList = value;
+            }
+        }
+        public string Selectedaddress { get; set; }
         public SmartContractMain()
         {
             InitializeComponent();
@@ -57,17 +73,39 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             this.DataContext = this;
             this.walletName = walletname;
             this.walletInfo.walletName = this.walletName;
-           
-            // LoadCreateAsync();
+
+            LoadAsync();
         }
+        public async void LoadAsync()
+        {
+            try
+            {
+                await GetAccountAddressesAsync(this.walletName);
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+
+        }
+
 
         private void useAddressBtn_Click(object sender, RoutedEventArgs e)
         {
 
             string selectedAddress = this.selectaddress.SelectionBoxItem.ToString();
-
-            SmartContractDashboard scm = new SmartContractDashboard(this.walletName,selectedAddress);
-            this.Content = scm;
+            if (selectedAddress != "")
+            {
+                SmartContractDashboard scm = new SmartContractDashboard(this.walletName, selectedAddress);
+                this.Content = scm;
+            }
+            else
+            {
+                MessageBox.Show("Select Address", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.selectaddress.Focus();
+            }
+            
         }
         private void dashboardBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -89,6 +127,11 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
                 IEnumerable<string> address = JsonConvert.DeserializeObject<IEnumerable<string>>(jsonString);
+                foreach (var add in address)
+                {
+                    this.addressList.Add(add);
+                }
+                
             }
             else
             {

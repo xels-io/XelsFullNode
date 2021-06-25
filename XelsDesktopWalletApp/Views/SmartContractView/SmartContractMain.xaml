@@ -23,27 +23,20 @@
                 <TextBlock Width="205" Height="93" Text="SMART CONTRACT" FontWeight="Normal"  FontSize="22" HorizontalAlignment="Center" FontFamily="Microsoft YaHei Light">
                 </TextBlock>
 
-                <!--<ComboBox ItemsSource="{Binding  Path=MyList, Mode=TwoWay}" 
-                      SelectedItem="{Binding Path=SelectedWallet, Mode=TwoWay}"
+                <!--<ComboBox ItemsSource="{Binding  Path=AddressList, Mode=TwoWay}" 
+                      SelectedItem="{Binding Path=AddressList, Mode=TwoWay}"
                       Width="531" Background="White" BorderBrush="LimeGreen"  
                       Padding="5,5,5,5" FontFamily="Microsoft YaHei Light" 
                       Margin="0,0,10,0" >
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding name}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
+               
             </ComboBox>-->
 
-                <ComboBox x:Name="selectaddress" Width="531" Background="White" BorderBrush="LimeGreen"  
+                <ComboBox x:Name="selectaddress" ItemsSource="{Binding  Path=AddressList, Mode=TwoWay}" 
+                          SelectedItem="{Binding Path=AddressList, Mode=TwoWay}"
+                          Width="531" Background="White" BorderBrush="LimeGreen"  
                       Padding="5,5,5,5" FontFamily="Microsoft YaHei Light" 
                       Margin="0,0,10,0">
-                    <ComboBoxItem Content="(frist Address Check)dhsjhdsjahdksajdhk" IsSelected="True"></ComboBoxItem>
-                    <ComboBoxItem Content="ncxnviucxhv328ewdw8dsbdiusa87das"></ComboBoxItem>
-                    <ComboBoxItem Content="dsfsdfsdf7dfs8d7fbsf87sdfds8f7"></ComboBoxItem>
-                    <ComboBoxItem Content="sjdhfdsjfhdsjfhdsfh8fdsfdsf887dsf8ds"></ComboBoxItem>
-                    <ComboBoxItem Content="sdfmbdsjfhsdfhds83243h4dbsi98bisds"></ComboBoxItem>
-                    <ComboBoxItem Content="dsnfiudvndifuhfdbiwe832984234n398ncds89"></ComboBoxItem>
+                   
                 </ComboBox>
 
                 <Button Background="LimeGreen" Width="531" x:Name="useAddressBtn" Click="useAddressBtn_Click"  Content="USE ADDRESS"  Margin="0 10 10 0" Grid.Column="0" FontFamily="Microsoft YaHei Light" FontWeight="Normal" Foreground="White" BorderThickness="0,0,0,0" Height="24" FontStyle="Normal" >

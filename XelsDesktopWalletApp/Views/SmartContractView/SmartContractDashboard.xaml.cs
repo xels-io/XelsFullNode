@@ -63,16 +63,18 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             this.walletInfo.walletName = this.walletName;
             this.lab_ActiveAddress.Content = selectedAddress;
             GLOBALS.Address = selectedAddress;
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             LoadCreateAsync();
         }
 
         public async void LoadCreateAsync()
         {
-            await GetAddressBalanceAsync(this.baseURL, GLOBALS.Address);
+            await GetAddressBalanceAsync(GLOBALS.Address);
+            await GetHistoryAsync(GLOBALS.Address,this.walletName);
         }
-        private async Task<string> GetAddressBalanceAsync(string path, string address)
+        private async Task<string> GetAddressBalanceAsync(string address)
         {
-            string getUrl = path + $"/SmartContractWallet/address-balance?address={address}";
+            string getUrl = URLConfiguration.BaseURL + $"/SmartContractWallet/address-balance?address={address}";
             var content = "";
             try
             {
@@ -94,6 +96,44 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
                 throw;
             }
+
+
+            return content;
+        }
+
+        private async Task<string> GetHistoryAsync(string address,string walletName)
+        {
+            var content = "";
+            try
+            {
+                string getUrl = URLConfiguration.BaseURL + $"/SmartContractWallet/historyForWPF?walletName={walletName}&&address={address}";
+             
+                try
+                {
+                    HttpResponseMessage response = await client.GetAsync(getUrl);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        content = await response.Content.ReadAsStringAsync();
+                       
+                    }
+                    else
+                    {
+                        MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+
+                    }
+                }
+                catch (Exception e)
+                {
+
+                    throw;
+                }
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+            
 
 
             return content;
@@ -154,7 +194,9 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         private void Btn_CreateContract_Click(object sender, RoutedEventArgs e)
         {
-            this.SmartContract_Dashboard.Children.Add(new CreateContract());
+            string activeAddress = this.lab_ActiveAddress.Content.ToString();
+            string balance = this.lab_addBalance.Content.ToString();
+            this.SmartContract_Dashboard.Children.Add(new CreateContract(this.walletName, activeAddress, balance));
         }
 
         private void Btn_AddressCopy_Click(object sender, RoutedEventArgs e)
