@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XelsDesktopWalletApp.Views.SmartContractView"
+        xmlns:gif="http://wpfanimatedgif.codeplex.com"
         mc:Ignorable="d"
         Title="Smart Contract" Height="700" Width="1080">
     <Grid>
@@ -36,7 +37,7 @@
                           Width="531" Background="White" BorderBrush="LimeGreen"  
                       Padding="5,5,5,5" FontFamily="Microsoft YaHei Light" 
                       Margin="0,0,10,0">
-                   
+
                 </ComboBox>
 
                 <Button Background="LimeGreen" Width="531" x:Name="useAddressBtn" Click="useAddressBtn_Click"  Content="USE ADDRESS"  Margin="0 10 10 0" Grid.Column="0" FontFamily="Microsoft YaHei Light" FontWeight="Normal" Foreground="White" BorderThickness="0,0,0,0" Height="24" FontStyle="Normal" >
@@ -49,6 +50,11 @@
             </StackPanel>
 
         </Border>
+
+        <!--<Image Source="/Assets/Images/loading-3.gif" x:Name="imgCircle"  Width="100" Height="100"  Margin="102,292,878,292" />-->
+        <Image Name="imgCircle" Visibility="Collapsed" Width="100" Height="100" gif:ImageBehavior.AnimatedSource="/Assets/Images/loading-3.gif" />
+        <!--<Button Name="PerformTask" Content="Execute job" Click="PerformTask_Click" Margin="110,237,0,0" Width="80" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top"/>-->
+
     </Grid>
     <!--<Grid>
         <Frame x:Name="smartContractMainWindow" Margin="0,35,0,0" NavigationUIVisibility="Hidden"/>

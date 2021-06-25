@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
     {
 
         private List<string> addressList = new List<string>();
-
+        BackgroundWorker worker;
         #region Base
         static HttpClient client = new HttpClient();
         string baseURL = URLConfiguration.BaseURL;// Common Url
@@ -97,13 +98,18 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             string selectedAddress = this.selectaddress.SelectionBoxItem.ToString();
             if (selectedAddress != "")
             {
+
                 SmartContractDashboard scm = new SmartContractDashboard(this.walletName, selectedAddress);
                 this.Content = scm;
+                this.imgCircle.Visibility = Visibility.Visible; //Make loader visible
+                this.useAddressBtn.IsEnabled = false;
             }
             else
             {
                 MessageBox.Show("Select Address", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.selectaddress.Focus();
+                this.imgCircle.Visibility = Visibility.Collapsed; //Make loader visible
+                this.useAddressBtn.IsEnabled = true;
             }
             
         }
@@ -141,5 +147,42 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             return content;
         }
 
+
+
+
+
+        //private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        //{
+        //    long sum = 0;
+        //    long total = 100000;
+        //    for (long i = 1; i <= total; i++)
+        //    {
+        //        sum += i;
+        //        int percentage = Convert.ToInt32(((double)i / total) * 100);
+
+        //        this.Dispatcher.Invoke(new System.Action(() =>
+        //        {
+        //            this.worker.ReportProgress(percentage);
+        //        }));
+        //    }
+        //    MessageBox.Show("Sum: " + sum);
+        //}
+
+        //private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        //{
+        //    this.imgCircle.Visibility = Visibility.Collapsed;
+        //    this.PerformTask.IsEnabled = true;
+        //}
+
+        //private void PerformTask_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.imgCircle.Visibility = Visibility.Visible; //Make Progressbar visible
+        //    this.PerformTask.IsEnabled = false; //Disabling the button
+        //    this.worker = new BackgroundWorker(); //Initializing the worker object
+        //    this.worker.DoWork += Worker_DoWork; //Binding Worker_DoWork method
+        //    this.worker.WorkerReportsProgress = true; //telling the worker that it supports reporting progress
+        //    this.worker.RunWorkerCompleted += Worker_RunWorkerCompleted; //Binding worker_RunWorkerCompleted method
+        //    this.worker.RunWorkerAsync(); //Executing the worker
+        //}
     }
 }

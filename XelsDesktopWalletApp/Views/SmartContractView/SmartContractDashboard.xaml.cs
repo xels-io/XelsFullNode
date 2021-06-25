@@ -118,20 +118,20 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                         content = await response.Content.ReadAsStringAsync();
 
                         this.SmthistoryList = JsonConvert.DeserializeObject<List<SmartContractTransactionItem>>(content);
-                        if (this.SmthistoryList.Count == 0)
-                        {
-                            var item = new SmartContractTransactionItem
-                            {
-                                blockHeight = 11,
-                                hash = "dsfdsfdsfhdsjhf",
-                                to = "sdkhkjdhfdsjfdskkdsja",
-                                amount = 242,
-                                transactionFee = Convert.ToDecimal(10.2),
-                                gasFee = Convert.ToDecimal(0.2),
+                        //if (this.SmthistoryList.Count == 0)
+                        //{
+                        //    var item = new SmartContractTransactionItem
+                        //    {
+                        //        blockHeight = 11,
+                        //        hash = "dsfdsfdsfhdsjhf",
+                        //        to = "sdkhkjdhfdsjfdskkdsja",
+                        //        amount = 242,
+                        //        transactionFee = Convert.ToDecimal(10.2),
+                        //        gasFee = Convert.ToDecimal(0.2),
 
-                            };
-                            this.SmthistoryList.Add(item);
-                        }
+                        //    };
+                        //    this.SmthistoryList.Add(item);
+                        //}
                         this.SmartContractHistoryList.ItemsSource = this.SmthistoryList;
 
                     }
