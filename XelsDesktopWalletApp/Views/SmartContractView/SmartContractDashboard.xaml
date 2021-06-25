@@ -146,7 +146,7 @@
 
                 </StackPanel>
                 <StackPanel Orientation="Vertical" Grid.Row="1" Margin="10,10,10,10" Grid.ColumnSpan="3">
-                    <Grid Height="58">
+                    <Grid Height="350">
                         <Grid>
                             <Label Name="NoData" Content="Looks like you haven't made any transactions yet."  HorizontalAlignment="Center"
                        FontFamily="Microsoft YaHei Light" Margin="233,10,213,80" FontSize="12" FontWeight="Bold" Foreground="#FFCF5959"/>
@@ -156,12 +156,11 @@
                             <!--<DataGrid MinWidth="1000" x:Name="SmartContractHistoryList" FontSize="11" FontWeight="Bold"  BorderThickness="0"  HorizontalAlignment="Center">
                                 
                             </DataGrid>-->
-                            <ListView Margin="0,20,0,0" x:Name="SmartContractHistoryList" FontSize="11" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Center">
+                            <ListView Margin="0,20,0,0" x:Name="SmartContractHistoryList" FontSize="10" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Center">
                                 <ListView.View>
                                     <GridView>
                                         <GridViewColumn Header="BLOCK" Width="150"
-                                            DisplayMemberBinding="{Binding Path=blockHeight}">
-                                        </GridViewColumn>
+                                            DisplayMemberBinding="{Binding Path=blockHeight}"/>
                                         <GridViewColumn Header="TYPE" Width="100"
                                             DisplayMemberBinding="{Binding Path=type}" />
                                         <GridViewColumn Header="HASH" Width="200" 

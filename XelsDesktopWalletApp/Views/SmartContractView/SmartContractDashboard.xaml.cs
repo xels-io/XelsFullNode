@@ -131,6 +131,17 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
                         //    };
                         //    this.SmthistoryList.Add(item);
+                        //    var item2 = new SmartContractTransactionItem
+                        //    {
+                        //        blockHeight = 34,
+                        //        hash = "dsfdsfdsf434343hdsjhf",
+                        //        to = "sdkhkjdhfdsjfd4333434skkdsja",
+                        //        amount = 24342,
+                        //        transactionFee = Convert.ToDecimal(3434),
+                        //        gasFee = Convert.ToDecimal(0.2),
+
+                        //    };
+                        //    this.SmthistoryList.Add(item2);
                         //}
                         this.SmartContractHistoryList.ItemsSource = this.SmthistoryList;
 
