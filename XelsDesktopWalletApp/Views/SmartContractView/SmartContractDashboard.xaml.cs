@@ -28,6 +28,8 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
     public partial class SmartContractDashboard : Page
     {
 
+        private List<SmartContractTransactionItem> SmthistoryList = new List<SmartContractTransactionItem>();
+
         #region Base
         static HttpClient client = new HttpClient();
         string baseURL = URLConfiguration.BaseURL;// Common Url
@@ -114,7 +116,24 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                     if (response.IsSuccessStatusCode)
                     {
                         content = await response.Content.ReadAsStringAsync();
-                       
+
+                        this.SmthistoryList = JsonConvert.DeserializeObject<List<SmartContractTransactionItem>>(content);
+                        if (this.SmthistoryList.Count == 0)
+                        {
+                            var item = new SmartContractTransactionItem
+                            {
+                                blockHeight = 11,
+                                hash = "dsfdsfdsfhdsjhf",
+                                to = "sdkhkjdhfdsjfdskkdsja",
+                                amount = 242,
+                                transactionFee = Convert.ToDecimal(10.2),
+                                gasFee = Convert.ToDecimal(0.2),
+
+                            };
+                            this.SmthistoryList.Add(item);
+                        }
+                        this.SmartContractHistoryList.ItemsSource = this.SmthistoryList;
+
                     }
                     else
                     {
