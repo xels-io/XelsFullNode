@@ -39,6 +39,7 @@
   <ItemGroup>
     <PackageReference Include="Nethereum.Web3" Version="3.8.0" />
     <PackageReference Include="QRCoder" Version="1.4.1" />
+    <PackageReference Include="System.Runtime.Caching" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
