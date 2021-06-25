@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using NBitcoin;
 using Newtonsoft.Json;
+using XelsDesktopWalletApp.Common;
 using XelsDesktopWalletApp.Models;
 
 namespace XelsDesktopWalletApp.Views
@@ -30,6 +31,11 @@ namespace XelsDesktopWalletApp.Views
         private WalletBalanceArray walletBalanceArray = new WalletBalanceArray();
         private HistoryModelArray historyModelArray = new HistoryModelArray();
         private List<TransactionInfo> transactions = new List<TransactionInfo>();
+        private CreateWallet createWallet = new CreateWallet();
+        private StoredWallet selswallet = new StoredWallet();
+        private StoredWallet belswallet = new StoredWallet();
+        private Money sels;
+        private Money bels;
 
         private readonly WalletInfo walletInfo = new WalletInfo();
         private string walletName;
@@ -101,7 +107,9 @@ namespace XelsDesktopWalletApp.Views
             {
                 _ = GetStakingInfoAsync(this.baseURL);
             }
+            _ = UpdateWalletAsync();
             PopulateTxt();
+
         }
 
 
@@ -410,6 +418,43 @@ namespace XelsDesktopWalletApp.Views
 
 
         }
+
+        private async Task UpdateWalletAsync()
+        {
+            this.selswallet = this.createWallet.GetLocalWallet(this.walletName, "SELS");
+            this.belswallet = this.createWallet.GetLocalWallet(this.walletName, "BELS");
+
+            if (this.selswallet.Address != null)
+            {
+                this.sels = await GetBalanceAsync(this.selswallet.Address);
+            }
+
+            if (this.belswallet.Address != null)
+            {
+                this.bels = await GetBalanceAsync(this.belswallet.Address);
+            }
+
+        }
+
+        private async Task<Money> GetBalanceAsync(string addr)
+        {
+            string getUrl = this.baseURL + $"";
+            var content = "";
+
+            HttpResponseMessage response = await client.GetAsync(getUrl);
+
+            if (response.IsSuccessStatusCode)
+            {
+                content = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
+            }
+            return 0;
+        }
+
+
 
         private void receiveButton_Click(object sender, RoutedEventArgs e)
         {
