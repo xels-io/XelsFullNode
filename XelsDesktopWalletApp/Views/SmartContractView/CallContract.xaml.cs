@@ -17,6 +17,7 @@ using XelsDesktopWalletApp.Models.CommonModels;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace XelsDesktopWalletApp.Views.SmartContractView
 {
@@ -106,8 +107,14 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         public bool ValidationCheck()
         {
-            if ( Convert.ToInt64(this.txtAmount.Text) > Convert.ToInt64(this.txtBalance.Text))
+            var balanceVal = this.txtBalance.Text;
+            var txtamtVal = this.txtAmount.Text;
+            double d2 = double.Parse(balanceVal, CultureInfo.InvariantCulture);
+            double d3 = double.Parse(txtamtVal, CultureInfo.InvariantCulture);
+            if (d3 > d2)
             {
+            //    if ( Convert.ToInt64(this.txtAmount.Text) > Convert.ToInt64(this.txtBalance.Text))
+            //{
                 MessageBox.Show("The amount you have entered exceeds balance available at the sender address", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.txtAmount.Focus();
                 return false;

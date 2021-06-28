@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -112,7 +113,14 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         public bool ValidationCheck()
         {
-            if (Convert.ToInt64(this.txtAmount.Text) > Convert.ToInt64(this.txtBalance.Text))
+            var balanceVal = this.txtBalance.Text;
+            var txtamtVal = this.txtAmount.Text;
+            double d2 = double.Parse(balanceVal, CultureInfo.InvariantCulture);
+            double d3 = double.Parse(txtamtVal, CultureInfo.InvariantCulture);
+            string byteCode = this.txtByteCode.Text;
+           
+
+            if (d3>d2)
             {
                 MessageBox.Show("The amount you have entered exceeds balance available at the sender address", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.txtAmount.Focus();
@@ -180,7 +188,13 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 return false;
             }
 
-            
+            if (!Regex.IsMatch(byteCode, @"\A\b[0-9a-fA-F]+\b\Z"))
+            {
+                MessageBox.Show("Must have an even number of characters and Must be valid hexadecimal characters", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtByteCode.Focus();
+                return false;
+            }
+
             //if (this.txtContractAddress.Text == "")
             //{
             //    MessageBox.Show("Contract Address Is reuired.", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -195,12 +209,12 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             //    return false;
             //}
 
-            //if (this.txtPassword.Password == "")
-            //{
-            //    MessageBox.Show("Password is reuired. Please enter the password for wallet: " + this.walletName, "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
-            //    this.txtMethodName.Focus();
-            //    return false;
-            //}
+            if (this.txtPassword.Password == "")
+            {
+                MessageBox.Show("Password is reuired. Please enter the password for wallet: " + this.walletName, "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtPassword.Focus();
+                return false;
+            }
 
 
             return true;
