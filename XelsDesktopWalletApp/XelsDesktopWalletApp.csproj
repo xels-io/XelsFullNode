@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <None Remove="Assets\Images\home-xels-logo-01.png" />
+    <None Remove="Assets\Images\loading-3.gif" />
     <None Remove="Views\home-xels-logo-01.png" />
   </ItemGroup>
 
@@ -39,6 +40,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="QRCoder" Version="1.4.1" />
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -66,6 +68,7 @@
 
   <ItemGroup>
     <Resource Include="Assets\Images\home-xels-logo-01.png" />
+    <Resource Include="Assets\Images\loading-3.gif" />
   </ItemGroup>
 
 </Project>
