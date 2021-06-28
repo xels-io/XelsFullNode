@@ -49,10 +49,19 @@
     <Compile Update="Views\History.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\layout\MainLayout.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\Login.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\LogoutConfirm.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Page1.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Page2.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\Receive.xaml.cs">
@@ -141,10 +150,19 @@
     <Page Update="Views\History.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\layout\MainLayout.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\Login.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\LogoutConfirm.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Page1.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Page2.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Receive.xaml">

@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 
 using XelsDesktopWalletApp.Models;
 using XelsDesktopWalletApp.Models.CommonModels;
+using XelsDesktopWalletApp.Views.layout;
 using XelsDesktopWalletApp.Views.SmartContractView;
 
 namespace XelsDesktopWalletApp.Views
@@ -469,12 +470,16 @@ namespace XelsDesktopWalletApp.Views
         private void Hyperlink_NavigateHistory(object sender, RequestNavigateEventArgs e)
         {
             History hs = new History(this.walletName);
+            //this.DashBoard_page_Content.Children.Add(new Page1());
+            // this.Content = hs.Content;
+
             hs.Show();
             this.Close();
         }
         private void Hyperlink_NavigateExchange(object sender, RequestNavigateEventArgs e)
         {
             Exchange ex = new Exchange(this.walletName);
+            //this.DashBoard_page_Content.Children.Add(new Page2());
             ex.Show();
             this.Close();
         }
@@ -482,6 +487,7 @@ namespace XelsDesktopWalletApp.Views
         {
 
             SmartContractMain sc = new SmartContractMain(this.walletName);
+            //this.Content = sc.Content;
             sc.Show();
             this.Close();
         }
@@ -489,12 +495,14 @@ namespace XelsDesktopWalletApp.Views
         private void Hyperlink_NavigateAddressBook(object sender, RequestNavigateEventArgs e)
         {
             AddressBook ex = new AddressBook(this.walletName);
+            // this.Content = ex.Content;
             ex.Show();
             this.Close();
         }
         private void Hyperlink_NavigateLogout(object sender, RequestNavigateEventArgs e)
         {
             LogoutConfirm lc = new LogoutConfirm(this.walletName);
+            //this.Content = lc.Content;
             lc.Show();
             this.Close();
         }
@@ -503,6 +511,7 @@ namespace XelsDesktopWalletApp.Views
         private void Hyperlink_NavigateAdvanced(object sender, RequestNavigateEventArgs e)
         {
             Advanced adv = new Advanced(this.walletName);
+            //this.Content = adv.Content;
             adv.Show();
             this.Close();
         }
@@ -511,6 +520,7 @@ namespace XelsDesktopWalletApp.Views
         {
 
             EthImport eImp = new EthImport(this.walletName);
+            //this.Content = eImp.Content;
             eImp.Show();
             this.Close();
         }
@@ -525,6 +535,7 @@ namespace XelsDesktopWalletApp.Views
             TransactionInfo item = (TransactionInfo)((sender as Button)?.Tag as ListViewItem)?.DataContext;
 
             TransactionDetail td = new TransactionDetail(this.walletName, item);
+            //this.Content = td.Content;
             td.Show();
             this.Close();
         }
@@ -533,6 +544,14 @@ namespace XelsDesktopWalletApp.Views
         private void GotoHistoryButton_Click(object sender, RoutedEventArgs e)
         {
             History history = new History(this.walletName);
+            //this.Content = history.Content;
+            history.Show();
+            this.Close();
+        }
+
+        private void Hyperlink_NavigateNewLayout(object sender, RequestNavigateEventArgs e)
+        {
+            MainLayout history = new MainLayout();
             history.Show();
             this.Close();
         }
