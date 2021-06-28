@@ -299,3 +299,4 @@ project.lock.json
 /XelsCore.UI/dist
 /XelsCore.UI/main.js
 .vscode/
+/XelsDesktopWalletApp/File

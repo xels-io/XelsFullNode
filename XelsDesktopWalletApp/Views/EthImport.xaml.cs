@@ -50,7 +50,9 @@ namespace XelsDesktopWalletApp.Views
         {
             InitializeComponent();
             this.DataContext = this;
-            HidePrivateKeyTxt();
+
+            //this.CheckboxPkey.IsChecked = true;
+            //HidePrivateKeyTxt();
 
             this.walletName = walletname;
             this.walletInfo.walletName = this.walletName;
@@ -118,46 +120,51 @@ namespace XelsDesktopWalletApp.Views
             this.walletHash = MnemonicToHash(this.MnemonicTxt.Text);
 
 
-            if (this.isCheckBoxChecked == false)
-            {
-                this.wallet = this.createWallet.WalletCreation(this.MnemonicTxt.Text);
-                //this.wallet.PrivateKey = this.encryption.encrypt(this.wallet.PrivateKey);
-                //this.Token.storeLocally(this.wallet, this.walletName, "SELS", this.walletHash);
-                //this.Token.storeLocally(this.wallet, this.walletName, "BELS", this.walletHash);
-            }
-            else
-            {
-                //this.sWallet = this.createWallet.WalletCreationFromPk(this.SELSPrivateKeyTxt.Text);
-                //this.sWallet.PrivateKey = this.encryption.encrypt(this.sWallet.PrivateKey);
-                //this.bWallet = this.createWallet.WalletCreationFromPk(this.BELSPrivateKeyTxt.Text);
-                //this.bWallet.PrivateKey = this.encryption.encrypt(this.bWallet.PrivateKey);
-                //this.Token.storeLocally(this.sWallet, this.walletName, "SELS", this.walletHash);
-                //this.Token.storeLocally(this.bWallet, this.walletName, "BELS", this.walletHash);
-            }
+            //if (this.isCheckBoxChecked == true)
+            //{
+            //this.wallet = this.createWallet.WalletCreation(this.MnemonicTxt.Text);
+            //this.wallet.PrivateKey = this.encryption.encrypt(this.wallet.PrivateKey);
+            //this.Token.storeLocally(this.wallet, this.walletName, "SELS", this.walletHash);
+            //this.Token.storeLocally(this.wallet, this.walletName, "BELS", this.walletHash);
+            //}
+            //else
+            //{
+            this.sWallet = this.createWallet.WalletCreationFromPk(this.SELSPrivateKeyTxt.Text);
+            this.sWallet.PrivateKey = Encryption.EncryptPrivateKey(this.sWallet.PrivateKey);
+            this.bWallet = this.createWallet.WalletCreationFromPk(this.BELSPrivateKeyTxt.Text);
+            this.bWallet.PrivateKey = Encryption.EncryptPrivateKey(this.bWallet.PrivateKey);
+
+            this.createWallet.StoreLocally(this.sWallet, this.walletName, "SELS", this.walletHash);
+            this.createWallet.StoreLocally(this.bWallet, this.walletName, "BELS", this.walletHash);
+            //}
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            this.isCheckBoxChecked = true;
+        //private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    this.isCheckBoxChecked = true;
+        //    HidePrivateKeyTxt();
+        //}
+        //private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        //{
+        //    this.isCheckBoxChecked = false;
+        //    VisiblePrivateKeyTxt();
+        //}
 
-            this.SPSELS.Visibility = Visibility.Visible;
-            this.SPSELSTxt.Visibility = Visibility.Visible;
-            this.SPBELS.Visibility = Visibility.Visible;
-            this.SPBELSTxt.Visibility = Visibility.Visible;
-        }
-        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            this.isCheckBoxChecked = false;
-            HidePrivateKeyTxt();
-        }
+        //private void HidePrivateKeyTxt()
+        //{
+        //    this.SPSELS.Visibility = Visibility.Hidden;
+        //    this.SPSELSTxt.Visibility = Visibility.Hidden;
+        //    this.SPBELS.Visibility = Visibility.Hidden;
+        //    this.SPBELSTxt.Visibility = Visibility.Hidden;
+        //}
 
-        private void HidePrivateKeyTxt()
-        {
-            this.SPSELS.Visibility = Visibility.Hidden;
-            this.SPSELSTxt.Visibility = Visibility.Hidden;
-            this.SPBELS.Visibility = Visibility.Hidden;
-            this.SPBELSTxt.Visibility = Visibility.Hidden;
-        }
+        //private void VisiblePrivateKeyTxt()
+        //{
+        //    this.SPSELS.Visibility = Visibility.Visible;
+        //    this.SPSELSTxt.Visibility = Visibility.Visible;
+        //    this.SPBELS.Visibility = Visibility.Visible;
+        //    this.SPBELSTxt.Visibility = Visibility.Visible;
+        //}
 
     }
 }
