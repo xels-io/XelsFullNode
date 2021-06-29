@@ -103,6 +103,9 @@
     <Compile Update="Views\SmartContractView\CreateContract.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\SmartContractView\IssueToken.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\SmartContractView\SmartContractDashboard.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -211,6 +214,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\SmartContractView\CreateContract.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SmartContractView\IssueToken.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\SmartContractView\SmartContractDashboard.xaml">

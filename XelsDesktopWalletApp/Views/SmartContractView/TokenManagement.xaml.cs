@@ -105,7 +105,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         
         private void Button_CrateTokenClick(object sender, RoutedEventArgs e)
         {
-
+            this.tokenManagementPageContant.Children.Add(new IssueToken());
         }
     }
 }
