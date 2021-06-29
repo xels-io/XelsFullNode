@@ -96,5 +96,16 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
             return content;
         }
+
+        private void Btn_AddToken_Click(object sender, RoutedEventArgs e)
+        {
+            this.tokenManagementPageContant.Children.Add(new AddToken());
+        }
+
+        
+        private void Button_CrateTokenClick(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

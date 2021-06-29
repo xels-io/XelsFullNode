@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:XelsDesktopWalletApp.Views.SmartContractView"
              mc:Ignorable="d" 
              d:DesignHeight="700" d:DesignWidth="1080">
-    <Grid>
+    <Grid x:Name="tokenManagementPageContant">
         <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0" Margin="10,10,10,10">
 
             <Grid Margin="0,0,0,0">
@@ -46,14 +46,14 @@
                     </Button.Resources>
                 </Button>
 
-                <Button x:Name="Btn_CallContract" Content="ADD TOKEN" Grid.Column="2" HorizontalAlignment="Center" Margin="0,13,0,0" VerticalAlignment="Top" Width="169" FontWeight="Bold" Height="42">
+                <Button x:Name="Btn_AddToken" Click="Btn_AddToken_Click" Content="ADD TOKEN" Grid.Column="2" HorizontalAlignment="Center" Margin="0,13,0,0" VerticalAlignment="Top" Width="169" FontWeight="Bold" Height="42">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="15"/>
                         </Style>
                     </Button.Resources>
                 </Button>
-                <Button Content="CREATE TOKEN" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.151,-0.148" Width="169" FontWeight="Bold" Height="42" Margin="0,67,0,0">
+                <Button Content="CREATE TOKEN" Grid.Column="2" Click="Button_CrateTokenClick" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.151,-0.148" Width="169" FontWeight="Bold" Height="42" Margin="0,67,0,0">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="15"/>
