@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:XelsDesktopWalletApp.Views.SmartContractView"
              mc:Ignorable="d" 
              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0">
+
     <Grid>
         <Rectangle Fill="PaleGreen" Opacity=".5" MouseDown="Rectangle_MouseDown" />
         <Border CornerRadius="10"  Background="White" Height="480" Width="480" HorizontalAlignment="Center">
@@ -112,13 +113,10 @@
                         </TextBox>
 
                         <TextBlock Grid.Column="0" Grid.Row="9" Text="WALLET PASSWORD" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center"  Margin="24,0,0,0" />
-                        <PasswordBox x:Name="txtPassword"  Grid.Column="1"  Grid.Row="9" FontFamily="Microsoft YaHei Light"  Margin="0,5,-150,5">
-                            <PasswordBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </PasswordBox.Resources>
+                        <PasswordBox x:Name="txtPassword" Grid.Column="1"  Grid.Row="9" FontFamily="Microsoft YaHei Light"  Margin="0,5,-150,5">
+                          
                         </PasswordBox>
+
 
                         <Button Grid.Column="1"  Grid.Row="11"   x:Name="btn_IssueTokenSubmit" Click="btn_IssueTokenSubmit_Click" Content="ISSUE TOKEN"  FontWeight="Bold" Background="#FF53E253"  Margin="0,0,-150,0">
                             <Button.Resources>

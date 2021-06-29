@@ -32,7 +32,7 @@
             <Label Content="&#xD;&#xA;Password" Width="548" FontFamily="Microsoft YaHei Light" Height="37" FontSize="10"/>
 
             
-            <PasswordBox Name="password" PasswordChar="*" Margin="0,0,10,0" Width="531" Padding="2" RenderTransformOrigin="0.792,0.552" FontFamily="Microsoft YaHei Light" Height="26" BorderBrush="LimeGreen" />
+            <PasswordBox Name="password"  PasswordChar="*" Margin="0,0,10,0" Width="531" Padding="2" RenderTransformOrigin="0.792,0.552" FontFamily="Microsoft YaHei Light" Height="26" BorderBrush="LimeGreen" />
 
             <Button Background="#FF53E253" Width="531" x:Name="decryptButton" Click="DecryptButton_ClickAsync" Margin="0 10 10 0" Grid.Column="0" Content="Decrypt" FontFamily="Microsoft YaHei Light" FontWeight="Normal" Foreground="White" BorderThickness="0,0,0,0" Height="24" FontStyle="Normal" >
                 <Button.Resources>
