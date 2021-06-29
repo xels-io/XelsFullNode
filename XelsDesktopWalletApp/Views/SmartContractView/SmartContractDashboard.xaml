@@ -24,6 +24,17 @@
                         </Button>
                         </TextBlock>
 
+                        <TextBlock Background="Green" Padding="2 2 2 2" Margin="120,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" MinHeight="25" MinWidth="100" >
+                        <Button Content="Token Management" Click="btn_TokenManagement_Click" MinWidth="100" MinHeight="25" >
+                             <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="7"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        </TextBlock>
+
+
                         <Image Height="50" Source="/Assets/Images/home-xels-logo-01.png"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" />
 
                         <Label Content="{Binding Path=WalletName}" Background="ForestGreen" Padding="2 2 2 2" Margin="0,0,30,0" 
@@ -83,106 +94,100 @@
                         </ComboBox>
                     </Grid>
                 </Border>
+            </StackPanel>
+        </Border>
+        <Grid x:Name="page_contant" Margin="0,80,0,0">
 
+            <StackPanel x:Name="dashboardStactPanal1" Orientation="Vertical" Grid.Column="1" Grid.Row="0" Margin="10,10,10,10">
 
-
-                <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0" Margin="10,10,10,10">
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="2*" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="1*" />
-                            <RowDefinition Height="1*" />
-                        </Grid.RowDefinitions>
-                        <Border Margin="3" Grid.Column="1" Grid.Row="0" BorderBrush="Black" 
+                <Grid Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+                    <Border Margin="3" Grid.Column="1" Grid.Row="0" BorderBrush="Black" 
                         BorderThickness="1" Background="{x:Null}" Height="120" CornerRadius="7,7,7,7" />
-                        <Border Grid.Column="0" Grid.Row="0" BorderBrush="Black" 
+                    <Border Grid.Column="0" Grid.Row="0" BorderBrush="Black" 
                         BorderThickness="1" Background="{x:Null}" Height="120" CornerRadius="7,7,7,7" />
-                        <Border Grid.Column="2" Grid.Row="0" BorderBrush="Black" 
+                    <Border Grid.Column="2" Grid.Row="0" BorderBrush="Black" 
                         BorderThickness="1" Background="{x:Null}" Height="120" CornerRadius="7,7,7,7" />
 
-                        <Label Content="ADDRESS BALANCE" HorizontalAlignment="Left"
+                    <Label Content="ADDRESS BALANCE" HorizontalAlignment="Left"
                                Margin="10,25,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.599,0.121" 
                                Width="137" FontFamily="Microsoft YaHei" Foreground="Black"   FontWeight="Bold"
                                FontSize="12" Height="24" Grid.Row="0"
                                />
 
-                        <Label x:Name="lab_addBalance" Content="" HorizontalAlignment="Left" Margin="10,73,0,0" VerticalAlignment="Top"  Foreground="Black" 
+                    <Label x:Name="lab_addBalance" Content="" HorizontalAlignment="Left" Margin="10,73,0,0" VerticalAlignment="Top"  Foreground="Black" 
                     FontSize="12" Height="24"
                     Grid.Column="0" Grid.Row="0" FontWeight="Bold"/>
 
-                        <Label Content="ACTIVE ADDRESS" Grid.Column="1" HorizontalAlignment="Left" Margin="20,23,0,0" VerticalAlignment="Top" FontWeight="Bold"  FontSize="12" Height="24" Width="143" />
-                        <Label x:Name="lab_ActiveAddress" Grid.Column="1" HorizontalAlignment="Left" Margin="20,66,0,0" VerticalAlignment="Top" Width="250"/>
-                        <Button Content="COPY" Click="Btn_AddressCopy_Click" Grid.Column="1" HorizontalAlignment="Left" Margin="316,66,0,0" VerticalAlignment="Top" MinWidth="80" RenderTransformOrigin="0.101,0.754">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="15"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
+                    <Label Content="ACTIVE ADDRESS" Grid.Column="1" HorizontalAlignment="Left" Margin="20,23,0,0" VerticalAlignment="Top" FontWeight="Bold"  FontSize="12" Height="24" Width="143" />
+                    <Label x:Name="lab_ActiveAddress" Grid.Column="1" HorizontalAlignment="Left" Margin="20,66,0,0" VerticalAlignment="Top" Width="250"/>
+                    <Button Content="COPY" Click="Btn_AddressCopy_Click" Grid.Column="1" HorizontalAlignment="Left" Margin="316,66,0,0" VerticalAlignment="Top" MinWidth="80" RenderTransformOrigin="0.101,0.754">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="15"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
 
-                        <Button x:Name="Btn_CallContract" Content="CALL CONTRACT" Grid.Column="2" HorizontalAlignment="Center" Margin="0,23,0,0" VerticalAlignment="Top" Width="169" FontWeight="Bold" Height="42" Click="Btn_CallContract_Click">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="15"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
-                        <Button Content="CREATE CONTRACT" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.151,-0.148" Width="169" FontWeight="Bold" Height="42" Margin="0,75,0,0" Click="Btn_CreateContract_Click">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="15"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
-
-
-                    </Grid>
+                    <Button x:Name="Btn_CallContract" Content="CALL CONTRACT" Grid.Column="2" HorizontalAlignment="Center" Margin="0,23,0,0" VerticalAlignment="Top" Width="169" FontWeight="Bold" Height="42" Click="Btn_CallContract_Click">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="15"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button Content="CREATE CONTRACT" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0.151,-0.148" Width="169" FontWeight="Bold" Height="42" Margin="0,75,0,0" Click="Btn_CreateContract_Click">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="15"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
 
 
-                </StackPanel>
-                <StackPanel Orientation="Vertical" Grid.Row="1" Margin="10,10,10,10" Grid.ColumnSpan="3">
-                    <Grid Height="350">
-                        <Grid>
-                            <Label Name="NoData" Content="Looks like you haven't made any transactions yet."  HorizontalAlignment="Center"
-                       FontFamily="Microsoft YaHei Light" Margin="233,10,213,80" FontSize="12" FontWeight="Bold" Foreground="#FFCF5959"/>
+                </Grid>
 
-                        </Grid>
-                        <Grid Margin="0,-15,0,34">
-                            <!--<DataGrid MinWidth="1000" x:Name="SmartContractHistoryList" FontSize="11" FontWeight="Bold"  BorderThickness="0"  HorizontalAlignment="Center">
+
+            </StackPanel>
+            <StackPanel x:Name="dashboardStactPanal2" Orientation="Vertical" Grid.Row="1" Margin="0,140,0,0" Grid.ColumnSpan="3">
+                <Grid HorizontalAlignment="Right" Width="1060">
+                    <!--<DataGrid MinWidth="1000" x:Name="SmartContractHistoryList" FontSize="11" FontWeight="Bold"  BorderThickness="0"  HorizontalAlignment="Center">
                                 
                             </DataGrid>-->
-                            <ListView Margin="0,20,0,0" x:Name="SmartContractHistoryList" FontSize="10" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Center">
-                                <ListView.View>
-                                    <GridView>
-                                        <GridViewColumn Header="BLOCK" Width="150"
+                    <ListView Margin="0,0,0,0" x:Name="SmartContractHistoryList" FontSize="10" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Center">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="BLOCK" Width="150"
                                             DisplayMemberBinding="{Binding Path=blockHeight}"/>
-                                        <GridViewColumn Header="TYPE" Width="100"
+                                <GridViewColumn Header="TYPE" Width="100"
                                             DisplayMemberBinding="{Binding Path=type}" />
-                                        <GridViewColumn Header="HASH" Width="200" 
+                                <GridViewColumn Header="HASH" Width="200" 
                                             DisplayMemberBinding="{Binding Path=hash}"  />
-                                        <GridViewColumn Header="ADDRESS" Width="200" 
+                                <GridViewColumn Header="ADDRESS" Width="200" 
                                             DisplayMemberBinding="{Binding Path=to}"   />
-                                        <GridViewColumn Header="AMOUNT" Width="100" 
+                                <GridViewColumn Header="AMOUNT" Width="100" 
                                             DisplayMemberBinding="{Binding Path=amount}"  />
-                                        <GridViewColumn Header="TRANSACTION FEE" Width="120" 
+                                <GridViewColumn Header="TRANSACTION FEE" Width="120" 
                                             DisplayMemberBinding="{Binding Path=transactionFee}"  />
-                                        <GridViewColumn Header="GAS FEE" Width="100" 
+                                <GridViewColumn Header="GAS FEE" Width="100" 
                                             DisplayMemberBinding="{Binding Path=gasFee}"  />
 
-                                    </GridView>
-                                </ListView.View>
+                            </GridView>
+                        </ListView.View>
 
-                            </ListView>
+                    </ListView>
 
-                        </Grid>
-                    </Grid>
-                </StackPanel>
+                </Grid>
             </StackPanel>
-        </Border>
+            
+        </Grid>
     </Grid>
 </Page>

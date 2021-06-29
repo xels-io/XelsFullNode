@@ -106,6 +106,9 @@
     <Compile Update="Views\SmartContractView\SmartContractMain.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\SmartContractView\TokenManagement.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="MainWindow.xaml">
@@ -208,6 +211,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\SmartContractView\SmartContractMain.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SmartContractView\TokenManagement.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
