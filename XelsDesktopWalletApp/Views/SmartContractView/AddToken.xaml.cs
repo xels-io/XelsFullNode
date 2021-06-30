@@ -31,7 +31,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         string tokenVal;
         string address;
         string ticker;
-        decimal decimals;
+        string decimals;
         string name;
 
         #region Base
@@ -94,7 +94,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
             List<TokenModel> objtokenList = new List<TokenModel>
             {
-                new TokenModel { Ticker = "MEDI", Address = "CUwkBGkXrQpMnZeWW2SpAv1Vu9zPvjWNFS",Name = "Mediconnect", Decimals=8, DropDownValue="(MEDI)-CUwkBGkXrQpMnZeWW2SpAv1Vu9zPvjWNFS-(Mediconnect)"},
+                new TokenModel { Ticker = "MEDI", Address = "CUwkBGkXrQpMnZeWW2SpAv1Vu9zPvjWNFS",Name = "Mediconnect", Decimals="8", DropDownValue="(MEDI)-CUwkBGkXrQpMnZeWW2SpAv1Vu9zPvjWNFS-(Mediconnect)"},
                 new TokenModel { Ticker = "Custom", Address = "custom", Name = "custom",DropDownValue="custom"},
                 
             };
@@ -151,11 +151,16 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         {
             string msg = "";
 
-            string path = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)
-             + "\\TokenFile.txt";
-            if (addTokenValidation(tokenModel,path))
+            //string path = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)
+            // + "\\TokenFile.json";
+            string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            string tokenFilePath = System.IO.Path.Combine(CurrentDirectory, @"..\..\..\Token\TokenFile.json");
+            string path = System.IO.Path.GetFullPath(tokenFilePath);
+
+            if (addTokenValidation(tokenModel, path))
             {
-                var saveThisToFile = Newtonsoft.Json.JsonConvert.SerializeObject(tokenModel);
+                string JSONresult = JsonConvert.SerializeObject(tokenModel, Formatting.Indented);
 
 
                 if (!File.Exists(path))
@@ -165,12 +170,11 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
                 using (var sw = new StreamWriter(path, true))
                 {
-                    sw.WriteLine(saveThisToFile);
+                    sw.WriteLine(JSONresult.ToString());
                     sw.Close();
                     msg = "SUCCESS";
                 }
             }
-           
             return msg;
         }
 
@@ -190,7 +194,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                     Ticker = this.txtTokenSymbol.Text,
                     Address = this.txtTokenContractAddress.Text,
                     Name= this.tokenNametxt.Text,
-                    Decimals =Convert.ToDecimal(this.tokenDecimalTxt.Text),
+                    Decimals =this.tokenDecimalTxt.Text,
                     Balance="0",
                 };
 
@@ -206,23 +210,26 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         private bool addTokenValidation(TokenModel tokenModel,string path)
         {
-            List<TokenModel> tokenList = new List<TokenModel>();
-            try
+
+            List<TokenModel> tokenlist = new List<TokenModel>();
+
+         
+
+            if (File.Exists(path))
             {
                 using (StreamReader r = new StreamReader(path))
                 {
                     string json = r.ReadToEnd();
-                    tokenList = JsonConvert.DeserializeObject<List<TokenModel>>(json);
-                }
-                return true;
-            }
-            catch (Exception e)
-            {
 
-                throw;
+                    if (json != "{ }" || json != "")
+                    {
+                        tokenlist = JsonConvert.DeserializeObject<List<TokenModel>>(json);
+                    }
+                }
             }
-           
             return true;
         }
+
+       
     }
 }

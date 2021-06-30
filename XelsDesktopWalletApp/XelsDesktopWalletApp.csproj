@@ -73,6 +73,7 @@
 
   <ItemGroup>
     <Folder Include="Assets\TokenFile\" />
+    <Folder Include="Token\" />
   </ItemGroup>  
 
   <ItemGroup>
