@@ -206,12 +206,10 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         }
 
-
-
         private bool addTokenValidation(TokenModel tokenModel,string path)
         {
 
-            List<TokenModel> tokenlist = new List<TokenModel>();
+            List<TokenRetrieveModel> tokenlist = new List<TokenRetrieveModel>();
 
          
 
@@ -221,10 +219,9 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 {
                     string json = r.ReadToEnd();
 
-                    if (json != "{ }" || json != "")
-                    {
-                        tokenlist = JsonConvert.DeserializeObject<List<TokenModel>>(json);
-                    }
+                   
+                        tokenlist = JsonConvert.DeserializeObject<List<TokenRetrieveModel>>(json);
+                    
                 }
             }
             return true;
