@@ -99,7 +99,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         private void Btn_AddToken_Click(object sender, RoutedEventArgs e)
         {
-            this.tokenManagementPageContant.Children.Add(new AddToken());
+            this.tokenManagementPageContant.Children.Add(new AddToken(this.walletName));
         }
 
         

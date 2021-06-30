@@ -69,6 +69,16 @@
   <ItemGroup>
     <Resource Include="Assets\Images\home-xels-logo-01.png" />
     <Resource Include="Assets\Images\loading-3.gif" />
+  </ItemGroup>  
+
+  <ItemGroup>
+    <Folder Include="Assets\TokenFile\" />
+  </ItemGroup>  
+
+  <ItemGroup>
+    <None Update="Assets\TokenFile\TokenFile.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

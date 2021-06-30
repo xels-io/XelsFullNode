@@ -37,8 +37,24 @@
                             <RowDefinition Height="10"/>
                             <RowDefinition Height="30"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Column="0" Grid.Row="0" Text="TOKEN" Margin="11,0,0,0" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" Width="37" />
-                        <TextBox  x:Name="token" IsReadOnly="True"  Grid.Column="1"  Grid.Row="0" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="TOKEN" Margin="11,0,0,0" FontWeight="Bold" FontFamily="Bahnschrift" VerticalAlignment="Center" HorizontalAlignment="Left" Width="37" />
+
+                        <ComboBox x:Name="token"  VerticalContentAlignment="Center"  SelectionChanged="token_SelectionChanged" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding  Path=Tokens, Mode=TwoWay}" 
+                          SelectedItem="{Binding Path=Tokens, Mode=TwoWay}"
+                          Background="White" BorderBrush="LimeGreen"  
+                          FontFamily="Bahnschrift" 
+                          Margin="0,0,-150,5">
+                            <!--<ComboBoxItem Content="{Binding Path=DropDownValue}"></ComboBoxItem>-->
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=DropDownValue}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+
+                        <TextBlock Grid.Row="2" x:Name="tokenAddresslab" Text="TOKEN CONTRACT ADDRESS" FontWeight="Bold" FontFamily="Bahnschrift"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="182" Margin="11,0,0,0"/>
+                        <TextBox x:Name="txtTokenContractAddress" VerticalContentAlignment="Center" Grid.Column="1"  Grid.Row="2" FontFamily="Bahnschrift"  Margin="0,0,-150,5">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="7"/>
@@ -46,8 +62,8 @@
                             </TextBox.Resources>
                         </TextBox>
 
-                        <TextBlock Grid.Row="2" x:Name="tokenAddresslab" Text="TOKEN CONTRACT ADDRESS" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" Height="40" VerticalAlignment="Top" Width="182" Margin="11,0,0,0" Grid.ColumnSpan="2"/>
-                        <TextBox x:Name="txtTokenContractAddress"  Grid.Column="1"  Grid.Row="2" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
+                        <TextBlock Grid.Column="0" Grid.Row="4" Name="tokenSymbollab"  Text="TOKEN SYMBOL" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="11,0,0,0" Width="84" />
+                        <TextBox x:Name="txtTokenSymbol"    VerticalContentAlignment="Center" Grid.Column="1"   Grid.Row="4" FontFamily="Bahnschrift"  Margin="0,0,-150,5">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="7"/>
@@ -55,8 +71,8 @@
                             </TextBox.Resources>
                         </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="4" Name="tokenSymbollab"  Text="TOKEN SYMBOL" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" Margin="11,0,0,0" Width="84" />
-                        <TextBox x:Name="txtTokenSymbol"  Grid.Column="1"  Grid.Row="4" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
+                        <TextBlock Grid.Column="0" Grid.Row="6" Name="tokenNamelab" Text="TOKEN NAME" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="11,0,0,0" Width="72" />
+                        <TextBox  x:Name="tokenNametxt"   VerticalContentAlignment="Center"  Grid.Column="1"  Grid.Row="6" FontFamily="Bahnschrift" Margin="0,0,-150,5">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="7"/>
@@ -64,8 +80,8 @@
                             </TextBox.Resources>
                         </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="6" Name="tokenNamelab" Text="TOKEN NAME" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" Margin="11,0,0,0" Width="72" />
-                        <TextBox  x:Name="tokenNametxt"  Grid.Column="1"  Grid.Row="6" FontFamily="Microsoft YaHei Light" Margin="0,0,-150,5">
+                        <TextBlock Grid.Column="0" Grid.Row="8" Name="tokenDecimalLab" Text="TOKEN DECIMAL" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="11,0,0,0" Grid.RowSpan="2" Width="89" />
+                        <TextBox x:Name="tokenDecimalTxt"   VerticalContentAlignment="Center"  Grid.Column="1"  Grid.Row="8" FontFamily="Bahnschrift"  Margin="0,0,-150,5">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="7"/>
@@ -73,16 +89,7 @@
                             </TextBox.Resources>
                         </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="8" Name="tokenDecimalLab" Text="TOKEN DECIMAL" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  Margin="11,0,0,0" Grid.RowSpan="2" Width="89" />
-                        <TextBox x:Name="tokenDecimalTxt"  Grid.Column="1"  Grid.Row="8" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
-
-                        <Button Grid.Column="1"  Grid.Row="11"   x:Name="btn_AddTokenSubmit"   FontWeight="Bold" Content="ADD TOKEN" Background="#FF53E253"  Margin="0,0,-150,0">
+                        <Button Grid.Column="1"  Grid.Row="11"   x:Name="btn_AddTokenSubmit" Click="btn_AddTokenSubmit_Click"   FontWeight="Bold" Content="ADD TOKEN" Background="#FF53E253"  Margin="0,0,-150,0">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="15"/>
