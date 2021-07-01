@@ -109,5 +109,14 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             string balance = this.lab_addBalance.Content.ToString();
             this.tokenManagementPageContant.Children.Add(new IssueToken(this.walletName,activeAddress,balance));
         }
+
+        
+
+        private void Button_CopyClick(object sender, RoutedEventArgs e)
+        {
+            string activeAddress = this.lab_ActiveAddress.Content.ToString();
+            Clipboard.SetText(activeAddress);
+            MessageBox.Show(activeAddress + "  COPIED");
+        }
     }
 }

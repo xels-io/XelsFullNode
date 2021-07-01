@@ -233,6 +233,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         {
             string activeAddress = this.lab_ActiveAddress.Content.ToString();
             Clipboard.SetText(activeAddress);
+            MessageBox.Show(activeAddress + "  COPIED");
         }
 
         private void btn_TokenManagement_Click(object sender, RoutedEventArgs e)

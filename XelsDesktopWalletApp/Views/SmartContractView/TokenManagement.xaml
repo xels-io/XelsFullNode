@@ -38,7 +38,7 @@
 
                 <Label Content="ACTIVE RECEIVE ADDRESS" Grid.Column="1" HorizontalAlignment="Left" Margin="20,23,0,0" VerticalAlignment="Top" FontWeight="Bold"  FontSize="12" Height="24" Width="200" />
                 <Label x:Name="lab_ActiveAddress" Grid.Column="1" HorizontalAlignment="Left" Margin="20,66,0,0" VerticalAlignment="Top" Width="250"/>
-                <Button Content="COPY"  Grid.Column="1" HorizontalAlignment="Left" Margin="417,66,0,0" VerticalAlignment="Top" MinWidth="80" RenderTransformOrigin="0.101,0.754">
+                <Button Content="COPY" Click="Button_CopyClick"  Grid.Column="1" HorizontalAlignment="Left" Margin="417,66,0,0" VerticalAlignment="Top" MinWidth="80" RenderTransformOrigin="0.101,0.754">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="15"/>
