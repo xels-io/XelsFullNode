@@ -131,6 +131,12 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             }
             else
             {
+                this.ticker = objtokenModel.Ticker;
+                this.address = objtokenModel.Address;
+                this.name = objtokenModel.Name;
+                this.decimals = objtokenModel.Decimals;
+
+
                 this.txtTokenContractAddress.Text = "";
                 this.txtTokenSymbol.Text = "";
                 this.tokenNametxt.Text = "";
@@ -155,13 +161,12 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             // + "\\TokenFile.json";
             string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-            string tokenFilePath = System.IO.Path.Combine(CurrentDirectory, @"..\..\..\Token\TokenFile.json");
+            string tokenFilePath = System.IO.Path.Combine(CurrentDirectory, @"..\..\..\Token\TokenFile.txt");
             string path = System.IO.Path.GetFullPath(tokenFilePath);
-
-            if (addTokenValidation(tokenModel, path))
+            string validcheck = addTokenValidation(tokenModel, path);
+            if (validcheck =="")
             {
                 string JSONresult = JsonConvert.SerializeObject(tokenModel, Formatting.Indented);
-
 
                 if (!File.Exists(path))
                 {
@@ -171,9 +176,14 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 using (var sw = new StreamWriter(path, true))
                 {
                     sw.WriteLine(JSONresult.ToString());
+                    sw.WriteLine(",");
                     sw.Close();
                     msg = "SUCCESS";
                 }
+            }
+            else
+            {
+                msg = validcheck;
             }
             return msg;
         }
@@ -182,10 +192,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         {
             string msg = "";
             TokenModel objtokenModel = this.token.SelectedItem as TokenModel;
-            this.ticker = objtokenModel.Ticker;
-            this.address = objtokenModel.Address;
-            this.name = objtokenModel.Name;
-            this.decimals = objtokenModel.Decimals;
+          
             string selectedVlaue = objtokenModel.DropDownValue;
             if (selectedVlaue== "custom")
             {
@@ -203,28 +210,59 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 MessageBox.Show("Message - " + msg);
                 this.Visibility = Visibility.Collapsed;
             }
+            else
+            {
+                var objSaveToken = new TokenModel
+                {
+                    Ticker = objtokenModel.Ticker,
+                    Address = objtokenModel.Address,
+                    Name = objtokenModel.Name,
+                    Decimals = objtokenModel.Decimals,
+                    Balance = "0",
+                };
+                var result = SaveTokenasync(objSaveToken);
+                msg = result.Result;
+                MessageBox.Show("Message - " + msg);
+                this.Visibility = Visibility.Collapsed;
+
+            }
 
         }
 
-        private bool addTokenValidation(TokenModel tokenModel,string path)
+        private string addTokenValidation(TokenModel tokenModel,string path)
         {
-
+            string retMsg = "";
             List<TokenRetrieveModel> tokenlist = new List<TokenRetrieveModel>();
-
-         
-
-            if (File.Exists(path))
+            try
             {
-                using (StreamReader r = new StreamReader(path))
+                if (File.Exists(path))
                 {
-                    string json = r.ReadToEnd();
+                    using (StreamReader r = new StreamReader(path))
+                    {
+                        string json = r.ReadToEnd();
+                        string concateData = '[' + json + ']';
+                       // TokenRetrieveModel[] objsdsf = JsonConvert.DeserializeObject<TokenRetrieveModel[]>(concateData);  //same kaj kore jason convdrt
+                        tokenlist = JsonConvert.DeserializeObject<List<TokenRetrieveModel>>(concateData);
 
-                   
-                        tokenlist = JsonConvert.DeserializeObject<List<TokenRetrieveModel>>(json);
-                    
+                        foreach (var item in tokenlist)
+                        {
+                            if (item.Address == tokenModel.Address.Trim() || item.Ticker == tokenModel.Ticker.Trim())
+                            {
+                                retMsg = tokenModel.Address + "- is already added.";
+                                return retMsg;
+                            }
+                        }
+
+                    }
                 }
             }
-            return true;
+            catch (Exception e)
+            {
+                retMsg = e.Message.ToString();
+                return retMsg;
+            }
+           
+            return retMsg;
         }
 
        

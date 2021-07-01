@@ -1,0 +1,27 @@
+{
+  "Ticker": "custom",
+  "Address": "custom",
+  "Name": "custom",
+  "Decimals": "0",
+  "Balance": "0",
+  "DropDownValue": null
+}
+,
+{
+  "Ticker": "custom2",
+  "Address": "custom2",
+  "Name": "custom2",
+  "Decimals": "0",
+  "Balance": "0",
+  "DropDownValue": null
+}
+,
+{
+  "Ticker": "MEDI",
+  "Address": "CUwkBGkXrQpMnZeWW2SpAv1Vu9zPvjWNFS",
+  "Name": "Mediconnect",
+  "Decimals": "8",
+  "Balance": "0",
+  "DropDownValue": null
+}
+,

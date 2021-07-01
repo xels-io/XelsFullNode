@@ -105,7 +105,9 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         
         private void Button_CrateTokenClick(object sender, RoutedEventArgs e)
         {
-            this.tokenManagementPageContant.Children.Add(new IssueToken());
+            string activeAddress = this.lab_ActiveAddress.Content.ToString();
+            string balance = this.lab_addBalance.Content.ToString();
+            this.tokenManagementPageContant.Children.Add(new IssueToken(this.walletName,activeAddress,balance));
         }
     }
 }
