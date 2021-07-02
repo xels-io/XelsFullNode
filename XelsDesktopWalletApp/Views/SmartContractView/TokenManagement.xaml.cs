@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,8 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
 using XelsDesktopWalletApp.Models;
 using XelsDesktopWalletApp.Models.CommonModels;
+using XelsDesktopWalletApp.Models.SmartContractModels;
 
 namespace XelsDesktopWalletApp.Views.SmartContractView
 {
@@ -66,6 +69,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             string activeAddress = this.lab_ActiveAddress.Content.ToString();
             await GetAddressBalanceAsync(activeAddress);
             //await GetHistoryAsync(GLOBALS.Address, this.walletName);
+            string result = AddTokenList();
         }
 
         private async Task<string> GetAddressBalanceAsync(string address)
@@ -102,15 +106,15 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             this.tokenManagementPageContant.Children.Add(new AddToken(this.walletName));
         }
 
-        
+
         private void Button_CrateTokenClick(object sender, RoutedEventArgs e)
         {
             string activeAddress = this.lab_ActiveAddress.Content.ToString();
             string balance = this.lab_addBalance.Content.ToString();
-            this.tokenManagementPageContant.Children.Add(new IssueToken(this.walletName,activeAddress,balance));
+            this.tokenManagementPageContant.Children.Add(new IssueToken(this.walletName, activeAddress, balance));
         }
 
-        
+
 
         private void Button_CopyClick(object sender, RoutedEventArgs e)
         {
@@ -118,5 +122,93 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             Clipboard.SetText(activeAddress);
             MessageBox.Show(activeAddress + "  COPIED");
         }
+
+        public string AddTokenList()
+        {
+            string retMsg = "";
+            List<TokenRetrieveModel> tokenlist = new List<TokenRetrieveModel>();
+            try
+            {
+                string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+                string tokenFilePath = System.IO.Path.Combine(CurrentDirectory, @"..\..\..\Token\TokenFile.txt");
+                string path = System.IO.Path.GetFullPath(tokenFilePath);
+
+                if (File.Exists(path))
+                {
+                    using (StreamReader r = new StreamReader(path))
+                    {
+                        string json = r.ReadToEnd();
+                        string concateData = '[' + json + ']';
+                        tokenlist = JsonConvert.DeserializeObject<List<TokenRetrieveModel>>(concateData);
+                        //this.TokenManagementList.ItemsSource = tokenlist;
+                        this.DataGrid1.ItemsSource = tokenlist;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                retMsg = e.Message.ToString();
+                return retMsg;
+            }
+
+            return retMsg;
+        }
+
+        private void btn_Delete_Token_Click(object sender, RoutedEventArgs e)
+        {
+            DataGrid dataGrid = this.DataGrid1;
+            DataGridRow Row = (DataGridRow)dataGrid.ItemContainerGenerator.ContainerFromIndex(dataGrid.SelectedIndex);
+            DataGridCell RowAndColumn = (DataGridCell)dataGrid.Columns[3].GetCellContent(Row).Parent;
+            string CellValue = ((TextBlock)RowAndColumn.Content).Text;
+            DeleteToken(CellValue);
+        }
+
+
+        public string DeleteToken(string address)
+        {
+            string msg = "";
+            string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string tokenFilePath = System.IO.Path.Combine(CurrentDirectory, @"..\..\..\Token\TokenFile.txt");
+            string path = System.IO.Path.GetFullPath(tokenFilePath);
+
+            List<TokenRetrieveModel> tokenlist = new List<TokenRetrieveModel>();
+
+            if (File.Exists(path))
+            {
+                using (StreamReader r = new StreamReader(path))
+                {
+                    string json = r.ReadToEnd();
+                    string concateData = '[' + json + ']';
+                    tokenlist = JsonConvert.DeserializeObject<List<TokenRetrieveModel>>(concateData);
+
+                    foreach (var item in tokenlist)
+                    {
+                        if (item.Address == address)
+                        {
+                            tokenlist.Remove(item);
+                            break;
+                        }
+                    }
+
+                }
+
+                File.Delete(path);
+                string JSONresult = JsonConvert.SerializeObject(tokenlist, Formatting.Indented);
+                string FinalResult= JSONresult.TrimStart('[').TrimEnd(']').TrimStart().TrimEnd();
+                File.Create(path).Dispose();
+               
+                using (var sw = new StreamWriter(path, true))
+                {
+                    sw.WriteLine(FinalResult.ToString());
+                    sw.WriteLine(",");
+                    sw.Flush();
+                    sw.Close();
+
+                }
+            }
+            return msg;
+        }
+
     }
 }

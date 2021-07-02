@@ -324,5 +324,8 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
             return true;
         }
+
+
+
         }
 }

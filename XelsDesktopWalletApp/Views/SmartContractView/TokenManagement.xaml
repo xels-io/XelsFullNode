@@ -64,22 +64,46 @@
         </StackPanel>
 
         <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,140,0,0" Grid.ColumnSpan="3">
-            <Grid HorizontalAlignment="Center" Width="Auto">
+            <!--<Grid HorizontalAlignment="Center" Width="Auto">
                 <ListView x:Name="TokenManagementList" FontSize="10" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Center" Width="1052">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="TICKER" Width="250"
-                                            DisplayMemberBinding="{Binding Path=blockHeight}"/>
+                            <GridViewColumn Header="TICKER" Width="250" 
+                                            DisplayMemberBinding="{Binding Path=Ticker}"/>
                             <GridViewColumn Header="NAME" Width="200"
-                                            DisplayMemberBinding="{Binding Path=type}"/>
+                                            DisplayMemberBinding="{Binding Path=Name}"/>
                             <GridViewColumn Header="BALANCE" Width="200" 
-                                            DisplayMemberBinding="{Binding Path=hash}"/>
+                                            DisplayMemberBinding="{Binding Path=Balance}"/>
                             <GridViewColumn Header="CONTRACT ADDRESS" Width="200" 
-                                            DisplayMemberBinding="{Binding Path=to}"/>
+                                            DisplayMemberBinding="{Binding Path=Address}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
-            </Grid>
+            </Grid>-->
+
+            <DataGrid Name="DataGrid1" Width="1054" VerticalAlignment="Center" HorizontalAlignment="Center" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="TICKER" Width="200" Binding="{Binding Path=Ticker}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="NAME" Width="200" Binding="{Binding Path=Name}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="BALANCE" Width="200" Binding="{Binding Path=Balance}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="ADDRESS" Width="200" Binding="{Binding Path=Address}" IsReadOnly="True" />
+                    <DataGridTemplateColumn Header="Actions" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Background="OrangeRed" Name="btn_Delete_Token" Click="btn_Delete_Token_Click">Delete</Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Actions" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Background="Blue">SEND</Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+           
         </StackPanel>
     </Grid>
 </UserControl>

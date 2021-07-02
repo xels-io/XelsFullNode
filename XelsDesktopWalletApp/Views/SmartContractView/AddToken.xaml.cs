@@ -104,10 +104,12 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
         {
             this.Visibility = Visibility.Collapsed;
+            TokenManagement tokenManagement = new TokenManagement(this.walletName, GLOBALS.Address);
         }
         private void btn_Cancel_Click(object sender, RoutedEventArgs e)
         {
             this.Visibility = Visibility.Collapsed;
+
         }
 
         private void token_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -209,6 +211,8 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 msg = result.Result;
                 MessageBox.Show("Message - " + msg);
                 this.Visibility = Visibility.Collapsed;
+                TokenManagement tokenManagement = new TokenManagement();
+                tokenManagement.AddTokenList();
             }
             else
             {
@@ -224,7 +228,8 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 msg = result.Result;
                 MessageBox.Show("Message - " + msg);
                 this.Visibility = Visibility.Collapsed;
-
+                TokenManagement tokenManagement = new TokenManagement();
+                tokenManagement.AddTokenList();
             }
 
         }
