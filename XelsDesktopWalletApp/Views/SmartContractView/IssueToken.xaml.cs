@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -76,7 +77,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         }
 
-        public IssueToken(string walletname, string selectedAddress,string balance)
+        public IssueToken(string walletname, string selectedAddress, string balance)
         {
             InitializeComponent();
 
@@ -95,7 +96,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
             //LoadAsync();
         }
-        
+
         private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
         {
             this.Visibility = Visibility.Collapsed;
@@ -107,6 +108,9 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         private async void btn_IssueTokenSubmit_Click(object sender, RoutedEventArgs e)
         {
+            string result = "";
+            if (IntCheck())
+            {
             IssueTokenModel issueTokenModel = new IssueTokenModel();
             List<string> param = new List<string>();
             issueTokenModel.amount = "0";
@@ -123,8 +127,13 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             issueTokenModel.walletName = this.walletName;
             issueTokenModel.sender = this.txtSender.Text;
 
-            string result = await IssueTokenSubmitAsync(issueTokenModel);
+          
+                if (ValidationCheck())
+                {
+                    result = await IssueTokenSubmitAsync(issueTokenModel);
+                }
 
+            }
 
         }
 
@@ -142,7 +151,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 {
 
                     retMsg = "Successfully Create Contract";
-                   // MessageBox.Show("");
+                    // MessageBox.Show("");
 
                     this.Visibility = Visibility.Collapsed;
                 }
@@ -155,8 +164,165 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             {
                 return retMsg;
             }
-            
+
             return retMsg;
         }
-    }
+
+        public bool ValidationCheck()
+        {
+            
+           double varBalnce= double.Parse(this.txtBalance.Text);
+            //double.Parse(this.txtBalance.Text)
+            if (double.Parse(this.txtFee.Text) > varBalnce || double.Parse(this.txtFee.Text) == varBalnce)
+            {
+                MessageBox.Show("Fee must be less than your balance", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtFee.Focus();
+                return false;
+            }
+
+            if (double.Parse(this.txtFee.Text) < 0.001 || this.txtFee.Text == "")
+            {
+                MessageBox.Show("The amount cannot be negative", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtFee.Focus();
+                return false;
+            }
+
+
+            if (double.Parse(this.txtGasPrice.Text) < Convert.ToInt64(this.gasPriceMinimum))
+            {
+                MessageBox.Show("Gas price must be greater than  " + this.gasPriceMinimum, "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return false;
+            }
+            if (double.Parse(this.txtGasPrice.Text) > Convert.ToInt64(this.gasPriceMaximum))
+            {
+                MessageBox.Show("Gas price must be less than  " + this.gasPriceMaximum, "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return false;
+            }
+            if (double.Parse(this.txtGasPrice.Text) < 0 || this.txtGasPrice.Text == "" || !Regex.IsMatch(this.txtGasPrice.Text, @"^[0-9][0-9]*$") || !Regex.IsMatch(this.txtGasPrice.Text, @"^[+]?([0-9]{0,})*[.]?([0-9]{0,2})?$"))
+            {
+                MessageBox.Show("The gas price cannot be negative", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtGasPrice.Focus();
+                return false;
+            }
+
+
+            if (Convert.ToInt64(this.txtGasLimit.Text) > Convert.ToInt64(this.gasLimitMaximum) || !Regex.IsMatch(this.txtGasPrice.Text, @"^[0-9][0-9]*$") || !Regex.IsMatch(this.txtGasPrice.Text, @"^[+]?([0-9]{0,})*[.]?([0-9]{0,2})?$"))
+            {
+                MessageBox.Show("Gas limit must be less than  " + this.gasLimitMaximum, "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return false;
+            }
+
+            if (Convert.ToInt64(this.txtGasLimit.Text) < Convert.ToInt64(this.gasCreateTokenLimitMinimum))
+            {
+                MessageBox.Show("Gas limit must be greater than  " + this.gasCallLimitMinimum, "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return false;
+            }
+
+            if (Convert.ToInt64(this.txtGasLimit.Text) < 0 || this.txtGasLimit.Text.Trim() == "")
+            {
+                MessageBox.Show("The amount cannot be negative", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtGasLimit.Focus();
+                return false;
+            }
+
+            if (Convert.ToInt64(this.txtDecimal.Text) < 0 || this.txtDecimal.Text.Trim() == "")
+            {
+                MessageBox.Show("The Decimal cannot be negative or cant be empty!.", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtDecimal.Focus();
+                return false;
+            }
+
+            if (Convert.ToInt64(this.txtDecimal.Text.Trim()) > 8)
+            {
+                MessageBox.Show("Max Limit must be less then 8", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtDecimal.Focus();
+                return false;
+            }
+
+
+            if (Convert.ToInt64(this.txtTotalSupply.Text) < 1 || this.txtTotalSupply.Text.Trim() == "")
+            {
+                MessageBox.Show("The TotalSupply cannot be negative or cant be empty!.", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtDecimal.Focus();
+                return false;
+            }
+
+            if (this.txtTokenName.Text.Trim() == "")
+            {
+                MessageBox.Show("Token Name is required..", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtTokenName.Focus();
+                return false;
+            }
+            if (this.txtTokenSymbol.Text.Trim() == "")
+            {
+                MessageBox.Show("Token Symbol is required..", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtTokenName.Focus();
+                return false;
+            }
+
+            if (this.txtPassword.Password == "")
+            {
+                MessageBox.Show("Password is reuired. Please enter the password for wallet: " + this.walletName, "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtPassword.Focus();
+                return false;
+            }
+
+
+            return true;
+        }
+
+        public bool IntCheck()
+        {
+            double k;
+            bool intDeccheck = double.TryParse(this.txtFee.Text, out k);
+            if (!intDeccheck)
+            {
+                MessageBox.Show("Value Is not valid must be number.", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtFee.Focus();
+                return false;
+            }
+
+            int i;
+            bool success = int.TryParse(this.txtDecimal.Text, out i);
+            if (!success)
+            {
+                MessageBox.Show("Value Is not valid must be number.", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtDecimal.Focus();
+                return false;
+            }
+            double l;
+            bool gaspriceCheck = double.TryParse(this.txtGasPrice.Text, out l);
+            if (!gaspriceCheck)
+            {
+                MessageBox.Show("Value Is not valid must be number.", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtGasPrice.Focus();
+                return false;
+            }
+
+            double m;
+            bool gaslimitCheck = double.TryParse(this.txtGasLimit.Text, out m);
+            if (!gaslimitCheck)
+            {
+                MessageBox.Show("Value Is not valid must be number.", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtGasLimit.Focus();
+                return false;
+            }
+
+
+            int j;
+            bool success2 = int.TryParse(this.txtTotalSupply.Text, out j);
+            if (!success2)
+            {
+                MessageBox.Show("Value Is not valid must be number.", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.txtTotalSupply.Focus();
+                return false;
+            }
+
+            return true;
+        }
+        }
 }

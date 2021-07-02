@@ -174,7 +174,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
                 return false;
             }
-            if (Convert.ToInt64(this.txtGasLimit.Text) < Convert.ToInt64(this.gasCallLimitMinimum))
+            if (Convert.ToInt64(this.txtGasLimit.Text) < Convert.ToInt64(this.gasCreateLimitMinimum))
             {
                 MessageBox.Show("Gas limit must be greater than  " + this.gasCallLimitMinimum, "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
 
