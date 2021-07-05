@@ -210,9 +210,11 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         private void dashboardBtn_Click(object sender, RoutedEventArgs e)
         {
+            SmartContractMain main = new SmartContractMain(this.walletName);
             Dashboard mw = new Dashboard(this.walletName);
             mw.ShowDialog();
-
+            main.Hide();
+            main.Visibility = Visibility.Hidden;
         }
 
         private void Btn_CallContract_Click(object sender, RoutedEventArgs e)

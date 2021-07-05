@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -25,6 +26,9 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
     /// </summary>
     public partial class TokenManagement : UserControl
     {
+        ObservableCollection<TokenRetrieveModel> tokenlist = new ObservableCollection<TokenRetrieveModel>();
+       // public ObservableCollection<TokenRetrieveModel> tokenlist { get; private set; }
+
         #region Base
         static HttpClient client = new HttpClient();
         string baseURL = URLConfiguration.BaseURL;// Common Url
@@ -50,7 +54,9 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         public TokenManagement()
         {
+
             InitializeComponent();
+            
         }
 
         public TokenManagement(string walletname, string selectedAddress)
@@ -69,7 +75,6 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             string activeAddress = this.lab_ActiveAddress.Content.ToString();
             await GetAddressBalanceAsync(activeAddress);
             //await GetHistoryAsync(GLOBALS.Address, this.walletName);
-            string result = AddTokenList();
         }
 
         private async Task<string> GetAddressBalanceAsync(string address)
@@ -123,10 +128,44 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             MessageBox.Show(activeAddress + "  COPIED");
         }
 
-        public string AddTokenList()
+        public void AddTokenList()
         {
             string retMsg = "";
-            List<TokenRetrieveModel> tokenlist = new List<TokenRetrieveModel>();
+
+            try
+            {
+                string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+                string tokenFilePath = System.IO.Path.Combine(CurrentDirectory, @"..\..\..\Token\TokenFile.txt");
+                string path = System.IO.Path.GetFullPath(tokenFilePath);
+
+                if (File.Exists(path))
+                {
+                    using (StreamReader r = new StreamReader(path))
+                    {
+                        string json = r.ReadToEnd();
+
+                      
+                            string concateData = '[' + json + ']';
+                            this.tokenlist = JsonConvert.DeserializeObject<ObservableCollection<TokenRetrieveModel>>(concateData);
+                            this.DataGrid1.ItemsSource = this.tokenlist;
+                    }
+                }
+                else
+                {
+                    this.tokenlist = new ObservableCollection<TokenRetrieveModel>();
+                    this.DataGrid1.ItemsSource = this.tokenlist;
+                }
+            }
+            catch (Exception e)
+            {
+                retMsg = e.Message.ToString();
+
+            }
+
+        }
+
+        public ObservableCollection<TokenRetrieveModel> GetAllToken() {
             try
             {
                 string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -140,21 +179,23 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                     {
                         string json = r.ReadToEnd();
                         string concateData = '[' + json + ']';
-                        tokenlist = JsonConvert.DeserializeObject<List<TokenRetrieveModel>>(concateData);
-                        //this.TokenManagementList.ItemsSource = tokenlist;
-                        this.DataGrid1.ItemsSource = tokenlist;
+                        this.tokenlist = JsonConvert.DeserializeObject<ObservableCollection<TokenRetrieveModel>>(concateData);
                     }
                 }
+                else
+                {
+                    this.tokenlist = new ObservableCollection<TokenRetrieveModel>();
+                    return this.tokenlist;
+                }
+                return this.tokenlist;
             }
             catch (Exception e)
             {
-                retMsg = e.Message.ToString();
-                return retMsg;
+                this.tokenlist = new ObservableCollection<TokenRetrieveModel>();
+                return this.tokenlist;
+
             }
-
-            return retMsg;
         }
-
         private void btn_Delete_Token_Click(object sender, RoutedEventArgs e)
         {
             DataGrid dataGrid = this.DataGrid1;
@@ -162,6 +203,8 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             DataGridCell RowAndColumn = (DataGridCell)dataGrid.Columns[3].GetCellContent(Row).Parent;
             string CellValue = ((TextBlock)RowAndColumn.Content).Text;
             DeleteToken(CellValue);
+            //this.DataGrid1.ItemsSource = null;
+            AddTokenList();
         }
 
 
@@ -194,21 +237,40 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 }
 
                 File.Delete(path);
-                string JSONresult = JsonConvert.SerializeObject(tokenlist, Formatting.Indented);
-                string FinalResult= JSONresult.TrimStart('[').TrimEnd(']').TrimStart().TrimEnd();
-                File.Create(path).Dispose();
-               
-                using (var sw = new StreamWriter(path, true))
+                if (tokenlist.Count > 0)
                 {
-                    sw.WriteLine(FinalResult.ToString());
-                    sw.WriteLine(",");
-                    sw.Flush();
-                    sw.Close();
+                    string JSONresult = JsonConvert.SerializeObject(tokenlist, Formatting.Indented);
+
+                    string FinalResult = JSONresult.TrimStart('[').TrimEnd(']').TrimStart().TrimEnd();
+                    File.Create(path).Dispose();
+
+                    using (var sw = new StreamWriter(path, true))
+                    {
+                        sw.WriteLine(FinalResult.ToString());
+                        sw.WriteLine(",");
+                        sw.Flush();
+                        sw.Close();
+
+                    }
+
 
                 }
+
             }
             return msg;
         }
 
+        private void btnGridLoad_Click(object sender, RoutedEventArgs e)
+        {
+            //this.tokenlist = new ObservableCollection<TokenRetrieveModel>();
+            //this.DataGrid1.ItemsSource = this.tokenlist;
+            AddTokenList();
+        }
+
+        public void tokenManagementPageContant_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.tokenlist = new ObservableCollection<TokenRetrieveModel>();
+            this.DataGrid1.ItemsSource = GetAllToken();
+        }
     }
 }

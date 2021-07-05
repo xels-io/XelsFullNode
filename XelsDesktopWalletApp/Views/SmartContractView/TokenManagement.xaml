@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:XelsDesktopWalletApp.Views.SmartContractView"
              mc:Ignorable="d" 
              d:DesignHeight="700" d:DesignWidth="1080">
-    <Grid x:Name="tokenManagementPageContant">
+    <Grid x:Name="tokenManagementPageContant" Loaded="tokenManagementPageContant_Loaded">
         <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0" Margin="10,10,10,10">
 
             <Grid Margin="0,0,0,0">
@@ -39,6 +39,13 @@
                 <Label Content="ACTIVE RECEIVE ADDRESS" Grid.Column="1" HorizontalAlignment="Left" Margin="20,23,0,0" VerticalAlignment="Top" FontWeight="Bold"  FontSize="12" Height="24" Width="200" />
                 <Label x:Name="lab_ActiveAddress" Grid.Column="1" HorizontalAlignment="Left" Margin="20,66,0,0" VerticalAlignment="Top" Width="250"/>
                 <Button Content="COPY" Click="Button_CopyClick"  Grid.Column="1" HorizontalAlignment="Left" Margin="417,66,0,0" VerticalAlignment="Top" MinWidth="80" RenderTransformOrigin="0.101,0.754">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="15"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+                <Button Content="load" Name="btnGridLoad" Click="btnGridLoad_Click"  Grid.Column="1" HorizontalAlignment="Left" Margin="417,90,0,0" VerticalAlignment="Top" MinWidth="80" RenderTransformOrigin="0.101,0.754">
                     <Button.Resources>
                         <Style TargetType="Border">
                             <Setter Property="CornerRadius" Value="15"/>
@@ -80,13 +87,14 @@
                     </ListView.View>
                 </ListView>
             </Grid>-->
+           
 
-            <DataGrid Name="DataGrid1" Width="1054" VerticalAlignment="Center" HorizontalAlignment="Center" AutoGenerateColumns="False">
+            <DataGrid Name="DataGrid1"  Width="1054" ItemsSource="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Center" AutoGenerateColumns="False" CanUserAddRows="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="TICKER" Width="200" Binding="{Binding Path=Ticker}" IsReadOnly="True" />
-                    <DataGridTextColumn Header="NAME" Width="200" Binding="{Binding Path=Name}" IsReadOnly="True" />
-                    <DataGridTextColumn Header="BALANCE" Width="200" Binding="{Binding Path=Balance}" IsReadOnly="True" />
-                    <DataGridTextColumn Header="ADDRESS" Width="200" Binding="{Binding Path=Address}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="TICKER" Width="200" Binding="{Binding Mode=TwoWay, Path=Ticker}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="NAME" Width="200" Binding="{Binding Mode=TwoWay, Path=Name}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="BALANCE" Width="200" Binding="{Binding Mode=TwoWay, Path=Balance}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="ADDRESS" Width="200" Binding="{Binding Mode=TwoWay, Path=Address}" IsReadOnly="True" />
                     <DataGridTemplateColumn Header="Actions" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -103,7 +111,7 @@
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
-           
+
         </StackPanel>
     </Grid>
 </UserControl>

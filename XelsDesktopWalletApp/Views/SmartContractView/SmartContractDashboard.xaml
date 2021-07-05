@@ -25,7 +25,7 @@
                         </TextBlock>
 
                         <TextBlock Background="Green" Padding="2 2 2 2" Margin="120,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Microsoft YaHei" TextDecorations="" FontWeight="Normal" FontSize="9" Foreground="#FF434943" RenderTransformOrigin="0.477,0.222" MinHeight="25" MinWidth="100" >
-                        <Button Content="Token Management" Click="btn_TokenManagement_Click" MinWidth="100" MinHeight="25" >
+                        <Button Content="Token Management" Name="btnTokenmanagement" Click="btn_TokenManagement_Click" MinWidth="100" MinHeight="25" >
                              <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="7"/>

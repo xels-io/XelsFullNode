@@ -211,8 +211,10 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 msg = result.Result;
                 MessageBox.Show("Message - " + msg);
                 this.Visibility = Visibility.Collapsed;
-                TokenManagement tokenManagement = new TokenManagement();
-                tokenManagement.AddTokenList();
+                TokenManagement tm = new TokenManagement();
+                tm.tokenManagementPageContant_Loaded(null, null);
+
+
             }
             else
             {
@@ -228,8 +230,9 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 msg = result.Result;
                 MessageBox.Show("Message - " + msg);
                 this.Visibility = Visibility.Collapsed;
-                TokenManagement tokenManagement = new TokenManagement();
-                tokenManagement.AddTokenList();
+                TokenManagement tm = new TokenManagement();
+                tm.tokenManagementPageContant_Loaded(null, null);
+
             }
 
         }
