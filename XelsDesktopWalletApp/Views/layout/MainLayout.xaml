@@ -137,26 +137,26 @@
 
                 <Button Margin="10" Background="#FF41A43C" BorderBrush="#FF41A43C">
                     <Grid Width="150">
-                        <materialDesign:PackIcon Kind="Account" VerticalAlignment="Center"/>
-                        <TextBlock HorizontalAlignment="Center" Text="PERFIL" FontFamily="Champagne &amp; Limousines"/>
+                        <materialDesign:PackIcon Kind="History" VerticalAlignment="Center"/>
+                        <TextBlock HorizontalAlignment="Center" Text="HISTORY" FontFamily="Champagne &amp; Limousines"/>
                     </Grid>
                 </Button>
 
                 <Button Margin="10" Background="#FF41A43C" BorderBrush="#FF41A43C">
                     <Grid Width="150">
-                        <materialDesign:PackIcon Kind="ContentPaste" VerticalAlignment="Center"/>
-                        <TextBlock HorizontalAlignment="Center" Text="TABELAS" FontFamily="Champagne &amp; Limousines"/>
+                        <materialDesign:PackIcon Kind="FindReplace" VerticalAlignment="Center"/>
+                        <TextBlock HorizontalAlignment="Right" Text="EXCHANGE" FontFamily="Champagne &amp; Limousines" Margin="0,0,39,0"/>
                     </Grid>
                 </Button>
 
                 <Button Margin="10" Background="#FF41A43C" BorderBrush="#FF41A43C">
                     <Grid Width="150">
-                        <materialDesign:PackIcon Kind="TshirtCrew" VerticalAlignment="Center"/>
-                        <TextBlock HorizontalAlignment="Center" Text="PRODUTOS" FontFamily="Champagne &amp; Limousines"/>
+                        <materialDesign:PackIcon Kind="Laptop" VerticalAlignment="Center" />
+                        <TextBlock HorizontalAlignment="Left" Text="SMART CONTRACT" FontFamily="Champagne &amp; Limousines" Height="17" VerticalAlignment="Center" Margin="21,0,0,0" Width="129"/>
                     </Grid>
                 </Button>
 
-                <Button Margin="10" Background="#FF41A43C" BorderBrush="#FF41A43C">
+                <!--<Button Margin="10" Background="#FF41A43C" BorderBrush="#FF41A43C">
                     <Grid Width="150">
                         <materialDesign:PackIcon Kind="TruckDelivery" VerticalAlignment="Center"/>
                         <TextBlock HorizontalAlignment="Center" Text="FORNECEDORES" FontFamily="Champagne &amp; Limousines"/>
@@ -168,40 +168,32 @@
                         <materialDesign:PackIcon Kind="Settings" VerticalAlignment="Center"/>
                         <TextBlock HorizontalAlignment="Center" Text="CONFIGURAÇÕES" FontFamily="Champagne &amp; Limousines"/>
                     </Grid>
-                </Button>
+                </Button>-->
             </StackPanel>
         </Grid>
 
         <Grid x:Name="GridBarraTitulo" Grid.ColumnSpan="2" Background="#FF41A43C" MouseDown="GridBarraTitulo_MouseDown">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10,0">
+                <materialDesign:PopupBox PlacementMode="BottomAndAlignLeftEdges" StaysOpen="False">
+                    <materialDesign:PopupBox.ToggleContent>
+                        <materialDesign:PackIcon Kind="Settings" Foreground="White" />
+                    </materialDesign:PopupBox.ToggleContent>
+                    <StackPanel Width="150">
+                        <Button Content="Address Book"/>
+                        <Button Content="Advance"/>
+                        <Separator/>
+                        <Button Content="Logout"/>
+                    </StackPanel>
+                </materialDesign:PopupBox>
 
-                <StackPanel Margin="5">
-                    <ToggleButton Name="button">
-                        <ToggleButton.Template>
-                            <ControlTemplate TargetType="ToggleButton" >
-                                <materialDesign:PackIcon Kind="Settings"/>
-                            </ControlTemplate>
-                        </ToggleButton.Template>
-                    </ToggleButton>
-                    <Popup IsOpen="{Binding IsChecked, ElementName=button}" StaysOpen="False">
-                        <StackPanel Width="100">
-                            <Button Content="Settings"/>
-                            <Button Content="Account"/>
-                            <Button Content="Help"/>
-                            <Separator/>
-                            <Button Content="Logout"/>
-                        </StackPanel>
-                    </Popup>
-                </StackPanel>
-
-                <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White">
+                <!--<Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White">
                     <materialDesign:PackIcon Kind="Bell"/>
                 </Button>
                 <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White">
                     <materialDesign:PackIcon Kind="Account"/>
-                </Button>
+                </Button>-->
                 <Button x:Name="ButtonFechar" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" Click="ButtonFechar_Click">
-                    <materialDesign:PackIcon Kind="Power"/>
+                    <materialDesign:PackIcon Kind="HighlightOff" Foreground="Red"/>
                 </Button>
             </StackPanel>
         </Grid>
