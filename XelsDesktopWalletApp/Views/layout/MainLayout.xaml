@@ -4,123 +4,206 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XelsDesktopWalletApp.Views.layout"
-          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" Width="1080" Height="700">
+            xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+          mc:Ignorable="d" Height="600" Width="1100" Foreground="White" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None">
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="btv" />
+        <ResourceDictionary>
+            <Style x:Key="ScrollThumbs" TargetType="{x:Type Thumb}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Thumb}">
+                            <Grid x:Name="Grid">
+                                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto" Fill="Transparent" />
+                                <Border x:Name="Rectangle1" CornerRadius="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto"  Background="{TemplateBinding Background}" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="Tag" Value="Horizontal">
+                                    <Setter TargetName="Rectangle1" Property="Width" Value="Auto" />
+                                    <Setter TargetName="Rectangle1" Property="Height" Value="7" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-        <!-- style a top level menu item -->
-        <ControlTemplate x:Key="VsMenuTop" TargetType="MenuItem">
-            <StackPanel TextBlock.FontSize="15px" Height="40">
-                <!-- label, icons, etc. -->
-                <Label Content="{TemplateBinding Header}" Margin="5" Foreground="White" />
+            <!--ScrollBars-->
+            <Style x:Key="{x:Type ScrollBar}" TargetType="{x:Type ScrollBar}">
+                <Setter Property="Stylus.IsFlicksEnabled" Value="false" />
+                <Setter Property="Foreground" Value="LightGray" />
+                <Setter Property="Background" Value="DarkGray" />
+                <Setter Property="Width" Value="10" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ScrollBar}">
+                            <Grid x:Name="GridRoot" Width="19" Background="{x:Null}">
+                                <Track x:Name="PART_Track" Grid.Row="0" IsDirectionReversed="true" Focusable="false">
+                                    <Track.Thumb>
+                                        <Thumb x:Name="Thumb" Background="{TemplateBinding Foreground}" Style="{DynamicResource ScrollThumbs}" />
+                                    </Track.Thumb>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton x:Name="PageUp" Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="false" />
+                                    </Track.IncreaseRepeatButton>
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton x:Name="PageDown" Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="false" />
+                                    </Track.DecreaseRepeatButton>
+                                </Track>
+                            </Grid>
 
-                <!-- sub items -->
-                <Popup IsOpen="{TemplateBinding IsSubmenuOpen}" AllowsTransparency="True" Focusable="False">
-                    <Border BorderThickness="1" Background="White" BorderBrush="#E0E0E0">
-                        <StackPanel IsItemsHost="True" />
-                    </Border>
-                </Popup>
-                <StackPanel.Style>
-                    <Style TargetType="StackPanel">
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver"  Value="True">
-                                <Setter Property="Background" Value="#32CD32" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </StackPanel.Style>
-            </StackPanel>
-        </ControlTemplate>
+                            <ControlTemplate.Triggers>
+                                <Trigger SourceName="Thumb" Property="IsMouseOver" Value="true">
+                                    <Setter Value="{DynamicResource ButtonSelectBrush}" TargetName="Thumb" Property="Background" />
+                                </Trigger>
+                                <Trigger SourceName="Thumb" Property="IsDragging" Value="true">
+                                    <Setter Value="{DynamicResource DarkBrush}" TargetName="Thumb" Property="Background" />
+                                </Trigger>
 
-        <!-- style a non-top level menu item -->
-        <ControlTemplate x:Key="VsMenuSub" TargetType="MenuItem">
-            <DockPanel TextBlock.FontSize="15px" x:Name="panel">
-                <!-- label, icons, etc. -->
-                <Image Source="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" Width="20" Margin="5,0" />
-                <Label Content="{TemplateBinding Header}" Foreground="Black" Margin="0,5,5,5" />
-                <Image Source="icon_right.png" Visibility="{Binding HasItems, Converter={StaticResource btv}, RelativeSource={RelativeSource TemplatedParent}}" />
-
-                <!-- sub items -->
-                <Popup IsOpen="{TemplateBinding IsSubmenuOpen}" AllowsTransparency="True" Focusable="False" Placement="Right" >
-                    <Border BorderThickness="1" Background="White" BorderBrush="#E0E0E0">
-                        <StackPanel IsItemsHost="True" />
-                    </Border>
-                </Popup>
-            </DockPanel>
-            <ControlTemplate.Triggers>
-                <Trigger Property="IsHighlighted" Value="True">
-                    <Setter Property="Background" TargetName="panel" Value="#EFF6FC" />
-                </Trigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
-
-        <!-- style the separator -->
-        <ControlTemplate x:Key="VsMenuSep" TargetType="Separator">
-            <Border Height="1" Background="#E0E0E0" />
-        </ControlTemplate>
-
-        <!-- style the VSOnline -->
-        <!-- style a top level menu item -->
-        <ControlTemplate x:Key="VsOnline" TargetType="MenuItem">
-            <StackPanel TextBlock.FontSize="15px" Height="40" Orientation="Horizontal" Background="#005A9E">
-                <Label Content="{TemplateBinding Header}" Margin="5" Foreground="White" />
-                <Image Source="icon_down.png" Height="20" Margin="0,0,5,0" />
-
-                <!-- sub items -->
-                <Popup IsOpen="{TemplateBinding IsSubmenuOpen}" AllowsTransparency="True" Focusable="False">
-                    <Border BorderThickness="1" Background="White" BorderBrush="#E0E0E0">
-                        <StackPanel IsItemsHost="True" />
-                    </Border>
-                </Popup>
-            </StackPanel>
-        </ControlTemplate>
-
-        <!-- some base stuff -->
-        <Style TargetType="Menu">
-            <Setter Property="Background" Value="#32CD32" />
-            <Setter Property="Height" Value="40px" />
-        </Style>
-
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter TargetName="Thumb" Property="Visibility" Value="Collapsed" />
+                                </Trigger>
+                                <Trigger Property="Orientation" Value="Horizontal">
+                                    <Setter TargetName="GridRoot" Property="LayoutTransform">
+                                        <Setter.Value>
+                                            <RotateTransform Angle="-90" />
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter TargetName="PART_Track" Property="LayoutTransform">
+                                        <Setter.Value>
+                                            <RotateTransform Angle="-90" />
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="Width" Value="Auto" />
+                                    <Setter Property="Height" Value="12" />
+                                    <Setter TargetName="Thumb" Property="Tag" Value="Horizontal" />
+                                    <Setter TargetName="PageDown" Property="Command" Value="ScrollBar.PageLeftCommand" />
+                                    <Setter TargetName="PageUp" Property="Command" Value="ScrollBar.PageRightCommand" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
     </Window.Resources>
-
     <Grid>
-        <Border Padding="10" BorderThickness="1,1,1,1" CornerRadius="7,7,7,7">
-            
-            
-            <StackPanel>
-                <Border Padding="10" CornerRadius="7,7,7,7" Background="#32CD32" BorderBrush="Black" BorderThickness="1,1,1,1">
-                    <Menu IsMainMenu="True">
-                        
-                        <MenuItem Header="_Dashboard" Template="{StaticResource VsMenuTop}">
-                            <MenuItem Header="_Overview" Template="{StaticResource VsMenuSub}" />
-                        </MenuItem>
-                        <MenuItem Header="_Page1"  Click="MenuItem_ClickPage1" Template="{StaticResource VsMenuTop}">
-                            <!--<MenuItem Header="_Files" Template="{StaticResource VsMenuSub}" />
-                            <MenuItem Header="_Commits" Template="{StaticResource VsMenuSub}" />
-                            <MenuItem Header="_Pushes" Template="{StaticResource VsMenuSub}" />-->
-                        </MenuItem>
-                        <MenuItem Header="Page2" Click="MenuItem_ClickPage2" Template="{StaticResource VsMenuTop}">
-                            <!--<MenuItem Header="_Backlogs" Template="{StaticResource VsMenuSub}" Icon="icon_backlogs.png" />
-                            <MenuItem Header="_Queries" Template="{StaticResource VsMenuSub}" Icon="icon_queries.png" />
-                            <Separator Template="{StaticResource VsMenuSep}" />
-                            <MenuItem Header="_New Work Item" Template="{StaticResource VsMenuSub}">
-                                <MenuItem Header="_Epic" Template="{StaticResource VsMenuSub}" Icon="icon_epic.png" />
-                                <MenuItem Header="_Feature" Template="{StaticResource VsMenuSub}" Icon="icon_feature.png" />
-                                <MenuItem Header="_Issue" Template="{StaticResource VsMenuSub}" Icon="icon_issue.png" />
-                                <MenuItem Header="_Task" Template="{StaticResource VsMenuSub}" Icon="icon_task.png" />
-                                <MenuItem Header="_Test Case" Template="{StaticResource VsMenuSub}" Icon="icon_testcase.png" />
-                                <MenuItem Header="_User Story" Template="{StaticResource VsMenuSub}" Icon="icon_userstory.png" />
-                            </MenuItem>-->
-                            <!--<MenuItem Header="_Bug" Template="{StaticResource VsMenuSub}" Icon="icon_bug.png" />-->
-                        </MenuItem>
-                    </Menu>
-                </Border>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                <Grid x:Name="page_Content" Height="600">
-                   
-                   
-                </Grid>
+
+        <Grid Grid.Column="1" Grid.Row="1" Background="#FFCFCFCF">
+            <ScrollViewer>
+                <Frame x:Name="PageContent" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="560" Width="880"></Frame>
+
+            </ScrollViewer>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="LightGray" Offset="1"/>
+                    <GradientStop Color="#FFE6E6E6"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="98"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.Effect>
+                <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" RenderingBias="Quality" ShadowDepth="1"/>
+            </Grid.Effect>
+
+            <Grid Background="LightGray" Margin="0,0,0,29">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="107*"/>
+                    <ColumnDefinition Width="93*"/>
+                </Grid.ColumnDefinitions>
+                <!--<TextBlock Text="DASHBOARD" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="WS Simple Gallifreyan" Foreground="White" FontSize="16"/>-->
+                <Image Height="50" Source="/Assets/Images/home-xels-logo-01.png"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Margin="20,20,80,30" Grid.ColumnSpan="2" />
+            </Grid>
+
+            <StackPanel Grid.Row="1">
+                <Button x:Name="btnDashboard" Margin="10" Background="#FF41A43C" BorderBrush="#FF41A43C" Click="btnDashboard_Click" Height="31">
+                    <Grid Width="150">
+                        <materialDesign:PackIcon Kind="ViewDashboard" VerticalAlignment="Center"/>
+                        <TextBlock HorizontalAlignment="Center" Text="DASHBOARD" FontFamily="Champagne &amp; Limousines"/>
+                    </Grid>
+                </Button>
+
+                <Button Margin="10" Background="#FF41A43C" BorderBrush="#FF41A43C">
+                    <Grid Width="150">
+                        <materialDesign:PackIcon Kind="Account" VerticalAlignment="Center"/>
+                        <TextBlock HorizontalAlignment="Center" Text="PERFIL" FontFamily="Champagne &amp; Limousines"/>
+                    </Grid>
+                </Button>
+
+                <Button Margin="10" Background="#FF41A43C" BorderBrush="#FF41A43C">
+                    <Grid Width="150">
+                        <materialDesign:PackIcon Kind="ContentPaste" VerticalAlignment="Center"/>
+                        <TextBlock HorizontalAlignment="Center" Text="TABELAS" FontFamily="Champagne &amp; Limousines"/>
+                    </Grid>
+                </Button>
+
+                <Button Margin="10" Background="#FF41A43C" BorderBrush="#FF41A43C">
+                    <Grid Width="150">
+                        <materialDesign:PackIcon Kind="TshirtCrew" VerticalAlignment="Center"/>
+                        <TextBlock HorizontalAlignment="Center" Text="PRODUTOS" FontFamily="Champagne &amp; Limousines"/>
+                    </Grid>
+                </Button>
+
+                <Button Margin="10" Background="#FF41A43C" BorderBrush="#FF41A43C">
+                    <Grid Width="150">
+                        <materialDesign:PackIcon Kind="TruckDelivery" VerticalAlignment="Center"/>
+                        <TextBlock HorizontalAlignment="Center" Text="FORNECEDORES" FontFamily="Champagne &amp; Limousines"/>
+                    </Grid>
+                </Button>
+
+                <Button Margin="10" Background="#FF41A43C" BorderBrush="#FF41A43C">
+                    <Grid Width="150">
+                        <materialDesign:PackIcon Kind="Settings" VerticalAlignment="Center"/>
+                        <TextBlock HorizontalAlignment="Center" Text="CONFIGURAÇÕES" FontFamily="Champagne &amp; Limousines"/>
+                    </Grid>
+                </Button>
             </StackPanel>
-        </Border>
+        </Grid>
+
+        <Grid x:Name="GridBarraTitulo" Grid.ColumnSpan="2" Background="#FF41A43C" MouseDown="GridBarraTitulo_MouseDown">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10,0">
+
+                <StackPanel Margin="5">
+                    <ToggleButton Name="button">
+                        <ToggleButton.Template>
+                            <ControlTemplate TargetType="ToggleButton" >
+                                <materialDesign:PackIcon Kind="Settings"/>
+                            </ControlTemplate>
+                        </ToggleButton.Template>
+                    </ToggleButton>
+                    <Popup IsOpen="{Binding IsChecked, ElementName=button}" StaysOpen="False">
+                        <StackPanel Width="100">
+                            <Button Content="Settings"/>
+                            <Button Content="Account"/>
+                            <Button Content="Help"/>
+                            <Separator/>
+                            <Button Content="Logout"/>
+                        </StackPanel>
+                    </Popup>
+                </StackPanel>
+
+                <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White">
+                    <materialDesign:PackIcon Kind="Bell"/>
+                </Button>
+                <Button Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White">
+                    <materialDesign:PackIcon Kind="Account"/>
+                </Button>
+                <Button x:Name="ButtonFechar" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Width="25" Height="25" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" Click="ButtonFechar_Click">
+                    <materialDesign:PackIcon Kind="Power"/>
+                </Button>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
