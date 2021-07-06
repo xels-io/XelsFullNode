@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <None Remove="Assets\Images\home-xels-logo-01.png" />
+    <None Remove="Assets\Images\icon.ico" />
     <None Remove="Assets\Images\loading-3.gif" />
     <None Remove="Views\home-xels-logo-01.png" />
   </ItemGroup>
@@ -70,6 +71,9 @@
 
   <ItemGroup>
     <Resource Include="Assets\Images\home-xels-logo-01.png" />
+    <Resource Include="Assets\Images\icon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Assets\Images\loading-3.gif" />
   </ItemGroup>  
 
