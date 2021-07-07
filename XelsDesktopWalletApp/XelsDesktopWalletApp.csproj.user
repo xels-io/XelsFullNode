@@ -55,6 +55,9 @@
     <Compile Update="Views\layout\Testpage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\layout\Testpage2.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\Login.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -118,6 +121,12 @@
     <Compile Update="Views\SmartContractView\TokenManagement.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\ViewPage\SmtAddressSelection.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\ViewPage\SmtContractDashboard.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="MainWindow.xaml">
@@ -166,6 +175,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\layout\Testpage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\layout\Testpage2.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Login.xaml">
@@ -232,6 +244,12 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\SmartContractView\TokenManagement.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ViewPage\SmtAddressSelection.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ViewPage\SmtContractDashboard.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

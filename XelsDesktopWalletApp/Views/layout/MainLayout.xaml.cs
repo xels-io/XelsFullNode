@@ -9,6 +9,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using XelsDesktopWalletApp.Models;
+using XelsDesktopWalletApp.Models.CommonModels;
+using XelsDesktopWalletApp.Views.SmartContractView;
+using XelsDesktopWalletApp.Views.ViewPage;
 
 namespace XelsDesktopWalletApp.Views.layout
 {
@@ -17,9 +21,50 @@ namespace XelsDesktopWalletApp.Views.layout
     /// </summary>
     public partial class MainLayout : Window
     {
+        #region Common
+        private string baseURL = URLConfiguration.BaseURL;
+        private readonly WalletInfo walletInfo = new WalletInfo();
+        private string walletName;
+        public string WalletName
+        {
+            get
+            {
+                return this.walletName;
+            }
+            set
+            {
+                this.walletName = value;
+            }
+        }
+        #endregion
+
         public MainLayout()
         {
             InitializeComponent();
+            this.DataContext = this;
+        }
+
+        public MainLayout(string walletname)
+        {
+            InitializeComponent();
+            this.DataContext = this;
+
+            this.walletName = walletname;
+            this.walletInfo.walletName = this.walletName;
+            //GetGeneralInfoAsync();
+            //LoadLoginAsync();
+            //GetHistoryAsync();
+
+            //if (URLConfiguration.Chain != "-sidechain")// (!this.sidechainEnabled)
+            //{
+            //    _ = GetStakingInfoAsync(this.baseURL);
+            //}
+
+            //if (URLConfiguration.Chain == "-sidechain")// (!this.sidechainEnabled)
+            //{
+            //    this.buttonPowMining.Visibility = Visibility.Hidden;
+            //}
+            //PopulateTxt();
         }
 
         private void ButtonFechar_Click(object sender, RoutedEventArgs e)
@@ -35,6 +80,12 @@ namespace XelsDesktopWalletApp.Views.layout
         private void btnDashboard_Click(object sender, RoutedEventArgs e)
         {
             this.PageContent.Content = new Testpage();
+        }
+
+        private void btn_SmartContract_Click(object sender, RoutedEventArgs e)
+        {
+            this.PageContent.Content = null;
+            this.PageContent.Content = new SmtAddressSelection(this.walletName);
         }
 
         //private void ButtonOpenMenu_Click(object sender, RoutedEventArgs e)

@@ -551,8 +551,8 @@ namespace XelsDesktopWalletApp.Views
 
         private void Hyperlink_NavigateNewLayout(object sender, RequestNavigateEventArgs e)
         {
-            MainLayout history = new MainLayout();
-            history.Show();
+            MainLayout mainLayout = new MainLayout(this.walletName);
+            mainLayout.Show();
             this.Close();
         }
     }

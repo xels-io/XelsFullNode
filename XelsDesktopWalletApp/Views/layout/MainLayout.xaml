@@ -149,7 +149,7 @@
                     </Grid>
                 </Button>
 
-                <Button Margin="10" Background="#FF41A43C" BorderBrush="#FF41A43C">
+                <Button Name="btn_SmartContract" Margin="10" Click="btn_SmartContract_Click" Background="#FF41A43C" BorderBrush="#FF41A43C">
                     <Grid Width="150">
                         <materialDesign:PackIcon Kind="Laptop" VerticalAlignment="Center" />
                         <TextBlock HorizontalAlignment="Left" Text="SMART CONTRACT" FontFamily="Champagne &amp; Limousines" Height="17" VerticalAlignment="Center" Margin="21,0,0,0" Width="129"/>

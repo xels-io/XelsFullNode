@@ -1,0 +1,53 @@
+﻿<Page x:Class="XelsDesktopWalletApp.Views.ViewPage.SmtAddressSelection"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:XelsDesktopWalletApp.Views.ViewPage"
+          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="SmtAddressSelection">
+
+    <Grid>
+        <Rectangle Margin="20,20,20,10" Fill="White" RadiusY="10" RadiusX="10" >
+            <Rectangle.Effect>
+                <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" RenderingBias="Quality" ShadowDepth="1"/>
+            </Rectangle.Effect>
+        </Rectangle>
+        <Grid Margin="20,187,20,143" Height="120">
+            
+            <StackPanel VerticalAlignment="Center" Margin="15">
+
+                <!--<ComboBox x:Name="selectaddress"
+                          ItemsSource="{Binding  Path=AddressList, Mode=TwoWay}" 
+                          SelectedItem="{Binding Path=AddressList, Mode=TwoWay}"
+                          materialDesign:HintAssist.Hint="ADDRESS" 
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                          Width="531" FontSize="20" Background="White" BorderBrush="LimeGreen"  
+                      FontFamily="Microsoft YaHei Light">
+                </ComboBox>-->
+                <ComboBox x:Name="selectaddress" VerticalContentAlignment="Center"
+                          ItemsSource="{Binding  Path=AddressList, Mode=TwoWay}" 
+                          SelectedItem="{Binding Path=selectedAddress, Mode=TwoWay}"
+                          materialDesign:HintAssist.Hint="ADDRESS" 
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                          Background="White" BorderBrush="LimeGreen"  
+                          FontFamily="Bahnschrift"  Width="531" FontSize="20"
+                          >
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Address}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+
+
+                <Button  Width="531" x:Name="useAddressBtn" Click="useAddressBtn_Click"   HorizontalAlignment="Center" Background="#FF41A43C" VerticalAlignment="Bottom" FontSize="20" Margin="0,20,10,10" Content="USE ADDRESS"/>
+
+            </StackPanel>
+
+        </Grid>
+    </Grid>
+</Page>

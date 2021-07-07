@@ -1,45 +1,29 @@
 {
-  "Ticker": "MEDI",
-  "Address": "CUwkBGkXrQpMnZeWW2SpAv1Vu9zPvjWNFS",
-  "Name": "Mediconnect",
-  "Decimals": "8",
-  "Balance": "0",
-  "DropDownValue": null
-}
-,
-{
-  "Ticker": "custom",
-  "Address": "custom",
-  "Name": "custom",
-  "Decimals": "0",
-  "Balance": "0",
-  "DropDownValue": null
-}
-,
-{
-  "Ticker": "customer",
-  "Address": "customer",
-  "Name": "customer",
-  "Decimals": "0",
-  "Balance": "0",
-  "DropDownValue": null
-}
-,
-{
-  "Ticker": "custom3",
-  "Address": "custom3",
-  "Name": "custom3",
-  "Decimals": "0",
-  "Balance": "0",
-  "DropDownValue": null
-}
-,
-{
-  "Ticker": "custom4",
-  "Address": "custom4",
-  "Name": "custom4",
-  "Decimals": "0",
-  "Balance": "0",
-  "DropDownValue": null
-}
+    "Ticker": "MEDI",
+    "Address": "CUwkBGkXrQpMnZeWW2SpAv1Vu9zPvjWNFS",
+    "Name": "Mediconnect",
+    "Decimals": "8",
+    "Balance": "0"
+  },
+  {
+    "Ticker": "customer",
+    "Address": "customer",
+    "Name": "customer",
+    "Decimals": "0",
+    "Balance": "0"
+  },
+  {
+    "Ticker": "custom3",
+    "Address": "custom3",
+    "Name": "custom3",
+    "Decimals": "0",
+    "Balance": "0"
+  },
+  {
+    "Ticker": "custom4",
+    "Address": "custom4",
+    "Name": "custom4",
+    "Decimals": "0",
+    "Balance": "0"
+  }
 ,
