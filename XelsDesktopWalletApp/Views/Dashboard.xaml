@@ -139,7 +139,7 @@
             </Grid>
 
             <StackPanel x:Name="DashBoard_page_Content">
-                <Grid Height="auto">
+                <Grid Height="628">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"></ColumnDefinition>
                         <ColumnDefinition Width="3*"></ColumnDefinition>
@@ -375,7 +375,7 @@
 
                             <Button Content="Go to History" Click="GotoHistoryButton_Click" FontFamily="Microsoft YaHei Light" 
                                 Foreground="#FF0FD421" Background="White" BorderBrush="#FF30CD3E" FontSize="10" 
-                                Margin="0,79,0,10" HorizontalAlignment="Center" Width="77">
+                                Margin="0,94,0,-13" HorizontalAlignment="Center" Width="192">
                                 <Button.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="2"/>
