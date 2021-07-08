@@ -87,11 +87,11 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
 
         }
 
-        private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            this.Visibility = Visibility.Collapsed;
+        //private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    this.Visibility = Visibility.Collapsed;
 
-        }
+        //}
 
         private void btn_CreateSubmit_Click(object sender, RoutedEventArgs e)
         {
@@ -238,9 +238,9 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 MessageBox.Show("Error Code" + response.StatusCode + " : Message - " + response.ReasonPhrase);
             }
         }
-        private void btn_Create_Cancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.Visibility = Visibility.Collapsed;
-        }
+        //private void btn_Create_Cancel_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.Visibility = Visibility.Collapsed;
+        //}
     }
 }

@@ -6,9 +6,16 @@
     "Balance": "0"
   },
   {
-    "Ticker": "customer",
-    "Address": "customer",
-    "Name": "customer",
+    "Ticker": "custom11",
+    "Address": "custom1",
+    "Name": "custom1",
+    "Decimals": "0",
+    "Balance": "0"
+  },
+  {
+    "Ticker": "custom2",
+    "Address": "custom2",
+    "Name": "custom2",
     "Decimals": "0",
     "Balance": "0"
   },
@@ -18,12 +25,14 @@
     "Name": "custom3",
     "Decimals": "0",
     "Balance": "0"
-  },
-  {
-    "Ticker": "custom4",
-    "Address": "custom4",
-    "Name": "custom4",
-    "Decimals": "0",
-    "Balance": "0"
   }
+,
+{
+  "Ticker": "custom",
+  "Address": "custom",
+  "Name": "custom",
+  "Decimals": "0",
+  "Balance": "0",
+  "DropDownValue": null
+}
 ,

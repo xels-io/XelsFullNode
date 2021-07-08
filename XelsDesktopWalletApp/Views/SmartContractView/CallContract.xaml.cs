@@ -80,10 +80,10 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             this.txtBalance.Text = addressBalance;
            
         }
-        private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            this.Visibility = Visibility.Collapsed;
-        }
+        //private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    this.Visibility = Visibility.Collapsed;
+        //}
 
         private void btn_CallSubmit_Click(object sender, RoutedEventArgs e)
         {
@@ -224,9 +224,9 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         }
 
 
-        private void btn_Cancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.Visibility = Visibility.Collapsed;
-        }
+        //private void btn_Cancel_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.Visibility = Visibility.Collapsed;
+        //}
     }
 }

@@ -4,143 +4,132 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:XelsDesktopWalletApp.Views.SmartContractView"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"   d:DesignHeight="500" d:DesignWidth="800"
              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0">
 
     <Grid>
-        <Rectangle Fill="PaleGreen" Opacity=".5" MouseDown="Rectangle_MouseDown" />
-        <Border CornerRadius="10"  Background="White" Height="480" Width="480" HorizontalAlignment="Center">
-            <Grid Margin="5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" TextAlignment="Center" FontSize="15" Text="ISSUE TOKEN" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Center"/>
-                <Separator Grid.Row="1" BorderThickness="2" BorderBrush="Silver" Margin="0,4,0,0" />
-                <Grid Grid.Row="2" >
-                    <Grid Margin="2,8,0,6">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="150"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions >
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="30"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Grid.Column="0" Grid.Row="0" Text="SENDER" Margin="24,0,24,0" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                        <TextBox x:Name="txtSender" VerticalContentAlignment="Center" IsReadOnly="True"   Grid.Column="1"  Grid.Row="0" FontFamily="Bahnschrift"  Margin="0,0,-150,5">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+        <!--<Rectangle Fill="PaleGreen" Opacity=".5" MouseDown="Rectangle_MouseDown" />-->
+        <!--<Rectangle Fill="Silver" Opacity=".5"/>-->
+        <Rectangle Margin="5,5,5,5" Fill="White" RadiusY="10" RadiusX="10" >
+            <Rectangle.Effect>
+                <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" RenderingBias="Quality" ShadowDepth="1"/>
+            </Rectangle.Effect>
+        </Rectangle>
+        <Grid Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" TextAlignment="Center" FontSize="15" Text="ISSUE TOKEN" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" Margin="352,5,0,451"/>
+            <Separator BorderThickness="1" BorderBrush="Silver" Margin="20,20,20,451" />
+            <Grid Grid.Row="2" >
+                <Grid Margin="5,30,5,115">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="400"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions >
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="SENDER" Margin="100,0,24,0" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                    <TextBox x:Name="txtSender" VerticalContentAlignment="Center" IsReadOnly="True"   Grid.Column="1"  Grid.Row="0" FontFamily="Bahnschrift"  Margin="0,0,0,5">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
 
-                        <TextBlock x:Name="txtBalance" Grid.Column="1" Grid.Row="1"  Margin="0,11,-150,2" VerticalAlignment="Center" FontSize="11" FontFamily="Bahnschrift" HorizontalAlignment="Right" Width="74" />
-                        <TextBlock Grid.Column="1" Grid.Row="1" Text="Balance:" Margin="0,11,-71,4"  VerticalAlignment="Center" FontSize="11" FontFamily="Bahnschrift" HorizontalAlignment="Right" Width="47" />
+                    <TextBlock x:Name="txtBalance" Grid.Column="1" Grid.Row="1"  Margin="0,10,13,0" VerticalAlignment="Top" FontSize="11" FontFamily="Bahnschrift" HorizontalAlignment="Right" Width="74" />
+                    <TextBlock Grid.Column="1" Grid.Row="1" Text="Balance:" Margin="0,9,114,0"  VerticalAlignment="Top" FontSize="11" FontFamily="Bahnschrift" HorizontalAlignment="Right" Width="47" />
 
-                        <TextBlock Grid.Column="0" Grid.Row="2" Text="FEE" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="24,0,24,0" />
-                        <TextBox x:Name="txtFee"  Grid.Column="1"  Grid.Row="2" VerticalContentAlignment="Center" FontFamily="Bahnschrift"  Margin="0,0,-150,5">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                    <TextBlock Grid.Column="0" Grid.Row="2" Text="FEE" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="100,0,24,0" />
+                    <TextBox x:Name="txtFee"  Grid.Column="1"  Grid.Row="2" VerticalContentAlignment="Center" FontFamily="Bahnschrift"  Margin="0,0,0,5">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="3" Text="GAS PRICE" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="24,0,24,0" />
-                        <TextBox x:Name="txtGasPrice" VerticalContentAlignment="Center"  Grid.Column="1"  Grid.Row="3" FontFamily="Bahnschrift" Margin="0,0,-150,5">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                    <TextBlock Grid.Column="0" Grid.Row="3" Text="GAS PRICE" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="100,0,24,0" />
+                    <TextBox x:Name="txtGasPrice" VerticalContentAlignment="Center"  Grid.Column="1"  Grid.Row="3" FontFamily="Bahnschrift" Margin="0,0,0,5">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="4" Text="GAS LIMIT" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="24,0,24,0"/>
-                        <TextBox x:Name="txtGasLimit"  Grid.Column="1" VerticalContentAlignment="Center"  Grid.Row="4" FontFamily="Bahnschrift"  Margin="0,0,-150,5">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                    <TextBlock Grid.Column="0" Grid.Row="4" Text="GAS LIMIT" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="100,0,24,0"/>
+                    <TextBox x:Name="txtGasLimit"  Grid.Column="1" VerticalContentAlignment="Center"  Grid.Row="4" FontFamily="Bahnschrift"  Margin="0,0,0,5">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="5" Text="TOKEN NAME" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="24,0,0,0" />
-                        <TextBox x:Name="txtTokenName"  Grid.Column="1" VerticalContentAlignment="Center"  Grid.Row="5" FontFamily="Bahnschrift"  Margin="0,0,-150,5">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
+                    <TextBlock Grid.Column="0" Grid.Row="5" Text="TOKEN NAME" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="100,0,0,0" />
+                    <TextBox x:Name="txtTokenName"  Grid.Column="1" VerticalContentAlignment="Center"  Grid.Row="5" FontFamily="Bahnschrift"  Margin="0,0,0,5">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </TextBox.Resources>
 
-                        </TextBox>
-                        <TextBlock Grid.Column="0" Grid.Row="6" Text="TOKEN SYMBOL" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="24,0,24,0"/>
-                        <TextBox x:Name="txtTokenSymbol" VerticalContentAlignment="Center"  Grid.Column="1"  Grid.Row="6" FontFamily="Bahnschrift"  Margin="0,5,-150,0">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                    </TextBox>
+                    <TextBlock Grid.Column="0" Grid.Row="6" Text="TOKEN SYMBOL" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="100,0,24,0"/>
+                    <TextBox x:Name="txtTokenSymbol" VerticalContentAlignment="Center"  Grid.Column="1"  Grid.Row="6" FontFamily="Bahnschrift"  Margin="0,5,0,0">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="7" Text="TOTAL SUPPLY" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="24,0,24,0"/>
-                        <TextBox x:Name="txtTotalSupply"  Grid.Column="1" VerticalContentAlignment="Center"  Grid.Row="7" FontFamily="Bahnschrift"  Margin="0,5,-150,0">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                    <TextBlock Grid.Column="0" Grid.Row="7" Text="TOTAL SUPPLY" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="100,0,24,0"/>
+                    <TextBox x:Name="txtTotalSupply"  Grid.Column="1" VerticalContentAlignment="Center"  Grid.Row="7" FontFamily="Bahnschrift"  Margin="0,5,0,0">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="8" Text="DECIMAL PLACES" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="24,0,24,0"/>
-                        <TextBox x:Name="txtDecimal"  Grid.Column="1" VerticalContentAlignment="Center"  Grid.Row="8" FontFamily="Bahnschrift"  Margin="0,5,-150,0">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                    <TextBlock Grid.Column="0" Grid.Row="8" Text="DECIMAL PLACES" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="100,0,24,0"/>
+                    <TextBox x:Name="txtDecimal"  Grid.Column="1" VerticalContentAlignment="Center"  Grid.Row="8" FontFamily="Bahnschrift"  Margin="0,5,0,0">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="9" Text="WALLET PASSWORD" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center"  Margin="24,0,0,0" />
-                        <PasswordBox x:Name="txtPassword" Grid.Column="1" VerticalContentAlignment="Center" Grid.Row="9" FontFamily="Bahnschrift"  Margin="0,5,-150,5">
-                          
-                        </PasswordBox>
+                    <TextBlock Grid.Column="0" Grid.Row="9" Text="WALLET PASSWORD" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center"  Margin="100,0,0,0" />
+                    <PasswordBox x:Name="txtPassword" Grid.Column="1" VerticalContentAlignment="Center" Grid.Row="9" FontFamily="Bahnschrift"  Margin="0,5,0,5">
 
-
-                        <Button Grid.Column="1"  Grid.Row="11"   x:Name="btn_IssueTokenSubmit" Click="btn_IssueTokenSubmit_Click" Content="ISSUE TOKEN"  FontWeight="Bold" Background="#FF53E253"  Margin="0,0,-150,0">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="15"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
-                        <Button x:Name="btn_Create_Cancel" Grid.Column="0" Grid.Row="11" Content="CANCEL" Click="btn_Create_Cancel_Click"  FontWeight="Bold" Background="BurlyWood">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="15"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
+                    </PasswordBox>
 
 
-                    </Grid>
-
-
+                    <Button Grid.Column="1"  Grid.Row="10"   x:Name="btn_IssueTokenSubmit" Click="btn_IssueTokenSubmit_Click" Content="ISSUE TOKEN"  FontWeight="Bold" Background="#FF41A43C"  Margin="0,0,234,-2">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="15"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
                 </Grid>
             </Grid>
-
-        </Border>
-
+        </Grid>
     </Grid>
 </UserControl>

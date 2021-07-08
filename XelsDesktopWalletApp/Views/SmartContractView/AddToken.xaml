@@ -4,114 +4,128 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:XelsDesktopWalletApp.Views.SmartContractView"
-             mc:Ignorable="d" 
-               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0">
+             mc:Ignorable="d"   d:DesignHeight="500" d:DesignWidth="800"
+               >
     <Grid>
-        <Rectangle Fill="PaleGreen" Opacity=".5" MouseDown="Rectangle_MouseDown" />
-        <Border CornerRadius="10"  x:Name="gridAllPage" Background="White" Height="380" Width="480" HorizontalAlignment="Center">
-            <Grid Margin="5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" TextAlignment="Center" FontSize="15" Text="ADD TOKEN" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Center"/>
-                <Separator Grid.Row="1" BorderThickness="1" BorderBrush="Silver" />
-                <Grid Grid.Row="2" >
-                    <Grid Margin="2,8,0,6">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="170"/>
-                            <ColumnDefinition Width="130"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions >
-                            <RowDefinition Height="40"/>
-                            <RowDefinition Height="10"/>
-                            <RowDefinition Height="50" x:Name="rowTokenContractAddress"/>
-                            <RowDefinition Height="10"/>
-                            <RowDefinition Height="40" x:Name="rowTokenSymbol"/>
-                            <RowDefinition Height="10"/>
-                            <RowDefinition Height="40" x:Name="rowTokenName"/>
-                            <RowDefinition Height="10"/>
-                            <RowDefinition Height="40" x:Name="rowTokenDecimal"/>
-                            <RowDefinition Height="0"/>
-                            <RowDefinition Height="10"/>
-                            <RowDefinition Height="30"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Grid.Column="0" Grid.Row="0" Text="TOKEN" Margin="11,0,0,0" FontWeight="Bold" FontFamily="Bahnschrift" VerticalAlignment="Center" HorizontalAlignment="Left" Width="37" />
+        <!--<Rectangle Fill="PaleGreen" Opacity=".5" MouseDown="Rectangle_MouseDown" />-->
+        <!--<Rectangle Fill="Silver" Opacity=".5" />-->
+        <Rectangle Margin="5,5,5,5" Fill="White" RadiusY="10" RadiusX="10" >
+            <Rectangle.Effect>
+                <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" RenderingBias="Quality" ShadowDepth="1"/>
+            </Rectangle.Effect>
+        </Rectangle>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" TextAlignment="Center" FontSize="15" Text="ADD TOKEN" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Center" Margin="0,0,0,305"/>
+            <Separator BorderThickness="1" BorderBrush="Silver" Margin="20,20,20,451" />
+            <Grid Margin="5,0,0,5">
+                <Grid Margin="5,30,5,115">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="265"/>
+                        <ColumnDefinition Width="135"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions >
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="5" x:Name="row2"/>
+                        <RowDefinition Height="25" x:Name="rowTokenContractAddress"/>
+                        <RowDefinition Height="5" x:Name="row3"/>
+                        <RowDefinition Height="25" x:Name="rowTokenSymbol"/>
+                        <RowDefinition Height="5" x:Name="row4"/>
+                        <RowDefinition Height="25" x:Name="rowTokenName"/>
+                        <RowDefinition Height="5" x:Name="row5"/>
+                        <RowDefinition Height="25" x:Name="rowTokenDecimal"/>
+                        <RowDefinition Height="25" x:Name="row6"/>
 
-                        <ComboBox x:Name="token"  VerticalContentAlignment="Center"  SelectionChanged="token_SelectionChanged" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding  Path=Tokens, Mode=TwoWay}" 
-                          SelectedItem="{Binding Path=Tokens, Mode=TwoWay}"
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Column="0" Text="TOKEN" Margin="77,0,0,0" FontWeight="Bold" FontFamily="Bahnschrift" VerticalAlignment="Center" HorizontalAlignment="Left" Width="37" Height="14" />
+
+                    <ComboBox x:Name="token"  VerticalContentAlignment="Center"  SelectionChanged="token_SelectionChanged" Grid.Column="1" ItemsSource="{Binding  Path=Tokens, Mode=TwoWay}" 
+                          SelectedItem="{Binding Path=TokenModel, Mode=TwoWay}"
                           Background="White" BorderBrush="LimeGreen"  
                           FontFamily="Bahnschrift" 
-                          Margin="0,0,-150,5">
-                            <!--<ComboBoxItem Content="{Binding Path=DropDownValue}"></ComboBoxItem>-->
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Path=DropDownValue}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
+                          Margin="0,0,-270,0" Height="23">
+                        <!--<ComboBoxItem Content="{Binding Path=DropDownValue}"></ComboBoxItem>-->
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=DropDownValue}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
 
-                        <TextBlock Grid.Row="2" x:Name="tokenAddresslab" Text="TOKEN CONTRACT ADDRESS" FontWeight="Bold" FontFamily="Bahnschrift"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="182" Margin="11,0,0,0"/>
-                        <TextBox x:Name="txtTokenContractAddress" VerticalContentAlignment="Center" Grid.Column="1"  Grid.Row="2" FontFamily="Bahnschrift"  Margin="0,0,-150,5">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                    <TextBlock Grid.Row="2" Margin="76,0,0,0" x:Name="tokenAddresslab" Text="TOKEN CONTRACT ADDRESS" FontWeight="Bold" FontFamily="Bahnschrift"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="182" Height="14"/>
+                    <TextBox x:Name="txtTokenContractAddress" VerticalContentAlignment="Center" Grid.Column="1"  Grid.Row="2" FontFamily="Bahnschrift"  Margin="0,0,-270,5">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="4" Name="tokenSymbollab"  Text="TOKEN SYMBOL" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="11,0,0,0" Width="84" />
-                        <TextBox x:Name="txtTokenSymbol"    VerticalContentAlignment="Center" Grid.Column="1"   Grid.Row="4" FontFamily="Bahnschrift"  Margin="0,0,-150,5">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                    <TextBlock Grid.Column="0"  Grid.Row="4" Name="tokenSymbollab"  Text="TOKEN SYMBOL" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="75,0,0,0" Width="84" Height="14" />
+                    <TextBox x:Name="txtTokenSymbol"    VerticalContentAlignment="Center" Grid.Column="1"   Grid.Row="4" FontFamily="Bahnschrift"  Margin="0,0,-270,5">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="6" Name="tokenNamelab" Text="TOKEN NAME" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="11,0,0,0" Width="72" />
-                        <TextBox  x:Name="tokenNametxt"   VerticalContentAlignment="Center"  Grid.Column="1"  Grid.Row="6" FontFamily="Bahnschrift" Margin="0,0,-150,5">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                    <TextBlock Grid.Column="0" Grid.Row="6" Name="tokenNamelab" Text="TOKEN NAME" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="75,0,0,0" Width="72" Height="14" />
+                    <TextBox  x:Name="tokenNametxt"   VerticalContentAlignment="Center"  Grid.Column="1"  Grid.Row="6" FontFamily="Bahnschrift" Margin="0,0,-270,5">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
 
-                        <TextBlock Grid.Column="0" Grid.Row="8" Name="tokenDecimalLab" Text="TOKEN DECIMAL" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="11,0,0,0" Grid.RowSpan="2" Width="89" />
-                        <TextBox x:Name="tokenDecimalTxt"   VerticalContentAlignment="Center"  Grid.Column="1"  Grid.Row="8" FontFamily="Bahnschrift"  Margin="0,0,-150,5">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="CornerRadius" Value="7"/>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                    <TextBlock Grid.Column="0" Grid.Row="8" Name="tokenDecimalLab" Text="TOKEN DECIMAL" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  VerticalAlignment="Center" Margin="75,0,0,0" Width="89" Height="14" />
+                    <TextBox x:Name="tokenDecimalTxt"   VerticalContentAlignment="Center"  Grid.Column="1"  Grid.Row="8" FontFamily="Bahnschrift"  Margin="0,0,-270,5">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="7"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
 
-                        <Button Grid.Column="1"  Grid.Row="11"   x:Name="btn_AddTokenSubmit" Click="btn_AddTokenSubmit_Click"   FontWeight="Bold" Content="ADD TOKEN" Background="#FF53E253"  Margin="0,0,-150,0">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="15"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
-                        <Button x:Name="btn_Cancel" Grid.Column="0" Grid.Row="11" Content="CANCEL" Click="btn_Cancel_Click"  FontWeight="Bold" Background="BurlyWood">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="15"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
-
-
-                    </Grid>
-
-
+                    <Button Grid.Column="1"  Grid.Row="9"   x:Name="btn_AddTokenSubmit" Click="btn_AddTokenSubmit_Click"   FontWeight="Bold" Content="ADD TOKEN" Background="#FF41A43C"  Margin="0,6,-50,-13" Grid.RowSpan="5">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="15"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
                 </Grid>
+
+                <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,235,0,0" Width="Auto">
+                    <DataGrid Name="DataGrid1"  Width="756" Height="240" ItemsSource="{Binding}" 
+                              HorizontalAlignment="Center" AutoGenerateColumns="False" 
+                              CanUserAddRows="False"
+                              ScrollViewer.CanContentScroll="True" 
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto">        
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="TICKER" Width="Auto" Binding="{Binding Mode=TwoWay, Path=Ticker}" IsReadOnly="True" />
+                            <DataGridTextColumn Header="NAME" Width="Auto" Binding="{Binding Mode=TwoWay, Path=Name}" IsReadOnly="True" />
+                            <DataGridTextColumn Header="BALANCE" Width="Auto" Binding="{Binding Mode=TwoWay, Path=Balance}" IsReadOnly="True" />
+                            <DataGridTextColumn Header="ADDRESS" Width="200" Binding="{Binding Mode=TwoWay, Path=Address}" IsReadOnly="True" />
+                            <DataGridTemplateColumn Header="Actions" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Background="OrangeRed" Name="btn_Delete_Token" Click="btn_Delete_Token_Click">Delete</Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                        </DataGrid.Columns>
+                     
+                    </DataGrid>
+
+                </StackPanel>
             </Grid>
-
-        </Border>
-
+        </Grid>
     </Grid>
 </UserControl>

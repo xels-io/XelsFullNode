@@ -7,7 +7,9 @@
              mc:Ignorable="d" 
               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0" >
     <Grid>
-        <Rectangle Fill="PaleGreen" Opacity=".5" MouseDown="Rectangle_MouseDown" />
+        <!--<Rectangle Fill="#989599" Opacity=".5" MouseDown="Rectangle_MouseDown" />-->
+        <Rectangle Fill="#989599" Opacity=".5"/>
+
         <Border CornerRadius="10"  Background="White" Height="450" Width="480" HorizontalAlignment="Center">
             <Grid Margin="5">
                 <Grid.RowDefinitions>
@@ -122,20 +124,20 @@
 
 
 
-                        <Button Grid.Column="1"  Grid.Row="11"   x:Name="btn_CallSubmit" Click="btn_CallSubmit_Click"  FontWeight="Bold" Content="Call Contract" Background="#FF53E253"  Margin="0,0,-150,0">
+                        <Button Grid.Column="1"  Grid.Row="10"   x:Name="btn_CallSubmit" Click="btn_CallSubmit_Click"  FontWeight="Bold" Content="Call Contract" Background="#FF41A43C"  Margin="0,15,-150,-2" Grid.RowSpan="2">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="15"/>
                                 </Style>
                             </Button.Resources>
                         </Button>
-                        <Button x:Name="btn_Cancel" Grid.Column="0" Grid.Row="11" Content="CANCEL" Click="btn_Cancel_Click"  FontWeight="Bold" Background="BurlyWood">
+                        <!--<Button x:Name="btn_Cancel" Grid.Column="0" Grid.Row="11" Content="CANCEL" Click="btn_Cancel_Click"  FontWeight="Bold" Background="BurlyWood">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="15"/>
                                 </Style>
                             </Button.Resources>
-                        </Button>
+                        </Button>-->
 
 
                     </Grid>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -27,6 +28,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
     {
 
         private List<TokenModel> tokens = new List<TokenModel>();
+        ObservableCollection<TokenRetrieveModel> tokenlist = new ObservableCollection<TokenRetrieveModel>();
 
         string tokenVal;
         string address;
@@ -40,6 +42,7 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
         #endregion
         #region Wallet Info
         private readonly WalletInfo walletInfo = new WalletInfo();
+        TokenModel TokenModel = new TokenModel();
 
         private string walletName;
         public string WalletName
@@ -88,7 +91,12 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             this.rowTokenSymbol.Height = new GridLength(0);
             this.rowTokenName.Height = new GridLength(0);
             this.rowTokenDecimal.Height = new GridLength(0);
-            this.gridAllPage.Height = 200;
+            this.row2.Height = new GridLength(0);
+            this.row3.Height = new GridLength(0);
+            this.row4.Height = new GridLength(0);
+            this.row5.Height = new GridLength(0);
+
+            // this.gridAllPage.Height = 200;
 
             //Angular er project a static diya silo
 
@@ -100,17 +108,61 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             };
             this.tokens.AddRange(objtokenList);
             //LoadAsync();
+            AddTokenList();
         }
-        private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
+
+
+        public void ResetPage()
         {
-            this.Visibility = Visibility.Collapsed;
-            TokenManagement tokenManagement = new TokenManagement(this.walletName, GLOBALS.Address);
+            this.txtTokenSymbol.Text = "";
+            this.txtTokenContractAddress.Text = "";
+            this.tokenNametxt.Text = "";
+            this.tokenDecimalTxt.Text = "0";
         }
-        private void btn_Cancel_Click(object sender, RoutedEventArgs e)
+
+            public  void AddTokenList()
         {
-            this.Visibility = Visibility.Collapsed;
+            string retMsg = "";
+
+            try
+            {
+                string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+                string tokenFilePath = System.IO.Path.Combine(CurrentDirectory, @"..\..\..\Token\TokenFile.txt");
+                string path = System.IO.Path.GetFullPath(tokenFilePath);
+
+                if (File.Exists(path))
+                {
+                    using (StreamReader r = new StreamReader(path))
+                    {
+                        string json = r.ReadToEnd();
+
+
+                        string concateData = '[' + json + ']';
+                        this.tokenlist = JsonConvert.DeserializeObject<ObservableCollection<TokenRetrieveModel>>(concateData);
+                        this.DataGrid1.ItemsSource = this.tokenlist;
+                    }
+                }
+                else
+                {
+                    this.tokenlist = new ObservableCollection<TokenRetrieveModel>();
+                    this.DataGrid1.ItemsSource = this.tokenlist;
+                }
+            }
+            catch (Exception e)
+            {
+                retMsg = e.Message.ToString();
+
+            }
 
         }
+
+        //private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    this.Visibility = Visibility.Collapsed;
+        //    TokenManagement tokenManagement = new TokenManagement(this.walletName, GLOBALS.Address);
+        //}
+
 
         private void token_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -124,12 +176,16 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 this.tokenNametxt.Text = "custom";
                 this.tokenDecimalTxt.Text = "0";
 
-                this.rowTokenContractAddress.Height = new GridLength(50);
-                this.rowTokenSymbol.Height = new GridLength(40);
-                this.rowTokenName.Height = new GridLength(40);
-                this.rowTokenDecimal.Height = new GridLength(40);
-                this.gridAllPage.Height = 380;
-               
+                this.rowTokenContractAddress.Height = new GridLength(25);
+                this.rowTokenSymbol.Height = new GridLength(25);
+                this.rowTokenName.Height = new GridLength(25);
+                this.rowTokenDecimal.Height = new GridLength(25);
+                // this.gridAllPage.Height = 380;
+                this.row2.Height = new GridLength(5);
+                this.row3.Height = new GridLength(5);
+                this.row4.Height = new GridLength(5);
+                this.row5.Height = new GridLength(5);
+
             }
             else
             {
@@ -148,7 +204,13 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 this.rowTokenSymbol.Height = new GridLength(0);
                 this.rowTokenName.Height = new GridLength(0);
                 this.rowTokenDecimal.Height = new GridLength(0);
-                this.gridAllPage.Height = 200;
+                //this.gridAllPage.Height = 200;
+
+                this.row2.Height = new GridLength(0);
+                this.row3.Height = new GridLength(0);
+                this.row4.Height = new GridLength(0);
+                this.row5.Height = new GridLength(0);
+
 
             }
            
@@ -210,9 +272,8 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 var result =  SaveTokenasync(objSaveToken);
                 msg = result.Result;
                 MessageBox.Show("Message - " + msg);
-                this.Visibility = Visibility.Collapsed;
-                TokenManagement tm = new TokenManagement();
-                tm.tokenManagementPageContant_Loaded(null, null);
+                ResetPage();
+                AddTokenList();
 
 
             }
@@ -229,9 +290,8 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
                 var result = SaveTokenasync(objSaveToken);
                 msg = result.Result;
                 MessageBox.Show("Message - " + msg);
-                this.Visibility = Visibility.Collapsed;
-                TokenManagement tm = new TokenManagement();
-                tm.tokenManagementPageContant_Loaded(null, null);
+                ResetPage();
+                AddTokenList();
 
             }
 
@@ -273,6 +333,68 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             return retMsg;
         }
 
-       
+        
+        private void btn_Delete_Token_Click(object sender, RoutedEventArgs e)
+        {
+            DataGrid dataGrid = this.DataGrid1;
+            DataGridRow Row = (DataGridRow)dataGrid.ItemContainerGenerator.ContainerFromIndex(dataGrid.SelectedIndex);
+            DataGridCell RowAndColumn = (DataGridCell)dataGrid.Columns[3].GetCellContent(Row).Parent;
+            string CellValue = ((TextBlock)RowAndColumn.Content).Text;
+            DeleteToken(CellValue);
+            AddTokenList();
+        }
+
+        public string DeleteToken(string address)
+        {
+            string msg = "";
+            string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string tokenFilePath = System.IO.Path.Combine(CurrentDirectory, @"..\..\..\Token\TokenFile.txt");
+            string path = System.IO.Path.GetFullPath(tokenFilePath);
+
+            List<TokenRetrieveModel> tokenlist = new List<TokenRetrieveModel>();
+
+            if (File.Exists(path))
+            {
+                using (StreamReader r = new StreamReader(path))
+                {
+                    string json = r.ReadToEnd();
+                    string concateData = '[' + json + ']';
+                    tokenlist = JsonConvert.DeserializeObject<List<TokenRetrieveModel>>(concateData);
+
+                    foreach (var item in tokenlist)
+                    {
+                        if (item.Address == address)
+                        {
+                            tokenlist.Remove(item);
+                            break;
+                        }
+                    }
+
+                }
+
+                File.Delete(path);
+                if (tokenlist.Count > 0)
+                {
+                    string JSONresult = JsonConvert.SerializeObject(tokenlist, Formatting.Indented);
+
+                    string FinalResult = JSONresult.TrimStart('[').TrimEnd(']').TrimStart().TrimEnd();
+                    File.Create(path).Dispose();
+
+                    using (var sw = new StreamWriter(path, true))
+                    {
+                        sw.WriteLine(FinalResult.ToString());
+                        sw.WriteLine(",");
+                        sw.Flush();
+                        sw.Close();
+
+                    }
+
+
+                }
+
+            }
+            return msg;
+        }
+
     }
 }

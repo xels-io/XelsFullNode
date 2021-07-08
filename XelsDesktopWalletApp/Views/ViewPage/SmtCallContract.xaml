@@ -1,0 +1,163 @@
+﻿<UserControl x:Class="XelsDesktopWalletApp.Views.ViewPage.SmtCallContract"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:XelsDesktopWalletApp.Views.ViewPage"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+      >
+
+    <Grid>
+        <Rectangle Margin="0,0,0,10" Fill="White" RadiusY="10" RadiusX="10" >
+            <Rectangle.Effect>
+                <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" RenderingBias="Quality" ShadowDepth="1"/>
+            </Rectangle.Effect>
+        </Rectangle>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="431*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0" Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="115*"/>
+                    <RowDefinition Height="18*"/>
+                </Grid.RowDefinitions>
+                <Rectangle Margin="5,6,5,7" Fill="White" RadiusY="10" RadiusX="10" Grid.RowSpan="2" RenderTransformOrigin="0.5,0.5" >
+                    <Rectangle.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform AngleY="-0.11"/>
+                            <RotateTransform/>
+                            <TranslateTransform Y="0.756"/>
+                        </TransformGroup>
+                    </Rectangle.RenderTransform>
+                    <Rectangle.Effect>
+                        <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" RenderingBias="Quality" ShadowDepth="1"/>
+                    </Rectangle.Effect>
+                </Rectangle>
+                <Grid Margin="10,10,10,3" Height="Auto">
+
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" TextAlignment="Center" FontSize="15" Text="CALL CONTRACT" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Center"/>
+                        <Separator Grid.Row="1" BorderThickness="1" BorderBrush="Silver" />
+                        <Grid Grid.Row="2" >
+                            <Grid Margin="2,8,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="400"/>
+                                    <ColumnDefinition Width="400"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions >
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="10"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock  Text="sdddddddddddddddddddddddddddddddddddd" VerticalAlignment="Center"  HorizontalAlignment="Center" x:Name="SenderAddress"  Grid.Column="0"  Grid.Row="0" 
+                                    FontFamily="Bahnschrift"  Width="Auto" FontSize="15"/>
+                                <TextBlock Text="234343434" x:Name="txtBalance" Grid.Column="0" Grid.Row="1"  VerticalAlignment="Center" FontSize="11" FontFamily="Bahnschrift" HorizontalAlignment="Right" Width="74" />
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="Balance:" VerticalAlignment="Center" FontSize="11" FontFamily="Bahnschrift" HorizontalAlignment="Left" Width="73" Margin="225,0,0,0" />
+                                <TextBox x:Name="txtAmount"  Grid.Column="0"  Grid.Row="2"  
+                                         materialDesign:HintAssist.Hint="Amount" 
+                          Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                          Background="White" BorderBrush="LimeGreen"  
+                          FontFamily="Bahnschrift"  Width="Auto" FontSize="12"/>
+
+                                <TextBox x:Name="txtFee"  Grid.Column="0"  Grid.Row="3" materialDesign:HintAssist.Hint="Fee" 
+                              Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                              Background="White" BorderBrush="LimeGreen"  
+                              FontFamily="Bahnschrift"  Width="Auto" FontSize="12"/>
+
+                                <TextBox  x:Name="txtGasPrice"  Grid.Column="0"  Grid.Row="4" materialDesign:HintAssist.Hint="Gas Price" 
+                              Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                              Background="White" BorderBrush="LimeGreen"  
+                              FontFamily="Bahnschrift"  Width="Auto" FontSize="12"/>
+
+                                <TextBox x:Name="txtGasLimit"  Grid.Column="0"  Grid.Row="5" materialDesign:HintAssist.Hint="Gas Limit" 
+                              Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                              Background="White" BorderBrush="LimeGreen"  
+                              FontFamily="Bahnschrift"  Width="Auto" FontSize="12" />
+
+                                <TextBox  x:Name="txtMethodName"  Grid.Column="1"  Grid.Row="0"
+                                         materialDesign:HintAssist.Hint="Method Name" 
+                                  Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                  Background="White" BorderBrush="LimeGreen"  
+                                  FontFamily="Bahnschrift"  Width="Auto" FontSize="12" Margin="10,0,36,0"/>
+
+                                <TextBox x:Name="txtContractAddress"   Grid.Column="1"  Grid.Row="1" Grid.RowSpan="2"   
+                                         materialDesign:HintAssist.Hint="Address" 
+                                  Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                  Background="White" BorderBrush="LimeGreen"  
+                                  FontFamily="Bahnschrift"  Width="Auto" FontSize="12" Margin="10,0,36,0"/>
+
+                                <PasswordBox x:Name="txtWalletPassword"  Grid.Column="1"  Grid.Row="3"
+                                            materialDesign:HintAssist.Hint="Wallet Password" 
+                                  Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
+                                  Background="White" BorderBrush="LimeGreen"  
+                                  FontFamily="Bahnschrift"  Width="Auto" FontSize="12" Margin="10,0,36,0"/>
+
+                                <!--<Button Grid.Column="1"  Grid.Row="5"  HorizontalAlignment="Center"  VerticalAlignment="Center" x:Name="btn_CallSubmit" Height="40"  FontWeight="Bold" Content="Call Contract" Background="#FF53E253"  Margin="10,0,282,-2">
+                                    <Button.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="15"/>
+                                        </Style>
+                                    </Button.Resources>
+                                </Button>-->
+                                <Button x:Name="btn_CallSubmit" Grid.Column="1"  Grid.Row="5"  Background="#FF41A43C" BorderBrush="#FF41A43C" Margin="10,0,36,8" Grid.RowSpan="2">
+                                    <Grid Width="150">
+                                        <materialDesign:PackIcon Kind="File" VerticalAlignment="Center" />
+                                        <TextBlock HorizontalAlignment="Left" Text="CALL CONTRACT" FontFamily="Champagne &amp; Limousines" Height="17" VerticalAlignment="Center" Margin="21,0,0,0" Width="129"/>
+                                    </Grid>
+                                </Button>
+
+                            </Grid>
+
+
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+            <!--<Grid Grid.Row="1" Grid.ColumnSpan="2">
+
+                <ListView Margin="0,0,0,0" x:Name="SmartContractHistoryList" FontSize="10" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Center">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="BLOCK"
+                                            DisplayMemberBinding="{Binding Path=blockHeight}"/>
+                            <GridViewColumn Header="TYPE"
+                                            DisplayMemberBinding="{Binding Path=type}" />
+                            <GridViewColumn Header="HASH"
+                                            DisplayMemberBinding="{Binding Path=hash}"  />
+                            <GridViewColumn Header="ADDRESS"
+                                            DisplayMemberBinding="{Binding Path=to}"   />
+                            <GridViewColumn Header="AMOUNT"
+                                            DisplayMemberBinding="{Binding Path=amount}"  />
+                            <GridViewColumn Header="TRANSACTION FEE"
+                                            DisplayMemberBinding="{Binding Path=transactionFee}"  />
+                            <GridViewColumn Header="GAS FEE" 
+                                            DisplayMemberBinding="{Binding Path=gasFee}"  />
+
+                        </GridView>
+                    </ListView.View>
+
+                </ListView>
+
+            </Grid>-->
+        </Grid>
+
+    </Grid>
+</UserControl>

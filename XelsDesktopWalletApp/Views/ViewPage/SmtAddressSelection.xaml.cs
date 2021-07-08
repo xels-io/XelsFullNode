@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using Newtonsoft.Json;
 using XelsDesktopWalletApp.Models;
 using XelsDesktopWalletApp.Models.CommonModels;
+using XelsDesktopWalletApp.Models.SmartContractModels;
 using XelsDesktopWalletApp.Views.SmartContractView;
 
 namespace XelsDesktopWalletApp.Views.ViewPage
@@ -114,12 +115,14 @@ namespace XelsDesktopWalletApp.Views.ViewPage
 
         private void useAddressBtn_Click(object sender, RoutedEventArgs e)
         {
-
-            string selectedAddress = this.selectaddress.SelectionBoxItem.ToString();
+            AddressModel objaddressModel = this.selectaddress.SelectedItem as AddressModel;
+            string selectedAddress = objaddressModel.Address.ToString();
             if (selectedAddress != "")
             {
+                GlobalPropertyModel.WalletName = this.walletName;
+                GlobalPropertyModel.Address = selectedAddress;
                 NavigationService navService = NavigationService.GetNavigationService(this);
-                SmtContractDashboard page2Obj = new SmtContractDashboard(); //Create object of Page2
+                SmtContractDashboard page2Obj = new SmtContractDashboard(selectedAddress); //Create object of Page2
                 navService.Navigate(page2Obj);
                 // this.imgCircle.Visibility = Visibility.Visible; //Make loader visible
                 //  this.useAddressBtn.IsEnabled = false;

@@ -4,8 +4,9 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:XelsDesktopWalletApp.Views.ViewPage"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="600" d:DesignWidth="800"
       Title="SmtContractDashboard">
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="btv" />
@@ -13,7 +14,7 @@
         <!-- style a top level menu item -->
         <ControlTemplate x:Key="VsMenuTop" TargetType="MenuItem">
             <StackPanel TextBlock.FontSize="15px" Height="40">
-              
+
                 <!-- label, icons, etc. -->
                 <Label Content="{TemplateBinding Header}" Margin="5" Foreground="White" />
 
@@ -32,7 +33,7 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                
+
             </StackPanel>
         </ControlTemplate>
 
@@ -95,23 +96,109 @@
         <Grid Margin="5">
             <StackPanel>
                 <Menu IsMainMenu="True">
-                    <MenuItem Header="_Dashboards" Template="{StaticResource VsOnline}" >
+                    <MenuItem Header="_Dashboards" Name="btnsmtDashboard" Click="btnsmtDashboard_Click" Template="{StaticResource VsOnline}" >
                     </MenuItem>
                     <MenuItem Header="Contract" Template="{StaticResource VsMenuTop}">
-                        <MenuItem Header="Call Contract" Template="{StaticResource VsMenuSub}" />
-                        <MenuItem Header="Create Contract" Template="{StaticResource VsMenuSub}" />
+                        <MenuItem Header="Call Contract" Name="CallContract" Click="CallContract_Click" Template="{StaticResource VsMenuSub}" />
+                        <MenuItem Header="Create Contract" Name="CreateContract" Click="CreateContract_Click" Template="{StaticResource VsMenuSub}" />
 
                     </MenuItem>
                     <MenuItem Header="Token" Template="{StaticResource VsMenuTop}">
-                        <MenuItem Header="Add Token" Template="{StaticResource VsMenuSub}" Icon="" />
-                        <MenuItem Header="Issue Token" Template="{StaticResource VsMenuSub}" Icon="" />
+                        <MenuItem Header="Add Token" Name="btnAddToken" Click="btnAddToken_Click" Template="{StaticResource VsMenuSub}" Icon="" />
+                        <MenuItem Header="Issue Token" Name="btnIssueToken" Click="btnIssueToken_Click" Template="{StaticResource VsMenuSub}" Icon="" />
                     </MenuItem>
                 </Menu>
             </StackPanel>
         </Grid>
+        <Grid x:Name="smtpageContent" Margin="0,50,0,5">
+            <Grid Width="Auto" Height="Auto">
 
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="133"/>
+                    <RowDefinition Height="133"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="329*"/>
+                    <ColumnDefinition Width="431*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="33*"/>
+                        <RowDefinition Height="100*"/>
+                    </Grid.RowDefinitions>
+                    <Rectangle Height="120" Margin="5,6,5,7" Fill="White" RadiusY="10" RadiusX="10" Grid.RowSpan="2" >
+                        <Rectangle.Effect>
+                            <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" RenderingBias="Quality" ShadowDepth="1"/>
+                        </Rectangle.Effect>
+                    </Rectangle>
+                    <Grid Margin="10,10,10,3" Height="120" Grid.RowSpan="2">
+                        <Grid Width="35" Height="50" Background="#FFFFAF24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20 0">
+                            <Grid.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="#FFECECEC" RenderingBias="Quality" ShadowDepth="1"/>
+                            </Grid.Effect>
+                            <materialDesign:PackIcon Kind="ContentCopy" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                        </Grid>
+                        <TextBlock Text="BALANCE" HorizontalAlignment="Right"  FontFamily="Champagne &amp; Limousines" Margin="0,23,10,0" VerticalAlignment="Top" Foreground="Gray" Width="55" FontWeight="Bold"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,50,10,0" Height="60" Width="183">
+                            <TextBlock  x:Name="lab_addBalance" FontFamily="Champagne &amp; Limousines" VerticalAlignment="Center" Foreground="Gray" FontSize="35" Width="140"/>
+                            <TextBlock Text="xels/bels" FontFamily="Champagne &amp; Limousines" Margin="0 5" Foreground="Gray" FontSize="10" VerticalAlignment="Bottom"/>
+                        </StackPanel>
+
+                    </Grid>
+                </Grid>
+                <Grid Margin="0,0,5,0" Grid.Column="1">
+                    <Rectangle Height="120" Margin="5" Fill="White" RadiusY="10" RadiusX="10" >
+                        <Rectangle.Effect>
+                            <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" RenderingBias="Quality" ShadowDepth="1"/>
+                        </Rectangle.Effect>
+                    </Rectangle>
+                    <Grid Margin="10" Height="120">
+                        <Grid Width="35" Height="50" Background="#FF41A43C" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20 0">
+                            <Grid.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="#FFECECEC" RenderingBias="Quality" ShadowDepth="1"/>
+                            </Grid.Effect>
+                            <materialDesign:PackIcon Kind="Store" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Foreground="White" Width="20" Height="20"/>
+                        </Grid>
+                        <TextBlock Text="ACTIVE ADDRESS" HorizontalAlignment="Right"  FontFamily="Champagne &amp; Limousines" Margin="0,23,10,0" VerticalAlignment="Top" Foreground="Gray" Width="105" FontWeight="Bold"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,67,4,0" Height="43" Width="382">
+                            <TextBlock x:Name="lab_ActiveAddress" FontFamily="Champagne &amp; Limousines" VerticalAlignment="Center" Foreground="Gray" FontSize="15" Width="318"/>
+                            <Button Width="56" Content="Copy" Click="Btn_AddressCopy_Click" Background="#FF41A43C" FontFamily="Champagne &amp; Limousines" Foreground="Black" FontSize="10" />
+                        </StackPanel>
+
+                    </Grid>
+                </Grid>
+                <Grid Grid.Row="1" Grid.ColumnSpan="2">
+
+                    <ListView Margin="0,0,0,0" x:Name="SmartContractHistoryList" FontSize="10" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Center">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="BLOCK"
+                                            DisplayMemberBinding="{Binding Path=blockHeight}"/>
+                                <GridViewColumn Header="TYPE"
+                                            DisplayMemberBinding="{Binding Path=type}" />
+                                <GridViewColumn Header="HASH"
+                                            DisplayMemberBinding="{Binding Path=hash}"  />
+                                <GridViewColumn Header="ADDRESS"
+                                            DisplayMemberBinding="{Binding Path=to}"   />
+                                <GridViewColumn Header="AMOUNT"
+                                            DisplayMemberBinding="{Binding Path=amount}"  />
+                                <GridViewColumn Header="TRANSACTION FEE"
+                                            DisplayMemberBinding="{Binding Path=transactionFee}"  />
+                                <GridViewColumn Header="GAS FEE" 
+                                            DisplayMemberBinding="{Binding Path=gasFee}"  />
+
+                            </GridView>
+                        </ListView.View>
+
+                    </ListView>
+
+                </Grid>
+            </Grid>
+        </Grid>
+        
 
     </Grid>
-   
-  
+
+
 </Page>

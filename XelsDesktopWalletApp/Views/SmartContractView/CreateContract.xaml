@@ -7,7 +7,8 @@
              mc:Ignorable="d" 
             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="0">
     <Grid>
-        <Rectangle Fill="PaleGreen" Opacity=".5" MouseDown="Rectangle_MouseDown" />
+        <!--<Rectangle Fill="#989599" Opacity=".5" MouseDown="Rectangle_MouseDown" />-->
+        <Rectangle Fill="#989599" Opacity=".5"/>
         <Border CornerRadius="10"  Background="White" Height="450" Width="480" HorizontalAlignment="Center">
             <Grid Margin="5">
                 <Grid.RowDefinitions>
@@ -100,10 +101,10 @@
                                     <Setter Property="CornerRadius" Value="7"/>
                                 </Style>
                             </TextBox.Resources>
-                           
+
                         </TextBox>
 
-                       
+
                         <TextBlock Grid.Column="0" Grid.Row="9" Text="WALLET PASSWORD" FontWeight="Bold" FontFamily="Bahnschrift" HorizontalAlignment="Left"  Margin="24,3,0,27" Grid.RowSpan="2" />
                         <PasswordBox x:Name="txtPassword"  Grid.Column="1"  Grid.Row="9" FontFamily="Microsoft YaHei Light"  Margin="0,0,-150,5">
                             <PasswordBox.Resources>
@@ -115,20 +116,20 @@
 
 
 
-                        <Button Grid.Column="1"  Grid.Row="11"   x:Name="btn_CreateSubmit" Click="btn_CreateSubmit_Click" Content="Create Contract"  FontWeight="Bold" Background="#FF53E253"  Margin="0,0,-150,0">
+                        <Button Grid.Column="1"  Grid.Row="10"   x:Name="btn_CreateSubmit" Click="btn_CreateSubmit_Click" Content="Create Contract"  FontWeight="Bold" Background="#FF41A43C"  Margin="0,15,-150,-2" Grid.RowSpan="2">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="15"/>
                                 </Style>
                             </Button.Resources>
                         </Button>
-                        <Button x:Name="btn_Create_Cancel" Grid.Column="0" Grid.Row="11" Content="CANCEL" Click="btn_Create_Cancel_Click"  FontWeight="Bold" Background="BurlyWood">
+                        <!--<Button x:Name="btn_Create_Cancel" Grid.Column="0" Grid.Row="11" Content="CANCEL" Click="btn_Create_Cancel_Click"  FontWeight="Bold" Background="BurlyWood">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="15"/>
                                 </Style>
                             </Button.Resources>
-                        </Button>
+                        </Button>-->
 
 
                     </Grid>

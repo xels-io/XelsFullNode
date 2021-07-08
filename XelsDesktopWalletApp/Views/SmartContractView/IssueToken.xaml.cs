@@ -97,14 +97,11 @@ namespace XelsDesktopWalletApp.Views.SmartContractView
             //LoadAsync();
         }
 
-        private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            this.Visibility = Visibility.Collapsed;
-        }
-        private void btn_Create_Cancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.Visibility = Visibility.Collapsed;
-        }
+        //private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    this.Visibility = Visibility.Collapsed;
+        //}
+      
 
         private async void btn_IssueTokenSubmit_Click(object sender, RoutedEventArgs e)
         {

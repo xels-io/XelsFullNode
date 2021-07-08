@@ -15,7 +15,7 @@
                 <DropShadowEffect BlurRadius="20" Color="#FFDEDEDE" RenderingBias="Quality" ShadowDepth="1"/>
             </Rectangle.Effect>
         </Rectangle>
-        <Grid Margin="20,187,20,143" Height="120">
+        <Grid Margin="20,150,20,143" Height="200">
             
             <StackPanel VerticalAlignment="Center" Margin="15">
 
